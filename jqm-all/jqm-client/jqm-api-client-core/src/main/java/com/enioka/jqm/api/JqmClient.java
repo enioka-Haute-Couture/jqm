@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * The one and only interface for all JQM client operations. Implementations are NOT expected to be thread safe.
- * 
+ *
  */
 public interface JqmClient
 {
@@ -34,12 +34,12 @@ public interface JqmClient
      * parameters) are given inside the job request argument <br>
      * <br>
      * Do not use this complex version for simple requests - there is a dedicated overload.
-     * 
+     *
      * @param jobRequest
      *            a property bag for all the parameters that can be specified at enqueue time.
      * @return the ID of the job instance. Use this ID to track the job instance later on (it is a very common parameter inside the JQM
      *         client API)
-     * 
+     *
      * @throws JqmInvalidRequestException
      *             when input data is invalid.
      * @throws JqmClientException
@@ -50,7 +50,7 @@ public interface JqmClient
     /**
      * Will create a new job instance inside an execution queue. All parameters (JQM parameters such as queue name, etc) as well as job
      * parameters) are given inside the job request argument <br>
-     * 
+     *
      * @param applicationName
      *            name of the job to launch
      * @param userName
@@ -67,7 +67,7 @@ public interface JqmClient
     /**
      * Create a new job instance from another job instance that has successfully ended. This does not change the copied instance. Everything
      * is copied: parameters, queue, etc.
-     * 
+     *
      * @param jobIdToCopy
      *            the id of the job instance to copy
      * @return the id of the new instance
@@ -87,7 +87,7 @@ public interface JqmClient
      * requests is often important to draw statistics and educate users.<br>
      * This only works if the job instance is not already running: one cannot cancel a request that was already accepted. (throws exception
      * in that case)
-     * 
+     *
      * @param jobId
      *            the id of the job to cancel
      * @throws JqmInvalidRequestException
@@ -101,7 +101,7 @@ public interface JqmClient
      * Remove an enqueued job from the queue, leaving no trace of it. This is an exceptional event - usually cancelJob would be used <br>
      * This only works if the job instance is not already running: one cannot cancel a request that was already accepted. (throws exception
      * in that case)
-     * 
+     *
      * @param jobId
      *            the id of the job to delete
      * @see #cancelJob(int) the more conventional way of removing job requests.
@@ -116,7 +116,7 @@ public interface JqmClient
      * Kill a running job. Kill of a running job is not immediate, and is only possible when a job payload calls some JQM APIs. If none are
      * called, the job cannot be killed.<br>
      * If the job is still waiting in queue, this is equivalent to calling {@link JqmClient#cancelJob(int)}.
-     * 
+     *
      * @param jobId
      *            the id of the job to kill
      * @throws JqmInvalidRequestException
@@ -128,7 +128,7 @@ public interface JqmClient
 
     /**
      * Remove a schedule. Effect is immediate.
-     * 
+     *
      * @param scheduleId
      *            the ID returned by the scheduling method (the ID of the scheduledJob object).
      * @throws JqmInvalidRequestException
@@ -144,7 +144,7 @@ public interface JqmClient
 
     /**
      * Prevent a queued job request (not already accepted by an engine) from running. It can be resumed afterwards.
-     * 
+     *
      * @param jobId
      *            id of the job instance to pause
      * @see #resumeJob(int) resuming the paused request.
@@ -157,7 +157,7 @@ public interface JqmClient
 
     /**
      * Resume a paused request and allow it to progress in queue once again.
-     * 
+     *
      * @param jobId
      *            id of the job instance to resume
      * @see #pauseQueuedJob(int) pause a job instance.
@@ -177,7 +177,7 @@ public interface JqmClient
     /**
      * Signal a running job instance that it should pause. The job instance may ignore this signal if it does not call any JobManager APIs.
      * Can be set only on job instance which are currently running.
-     * 
+     *
      * @param jobId
      *            id of the job instance to pause
      * @throws JqmInvalidRequestException
@@ -191,7 +191,7 @@ public interface JqmClient
      * Signal a job instance which was paused during its run with {@link #pauseRunningJob(int)} that it is allowed to resume. This works
      * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(int)} was
      * used.
-     * 
+     *
      * @param jobId
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job instance was never paused, job instance does not exist...)
@@ -202,7 +202,7 @@ public interface JqmClient
 
     /**
      * Will restart a crashed job. This will remove all trace of the failed execution.
-     * 
+     *
      * @param jobId
      *            id of the job instance that has failed.
      * @return the ID of the restarted job instance. Use this ID to track the job instance later on (it is a very common parameter inside
@@ -220,7 +220,7 @@ public interface JqmClient
 
     /**
      * Move a job instance from a queue to another queue
-     * 
+     *
      * @param jobId
      *            the job instance to modify
      * @param queueId
@@ -234,7 +234,7 @@ public interface JqmClient
 
     /**
      * Move a job instance from a queue to another queue
-     * 
+     *
      * @param jobId
      *            the job instance to modify
      * @param queue
@@ -248,7 +248,7 @@ public interface JqmClient
 
     /**
      * Change the position of a waiting job instance inside a queue.
-     * 
+     *
      * @param jobId
      *            id of the job instance to modify
      * @param newPosition
@@ -262,7 +262,7 @@ public interface JqmClient
 
     /**
      * Change the priority of a queued (waiting) or running job instance.
-     * 
+     *
      * @param jobId
      *            id of the job instance to modify
      * @param priority
@@ -274,7 +274,7 @@ public interface JqmClient
     /**
      * Change the "do not run before" date of a waiting job. Only works on job instances already having a "do not run before" date or
      * waiting in queue.
-     * 
+     *
      * @param jobId
      *            id of the job instance to modify
      * @param whenToRun
@@ -284,7 +284,7 @@ public interface JqmClient
 
     /**
      * Change the cron pattern used by a schedule. It is used on next schedule evaluation.
-     * 
+     *
      * @param scheduleId
      *            the schedule to update
      * @param cronExpression
@@ -294,7 +294,7 @@ public interface JqmClient
 
     /**
      * Change the default queue of a scheduled job.
-     * 
+     *
      * @param scheduleId
      *            the schedule to update
      * @param queueId
@@ -304,7 +304,7 @@ public interface JqmClient
 
     /**
      * Change the default priority for job instances created by this schedule.
-     * 
+     *
      * @param scheduleId
      *            the schedule to update
      * @param priority
@@ -321,7 +321,7 @@ public interface JqmClient
      * Retrieve a job instance. The returned object will contain all relevant data on that job instance such as its status. Call this
      * function again to refresh the data. <br>
      * This function queries both the active queues and the history. If not job is found, an exception is raised.
-     * 
+     *
      * @param jobId
      * @return the characteristics of the job instance.
      * @throws JqmInvalidRequestException
@@ -333,7 +333,7 @@ public interface JqmClient
 
     /**
      * Administrative method. List all currently running or waiting or finished job instances.
-     * 
+     *
      * @return the characteristics of the job instances.
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -342,7 +342,7 @@ public interface JqmClient
 
     /**
      * Administrative method. List all currently running or waiting job instances.
-     * 
+     *
      * @return the characteristics of the job instances.
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -351,7 +351,7 @@ public interface JqmClient
 
     /**
      * List all currently running or waiting job instances for a given "user" (see userName parameter at enqueue time)
-     * 
+     *
      * @return the characteristics of the job instances.
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -360,7 +360,7 @@ public interface JqmClient
 
     /**
      * Generic query method. See {@link Query} for arguments.
-     * 
+     *
      * @param query
      *            the query parameters.
      * @return the selected JobInstances
@@ -378,7 +378,7 @@ public interface JqmClient
     /**
      * Get all messages that were created by a given job instance (running or done). Note that in addition to eventual messages created by
      * the payload itself, the JQM engine creates some messages so there should always be some for a completed job instance.
-     * 
+     *
      * @param jobId
      * @return all messages as strings
      * @throws JqmInvalidRequestException
@@ -390,7 +390,7 @@ public interface JqmClient
 
     /**
      * Get the progress indication that may have been given by a job instance (running or done).
-     * 
+     *
      * @param jobId
      * @return the progress, or 0 if none was given.
      * @throws JqmInvalidRequestException
@@ -406,7 +406,7 @@ public interface JqmClient
 
     /**
      * Return all metadata concerning the (potential) files created by the job instance.
-     * 
+     *
      * @param jobId
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
@@ -420,7 +420,7 @@ public interface JqmClient
      * <strong>The underlying temporary files are deleted at stream closure</strong>.<br>
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
-     * 
+     *
      * @param jobId
      * @return a list of streams
      * @throws JqmInvalidRequestException
@@ -435,7 +435,7 @@ public interface JqmClient
      * <strong>The underlying temporary files are deleted at stream closure</strong>. <br>
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
-     * 
+     *
      * @param file
      *            the file to retrieve (usually obtained through {@link #getJobDeliverables(int)})
      * @return a stream
@@ -449,7 +449,7 @@ public interface JqmClient
      * <strong>The underlying temporary files are deleted at stream closure</strong>. <br>
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
-     * 
+     *
      * @param fileId
      *            the id of the file to retrieve (usually obtained through {@link #getJobDeliverables(int)})
      * @return a stream
@@ -462,7 +462,7 @@ public interface JqmClient
      * Returns the standard output flow of of an ended job instance <br>
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
-     * 
+     *
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job instance does not exist)
      * @throws JqmClientException
@@ -475,7 +475,7 @@ public interface JqmClient
      * Returns the standard error flow of of an ended job instance<br>
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
-     * 
+     *
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
      * @throws JqmClientException
@@ -485,13 +485,23 @@ public interface JqmClient
     InputStream getJobLogStdErr(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
+    // File input management
+    // /////////////////////////////////////////////////////////////////////
+
+    /**
+     * Add a file to the job instance. Only job instance that have not started yet are eligible. The file will be copied to the JQM server
+     * and made available to the running job instance through the {@link JobManager} API.
+     */
+    public int addJobFile(int jobId, String name, InputStream file);
+
+    // /////////////////////////////////////////////////////////////////////
     // Queue API
     // /////////////////////////////////////////////////////////////////////
 
     /**
      * List all available queues with their characteristics. Useful mostly for admin operations and changing a job instance from one queue
      * to another.
-     * 
+     *
      * @return a list of queues
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -501,7 +511,7 @@ public interface JqmClient
     /**
      * All subscribers to the given queue pause until {@link #resumeQueue(Queue)} is called (can also be reactivated from the UI by an
      * administrator).
-     * 
+     *
      * @param q
      *            the queue to pause
      */
@@ -509,7 +519,7 @@ public interface JqmClient
 
     /**
      * Resume all subscribers to the given queue. Idempotent.
-     * 
+     *
      * @param q
      *            the queue to resume.
      */
@@ -517,7 +527,7 @@ public interface JqmClient
 
     /**
      * All job instances waiting inside this queue are purged. Does not affect job instances already running.
-     * 
+     *
      * @param q
      *            the queue to clear.
      */
@@ -525,7 +535,7 @@ public interface JqmClient
 
     /**
      * Query the status of a given queue
-     * 
+     *
      * @param q
      *            the queue to query
      * @return the status at the time of call.
@@ -547,7 +557,7 @@ public interface JqmClient
 
     /**
      * Lists all the available {@link JobDef} objects, i.e. the different payloads that can be launched by JQM.
-     * 
+     *
      * @return a list of JobDef
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -558,7 +568,7 @@ public interface JqmClient
      * Lists all the available {@link JobDef} objects for a given application, i.e. the different payloads that can be launched by JQM. The
      * "application" is the optional tag that can be given inside the <code> &ltapplication&gt</code> tag of the JobDef XML file.<br>
      * If application is null, this method is equivalent to {@link #getJobDefinitions()}.
-     * 
+     *
      * @return a list of JobDef
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.

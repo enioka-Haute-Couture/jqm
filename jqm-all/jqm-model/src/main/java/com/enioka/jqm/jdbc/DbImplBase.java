@@ -247,6 +247,11 @@ class DbImplBase
         queries.put("deliverable_select_by_id", queries.get("deliverable_select_all") +  " WHERE ID=?");
         queries.put("deliverable_select_by_randomid", queries.get("deliverable_select_all") +  " WHERE RANDOM_ID=?");
         queries.put("deliverable_select_all_for_ji", queries.get("deliverable_select_all") +  " WHERE JOB_INSTANCE=?");
+
+        // INPUT FILES
+        queries.put("inputfile_insert",  "INSERT INTO __T__INPUT_FILE(ID, FILE_FAMILY, PATH, JOB_INSTANCE, ORIGINAL_FILE_NAME, STORAGE_NODE) VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?)");
+        queries.put("inputfile_select_all", "SELECT ID, FILE_FAMILY, PATH, JOB_INSTANCE, ORIGINAL_FILE_NAME, STORAGE_NODE FROM __T__INPUT_FILE");
+        queries.put("inputfile_select_all_for_ji", queries.get("inputfile_select_all") + " WHERE JOB_INSTANCE=?");
         
         // RUNTIME PRM
         queries.put("jiprm_insert", "INSERT INTO __T__JOB_INSTANCE_PARAMETER(ID, JOB_INSTANCE, KEYNAME, VALUE) VALUES(JQM_PK.nextval, ?, ?, ?)");

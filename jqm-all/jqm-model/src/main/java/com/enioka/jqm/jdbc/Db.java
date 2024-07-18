@@ -29,12 +29,12 @@ public class Db
     /**
      * The version of the schema as it described in the current Maven artifact
      */
-    private static final int SCHEMA_VERSION = 3;
+    private static final int SCHEMA_VERSION = 4;
 
     /**
      * The SCHEMA_VERSION version is backward compatible until this version
      */
-    private static final int SCHEMA_COMPATIBLE_VERSION = 3;
+    private static final int SCHEMA_COMPATIBLE_VERSION = 4;
 
     /**
      * The list of different database adapters. We are using reflection for loading them for future extensibility.
@@ -60,9 +60,9 @@ public class Db
      * Constructor for cases when a DataSource is readily available (and not retrieved through JNDI).
      *
      * @param ds
-     *                         the existing DataSource.
+     *            the existing DataSource.
      * @param updateSchema
-     *                         set to true if the database schema should upgrade (if needed) during initialization
+     *            set to true if the database schema should upgrade (if needed) during initialization
      */
     public Db(DataSource ds, boolean updateSchema)
     {
@@ -216,8 +216,8 @@ public class Db
      * Helper method to load a property file from class path.
      *
      * @param filesToLoad
-     *                        an array of paths (class path paths) designating where the files may be. All files are loaded, in the order
-     *                        given. Missing files are silently ignored.
+     *            an array of paths (class path paths) designating where the files may be. All files are loaded, in the order given. Missing
+     *            files are silently ignored.
      *
      * @return a Properties object, which may be empty but not null.
      */
@@ -539,7 +539,7 @@ public class Db
      * Gets the interpolated text of a query from cache. If key does not exist, an exception is thrown.
      *
      * @param key
-     *                name of the query
+     *            name of the query
      * @return the query text
      */
     String getQuery(String key)
@@ -566,7 +566,7 @@ public class Db
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     private static void closeQuietly(Closeable ps)
     {

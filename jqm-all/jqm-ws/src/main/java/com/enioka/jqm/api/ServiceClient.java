@@ -525,4 +525,12 @@ public class ServiceClient implements JqmClient
         return new JobRequest("appName", "rsapi user");
     }
 
+    @Path("ji/{jobId}/files/{name}")
+    @POST
+    @Consumes("*/*")
+    @Override
+    public int addJobFile(@PathParam("jobId") int jobId, @PathParam("name") String name, InputStream file)
+    {
+        return JqmClientFactory.getClient().addJobFile(jobId, name, file);
+    }
 }

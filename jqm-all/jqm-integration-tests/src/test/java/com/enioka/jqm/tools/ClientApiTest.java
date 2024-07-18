@@ -18,7 +18,9 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -526,6 +528,33 @@ public class ClientApiTest extends JqmBaseTest
 
         // Resume at will.
         JqmClientFactory.getClient().resumeQueuedJob(i);
+        TestHelpers.waitFor(1, 10000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+    }
+
+    @Test
+    public void testInputFile()
+    {
+        CreationTools.createJobDef(null, true, "pyl.EngineApiExpectInputFile", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        int i = JobRequest.create("MarsuApplication", "testuser").startHeld().submit();
+        var expectedFile = new File("./target/outputfiles/MarsuApplication/" + i + "/SuperFile");
+        if (expectedFile.exists())
+        {
+            expectedFile.delete();
+        }
+
+        // Add an input file
+        InputStream is = new ByteArrayInputStream(String.valueOf("Hello, World!").getBytes());
+        JqmClientFactory.getClient().addJobFile(i, "SuperFile", is);
+
+        // Check file was created
+        expectedFile.canRead();
+
+        // Should run
+        JqmClientFactory.getClient().resumeQueuedJob(i);
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
     }

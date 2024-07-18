@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.sql.ResultSet;
@@ -75,6 +77,7 @@ import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
 import com.enioka.jqm.model.ScheduledJob;
@@ -443,9 +446,9 @@ final class JdbcClient implements JqmClient
      * Does not create a transaction, and no need for an active transaction.
      *
      * @param launchId
-     *                     the ID of the launch (was the ID of the JI, now the ID of the History object)
+     *            the ID of the launch (was the ID of the JI, now the ID of the History object)
      * @param cnx
-     *                     an open DB session
+     *            an open DB session
      * @return a new execution request
      */
     private JobRequest getJobRequest(int launchId, DbConn cnx)
@@ -2000,6 +2003,58 @@ final class JdbcClient implements JqmClient
         }
 
         return getFile(url.toString());
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // File input management
+    // /////////////////////////////////////////////////////////////////////
+
+    @Override
+    public int addJobFile(int jobId, String name, InputStream file)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+
+            JobInstance ji = JobInstance.select_id(cnx, jobId);
+
+            if (ji.getNode() != null)
+            {
+                throw new JqmInvalidRequestException("Job instance is already assigned to a node - cannot add input files");
+            }
+
+            // TODO: for now single node. Should add mesh.
+            Node n = Node.select(cnx, "node_select_all").get(0);
+
+            String outputRoot = n.getDlRepo();
+            String relDestPath = ji.getJD().getApplicationName() + "/" + jobId + "/" + name;
+            File dest = new File(outputRoot + "/" + relDestPath);
+
+            jqmlogger.info("An input file is added for job ID {}. Stored as {}.", jobId, dest.getAbsolutePath());
+
+            // Store the file
+            if (!dest.getParentFile().isDirectory() && !dest.getParentFile().mkdirs())
+            {
+                throw new JqmClientException("Could not create directory " + dest.getParentFile().getAbsolutePath());
+            }
+            Files.copy(file, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            // Store the file in the DB
+            QueryResult qr = cnx.runUpdate("inputfile_insert", "", dest.getAbsolutePath(), jobId, name, null);
+
+            // Done
+            cnx.commit();
+            return qr.generatedKey;
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException("Could not store file", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
