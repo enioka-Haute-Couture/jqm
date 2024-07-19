@@ -39,14 +39,14 @@ public class DbImplMySql8 extends DbAdapter
         {
             return "";
         }
-        return sql.replace("MEMORY TABLE", "TABLE").replace("ID BIGINT NOT NULL", "ID BIGINT NOT NULL AUTO_INCREMENT")
-                .replace("JQM_PK.nextval", "NULL").replace(" DOUBLE", " DOUBLE PRECISION")
+        return sql.replace("MEMORY TABLE", "TABLE")
+                .replace("JQM_PK.nextval", "NULL")
                 .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(UTC_TIMESTAMP() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " DATETIME(3) ")
+                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)")
                 .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "UTC_TIMESTAMP(3)")
-                .replace("DATETIME(3) NOT NULL", "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
+                .replace("__T__", this.tablePrefix);
     }
 
     @Override

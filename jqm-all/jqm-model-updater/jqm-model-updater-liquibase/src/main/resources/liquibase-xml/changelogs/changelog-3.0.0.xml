@@ -28,7 +28,7 @@
             </column>
             <column name="JMX_REGISTRY_PORT" type="INTEGER" />
             <column name="JMX_SERVER_PORT" type="INTEGER" />
-            <column name="LAST_SEEN_ALIVE" type="TIMESTAMP" />
+            <column name="LAST_SEEN_ALIVE" type="TIMESTAMP(3)" />
             <column name="LOAD_API_ADMIN" type="BOOLEAN" />
             <column name="LOAD_API_CLIENT" type="BOOLEAN" />
             <column name="LOAD_API_SIMPLE" type="BOOLEAN" />
@@ -62,7 +62,7 @@
                     nullable="false" />
             </column>
             <column name="ENABLED" type="BOOLEAN" />
-            <column name="LAST_MODIFIED" type="TIMESTAMP" />
+            <column name="LAST_MODIFIED" type="TIMESTAMP(3)" />
             <column name="MAX_THREAD" type="INTEGER">
                 <constraints nullable="false" />
             </column>
@@ -264,7 +264,7 @@
             <column name="PRIORITY" type="INTEGER">
                 <constraints nullable="true" />
             </column>
-            <column name="LAST_UPDATED" type="TIMESTAMP">
+            <column name="LAST_UPDATED" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -307,16 +307,16 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="DATE_ENQUEUE" type="TIMESTAMP">
+            <column name="DATE_ENQUEUE" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="DATE_ATTRIBUTION" type="TIMESTAMP">
+            <column name="DATE_ATTRIBUTION" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
-            <column name="DATE_START" type="TIMESTAMP">
+            <column name="DATE_START" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
-            <column name="DATE_NOT_BEFORE" type="TIMESTAMP">
+            <column name="DATE_NOT_BEFORE" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
 
@@ -409,19 +409,19 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="DATE_ENQUEUE" type="TIMESTAMP">
+            <column name="DATE_ENQUEUE" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
-            <column name="DATE_ATTRIBUTION" type="TIMESTAMP">
+            <column name="DATE_ATTRIBUTION" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
-            <column name="DATE_START" type="TIMESTAMP">
+            <column name="DATE_START" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
-            <column name="DATE_NOT_BEFORE" type="TIMESTAMP">
+            <column name="DATE_NOT_BEFORE" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
-            <column name="DATE_END" type="TIMESTAMP">
+            <column name="DATE_END" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
 
@@ -601,7 +601,7 @@
             <column name="FACTORY" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="LAST_MODIFIED" type="TIMESTAMP">
+            <column name="LAST_MODIFIED" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
             <column name="NAME" type="VARCHAR(100)">
@@ -627,7 +627,7 @@
             <column name="KEYNAME" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>
-            <column name="LAST_MODIFIED" type="TIMESTAMP">
+            <column name="LAST_MODIFIED" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
             <column name="VALUE" type="VARCHAR(1000)">
@@ -693,13 +693,13 @@
             <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_RUSER" nullable="false" />
             </column>
-            <column name="CREATION_DATE" type="TIMESTAMP">
+            <column name="CREATION_DATE" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
             <column name="EMAIL" type="VARCHAR(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="EXPIRATION_DATE" type="TIMESTAMP">
+            <column name="EXPIRATION_DATE" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
             <column name="FREETEXT" type="VARCHAR(255)">
@@ -711,7 +711,7 @@
             <column name="INTERNAL" type="BOOLEAN">
                 <constraints nullable="true" />
             </column>
-            <column name="LAST_MODIFIED" type="TIMESTAMP">
+            <column name="LAST_MODIFIED" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
             <column name="LOCKED" type="BOOLEAN">
@@ -757,7 +757,7 @@
                 <constraints unique="true" uniqueConstraintName="UK_GLOBAL_PARAMETER_1"
                     nullable="false" />
             </column>
-            <column name="LAST_MODIFIED" type="TIMESTAMP">
+            <column name="LAST_MODIFIED" type="TIMESTAMP(3)">
                 <constraints nullable="false" />
             </column>
             <column name="VALUE" type="VARCHAR(1000)">
@@ -775,10 +775,14 @@
             <column name="NODE" type="BIGINT">
                 <constraints nullable="true" />
             </column>
-            <column name="LATEST_CONTACT" type="TIMESTAMP">
+            <column name="LATEST_CONTACT" type="TIMESTAMP(3)">
                 <constraints nullable="true" />
             </column>
         </createTable>
+
+        <modifySql dbms="mariadb,mysql">
+            <replace  replace="ID BIGINT NOT NULL"  with="ID BIGINT NOT NULL AUTO_INCREMENT"/>
+        </modifySql>
     </changeSet>
 
 </databaseChangeLog>
