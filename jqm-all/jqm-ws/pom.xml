@@ -204,12 +204,22 @@
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-api-client-jersey</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-admin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-xml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-shared</artifactId>
             <version>${project.version}</version>
         </dependency>
 

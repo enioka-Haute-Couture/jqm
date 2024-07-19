@@ -16,8 +16,12 @@
 package com.enioka.jqm.ws.api;
 
 import java.io.InputStream;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,7 @@ import com.enioka.jqm.client.api.Deliverable;
 import com.enioka.jqm.client.api.JobDef;
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JobRequest;
+import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.client.api.Queue;
 import com.enioka.jqm.client.api.QueueStatus;
@@ -34,6 +39,8 @@ import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SelfDestructFileStream;
+import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.ws.plumbing.HttpCache;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,6 +55,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
+import static com.enioka.jqm.shared.misc.StandaloneHelpers.ipFromId;
+
 /**
  * The main web service class for doing operations on JobInstances.
  */
@@ -55,6 +64,25 @@ import jakarta.ws.rs.core.MediaType;
 public class ServiceClient
 {
     static Logger log = LoggerFactory.getLogger(ServiceClient.class);
+
+    private boolean standaloneMode;
+    private String localIp;
+
+    @Activate
+    public void onServiceActivation(Map<String, Object> properties)
+    {
+        log.info("\tStarting ServiceClient");
+        standaloneMode = Boolean.parseBoolean(
+            GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
+
+        if (standaloneMode) {
+            try {
+                localIp = Inet4Address.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
@@ -266,7 +294,17 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public JobInstance getJob(@PathParam("jobId") long jobId)
     {
-        return Helpers.getClient().getJob(jobId);
+        JqmClient client;
+        if (standaloneMode && !ipFromId(jobId).equals(localIp)) {
+            // Redirect to distant node with Jersey client
+            final var p = new Properties();
+            p.setProperty("com.enioka.jqm.ws.url", "http://" + ipFromId(jobId) + ":1789/ws/client");
+            client = com.enioka.jqm.client.jersey.api.JqmClientFactory.getClient(null, p, false);
+        } else {
+            // Use local node with JDBC client
+            client = com.enioka.jqm.client.jdbc.api.JqmClientFactory.getClient();
+        }
+        return client.getJob(jobId);
     }
 
     @GET
