@@ -40,7 +40,7 @@ public class TestHelpers
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(TestHelpers.class);
 
-    public static Integer qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
+    public static Long qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
     public static Node node, node2, node3, nodeMix, nodeMix2;
 
     public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix, dpVipMix2;

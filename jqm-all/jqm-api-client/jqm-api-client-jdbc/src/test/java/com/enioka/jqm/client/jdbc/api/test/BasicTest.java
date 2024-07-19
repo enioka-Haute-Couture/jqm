@@ -83,8 +83,8 @@ public class BasicTest
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
         q.setInstanceModule("module");
-        q.setParentId(12);
-        q.setJobInstanceId(132);
+        q.setParentId(12L);
+        q.setJobInstanceId(132L);
         q.setQueryLiveInstances(true);
 
         q.setJobDefKeyword2("pouet2");
@@ -99,8 +99,8 @@ public class BasicTest
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
         q.setInstanceModule("module");
-        q.setParentId(12);
-        q.setJobInstanceId(132);
+        q.setParentId(12L);
+        q.setJobInstanceId(132L);
         q.setQueryLiveInstances(true);
 
         q.setEnqueuedBefore(Calendar.getInstance());
@@ -166,14 +166,14 @@ public class BasicTest
     public void testQueueNameId()
     {
         JqmClientFactory.getClient().newQuery().setQueueName("test").invoke();
-        JqmClientFactory.getClient().newQuery().setQueueId(12).invoke();
+        JqmClientFactory.getClient().newQuery().setQueueId(12L).invoke();
     }
 
     @Test
     public void testPaginationWithFilter()
     {
         JqmClientFactory.getClient().newQuery().setQueueName("test").setPageSize(10).invoke();
-        JqmClientFactory.getClient().newQuery().setQueueId(12).setPageSize(10).invoke();
+        JqmClientFactory.getClient().newQuery().setQueueId(12L).setPageSize(10).invoke();
     }
 
     @Test
@@ -207,7 +207,7 @@ public class BasicTest
     @Test
     public void testBug159()
     {
-        JqmClientFactory.getClient().newQuery().setJobInstanceId(1234).setQueryLiveInstances(true).setQueryHistoryInstances(false)
+        JqmClientFactory.getClient().newQuery().setJobInstanceId(1234L).setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .setPageSize(15).setFirstRow(0).invoke();
     }
 
@@ -223,8 +223,8 @@ public class BasicTest
     {
         try (DbConn cnx = db.getConn())
         {
-            int qId = Queue.create(cnx, "q1", "q1 description", true);
-            int jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
+            long qId = Queue.create(cnx, "q1", "q1 description", true);
+            long jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
                     false, null, PathType.FS);
 
             JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null,

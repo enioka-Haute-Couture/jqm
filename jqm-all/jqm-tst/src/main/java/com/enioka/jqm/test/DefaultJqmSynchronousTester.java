@@ -35,9 +35,9 @@ public class DefaultJqmSynchronousTester implements JqmSynchronousTester
     private JqmSingleRunnerOperations runner;
 
     private Node node = null;
-    private Integer jd = null;
-    private Integer q = null;
-    private Integer ji = null;
+    private Long jd = null;
+    private Long q = null;
+    private Long ji = null;
 
     public DefaultJqmSynchronousTester()
     {

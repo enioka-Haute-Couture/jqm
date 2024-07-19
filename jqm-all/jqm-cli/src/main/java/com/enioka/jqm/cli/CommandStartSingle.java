@@ -14,7 +14,7 @@ import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 class CommandStartSingle extends CommandBase
 {
     @Parameter(names = { "-i", "--id" }, description = "ID of the job instance to launch.", required = true)
-    private int id;
+    private Long id;
 
     @Override
     public int doWork()

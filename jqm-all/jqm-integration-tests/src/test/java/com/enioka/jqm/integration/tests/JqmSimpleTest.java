@@ -16,7 +16,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 public class JqmSimpleTest
 {
     private DbConn cnx;
-    private Integer jd = null;
+    private Long jd = null;
     private Map<String, String> runtimePrms = new HashMap<>();
     private List<String> nodeNames = new ArrayList<>();
     private String sessionId = null;
@@ -104,7 +104,7 @@ public class JqmSimpleTest
         return this;
     }
 
-    public Integer run(JqmBaseTest test)
+    public Long run(JqmBaseTest test)
     {
         int nbExpected = expectedNonOk + expectedOk;
 
@@ -112,7 +112,7 @@ public class JqmSimpleTest
         {
             test.addAndStartEngine(nodeName);
         }
-        Integer i = JqmDbClientFactory.getClient().newJobRequest("TestJqmApplication", "TestUser").setSessionID(sessionId)
+        Long i = JqmClientFactory.getClient().newJobRequest("TestJqmApplication", "TestUser").setSessionID(sessionId)
                 .setParameters(runtimePrms).enqueue();
         TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, cnx);
         if (waitMsMin > 0)

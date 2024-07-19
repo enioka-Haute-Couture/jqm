@@ -42,12 +42,12 @@ public class JobDefParameter implements Serializable
 {
     private static final long serialVersionUID = -5308516206913425230L;
 
-    private Integer id;
+    private long id;
 
     private String key;
     private String value;
 
-    private int jobdef_id;
+    private long jobdef_id;
 
     /**
      * The name of the parameter.<br>
@@ -86,7 +86,7 @@ public class JobDefParameter implements Serializable
     /**
      * A technical ID without special meaning.
      */
-    public Integer getId()
+    public long getId()
     {
         return id;
     }
@@ -100,10 +100,10 @@ public class JobDefParameter implements Serializable
             {
                 JobDefParameter tmp = new JobDefParameter();
 
-                tmp.id = rs.getInt(1);
+                tmp.id = rs.getLong(1);
                 tmp.key = rs.getString(2);
                 tmp.value = rs.getString(3);
-                tmp.jobdef_id = rs.getInt(4);
+                tmp.jobdef_id = rs.getLong(4);
 
                 res.add(tmp);
             }
@@ -115,19 +115,19 @@ public class JobDefParameter implements Serializable
         return res;
     }
 
-    public static Map<Integer, List<JobDefParameter>> select_all(DbConn cnx, String query_key, Object... args)
+    public static Map<Long, List<JobDefParameter>> select_all(DbConn cnx, String query_key, Object... args)
     {
-        Map<Integer, List<JobDefParameter>> res = new HashMap<>();
+        Map<Long, List<JobDefParameter>> res = new HashMap<>();
         try (ResultSet rs = cnx.runSelect(query_key, args))
         {
             while (rs.next())
             {
                 JobDefParameter tmp = new JobDefParameter();
 
-                tmp.id = rs.getInt(1);
+                tmp.id = rs.getLong(1);
                 tmp.key = rs.getString(2);
                 tmp.value = rs.getString(3);
-                tmp.jobdef_id = rs.getInt(4);
+                tmp.jobdef_id = rs.getLong(4);
 
                 List<JobDefParameter> list = res.get(tmp.jobdef_id);
                 if (list == null)
@@ -163,7 +163,7 @@ public class JobDefParameter implements Serializable
         return res;
     }
 
-    public static int create(DbConn cnx, String key, String value, int jdId)
+    public static long create(DbConn cnx, String key, String value, long jdId)
     {
         QueryResult qr = cnx.runUpdate("jdprm_insert", key, value, jdId);
         return qr.getGeneratedId();

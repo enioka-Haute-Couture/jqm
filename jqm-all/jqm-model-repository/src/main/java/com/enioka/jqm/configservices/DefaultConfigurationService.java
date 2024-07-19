@@ -117,10 +117,10 @@ public class DefaultConfigurationService
     public static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
     {
         // Node
-        Integer nodeId = null;
+        Long nodeId = null;
         try
         {
-            nodeId = cnx.runSelectSingle("node_select_by_key", Integer.class, nodeName);
+            nodeId = cnx.runSelectSingle("node_select_by_key", Long.class, nodeName);
         }
         catch (NoResultException e)
         {
@@ -132,11 +132,11 @@ public class DefaultConfigurationService
         }
 
         // Deployment parameters
-        long i = cnx.runSelectSingle("dp_select_count_for_node", Integer.class, nodeId);
+        long i = cnx.runSelectSingle("dp_select_count_for_node", Long.class, nodeId);
         if (i == 0L)
         {
             jqmlogger.info("As this node is not bound to any queue, it will be set to poll from the default queue with default parameters");
-            Integer default_queue_id = cnx.runSelectSingle("q_select_default", 1, Integer.class);
+            Long default_queue_id = cnx.runSelectSingle("q_select_default", 1, Long.class);
             DeploymentParameter.create(cnx, nodeId, 5, 1000, default_queue_id);
 
             cnx.commit();

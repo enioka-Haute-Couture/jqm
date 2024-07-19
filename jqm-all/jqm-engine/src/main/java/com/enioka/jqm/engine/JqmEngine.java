@@ -81,7 +81,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private ObjectName name;
 
     // Threads that together constitute the engine
-    private Map<Integer, QueuePoller> pollers = new HashMap<>();
+    private Map<Long, QueuePoller> pollers = new HashMap<>();
     private InternalPoller intPoller = null;
     private Thread intPollerThread = null;
     private CronScheduler scheduler = null;
@@ -381,12 +381,12 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             }
 
             // Remove deleted pollers
-            for (int dp : this.pollers.keySet().toArray(new Integer[0]))
+            for (long dp : this.pollers.keySet())
             {
                 boolean found = false;
                 for (DeploymentParameter ndp : dps)
                 {
-                    if (ndp.getId().equals(dp))
+                    if (ndp.getId() == dp)
                     {
                         found = true;
                         break;
@@ -751,7 +751,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public long getCurrentlyRunningJobCount()
     {
-        Long nb = 0L;
+        long nb = 0L;
         for (QueuePoller p : this.pollers.values())
         {
             nb += p.getCurrentlyRunningJobCount();

@@ -25,18 +25,18 @@ public class QueueTest extends JqmBaseTest
         public void testQueueWidth() throws Exception
         {
                 // Only 3 threads
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 3, 1, qId);
 
                 CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42,
                                 "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
                 cnx.commit();
 
-                int i1 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i2 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i3 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i4 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i5 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i1 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i2 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i3 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i4 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i5 = jqmClient.enqueue("jqm-test-kill", "test");
 
                 addAndStartEngine();
 
@@ -73,7 +73,7 @@ public class QueueTest extends JqmBaseTest
         public void testQueuePollWidth() throws Exception
         {
                 // Only 3 threads, one poll every hour
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 3, 3600000, qId);
 
                 CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42,
@@ -130,7 +130,7 @@ public class QueueTest extends JqmBaseTest
         public void testPriority() throws Exception
         {
                 // Single thread available.
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, qId);
 
                 CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42,
@@ -138,8 +138,8 @@ public class QueueTest extends JqmBaseTest
                 cnx.commit();
 
                 // Enqueue a low priority first, then a higher priority one. The higher priority should run first.
-                int i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(1).enqueue();
-                int i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(6).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(1).enqueue();
+                long i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(6).enqueue();
 
                 addAndStartEngine();
 
@@ -161,7 +161,7 @@ public class QueueTest extends JqmBaseTest
         @Test(expected = JqmInvalidRequestException.class)
         public void testPriorityLimits()
         {
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, qId);
 
                 CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42,
@@ -176,7 +176,7 @@ public class QueueTest extends JqmBaseTest
         public void testFifo() throws Exception
         {
                 // Single thread available.
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, qId);
 
                 CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42,
@@ -184,8 +184,8 @@ public class QueueTest extends JqmBaseTest
                 cnx.commit();
 
                 // No priority = FIFO queue.
-                int i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
-                int i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
+                long i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
 
                 addAndStartEngine();
                 displayAllQueueTable();
@@ -207,7 +207,7 @@ public class QueueTest extends JqmBaseTest
         public void testTakingMultipleResources() throws Exception
         {
                 // Single thread available.
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                Long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 2, 1, qId); // 2 slots
 
                 Map<String, String> prms = new HashMap<>(1);
@@ -220,8 +220,8 @@ public class QueueTest extends JqmBaseTest
                                 "jqm-test-wait-single", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
                 cnx.commit();
 
-                int i1 = jqmClient.newJobRequest("jqm-test-wait-single", "test").setPriority(null).enqueue();
-                int i2 = jqmClient.newJobRequest("jqm-test-wait-dual", "test").setPriority(null).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-wait-single", "test").setPriority(null).enqueue();
+                long i2 = jqmClient.newJobRequest("jqm-test-wait-dual", "test").setPriority(null).enqueue();
 
                 addAndStartEngine();
 
@@ -245,7 +245,7 @@ public class QueueTest extends JqmBaseTest
         public void testRmParameterCleanup() throws Exception
         {
                 // Single thread available.
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 2, 1, qId); // 2 slots
 
                 Map<String, String> prms = new HashMap<>(1);
@@ -255,7 +255,7 @@ public class QueueTest extends JqmBaseTest
                                 "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
                 cnx.commit();
 
-                int i1 = jqmClient.newJobRequest("jqm-test-kill", "test").setPriority(null).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-kill", "test").setPriority(null).enqueue();
 
                 addAndStartEngine();
                 TestHelpers.waitFor(1, 60000, cnx);
@@ -276,7 +276,7 @@ public class QueueTest extends JqmBaseTest
         public void testRmDiscrete() throws Exception
         {
                 // Create queue
-                int qId = Queue.create(cnx, "testqueue", " ", false);
+                long qId = Queue.create(cnx, "testqueue", " ", false);
                 DeploymentParameter.create(cnx, TestHelpers.node.getId(), 40, 1, qId); // 40 threads, so not the limiting factor.
 
                 // Enable the global discrete RM.
@@ -302,7 +302,7 @@ public class QueueTest extends JqmBaseTest
                 Assert.assertEquals(3, TestHelpers.getQueueAllCount(cnx));
 
                 // Kill one, the last JI should start after the kill
-                int toKill = jqmClient.newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).addStatusFilter(State.RUNNING)
+                long toKill = jqmClient.newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).addStatusFilter(State.RUNNING)
                                 .invoke().get(0).getId();
                 jqmClient.killJob(toKill);
 

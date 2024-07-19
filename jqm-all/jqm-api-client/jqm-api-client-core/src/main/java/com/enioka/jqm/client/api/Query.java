@@ -174,12 +174,12 @@ public interface Query
      * To QueryInterface a specific job instance. This ID is returned, for example, by the {@link JqmClient#enqueue(JobRequest)} method.
      * <br>
      * It is pretty useless to give any other QueryInterface parameters if you know the ID. Also note that there is a shortcut method named
-     * {@link JqmClient#getJob(int)} to make a QueryInterface by ID.
+     * {@link JqmClient#getJob(long)} to make a QueryInterface by ID.
      *
      * @param jobInstanceId
      *            the job instance ID
      */
-    public Query setJobInstanceId(Integer jobInstanceId);
+    public Query setJobInstanceId(long jobInstanceId);
 
     /**
      * Some job instances are launched by other job instances (linked jobs which launch one another). This allows to QueryInterface all job
@@ -188,7 +188,7 @@ public interface Query
      * @param parentId
      *            the ID of the parent job instance.
      */
-    public Query setParentId(Integer parentId);
+    public Query setParentId(long parentId);
 
     /**
      * The application name is the name of the job definition - the same name that is given in the Job Definition XML. This allows to query
@@ -388,7 +388,7 @@ public interface Query
      * For querying jobs on a given queue. The list of queues can be retrieved through {@link JqmClient#getQueues()}.<br>
      * Ignored if setQueueName is used.
      */
-    public Query setQueueId(Integer queueId);
+    public Query setQueueId(long queueId);
 
     /**
      * For querying jobs that have run or are running on a specific JQM node.

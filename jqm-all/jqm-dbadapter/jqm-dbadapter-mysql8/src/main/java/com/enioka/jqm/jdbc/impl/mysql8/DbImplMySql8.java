@@ -39,7 +39,7 @@ public class DbImplMySql8 extends DbAdapter
         {
             return "";
         }
-        return sql.replace("MEMORY TABLE", "TABLE").replace("ID INTEGER NOT NULL", "ID INTEGER NOT NULL AUTO_INCREMENT")
+        return sql.replace("MEMORY TABLE", "TABLE").replace("ID BIGINT NOT NULL", "ID BIGINT NOT NULL AUTO_INCREMENT")
                 .replace("JQM_PK.nextval", "NULL").replace(" DOUBLE", " DOUBLE PRECISION")
                 .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")

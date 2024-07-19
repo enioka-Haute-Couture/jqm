@@ -289,7 +289,7 @@ public class MultiNodeTest extends JqmBaseTest
     {
         long size = 1000;
 
-        int qId = Queue.create(cnx, "testqueue", "super test queue", false);
+        long qId = Queue.create(cnx, "testqueue", "super test queue", false);
 
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "appliname",
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);

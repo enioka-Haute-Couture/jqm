@@ -8,7 +8,7 @@ import com.enioka.jqm.client.api.JqmDbClientFactory;
 class CommandGetJiStatus extends CommandBase
 {
     @Parameter(names = { "-i", "--id" }, description = "ID of the job instance to query.", required = true)
-    private Integer id;
+    private Long id;
 
     @Override
     int doWork()

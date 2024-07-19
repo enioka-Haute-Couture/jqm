@@ -154,7 +154,7 @@ public class ShellRunnerTest extends JqmBaseTest
                     "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         }
 
-        int i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
         GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "500");
         cnx.commit();
 
@@ -184,7 +184,7 @@ public class ShellRunnerTest extends JqmBaseTest
                     PathType.DEFAULTSHELLCOMMAND);
         }
 
-        int i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
         GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "500");
         cnx.commit();
 
