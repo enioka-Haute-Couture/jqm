@@ -27,7 +27,7 @@ class RunningExternalJobInstance implements Runnable
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(RunningExternalJobInstance.class);
 
-    int jobId;
+    long jobId;
     JobInstance ji;
     String opts;
     String logFilePath;

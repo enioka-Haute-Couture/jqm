@@ -35,7 +35,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                postgres: [9.6, 12, 15]
+                postgres: [12, 15]
         steps:
             - uses: actions/checkout@v4
             - name: Set up java
@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
         services:
             mysql:
-                image: mysql:5.7
+                image: mysql:8
                 env:
                     MYSQL_ROOT_PASSWORD: password
                     MYSQL_DATABASE: jqm
@@ -83,14 +83,14 @@ jobs:
               run: mvn test
               env:
                   DB: mysql
-                  DB_VERSION: 5.7
+                  DB_VERSION: 8
 
     mariadb_tests:
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
-                mariadb: [10.1, 10.3]
+                mariadb: [10.5]
         steps:
             - uses: actions/checkout@v4
             - name: Set up java

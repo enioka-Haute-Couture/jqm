@@ -159,7 +159,7 @@ class JettyServer
         httpServiceProperties.put("org.apache.felix.http.jetty.sendServerHeader", false);
 
         // This is a JQM node
-        httpServiceProperties.put("servlet.init.jqmnodeid", node.getId().toString());
+        httpServiceProperties.put("servlet.init.jqmnodeid", String.valueOf(node.getId()));
 
         // Interface to use (default is all)
         String interfaceFromProperty = System.getProperty("com.enioka.jqm.interface");

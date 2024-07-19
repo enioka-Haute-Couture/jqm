@@ -18,9 +18,9 @@ import com.enioka.jqm.jdbc.QueryResult;
  */
 public class ScheduledJob
 {
-    private int id;
+    private long id;
 
-    private Integer jobDefinition;
+    private long jobDefinition;
 
     private String cronExpression;
 
@@ -28,26 +28,26 @@ public class ScheduledJob
 
     private Integer priority;
 
-    private Integer queue;
+    private Long queue;
 
     private Map<String, String> parametersCache = new HashMap<>();
 
-    public int getId()
+    public long getId()
     {
         return id;
     }
 
-    public void setId(int id)
+    public void setId(long id)
     {
         this.id = id;
     }
 
-    public int getJobDefinition()
+    public long getJobDefinition()
     {
         return jobDefinition;
     }
 
-    public void setJobDefinition(int jobDefinition)
+    public void setJobDefinition(long jobDefinition)
     {
         this.jobDefinition = jobDefinition;
     }
@@ -72,12 +72,12 @@ public class ScheduledJob
         this.lastUpdated = lastUpdated;
     }
 
-    public Integer getQueue()
+    public Long getQueue()
     {
         return queue;
     }
 
-    public void setQueue(Integer queue)
+    public void setQueue(Long queue)
     {
         this.queue = queue;
     }
@@ -100,8 +100,8 @@ public class ScheduledJob
     public static List<ScheduledJob> select(DbConn cnx, String query_key, Object... args)
     {
         List<ScheduledJob> res = new ArrayList<>();
-        List<Integer> currentIdList = null;
-        List<List<Integer>> allIdLists = new ArrayList<>();
+        List<Long> currentIdList = null;
+        List<List<Long>> allIdLists = new ArrayList<>();
         ScheduledJob tmp = null;
         try (ResultSet rs = cnx.runSelect(query_key, args))
         {
@@ -109,10 +109,10 @@ public class ScheduledJob
             {
                 // ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED
                 tmp = new ScheduledJob();
-                tmp.setId(rs.getInt(1));
+                tmp.setId(rs.getLong(1));
                 tmp.setCronExpression(rs.getString(2));
-                tmp.setJobDefinition(rs.getInt(3));
-                tmp.setQueue(rs.getInt(4) > 0 ? rs.getInt(4) : null);
+                tmp.setJobDefinition(rs.getLong(3));
+                tmp.setQueue(rs.getLong(4) > 0 ? rs.getLong(4) : null);
                 tmp.setPriority(rs.getInt(5) > 0 ? rs.getInt(5) : null);
                 tmp.setLastUpdated(cnx.getCal(rs, 6));
 
@@ -133,7 +133,7 @@ public class ScheduledJob
 
         // Batch fetch parameters, 500 by 500.
         int currentSJ = 0;
-        for (List<Integer> ids : allIdLists)
+        for (List<Long> ids : allIdLists)
         {
             try (ResultSet rs = cnx.runSelect("sjprm_select_for_sj_list", ids);)
             {
@@ -160,8 +160,8 @@ public class ScheduledJob
         return res;
     }
 
-    public static int create(DbConn cnx, String cronExpression, Integer jobDefId, Integer queueId, Integer priority,
-            Map<String, String> parameterOverloads)
+    public static long create(DbConn cnx, String cronExpression, long jobDefId, Long queueId, Integer priority,
+                              Map<String, String> parameterOverloads)
     {
         QueryResult r = cnx.runUpdate("sj_insert", cronExpression, jobDefId, queueId, priority);
 

@@ -48,9 +48,9 @@ final class Common
         return p;
     }
 
-    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Integer> queues)
+    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Long> queues)
     {
-        int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
+        Long clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
                 d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
 
         JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),

@@ -72,7 +72,7 @@ public class ServiceSimple
 {
     private static Logger log = LoggerFactory.getLogger(ServiceSimple.class);
 
-    private Integer jqmNodeId = null;
+    private Long jqmNodeId = null;
 
     @Activate
     public void onServiceActivation(Map<String, Object> properties)
@@ -82,7 +82,7 @@ public class ServiceSimple
             throw new JqmAdminApiException("OSGi configuration for ServiceSimple does not contain a valid node ID");
         }
 
-        jqmNodeId = (int) properties.get("jqmnodeid"); // small int - cannot be null.
+        jqmNodeId = (long) properties.get("jqmnodeid"); // small int - cannot be null.
         log.info("\tStarting ServiceSimple with node ID {}", jqmNodeId);
     }
 
@@ -117,7 +117,7 @@ public class ServiceSimple
     @GET
     @Path("status")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getStatus(@QueryParam("id") int id)
+    public String getStatus(@QueryParam("id") long id)
     {
         return JqmClientFactory.getClient().getJob(id).getState().toString();
     }
@@ -129,7 +129,7 @@ public class ServiceSimple
     @GET
     @Path("stdout")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public InputStream getLogOut(@QueryParam("id") int id, @Context HttpServletResponse res, @Context SecurityContext security)
+    public InputStream getLogOut(@QueryParam("id") long id, @Context HttpServletResponse res, @Context SecurityContext security)
     {
         res.setHeader("Content-Disposition", "attachment; filename=" + id + ".stdout.txt");
         return getFile(FilenameUtils.concat("./logs", StringUtils.leftPad("" + id, 10, "0") + ".stdout.log"), security);
@@ -138,7 +138,7 @@ public class ServiceSimple
     @GET
     @Path("stderr")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public InputStream getLogErr(@QueryParam("id") int id, @Context HttpServletResponse res, @Context SecurityContext security)
+    public InputStream getLogErr(@QueryParam("id") long id, @Context HttpServletResponse res, @Context SecurityContext security)
     {
         res.setHeader("Content-Disposition", "attachment; filename=" + id + ".stderr.txt");
         return getFile(FilenameUtils.concat("./logs", StringUtils.leftPad("" + id, 10, "0") + ".stderr.log"), security);
@@ -253,10 +253,10 @@ public class ServiceSimple
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     public String enqueue(@FormParam("applicationname") String applicationName, @FormParam("module") String module,
-            @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
-            @FormParam("keyword3") String keyword3, @FormParam("parentid") Integer parentId, @FormParam("user") String user,
-            @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
-            @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
+                          @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
+                          @FormParam("keyword3") String keyword3, @FormParam("parentid") Long parentId, @FormParam("user") String user,
+                          @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
+                          @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
     {
         if (user == null && security != null && security.getUserPrincipal() != null)
         {
@@ -289,8 +289,8 @@ public class ServiceSimple
             log.trace("Adding a parameter: " + name + " - " + value);
         }
 
-        Integer i = jd.enqueue();
-        return i.toString();
+        long i = jd.enqueue();
+        return Long.toString(i);
     }
 
     /////////////////////////////////////////////////////////////

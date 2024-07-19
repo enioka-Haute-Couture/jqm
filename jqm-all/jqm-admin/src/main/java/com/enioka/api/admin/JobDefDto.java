@@ -35,11 +35,11 @@ public class JobDefDto implements Serializable
 {
     private static final long serialVersionUID = 4934352148555212325L;
 
-    private Integer id;
+    private Long id;
     private String description;
     private boolean canBeRestarted = true;
     private String javaClassName;
-    private Integer queueId;
+    private Long queueId;
     private String applicationName;
     private String application;
     private String module;
@@ -50,7 +50,7 @@ public class JobDefDto implements Serializable
     private String jarPath;
     private String pathType;
     private Integer reasonableRuntimeLimitMinute;
-    private Integer classLoaderId;
+    private Long classLoaderId;
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter")
@@ -58,12 +58,12 @@ public class JobDefDto implements Serializable
 
     private List<ScheduledJob> schedules = new ArrayList<>();
 
-    public Integer getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -98,12 +98,12 @@ public class JobDefDto implements Serializable
         this.javaClassName = javaClassName;
     }
 
-    public Integer getQueueId()
+    public Long getQueueId()
     {
         return queueId;
     }
 
-    public void setQueueId(Integer queueId)
+    public void setQueueId(Long queueId)
     {
         this.queueId = queueId;
     }
@@ -228,7 +228,7 @@ public class JobDefDto implements Serializable
         this.reasonableRuntimeLimitMinute = reasonableRuntimeLimitMinute;
     }
 
-    public Integer getClassLoaderId()
+    public Long getClassLoaderId()
     {
         return this.classLoaderId;
     }
@@ -243,7 +243,7 @@ public class JobDefDto implements Serializable
         this.schedules = schedules;
     }
 
-    public void setClassLoaderId(Integer classLoaderId)
+    public void setClassLoaderId(Long classLoaderId)
     {
         this.classLoaderId = classLoaderId;
     }

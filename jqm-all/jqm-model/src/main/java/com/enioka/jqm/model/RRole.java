@@ -32,16 +32,16 @@ public class RRole implements Serializable
 {
     private static final long serialVersionUID = 1234354709423603792L;
 
-    private Integer id;
+    private long id;
     private String name;
     private String description;
 
-    public Integer getId()
+    public long getId()
     {
         return id;
     }
 
-    void setId(Integer id)
+    void setId(long id)
     {
         this.id = id;
     }
@@ -85,7 +85,7 @@ public class RRole implements Serializable
             {
                 RRole tmp = new RRole();
 
-                tmp.id = rs.getInt(1);
+                tmp.id = rs.getLong(1);
                 tmp.name = rs.getString(2);
                 tmp.description = rs.getString(3);
 
@@ -102,7 +102,7 @@ public class RRole implements Serializable
     public static void create(DbConn cnx, String roleName, String description, String... permissions)
     {
         QueryResult r = cnx.runUpdate("role_insert", description, roleName);
-        int newId = r.getGeneratedId();
+        long newId = r.getGeneratedId();
 
         for (String s : permissions)
         {

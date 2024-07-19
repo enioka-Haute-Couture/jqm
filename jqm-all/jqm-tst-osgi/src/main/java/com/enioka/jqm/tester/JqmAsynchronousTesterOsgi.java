@@ -50,7 +50,7 @@ public class JqmAsynchronousTesterOsgi implements JqmAsynchronousTester
 {
     private Map<String, JqmEngineOperations> engines = new HashMap<>();
     private Map<String, Node> nodes = new HashMap<>();
-    private Map<String, Integer> queues = new HashMap<>();
+    private Map<String, Long> queues = new HashMap<String, Long>();
 
     private DbConn cnx = null;
 
@@ -137,7 +137,7 @@ public class JqmAsynchronousTesterOsgi implements JqmAsynchronousTester
             throw new IllegalStateException("tester has already started");
         }
 
-        int q = Queue.create(cnx, name, "test queue", queues.size() == 0);
+        Long q = Queue.create(cnx, name, "test queue", queues.size() == 0);
         cnx.commit();
 
         queues.put(name, q);
@@ -227,7 +227,7 @@ public class JqmAsynchronousTesterOsgi implements JqmAsynchronousTester
     }
 
     @Override
-    public int enqueue(String name)
+    public Long enqueue(String name)
     {
         return JqmClientFactory.getClient().newJobRequest(name, "test").enqueue();
     }

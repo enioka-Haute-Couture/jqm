@@ -10,7 +10,7 @@
 
         <!-- Deployment infra -->
         <createTable tableName="NODE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_NODE" nullable="false" />
             </column>
             <column name="NAME" type="VARCHAR(255)">
@@ -43,7 +43,7 @@
         </createTable>
 
         <createTable tableName="QUEUE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_QUEUE" nullable="false" />
             </column>
             <column name="DEFAULT_QUEUE" type="BOOLEAN" />
@@ -57,7 +57,7 @@
         </createTable>
 
         <createTable tableName="QUEUE_NODE_MAPPING">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_QUEUE_NODE_MAPPING"
                     nullable="false" />
             </column>
@@ -69,12 +69,12 @@
             <column name="POLLING_INTERVAL" type="INTEGER">
                 <constraints nullable="false" />
             </column>
-            <column name="NODE" type="INTEGER">
+            <column name="NODE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="NODE" referencedColumnNames="ID"
                     foreignKeyName="FK_QUEUE_NODE_MAPPING_1" unique="true"
                     uniqueConstraintName="UK_QUEUE_NODE_MAPPING_1" />
             </column>
-            <column name="QUEUE" type="INTEGER">
+            <column name="QUEUE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
                     foreignKeyName="FK_QUEUE_NODE_MAPPING_2" unique="true"
                     uniqueConstraintName="UK_QUEUE_NODE_MAPPING_1" />
@@ -89,7 +89,7 @@
 
         <!-- Execution context -->
         <createTable tableName="CL">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_CL" nullable="false" />
             </column>
             <column name="NAME" type="VARCHAR(255)">
@@ -109,7 +109,7 @@
         </createTable>
 
         <createTable tableName="CL_HANDLER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_CL_HANDLER" nullable="false" />
             </column>
             <column name="EVENT_TYPE" type="VARCHAR(255)">
@@ -118,7 +118,7 @@
             <column name="CLASS_NAME" type="VARCHAR(1024)">
                 <constraints nullable="true" />
             </column>
-            <column name="CL" type="INTEGER">
+            <column name="CL" type="BIGINT">
                 <constraints nullable="false" referencedTableName="CL" referencedColumnNames="ID"
                     foreignKeyName="FK_CL_HANDLER_1" />
             </column>
@@ -128,7 +128,7 @@
         </createIndex>
 
         <createTable tableName="CL_HANDLER_PARAMETER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_CL_HANDLER_PARAMETER"
                     nullable="false" />
             </column>
@@ -138,7 +138,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="CL_HANDLER" type="INTEGER">
+            <column name="CL_HANDLER" type="BIGINT">
                 <constraints nullable="false" referencedTableName="CL_HANDLER"
                     referencedColumnNames="ID" foreignKeyName="FK_CL_HANDLER_PARAMETER_1" />
             </column>
@@ -149,7 +149,7 @@
 
         <!-- Job definition -->
         <createTable tableName="JOB_DEFINITION">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_DEFINITION" nullable="false" />
             </column>
             <column name="JD_KEY" type="VARCHAR(255)">
@@ -166,7 +166,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="QUEUE" type="INTEGER">
+            <column name="QUEUE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
                     foreignKeyName="FK_JOBDEF_1" />
             </column>
@@ -194,7 +194,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="CL" type="INTEGER">
+            <column name="CL" type="BIGINT">
                 <constraints nullable="true" referencedTableName="CL" referencedColumnNames="ID"
                     foreignKeyName="FK_JOBDEF_2" />
             </column>
@@ -227,7 +227,7 @@
         </createIndex>
 
         <createTable tableName="JOB_DEFINITION_PARAMETER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_DEFINITION_PARAMETER"
                     nullable="false" />
             </column>
@@ -237,7 +237,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOBDEF" type="INTEGER">
+            <column name="JOBDEF" type="BIGINT">
                 <constraints nullable="false" referencedTableName="JOB_DEFINITION"
                     referencedColumnNames="ID" foreignKeyName="FK_JOB_DEFINITION_PARAMETER_1" />
             </column>
@@ -247,17 +247,17 @@
         </createIndex>
 
         <createTable tableName="JOB_SCHEDULE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_SCHEDULE" nullable="false" />
             </column>
             <column name="CRON_EXPRESSION" type="VARCHAR(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOBDEF" type="INTEGER">
+            <column name="JOBDEF" type="BIGINT">
                 <constraints nullable="false" referencedTableName="JOB_DEFINITION"
                     referencedColumnNames="ID" foreignKeyName="FK_JOB_SCHEDULE_1" />
             </column>
-            <column name="QUEUE" type="INTEGER">
+            <column name="QUEUE" type="BIGINT">
                 <constraints nullable="true" referencedTableName="QUEUE" referencedColumnNames="ID"
                     foreignKeyName="FK_JOB_SCHEDULE_2" />
             </column>
@@ -279,7 +279,7 @@
         </createIndex>
 
         <createTable tableName="JOB_SCHEDULE_PARAMETER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_SCHEDULE_PARAMETER"
                     nullable="false" />
             </column>
@@ -289,7 +289,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOB_SCHEDULE" type="INTEGER">
+            <column name="JOB_SCHEDULE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="JOB_SCHEDULE"
                     referencedColumnNames="ID" foreignKeyName="FK_JOB_SCHEDULE_PARAMETER_1" />
             </column>
@@ -300,10 +300,10 @@
 
         <!-- Execution and history -->
         <createTable tableName="JOB_INSTANCE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_INSTANCE" nullable="false" />
             </column>
-            <column name="PARENT" type="INTEGER">
+            <column name="PARENT" type="BIGINT">
                 <constraints nullable="true" />
             </column>
 
@@ -369,15 +369,15 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="JOBDEF" type="INTEGER">
+            <column name="JOBDEF" type="BIGINT">
                 <constraints nullable="false" referencedTableName="JOB_DEFINITION"
                     referencedColumnNames="ID" foreignKeyName="FK_JOB_INSTANCE_1" />
             </column>
-            <column name="NODE" type="INTEGER">
+            <column name="NODE" type="BIGINT">
                 <constraints nullable="true" referencedTableName="NODE" referencedColumnNames="ID"
                     foreignKeyName="FK_JOB_INSTANCE_2" />
             </column>
-            <column name="QUEUE" type="INTEGER">
+            <column name="QUEUE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
                     foreignKeyName="FK_JOB_INSTANCE_3" />
             </column>
@@ -401,11 +401,11 @@
         </createIndex>
 
         <createTable tableName="HISTORY">
-            <column name="ID" type="INTEGER"> <!-- always set from JI ID so no sequence used here -->
+            <column name="ID" type="BIGINT"> <!-- always set from JI ID so no sequence used here -->
                 <constraints primaryKey="true"
                     primaryKeyName="PK_HISTORY" nullable="false" />
             </column>
-            <column name="PARENT" type="INTEGER">
+            <column name="PARENT" type="BIGINT">
                 <constraints nullable="true" />
             </column>
 
@@ -487,19 +487,19 @@
             </column>
 
 
-            <column name="JOBDEF" type="INTEGER">
+            <column name="JOBDEF" type="BIGINT">
                 <constraints nullable="true" /> <!-- FK created with a cascade below -->
             </column>
             <column name="JD_KEY" type="VARCHAR(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="NODE" type="INTEGER">
+            <column name="NODE" type="BIGINT">
                 <constraints nullable="true" /> <!-- FK created with a cascade below -->
             </column>
             <column name="NODE_NAME" type="VARCHAR(255)">
                 <constraints nullable="true" /> <!-- null when cancelled -->
             </column>
-            <column name="QUEUE" type="INTEGER">
+            <column name="QUEUE" type="BIGINT">
                 <constraints nullable="true" /> <!-- FK created with a cascade below -->
             </column>
             <column name="QUEUE_NAME" type="VARCHAR(255)">
@@ -526,7 +526,7 @@
         </createIndex>
 
         <createTable tableName="DELIVERABLE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_DELIVERABLE" nullable="false" />
             </column>
             <column name="FILE_FAMILY" type="VARCHAR(100)">
@@ -535,7 +535,7 @@
             <column name="PATH" type="VARCHAR(1024)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOB_INSTANCE" type="INTEGER">
+            <column name="JOB_INSTANCE" type="BIGINT">
                 <!-- Not an FK, as this is used by both History and JobDef -->
                 <constraints nullable="false" />
             </column>
@@ -551,7 +551,7 @@
         </createIndex>
 
         <createTable tableName="JOB_INSTANCE_PARAMETER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_INSTANCE_PARAMETER"
                     nullable="false" />
             </column>
@@ -561,7 +561,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOB_INSTANCE" type="INTEGER">
+            <column name="JOB_INSTANCE" type="BIGINT">
                 <!-- Not an FK, as this is used by both History and JobDef -->
                  <constraints nullable="false" />
             </column>
@@ -571,10 +571,10 @@
         </createIndex>
 
         <createTable tableName="MESSAGE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_MESSAGE" nullable="false" />
             </column>
-            <column name="JOB_INSTANCE" type="INTEGER">
+            <column name="JOB_INSTANCE" type="BIGINT">
                 <!-- Not an FK, as this is used by both History and JobDef -->
                 <constraints nullable="false" />
             </column>
@@ -588,7 +588,7 @@
 
         <!-- JNDI registry -->
         <createTable tableName="JNDI_OBJECT_RESOURCE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JNDI_OBJECT_RESOURCE"
                     nullable="false" />
             </column>
@@ -620,7 +620,7 @@
         </createTable>
 
         <createTable tableName="JNDI_OR_PARAMETER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JNDI_OR_PARAMETER"
                     nullable="false" />
             </column>
@@ -633,7 +633,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="JNDI_OR" type="INTEGER">
+            <column name="JNDI_OR" type="BIGINT">
                 <constraints nullable="false" referencedTableName="JNDI_OBJECT_RESOURCE"
                     referencedColumnNames="ID" foreignKeyName="FK_JNDI_OR_PARAMETER_1" />
             </column>
@@ -644,7 +644,7 @@
 
         <!-- Security -->
         <createTable tableName="PKI">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_PKI" nullable="false" />
             </column>
 
@@ -661,7 +661,7 @@
         </createTable>
 
         <createTable tableName="RROLE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_RROLE" nullable="false" />
             </column>
             <column name="DESCRIPTION" type="VARCHAR(1000)">
@@ -673,13 +673,13 @@
         </createTable>
 
         <createTable tableName="RPERMISSION">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_RPERMISSION" nullable="false" />
             </column>
             <column name="NAME" type="VARCHAR(255)">
                 <constraints unique="true" uniqueConstraintName="UK_RPERMISSION_1" nullable="false" />
             </column>
-            <column name="ROLE" type="INTEGER">
+            <column name="ROLE" type="BIGINT">
                 <constraints nullable="false" unique="true" uniqueConstraintName="UK_RPERMISSION_1"
                     referencedTableName="RROLE" referencedColumnNames="ID"
                     foreignKeyName="FK_RPERMISSION_1" />
@@ -690,7 +690,7 @@
         </createIndex>
 
         <createTable tableName="RUSER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_RUSER" nullable="false" />
             </column>
             <column name="CREATION_DATE" type="TIMESTAMP">
@@ -726,15 +726,15 @@
         </createTable>
 
         <createTable tableName="RROLE_RUSER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_RROLE_RUSER" nullable="false" />
             </column>
-            <column name="ROLE" type="INTEGER">
+            <column name="ROLE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="RROLE" referencedColumnNames="ID"
                     deleteCascade="true" foreignKeyName="FK_RROLE_RUSER_1"
                     unique="true" uniqueConstraintName="UK_RROLE_RUSER_1" />
             </column>
-            <column name="ACCOUNT" type="INTEGER">
+            <column name="ACCOUNT" type="BIGINT">
                 <constraints nullable="false" referencedTableName="RUSER" referencedColumnNames="ID"
                     deleteCascade="true" foreignKeyName="FK_RROLE_RUSER_2"
                     unique="true" uniqueConstraintName="UK_RROLE_RUSER_1" />
@@ -749,7 +749,7 @@
 
         <!-- Misc -->
         <createTable tableName="GLOBAL_PARAMETER">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_GLOBAL_PARAMETER"
                     nullable="false" />
             </column>
@@ -766,13 +766,13 @@
         </createTable>
 
         <createTable tableName="WITNESS">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_WITNESS" nullable="false" />
             </column>
             <column name="KEYNAME" type="VARCHAR(20)">
                 <constraints nullable="false" unique="true" uniqueConstraintName="UK_WITNESS_1" />
             </column>
-            <column name="NODE" type="INTEGER">
+            <column name="NODE" type="BIGINT">
                 <constraints nullable="true" />
             </column>
             <column name="LATEST_CONTACT" type="TIMESTAMP">

@@ -24,7 +24,7 @@ class RunnerManager
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunnerManager.class);
 
-    private Map<Integer, JobRunner> runnerCache = new HashMap<>();
+    private Map<Long, JobRunner> runnerCache = new HashMap<>();
 
     private ConcurrentLinkedQueue<JobRunner> runners = new ConcurrentLinkedQueue<>();
 
