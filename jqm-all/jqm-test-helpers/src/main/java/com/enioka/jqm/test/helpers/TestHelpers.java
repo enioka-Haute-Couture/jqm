@@ -48,7 +48,7 @@ public class TestHelpers
     public static void createTestData(DbConn cnx)
     {
         CreationTools.createJndiString(cnx, "string/debug", "a string which exists solely for test initialisation", "houba hop");
-        CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
         GlobalParameter.create(cnx, "mavenRepo", "http://repo1.maven.org/maven2/");
