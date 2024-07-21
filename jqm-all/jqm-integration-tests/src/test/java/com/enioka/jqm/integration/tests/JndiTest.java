@@ -172,7 +172,7 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testJndiJdbcPool() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         cnx.runUpdate("jndiprm_update_value_by_key", "true", "jmxEnabled");
         cnx.commit();
@@ -194,7 +194,7 @@ public class JndiTest extends JqmBaseTest
     public void testJndiJdbcPoolLeakWithoutHunter() throws Exception
     {
         // Sanity check - our test DOES leak connections
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         cnx.runUpdate("jndiprm_update_value_by_key", "true", "jmxEnabled");
         cnx.commit();
@@ -222,7 +222,7 @@ public class JndiTest extends JqmBaseTest
         // Create a connection with our custom interceptor
         Map<String, String> prms = new HashMap<>(1);
         prms.put("jdbcInterceptors", "com.enioka.jqm.providers.PayloadInterceptor");
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", prms);
 
         cnx.runUpdate("jndiprm_update_value_by_key", "true", "jmxEnabled");
