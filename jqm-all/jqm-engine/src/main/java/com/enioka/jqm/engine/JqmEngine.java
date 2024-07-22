@@ -254,9 +254,9 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             // Standalone sequence reinit
             final var standaloneMode = Boolean.parseBoolean(
                 GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
-            final var localIp = Inet4Address.getLocalHost().getHostAddress();
             if (standaloneMode) {
-                cnx.runUpdate("node_reset_id_sequence", idSequenceBaseFromIp(localIp));
+                final var localIp = Inet4Address.getLocalHost().getHostAddress();
+                cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idSequenceBaseFromIp(localIp));
             }
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);

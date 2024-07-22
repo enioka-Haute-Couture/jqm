@@ -23,7 +23,6 @@ class DbImplBase
         queries.put("version_select_latest", "SELECT v1.VERSION_D1, v1.COMPAT_D1 FROM __T__VERSION v1 WHERE v1.ID = (SELECT MAX(v2.ID) AS OID FROM __T__VERSION v2 WHERE v2.COMPONENT='SCHEMA')");
 
         // NODE
-        queries.put("node_reset_id_sequence", "ALTER SEQUENCE __T__JQM_SEQUENCE RESTART WITH ?");
         queries.put("node_insert", "INSERT INTO __T__NODE(ID, REPO_DELIVERABLE, DNS, ENABLED, JMX_REGISTRY_PORT, JMX_SERVER_PORT, "
                 + "LOAD_API_ADMIN, LOAD_API_CLIENT, LOAD_API_SIMPLE, NAME, PORT, REPO_JOB_DEF, ROOT_LOG_LEVEL, STOP, REPO_TMP) "
                 + "VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
