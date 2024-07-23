@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: jqm-standalone-deployment
+    labels:
+        app: jqm-standalone
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: jqm-standalone
+    template:
+        metadata:
+            labels:
+                app: jqm-standalone
+        spec:
+            containers:
+                - name: jqm-standalone-deployment
+                  image: enioka/jqm-standalone
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - containerPort: 1789
+                  livenessProbe:
+                      httpGet:
+                          path: /ws/simple/localnode/health
+                          port: 1789
+                      initialDelaySeconds: 30
+                      periodSeconds: 30
+                  readinessProbe:
+                      httpGet:
+                          path: /ws/simple/localnode/health
+                          port: 1789
+                      initialDelaySeconds: 15
+                      periodSeconds: 30
