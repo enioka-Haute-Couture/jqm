@@ -1,0 +1,19 @@
+# This file describes a k8s LoadBalancer service that will redirect requests to pods in the cluster
+#
+# By default, the LoadBalancer will not be reachable from outside the cluster, you need either an ingress point or
+# an external IP (for example through Microk8s's `metallb` addon) to reach it.
+
+apiVersion: v1
+kind: Service
+metadata:
+    name: jqm-lb
+    labels:
+        app: jqm
+spec:
+    type: LoadBalancer
+    ports:
+        - port: 1789  # Keep in mind the ingress can only reach one port of your service
+          protocol: TCP
+          targetPort: 80  # FIXME: 80 for NGINX, 1789 for JQM
+    selector:
+        app: jqm
