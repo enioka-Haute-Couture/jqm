@@ -132,7 +132,7 @@ public class DbConn implements Closeable
         }
     }
 
-    void runRawUpdate(String query_sql)
+    public void runRawUpdate(String query_sql)
     {
         transac_open = true;
         String sql = null;
