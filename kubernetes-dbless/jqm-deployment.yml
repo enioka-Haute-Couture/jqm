@@ -1,0 +1,44 @@
+# This file describes a k8s deployment that will create pods containing the JQM-Standalone image.
+#
+# You will need to also apply the LoadBalancer service config to make these pods reachable.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: jqm
+    labels:
+        app: jqm
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: jqm
+    template:
+        metadata:
+            labels:
+                app: jqm
+        spec:
+            containers:
+                - name: nginx  # FIXME:  To test reachability. Simply change which port the LB redirects to
+                  image: nginx:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 80
+                - name: jqm
+                  image: enioka/jqm-standalone
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - containerPort: 1789
+# FIXME: Probes disabled until the code can properly compile. The NGINX server will be unreachable until both containers are ok
+#                  livenessProbe:
+#                      httpGet:
+#                          path: /ws/simple/localnode/health
+#                          port: 1789
+#                      initialDelaySeconds: 15
+#                      periodSeconds: 15
+#                  readinessProbe:
+#                      httpGet:
+#                          path: /ws/simple/localnode/health
+#                          port: 1789
+#                      initialDelaySeconds: 5
+#                      periodSeconds: 10
