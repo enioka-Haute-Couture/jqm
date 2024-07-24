@@ -53,7 +53,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.enioka.jqm</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jqm-tst-osgi</artifactId>
             <version>${project.version}</version>
         </dependency>

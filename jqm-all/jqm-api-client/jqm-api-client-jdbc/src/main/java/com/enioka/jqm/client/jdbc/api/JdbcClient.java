@@ -26,14 +26,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,7 +153,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public int enqueue(JobRequestBaseImpl runRequest)
+    public Long enqueue(JobRequestBaseImpl runRequest)
     {
         jqmlogger.trace("BEGINING ENQUEUE - request is for application name " + runRequest.getApplicationName());
 
@@ -178,12 +171,12 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
     }
 
-    private int enqueueWithCnx(JobRequestBaseImpl runRequest, DbConn cnx)
+    private Long enqueueWithCnx(JobRequestBaseImpl runRequest, DbConn cnx)
     {
         // New schedule?
         if (runRequest.getRecurrence() != null && !runRequest.getRecurrence().trim().isEmpty())
         {
-            int res = createSchedule(runRequest, cnx);
+            Long res = createSchedule(runRequest, cnx);
             cnx.commit();
             return res;
         }
@@ -249,10 +242,10 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         Object highlanderResult = highlanderMode(jobDef, cnx); // Returns Integer if already exists, a resultset otherwise. The RS thing is
                                                                // to allow to explicitely close it as required by some pools (against the
                                                                // spec).
-        if (highlanderResult != null && highlanderResult instanceof Integer)
+        if (highlanderResult != null && highlanderResult instanceof Long)
         {
             jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + highlanderResult);
-            return (Integer) highlanderResult;
+            return (Long) highlanderResult;
         }
         ResultSet highlanderRs = (ResultSet) highlanderResult;
 
@@ -268,13 +261,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         prms.putAll(runRequest.getParameters());
 
         // On which queue?
-        Integer queue_id = null;
+        Long queue_id = null;
         if (runRequest.getQueueName() != null)
         {
             // use requested key if given.
             try
             {
-                queue_id = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, runRequest.getQueueName());
+                queue_id = cnx.runSelectSingle("q_select_by_key", 1, Long.class, runRequest.getQueueName());
             }
             catch (NoResultException e)
             {
@@ -321,7 +314,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         // Now create the JI
         try
         {
-            int id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
+            Long id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
                     runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
                     sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), priority, Instruction.RUN, prms);
@@ -341,13 +334,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public int enqueue(String applicationName, String userName)
+    public long enqueue(String applicationName, String userName)
     {
         return this.newJobRequest(applicationName, userName).enqueue();
     }
 
     @Override
-    public int enqueueFromHistory(int jobIdToCopy)
+    public long enqueueFromHistory(long jobIdToCopy)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -369,7 +362,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
         try
         {
-            Integer existing = cnx.runSelectSingle("ji_select_existing_highlander", Integer.class, jd.getId());
+            Long existing = cnx.runSelectSingle("ji_select_existing_highlander", Long.class, jd.getId());
             return existing;
         }
         catch (NoResultException ex)
@@ -384,7 +377,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         // Now we have a lock, just retry - some other client may have created a job instance recently.
         try
         {
-            Integer existing = cnx.runSelectSingle("ji_select_existing_highlander", Integer.class, jd.getId());
+            Long existing = cnx.runSelectSingle("ji_select_existing_highlander", Long.class, jd.getId());
             rs.close();
             cnx.commit(); // Do not keep the lock!
             return existing;
@@ -414,7 +407,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
      *            an open DB session
      * @return a new execution request
      */
-    private JobRequestBaseImpl getJobRequest(int launchId, DbConn cnx)
+    private JobRequestBaseImpl getJobRequest(Long launchId, DbConn cnx)
     {
         Map<String, String> prms = RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", launchId);
         ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", launchId);
@@ -441,7 +434,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jd.setKeyword2(rs.getString(5));
             jd.setKeyword3(rs.getString(6));
             jd.setModule(rs.getString(7));
-            jd.setParentID(rs.getInt(8));
+            jd.setParentID(rs.getLong(8));
             jd.setSessionID(rs.getString(9));
             jd.setUser(rs.getString(10));
 
@@ -462,7 +455,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         return jd;
     }
 
-    private int createSchedule(JobRequestBaseImpl jr, DbConn cnx)
+    private Long createSchedule(JobRequestBaseImpl jr, DbConn cnx)
     {
         // The job def
         JobDef jobDef = null;
@@ -484,11 +477,11 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
 
         // The queue
-        Integer queueId = null; // No override = use JD queue.
+        Long queueId = null; // No override = use JD queue.
         if (jr.getQueueName() != null)
         {
             // use requested key if given.
-            queueId = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, jr.getQueueName());
+            queueId = cnx.runSelectSingle("q_select_by_key", 1, Long.class, jr.getQueueName());
         }
 
         // The new schedule
@@ -500,7 +493,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public void cancelJob(int idJob)
+    public void cancelJob(long idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " will be cancelled");
         try (DbConn cnx = getDbSession())
@@ -526,7 +519,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void deleteJob(int idJob)
+    public void deleteJob(long idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " will be deleted");
 
@@ -557,7 +550,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void killJob(int idJob)
+    public void killJob(long idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " will be killed (if possible)o");
 
@@ -594,7 +587,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void removeRecurrence(int scheduleId)
+    public void removeRecurrence(long scheduleId)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -621,7 +614,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public void pauseQueuedJob(int idJob)
+    public void pauseQueuedJob(long idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " status will be set to HOLDED");
 
@@ -642,13 +635,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void resumeJob(int jobId)
+    public void resumeJob(long jobId)
     {
         resumeQueuedJob(jobId);
     }
 
     @Override
-    public void resumeQueuedJob(int idJob)
+    public void resumeQueuedJob(long idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be resumed");
 
@@ -667,7 +660,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
     }
 
-    public int restartCrashedJob(int idJob)
+    public long restartCrashedJob(long idJob)
     {
         // History and Job ID have the same ID.
         try (DbConn cnx = getDbSession(); ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);)
@@ -685,7 +678,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jr.setKeyword2(rs.getString(5));
             jr.setKeyword3(rs.getString(6));
             jr.setModule(rs.getString(7));
-            jr.setParentID(rs.getInt(8));
+            jr.setParentID(rs.getLong(8));
             jr.setSessionID(rs.getString(9));
             jr.setUser(rs.getString(10));
 
@@ -695,7 +688,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 throw new JqmClientException("You cannot restart a job that has not crashed");
             }
 
-            int res = enqueue(jr);
+            Long res = enqueue(jr);
             cnx.runUpdate("history_delete_by_id", idJob);
             cnx.commit();
             return res;
@@ -711,7 +704,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void pauseRunningJob(int jobId)
+    public void pauseRunningJob(long jobId)
     {
         jqmlogger.trace("Job instance number " + jobId + " will receive a PAUSE instruction");
 
@@ -731,7 +724,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void resumeRunningJob(int jobId)
+    public void resumeRunningJob(long jobId)
     {
         jqmlogger.trace("Job instance number {}, supposed to be paused, will receive a RUN instruction", jobId);
 
@@ -755,7 +748,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public void setJobQueue(int idJob, int idQueue)
+    public void setJobQueue(long idJob, long idQueue)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -781,13 +774,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void setJobQueue(int idJob, com.enioka.jqm.client.api.Queue queue)
+    public void setJobQueue(long idJob, com.enioka.jqm.client.api.Queue queue)
     {
         setJobQueue(idJob, queue.getId());
     }
 
     @Override
-    public void setJobQueuePosition(int idJob, int position)
+    public void setJobQueuePosition(long idJob, int position)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -797,7 +790,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             {
                 throw new JqmInvalidRequestException("Job does not exist or is already running.");
             }
-            int queue_id = rs1.getInt(1);
+            long queue_id = rs1.getLong(1);
             int internal_id = rs1.getInt(2);
             rs1.close();
 
@@ -854,7 +847,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void setJobPriority(int jobId, int priority)
+    public void setJobPriority(long jobId, int priority)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -877,7 +870,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void setJobRunAfter(int jobId, Calendar whenToRun)
+    public void setJobRunAfter(long jobId, Calendar whenToRun)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -900,7 +893,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void setScheduleRecurrence(int scheduleId, String cronExpression)
+    public void setScheduleRecurrence(long scheduleId, String cronExpression)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -923,7 +916,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void setScheduleQueue(int scheduleId, int queueId)
+    public void setScheduleQueue(long scheduleId, long queueId)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -946,7 +939,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public void setSchedulePriority(int scheduleId, int priority)
+    public void setSchedulePriority(long scheduleId, int priority)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -1021,6 +1014,14 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
     private String getIntPredicate(String fieldName, Integer filterValue, List<Object> prms)
     {
+        if (filterValue == null) {
+            return "";
+        }
+        return getLongPredicate(fieldName, filterValue.longValue(), prms);
+    }
+
+    private String getLongPredicate(String fieldName, Long filterValue, List<Object> prms)
+    {
         if (filterValue != null)
         {
             if (filterValue != -1)
@@ -1086,7 +1087,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
         try (DbConn cnx = getDbSession())
         {
-            Map<Integer, com.enioka.jqm.client.api.JobInstance> res = new LinkedHashMap<>();
+            Map<Long, com.enioka.jqm.client.api.JobInstance> res = new LinkedHashMap<>();
 
             String wh = "";
             List<Object> prms = new ArrayList<>();
@@ -1099,8 +1100,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             if (query.isQueryLiveInstances())
             {
                 // WHERE
-                wh += getIntPredicate("ji.ID", query.getJobInstanceId(), prms);
-                wh += getIntPredicate("ji.PARENT", query.getParentId(), prms);
+                wh += getLongPredicate("ji.ID", query.getJobInstanceId(), prms);
+                wh += getLongPredicate("ji.PARENT", query.getParentId(), prms);
                 wh += getStringPredicate("ji.APPLICATION", query.getInstanceApplication(), prms);
                 wh += getStringPredicate("ji.MODULE", query.getInstanceModule(), prms);
                 wh += getStringPredicate("ji.KEYWORD1", query.getInstanceKeyword1(), prms);
@@ -1120,7 +1121,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 wh += getStringPredicate("n.NAME", query.getNodeName(), prms);
 
                 wh += getStringPredicate("q.NAME", query.getQueueName(), prms);
-                wh += getIntPredicate("q.ID", query.getQueueId() == null ? null : query.getQueueId(), prms);
+                wh += getLongPredicate("q.ID", query.getQueueId() == null ? null : query.getQueueId(), prms);
 
                 wh += getCalendarPredicate("ji.DATE_ENQUEUE", query.getEnqueuedAfter(), ">=", prms);
                 wh += getCalendarPredicate("ji.DATE_ENQUEUE", query.getEnqueuedBefore(), "<=", prms);
@@ -1156,8 +1157,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             {
                 wh = "";
 
-                wh += getIntPredicate("ID", query.getJobInstanceId(), prms);
-                wh += getIntPredicate("PARENT", query.getParentId(), prms);
+                wh += getLongPredicate("ID", query.getJobInstanceId(), prms);
+                wh += getLongPredicate("PARENT", query.getParentId(), prms);
                 wh += getStringPredicate("INSTANCE_APPLICATION", query.getInstanceApplication(), prms);
                 wh += getStringPredicate("INSTANCE_MODULE", query.getInstanceModule(), prms);
                 wh += getStringPredicate("INSTANCE_KEYWORD1", query.getInstanceKeyword1(), prms);
@@ -1177,7 +1178,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 wh += getStringPredicate("NODE_NAME", query.getNodeName(), prms);
 
                 wh += getStringPredicate("QUEUE_NAME", query.getQueueName(), prms);
-                wh += getIntPredicate("QUEUE", query.getQueueId() == null ? null : query.getQueueId(), prms);
+                wh += getLongPredicate("QUEUE", query.getQueueId() == null ? null : query.getQueueId(), prms);
 
                 wh += getCalendarPredicate("DATE_ENQUEUE", query.getEnqueuedAfter(), ">=", prms);
                 wh += getCalendarPredicate("DATE_ENQUEUE", query.getEnqueuedBefore(), "<=", prms);
@@ -1279,8 +1280,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             // Fetch messages and parameters in batch
 
             // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
-            List<List<Integer>> ids = new ArrayList<>();
-            List<Integer> currentList = null;
+            List<List<Long>> ids = new ArrayList<>();
+            List<Long> currentList = null;
             int i = 0;
             for (com.enioka.jqm.client.api.JobInstance ji : res.values())
             {
@@ -1294,19 +1295,19 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             }
             if (currentList != null && !currentList.isEmpty())
             {
-                for (List<Integer> idsBatch : ids)
+                for (List<Long> idsBatch : ids)
                 {
                     ResultSet run = cnx.runSelect("jiprm_select_by_ji_list", idsBatch);
                     while (run.next())
                     {
-                        res.get(run.getInt(2)).getParameters().put(run.getString(3), run.getString(4));
+                        res.get(run.getLong(2)).getParameters().put(run.getString(3), run.getString(4));
                     }
                     run.close();
 
                     ResultSet msg = cnx.runSelect("message_select_by_ji_list", idsBatch);
                     while (msg.next())
                     {
-                        res.get(msg.getInt(2)).getMessages().add(msg.getString(3));
+                        res.get(msg.getLong(2)).getMessages().add(msg.getString(3));
                     }
                     msg.close();
                 }
@@ -1327,7 +1328,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     {
         com.enioka.jqm.client.api.JobInstance res = new com.enioka.jqm.client.api.JobInstance();
 
-        res.setId(rs.getInt(1));
+        res.setId(rs.getLong(1));
         // res.setApplication(rs.getString(2));
         res.setApplicationName(rs.getString(3));
         res.setEmail(rs.getString(5));
@@ -1344,7 +1345,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         res.setDefinitionKeyword2(rs.getString(16));
         res.setDefinitionKeyword3(rs.getString(17));
         res.setNodeName(rs.getString(19));
-        res.setParent(rs.getInt(20));
+        res.setParent(rs.getLong(20));
         res.setProgress(rs.getInt(21));
         res.setQueueName(rs.getString(22));
         res.setSessionID(rs.getString(24));
@@ -1352,7 +1353,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         res.setUser(rs.getString(26));
 
         com.enioka.jqm.client.api.Queue q = new com.enioka.jqm.client.api.Queue();
-        q.setId(rs.getInt(29));
+        q.setId(rs.getLong(29));
         q.setName(rs.getString(22));
         res.setQueue(q);
 
@@ -1366,7 +1367,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public com.enioka.jqm.client.api.JobInstance getJob(int idJob)
+    public com.enioka.jqm.client.api.JobInstance getJob(long idJob)
     {
         // TODO: direct queries following previous logic, but after we have common table structures.
         return this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke().get(0);
@@ -1452,13 +1453,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<String> getJobMessages(int idJob)
+    public List<String> getJobMessages(long idJob)
     {
         return getJob(idJob).getMessages();
     }
 
     @Override
-    public int getJobProgress(int idJob)
+    public int getJobProgress(long idJob)
     {
         return getJob(idJob).getProgress();
     }
@@ -1468,7 +1469,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<com.enioka.jqm.client.api.Deliverable> getJobDeliverables(int idJob)
+    public List<com.enioka.jqm.client.api.Deliverable> getJobDeliverables(long idJob)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -1490,7 +1491,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public List<InputStream> getJobDeliverablesContent(int idJob)
+    public List<InputStream> getJobDeliverablesContent(long idJob)
     {
         ArrayList<InputStream> streams = new ArrayList<>();
         try (DbConn cnx = getDbSession())
@@ -1514,7 +1515,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public InputStream getDeliverableContent(int delId)
+    public InputStream getDeliverableContent(long delId)
     {
         Deliverable deliverable = null;
 
@@ -1546,7 +1547,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 throw new NoResultException("no node named " + nodeName);
             }
             String dns = rs.getString(1);
-            Integer port = rs.getInt(2);
+            int port = rs.getInt(2);
 
             if (rs.next())
             {
@@ -1599,18 +1600,18 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
-    public InputStream getJobLogStdOut(int jobId)
+    public InputStream getJobLogStdOut(long jobId)
     {
         return getJobLog(jobId, ".stdout", "stdout");
     }
 
     @Override
-    public InputStream getJobLogStdErr(int jobId)
+    public InputStream getJobLogStdErr(long jobId)
     {
         return getJobLog(jobId, ".stderr", "stderr");
     }
 
-    private String getHostForLaunch(int launchId)
+    private String getHostForLaunch(Long launchId)
     {
         String host;
         try (DbConn cnx = getDbSession())
@@ -1648,7 +1649,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
     }
 
-    private InputStream getJobLog(int jobId, String extension, String param)
+    private InputStream getJobLog(Long jobId, String extension, String param)
     {
         // 1: retrieve node to address
         String uriStart = getHostForLaunch(jobId);
@@ -1812,7 +1813,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         return q;
     }
 
-    private static Schedule getSchedule(ScheduledJob s, Map<Integer, com.enioka.jqm.client.api.Queue> queues)
+    private static Schedule getSchedule(ScheduledJob s, Map<Long, com.enioka.jqm.client.api.Queue> queues)
     {
         Schedule res = new Schedule();
         res.setCronExpression(s.getCronExpression());
@@ -1851,9 +1852,9 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     {
         List<com.enioka.jqm.client.api.JobDef> res = new ArrayList<>();
         List<JobDef> dbr = null;
-        List<Integer> ids = null;
-        Map<Integer, com.enioka.jqm.client.api.Queue> queues = null;
-        Map<Integer, List<JobDefParameter>> allParams = null;
+        List<Long> ids = null;
+        Map<Long, com.enioka.jqm.client.api.Queue> queues = null;
+        Map<Long, List<JobDefParameter>> allParams = null;
         List<ScheduledJob> sjs = null;
 
         try (DbConn cnx = getDbSession())

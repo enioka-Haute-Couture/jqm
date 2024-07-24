@@ -116,7 +116,7 @@ public class JqmAsynchonousTesterJse implements JqmAsynchronousTester
     }
 
     @Override
-    public int enqueue(String name)
+    public Long enqueue(String name)
     {
         return tester.enqueue(name);
     }

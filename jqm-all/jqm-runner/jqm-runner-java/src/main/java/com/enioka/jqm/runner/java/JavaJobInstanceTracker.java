@@ -253,7 +253,7 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
     }
 
     @Override
-    public Integer getId()
+    public Long getId()
     {
         return this.job.getId();
     }

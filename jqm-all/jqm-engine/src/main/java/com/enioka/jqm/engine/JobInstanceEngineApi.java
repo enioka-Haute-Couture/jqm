@@ -88,8 +88,8 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
-            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+    public long enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
+                        String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         JobRequest jr = getJqmClient().newJobRequest(applicationName, user);
         jr.setApplicationName(applicationName);
@@ -111,16 +111,16 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Integer enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
-            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+    public long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
+                            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        int i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
+        long i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
         waitChild(i);
         return i;
     }
 
     @Override
-    public void waitChild(int id)
+    public void waitChild(long id)
     {
         JqmClient c = getJqmClient();
         Query q = c.newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).setJobInstanceId(id);
@@ -162,7 +162,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Integer addDeliverable(String path, String fileLabel)
+    public long addDeliverable(String path, String fileLabel)
     {
         try (DbConn cnx = Helpers.getNewDbSession())
         {
@@ -175,7 +175,7 @@ class JobInstanceEngineApi implements JobManager
             jqmlogger.debug("A deliverable is added. Stored as " + absDestPath + ". Initial name: " + fileName);
             FileUtils.moveFile(new File(path), new File(absDestPath));
             cnx.commit();
-            int res = Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), cnx);
+            long res = Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), cnx);
             cnx.commit();
             return res;
         }
@@ -188,7 +188,7 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public File getWorkDir()
     {
-        File f = new File(FilenameUtils.concat(ji.getNode().getTmpDirectory(), Integer.toString(this.ji.getId())));
+        File f = new File(FilenameUtils.concat(ji.getNode().getTmpDirectory(), Long.toString(this.ji.getId())));
         if (!f.isDirectory())
         {
             try
@@ -220,7 +220,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public boolean hasEnded(int jobId)
+    public boolean hasEnded(long jobId)
     {
         try (DbConn cnx = Helpers.getNewDbSession())
         {
@@ -234,7 +234,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Boolean hasSucceeded(int requestId)
+    public Boolean hasSucceeded(long requestId)
     {
         try (DbConn cnx = Helpers.getNewDbSession())
         {
@@ -248,7 +248,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Boolean hasFailed(int requestId)
+    public Boolean hasFailed(long requestId)
     {
         Boolean b = hasSucceeded(requestId);
         if (b == null)
@@ -339,19 +339,19 @@ class JobInstanceEngineApi implements JobManager
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Integer jobApplicationId()
+    public long jobApplicationId()
     {
         return this.ji.getJdId();
     }
 
     @Override
-    public Integer parentID()
+    public Long parentID()
     {
         return this.ji.getParentId();
     }
 
     @Override
-    public Integer jobInstanceID()
+    public long jobInstanceID()
     {
         return this.ji.getId();
     }

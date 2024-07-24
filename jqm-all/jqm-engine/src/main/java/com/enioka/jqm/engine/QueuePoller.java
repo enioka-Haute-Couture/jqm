@@ -60,14 +60,14 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private int maxNbThread = 10;
     private boolean paused = false;
     private int pollingInterval = 10000;
-    private int dpId;
+    private long dpId;
     private boolean strictPollingPeriod = false;
 
     private boolean run = true;
     private AtomicInteger actualNbThread = new AtomicInteger(0);
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
-    private Map<Integer, Date> peremption = new ConcurrentHashMap<>();
+    private Map<Long, Date> peremption = new ConcurrentHashMap<Long, Date>();
 
     private List<ResourceManagerBase> resourceManagers = new ArrayList<>();
     private ResourceManager threadresourceManagerConfiguration;

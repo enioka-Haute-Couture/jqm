@@ -1,0 +1,26 @@
+# This file describes an ingress point for the LoadBalancer service. It will forward requests of the host's 80 port to
+# the requested service port (here: 1789).
+#
+# On Microk8s, this requires the `ingress` addon to be enabled.
+#
+# If you do not want to use an ingress point, you need to assign an external IP address to the LoadBalancer service
+# using a tool like MetalLB.
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: jqm-ingress
+    annotations:
+        ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+    rules:
+        - http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: jqm-lb
+                            port:
+                                number: 1789
+    ingressClassName: public

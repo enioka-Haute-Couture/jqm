@@ -138,7 +138,7 @@ public interface JqmAsynchronousTester
      *
      * @return the request ID.
      */
-    public int enqueue(String name);
+    public Long enqueue(String name);
 
     /**
      * Wait for a given amount of ended job instances (OK or KO).

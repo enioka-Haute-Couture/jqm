@@ -102,7 +102,7 @@ public class ServiceAdmin
     @Path("node/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @HttpCache("public, max-age=60")
-    public NodeDto getNode(@PathParam("id") int id)
+    public NodeDto getNode(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -167,7 +167,7 @@ public class ServiceAdmin
     @Path("q/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @HttpCache
-    public QueueDto getQueue(@PathParam("id") int id)
+    public QueueDto getQueue(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -178,7 +178,7 @@ public class ServiceAdmin
     @PUT
     @Path("q/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueue(@PathParam("id") Integer id, QueueDto dto)
+    public void setQueue(@PathParam("id") long id, QueueDto dto)
     {
         dto.setId(id);
         setQueue(dto);
@@ -198,7 +198,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("q/{id}")
-    public void deleteQueue(@PathParam("id") Integer id)
+    public void deleteQueue(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -250,7 +250,7 @@ public class ServiceAdmin
     @PUT
     @Path("qmapping/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueueMapping(@PathParam("id") Integer id, QueueMappingDto dto)
+    public void setQueueMapping(@PathParam("id") Long id, QueueMappingDto dto)
     {
         dto.setId(id);
         setQueueMapping(dto);
@@ -270,7 +270,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("qmapping/{id}")
-    public void deleteQueueMapping(@PathParam("id") Integer id)
+    public void deleteQueueMapping(@PathParam("id") Long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -321,7 +321,7 @@ public class ServiceAdmin
     @PUT
     @Path("jndi/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setJndiResource(@PathParam("id") Integer id, JndiObjectResourceDto dto)
+    public void setJndiResource(@PathParam("id") Long id, JndiObjectResourceDto dto)
     {
         dto.setId(id);
         setJndiResource(dto);
@@ -341,7 +341,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("jndi/{id}")
-    public void deleteJndiResource(@PathParam("id") Integer id)
+    public void deleteJndiResource(@PathParam("id") Long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -393,7 +393,7 @@ public class ServiceAdmin
     @PUT
     @Path("prm/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setGlobalParameter(@PathParam("id") Integer id, GlobalParameterDto dto)
+    public void setGlobalParameter(@PathParam("id") Long id, GlobalParameterDto dto)
     {
         dto.setId(id);
         setGlobalParameter(dto);
@@ -413,7 +413,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("prm/{id}")
-    public void deleteGlobalParameter(@PathParam("id") Integer id)
+    public void deleteGlobalParameter(@PathParam("id") Long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -454,7 +454,7 @@ public class ServiceAdmin
     @Path("jd/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @HttpCache
-    public JobDefDto getJobDef(@PathParam("id") int id)
+    public JobDefDto getJobDef(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -465,7 +465,7 @@ public class ServiceAdmin
     @PUT
     @Path("jd/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setJobDef(@PathParam("id") Integer id, JobDefDto dto)
+    public void setJobDef(@PathParam("id") long id, JobDefDto dto)
     {
         dto.setId(id);
         setJobDef(dto);
@@ -485,7 +485,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("jd/{id}")
-    public void deleteJobDef(@PathParam("id") Integer id)
+    public void deleteJobDef(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -585,7 +585,7 @@ public class ServiceAdmin
     @PUT
     @Path("user/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setUser(@PathParam("id") Integer id, RUserDto dto)
+    public void setUser(@PathParam("id") long id, RUserDto dto)
     {
         dto.setId(id);
         setUser(dto);
@@ -605,7 +605,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("user/{id}")
-    public void deleteUser(@PathParam("id") Integer id)
+    public void deleteUser(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -657,7 +657,7 @@ public class ServiceAdmin
     @PUT
     @Path("role/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setRole(@PathParam("id") Integer id, RRoleDto dto)
+    public void setRole(@PathParam("id") Long id, RRoleDto dto)
     {
         dto.setId(id);
         setRole(dto);
@@ -677,7 +677,7 @@ public class ServiceAdmin
 
     @DELETE
     @Path("role/{id}")
-    public void deleteRole(@PathParam("id") Integer id)
+    public void deleteRole(@PathParam("id") Long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
@@ -725,7 +725,7 @@ public class ServiceAdmin
     @Path("user/{id}/certificate")
     @Produces("application/zip")
     @GET
-    public InputStream getNewCertificate(@PathParam("id") int userId)
+    public InputStream getNewCertificate(@PathParam("id") long userId)
     {
         try (DbConn cnx = Helpers.getDbSession())
         {

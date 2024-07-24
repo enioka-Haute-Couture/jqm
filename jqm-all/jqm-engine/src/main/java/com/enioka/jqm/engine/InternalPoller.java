@@ -151,7 +151,7 @@ class InternalPoller implements Runnable
                     ResultSet rs = cnx.runSelect("ji_select_instructions_by_node", node.getId());
                     while (rs.next())
                     {
-                        Integer jiid = rs.getInt(1);
+                        long jiid = rs.getLong(1);
                         String instr = rs.getString(2);
                         Instruction instruction;
                         try

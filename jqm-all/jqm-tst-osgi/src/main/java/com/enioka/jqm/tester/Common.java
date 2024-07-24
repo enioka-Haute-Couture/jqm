@@ -42,14 +42,15 @@ final class Common
     static Properties dbProperties()
     {
         Properties p = new Properties();
-        p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
         p.put("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
+        p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
+        p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
         return p;
     }
 
-    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Integer> queues)
+    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Long> queues)
     {
-        int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
+        Long clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
                 d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
 
         JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),

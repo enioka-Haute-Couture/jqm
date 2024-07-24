@@ -34,7 +34,7 @@ public class EngineApiTest extends JqmBaseTest
         boolean success2 = false;
         boolean success3 = false;
 
-        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
+        Long i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
 
         List<String> messages = jqmClient.newQuery().setJobInstanceId(i).invoke().get(0).getMessages();
         for (String msg : messages)

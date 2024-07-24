@@ -2,6 +2,7 @@ package com.enioka.jqm.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -17,7 +18,7 @@ class CommandNewNode extends CommandBase
     private int port = 0;
 
     @Override
-    int doWork()
+    public int doWork()
     {
         try (DbConn cnx = DbManager.getDb().getConn())
         {

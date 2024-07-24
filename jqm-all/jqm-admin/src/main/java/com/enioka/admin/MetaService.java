@@ -2,10 +2,7 @@ package com.enioka.admin;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
@@ -100,7 +97,7 @@ public class MetaService
     // GLOBAL PARAMETER
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteGlobalParameter(DbConn cnx, int id)
+    public static void deleteGlobalParameter(DbConn cnx, Long id)
     {
         QueryResult qr = cnx.runUpdate("globalprm_delete_by_id", id);
         if (qr.nbUpdated != 1)
@@ -122,7 +119,7 @@ public class MetaService
     private static GlobalParameterDto mapGlobalParameter(ResultSet rs) throws SQLException
     {
         GlobalParameterDto res = new GlobalParameterDto();
-        res.setId(rs.getInt(1));
+        res.setId(rs.getLong(1));
         res.setKey(rs.getString(2));
         res.setValue(rs.getString(3));
         return res;
@@ -211,7 +208,7 @@ public class MetaService
     // JNDI
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteJndiObjectResource(DbConn cnx, int id)
+    public static void deleteJndiObjectResource(DbConn cnx, Long id)
     {
         cnx.runUpdate("jndiprm_delete_for_resource", id);
         QueryResult qr = cnx.runUpdate("jndi_delete_by_id", id);
@@ -289,7 +286,7 @@ public class MetaService
     private static JndiObjectResourceDto mapJndiObjectResource(ResultSet rs) throws SQLException
     {
         JndiObjectResourceDto res = new JndiObjectResourceDto();
-        res.setId(rs.getInt(1));
+        res.setId(rs.getLong(1));
         res.setName(rs.getString(2));
         res.setAuth(rs.getString(3));
         res.setType(rs.getString(4));
@@ -335,7 +332,7 @@ public class MetaService
     {
         ResultSet rs = cnx.runSelect(query_key, prms);
         List<JndiObjectResourceDto> res = new ArrayList<>();
-        List<Integer> rscIds = new ArrayList<>();
+        List<Long> rscIds = new ArrayList<>();
         try
         {
             // The resources
@@ -355,7 +352,7 @@ public class MetaService
                 {
                     String key = rs.getString(2);
                     String value = rs.getString(4);
-                    int rid = rs.getInt(5);
+                    long rid = rs.getLong(5);
 
                     for (JndiObjectResourceDto tmp : res)
                     {
@@ -406,7 +403,7 @@ public class MetaService
     // JOB DEF
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteJobDef(DbConn cnx, int id)
+    public static void deleteJobDef(DbConn cnx, Long id)
     {
         int countRunning = cnx.runSelectSingle("ji_select_count_by_jd", Integer.class, id);
         if (countRunning > 0)
@@ -429,10 +426,10 @@ public class MetaService
         JobDefDto tmp = new JobDefDto();
         try
         {
-            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setId(rs.getLong(1 + colShift));
             tmp.setApplication(rs.getString(2 + colShift));
             tmp.setApplicationName(rs.getString(3 + colShift));
-            tmp.setClassLoaderId(rs.getInt(4 + colShift) > 0 ? rs.getInt(4 + colShift) : null);
+            tmp.setClassLoaderId(rs.getLong(4 + colShift) > 0 ? rs.getLong(4 + colShift) : null);
             tmp.setCanBeRestarted(true);
             tmp.setDescription(rs.getString(5 + colShift));
             tmp.setEnabled(rs.getBoolean(6 + colShift));
@@ -447,7 +444,7 @@ public class MetaService
             tmp.setKeyword3(rs.getString(14 + colShift));
             tmp.setReasonableRuntimeLimitMinute(rs.getInt(15 + colShift));
             tmp.setModule(rs.getString(16 + colShift));
-            tmp.setQueueId(rs.getInt(18 + colShift) > 0 ? rs.getInt(18 + colShift) : null);
+            tmp.setQueueId(rs.getLong(18 + colShift) > 0 ? rs.getLong(18 + colShift) : null);
         }
         catch (SQLException e)
         {
@@ -458,8 +455,8 @@ public class MetaService
 
     private static void addSubElementsToDto(DbConn cnx, List<JobDefDto> dtos)
     {
-        List<Integer> currentIdList = null;
-        List<List<Integer>> allIdLists = new ArrayList<>();
+        List<Long> currentIdList = null;
+        List<List<Long>> allIdLists = new ArrayList<>();
         for (JobDefDto dto : dtos)
         {
             if (currentIdList == null || currentIdList.size() == 500)
@@ -473,14 +470,14 @@ public class MetaService
         // Parameters
         try
         {
-            for (List<Integer> ids : allIdLists)
+            for (List<Long> ids : allIdLists)
             {
                 ResultSet rs = cnx.runSelect("jdprm_select_all_for_jd_list", ids);
                 while (rs.next())
                 {
                     String key = rs.getString(2);
                     String value = rs.getString(3);
-                    int id = rs.getInt(4);
+                    long id = rs.getLong(4);
 
                     for (JobDefDto dto : dtos)
                     {
@@ -502,7 +499,7 @@ public class MetaService
         // Schedules
         try
         {
-            for (List<Integer> ids : allIdLists)
+            for (List<Long> ids : allIdLists)
             {
                 List<ScheduledJob> sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
 
@@ -554,7 +551,7 @@ public class MetaService
         return res;
     }
 
-    public static JobDefDto getJobDef(DbConn cnx, Integer id)
+    public static JobDefDto getJobDef(DbConn cnx, Long id)
     {
         try (var rs = cnx.runSelect("jd_select_by_id", id))
         {
@@ -642,7 +639,7 @@ public class MetaService
                         }
                         if (existing == null)
                         {
-                            throw new JqmAdminApiUserException("Trying to update a sccheduled job which does not exist - id " + sj.getId());
+                            throw new JqmAdminApiUserException("Trying to update a scheduled job which does not exist - id " + sj.getId());
                         }
 
                         // Parameter update?
@@ -657,7 +654,7 @@ public class MetaService
                         }
 
                         // Update main SJ fields (only if needed).
-                        if (update || !sj.getCronExpression().equals(existing.getCronExpression()) || sj.getQueue() != existing.getQueue())
+                        if (update || !sj.getCronExpression().equals(existing.getCronExpression()) || (existing.getQueue() != null && !existing.getQueue().equals(sj.getQueue())))
                         {
                             cnx.runUpdate("sj_update_all_fields_by_id", sj.getCronExpression(), sj.getQueue(), sj.getPriority(),
                                     sj.getId());
@@ -669,7 +666,7 @@ public class MetaService
         }
         else
         {
-            int i = JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(),
+            long i = JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(),
                     dto.getQueueId(), dto.getReasonableRuntimeLimitMinute(), dto.getApplicationName(), dto.getApplication(),
                     dto.getModule(), dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getClassLoaderId(),
                     PathType.valueOf(dto.getPathType()));
@@ -754,7 +751,7 @@ public class MetaService
         {
             NodeDto tmp = new NodeDto();
 
-            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setId(rs.getLong(1 + colShift));
 
             tmp.setOutputDirectory(rs.getString(2 + colShift));
             tmp.setDns(rs.getString(3 + colShift));
@@ -806,7 +803,7 @@ public class MetaService
         return res;
     }
 
-    public static NodeDto getNode(DbConn cnx, int id)
+    public static NodeDto getNode(DbConn cnx, Long id)
     {
         try (var rs = cnx.runSelect("node_select_by_id", id))
         {
@@ -894,7 +891,7 @@ public class MetaService
     // QUEUE
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteQueue(DbConn cnx, int id)
+    public static void deleteQueue(DbConn cnx, Long id)
     {
         int countRunning = cnx.runSelectSingle("ji_select_count_by_queue", Integer.class, id);
         if (countRunning > 0)
@@ -919,7 +916,7 @@ public class MetaService
         {
             QueueDto tmp = new QueueDto();
 
-            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setId(rs.getLong(1 + colShift));
             tmp.setDefaultQueue(rs.getBoolean(2 + colShift));
             tmp.setDescription(rs.getString(3 + colShift));
             tmp.setName(rs.getString(4 + colShift));
@@ -951,7 +948,7 @@ public class MetaService
         return res;
     }
 
-    public static QueueDto getQueue(DbConn cnx, int id)
+    public static QueueDto getQueue(DbConn cnx, Long id)
     {
         try (var rs = cnx.runSelect("q_select_by_id", id))
         {
@@ -1011,7 +1008,7 @@ public class MetaService
     // DEPLOYMENT PARAMETER
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteQueueMapping(DbConn cnx, int id)
+    public static void deleteQueueMapping(DbConn cnx, Long id)
     {
         QueryResult qr = cnx.runUpdate("dp_delete_by_id", id);
         if (qr.nbUpdated != 1)
@@ -1027,13 +1024,13 @@ public class MetaService
         {
             QueueMappingDto tmp = new QueueMappingDto();
 
-            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setId(rs.getLong(1 + colShift));
             tmp.setEnabled(rs.getBoolean(2 + colShift));
 
             tmp.setNbThread(rs.getInt(4 + colShift));
             tmp.setPollingInterval(rs.getInt(5 + colShift));
-            tmp.setNodeId(rs.getInt(6 + colShift));
-            tmp.setQueueId(rs.getInt(7 + colShift));
+            tmp.setNodeId(rs.getLong(6 + colShift));
+            tmp.setQueueId(rs.getLong(7 + colShift));
             tmp.setNodeName(rs.getString(8 + colShift));
             tmp.setQueueName(rs.getString(9 + colShift));
 
@@ -1083,7 +1080,7 @@ public class MetaService
         }
     }
 
-    public static List<QueueMappingDto> getNodeQueueMappings(DbConn cnx, int nodeId)
+    public static List<QueueMappingDto> getNodeQueueMappings(DbConn cnx, Long nodeId)
     {
         ResultSet rs = null;
         List<QueueMappingDto> res = new ArrayList<>();
@@ -1147,7 +1144,7 @@ public class MetaService
     // ROLE
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteRole(DbConn cnx, int id, boolean force)
+    public static void deleteRole(DbConn cnx, Long id, boolean force)
     {
         if (force)
         {
@@ -1178,7 +1175,7 @@ public class MetaService
         {
             RRoleDto tmp = new RRoleDto();
 
-            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setId(rs.getLong(1 + colShift));
             tmp.setName(rs.getString(2 + colShift));
             tmp.setDescription(rs.getString(3 + colShift));
 
@@ -1204,7 +1201,7 @@ public class MetaService
             }
             rs.close();
 
-            List<Integer> ids = new ArrayList<>();
+            List<Long> ids = new ArrayList<>();
             for (RRoleDto dto : res)
             {
                 ids.add(dto.getId());
@@ -1213,7 +1210,7 @@ public class MetaService
             rs = cnx.runSelect("perm_select_all_in_role_list", ids);
             while (rs.next())
             {
-                int role_id = rs.getInt(3);
+                long role_id = rs.getLong(3);
                 String permName = rs.getString(2);
 
                 for (RRoleDto dto : res)
@@ -1300,7 +1297,7 @@ public class MetaService
     // USER
     ///////////////////////////////////////////////////////////////////////////
 
-    public static void deleteUser(DbConn cnx, int id)
+    public static void deleteUser(DbConn cnx, Long id)
     {
         QueryResult qr = cnx.runUpdate("user_delete_by_id", id);
         if (qr.nbUpdated != 1)
@@ -1316,7 +1313,7 @@ public class MetaService
         {
             RUserDto tmp = new RUserDto();
 
-            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setId(rs.getLong(1 + colShift));
             tmp.setLogin(rs.getString(2 + colShift));
 
             tmp.setLocked(rs.getBoolean(5 + colShift));
@@ -1349,7 +1346,7 @@ public class MetaService
             }
             rs.close();
 
-            List<Integer> ids = new ArrayList<>();
+            List<Long> ids = new ArrayList<>();
             for (RUserDto dto : res)
             {
                 ids.add(dto.getId());
@@ -1358,12 +1355,12 @@ public class MetaService
             rs = cnx.runSelect("role_select_id_for_user_list", ids);
             while (rs.next())
             {
-                int userId = rs.getInt(2);
-                int roleId = rs.getInt(1);
+                long userId = rs.getLong(2);
+                long roleId = rs.getLong(1);
 
                 for (RUserDto dto : res)
                 {
-                    if (dto.getId().equals(userId))
+                    if (dto.getId() == userId)
                     {
                         dto.addRole(roleId);
                     }
@@ -1396,7 +1393,7 @@ public class MetaService
         }
     }
 
-    public static void changeUserPassword(DbConn cnx, int userId, String newPassword)
+    public static void changeUserPassword(DbConn cnx, Long userId, String newPassword)
     {
         ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
         String hash = new Sha512Hash(newPassword, salt, 100000).toHex();
@@ -1434,7 +1431,7 @@ public class MetaService
 
             // Roles
             cnx.runUpdate("user_remove_all_roles_by_id", dto.getId());
-            for (int i : dto.getRoles())
+            for (long i : dto.getRoles())
             {
                 cnx.runUpdate("user_add_role_by_id", dto.getId(), i);
             }
@@ -1443,14 +1440,14 @@ public class MetaService
         {
             QueryResult r = cnx.runUpdate("user_insert", dto.getEmail(), dto.getExpirationDate(), dto.getFreeText(), null,
                     dto.getInternal(), false, dto.getLogin(), null);
-            int newId = r.getGeneratedId();
+            Long newId = r.getGeneratedId();
 
             if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
             {
                 changeUserPassword(cnx, newId, dto.getNewPassword());
             }
 
-            for (int i : dto.getRoles())
+            for (long i : dto.getRoles())
             {
                 cnx.runUpdate("user_add_role_by_id", newId, i);
             }

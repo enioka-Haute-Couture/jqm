@@ -40,13 +40,14 @@ import com.enioka.jqm.client.api.State;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class QueryBaseImpl implements Query
 {
-    protected Integer jobInstanceId, parentId;
+    protected Long jobInstanceId;
+    protected Long parentId;
     protected List<String> applicationName = new ArrayList<>();
     protected String user, sessionId;
     protected String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     protected String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
     protected String queueName, nodeName;
-    protected Integer queueId;
+    protected Long queueId;
     protected Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
 
     @XmlElementWrapper(name = "statuses")
@@ -175,25 +176,25 @@ public class QueryBaseImpl implements Query
     // Stupid get/set
     // //////////////////////////////////////////
 
-    public Integer getJobInstanceId()
+    public Long getJobInstanceId()
     {
         return jobInstanceId;
     }
 
     @Override
-    public Query setJobInstanceId(Integer jobInstanceId)
+    public Query setJobInstanceId(long jobInstanceId)
     {
         this.jobInstanceId = jobInstanceId;
         return this;
     }
 
-    public Integer getParentId()
+    public Long getParentId()
     {
         return parentId;
     }
 
     @Override
-    public Query setParentId(Integer parentId)
+    public Query setParentId(long parentId)
     {
         this.parentId = parentId;
         return this;
@@ -498,13 +499,13 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
-    public Integer getQueueId()
+    public Long getQueueId()
     {
         return queueId;
     }
 
     @Override
-    public Query setQueueId(Integer queueId)
+    public Query setQueueId(long queueId)
     {
         this.queueId = queueId;
         return this;

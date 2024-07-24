@@ -119,7 +119,7 @@ public class HighlanderTest extends JqmBaseTest
 
         addAndStartEngine();
 
-        int firstJob = jqmClient.newJobRequest("kill", "TestUser").enqueue();
+        long firstJob = jqmClient.newJobRequest("kill", "TestUser").enqueue();
         for (int i = 0; i < 100; i++)
         {
             jqmClient.newJobRequest("kill", "TestUser").enqueue();
@@ -157,7 +157,7 @@ public class HighlanderTest extends JqmBaseTest
     @Test
     public void testHighlanderMultiNodeBug195() throws Exception
     {
-        int q = Queue.create(cnx, "q", "test queue", false);
+        long q = Queue.create(cnx, "q", "test queue", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, q);
         DeploymentParameter.create(cnx, TestHelpers.nodeMix.getId(), 1, 1, q);
 
@@ -166,15 +166,15 @@ public class HighlanderTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", q, 42, "WithoutH", null,
                 "Franquin", "WithoutH", "other", "other", false, cnx);
 
-        int i1 = jqmClient.newJobRequest("WithH", "TestUser").enqueue();
+        long i1 = jqmClient.newJobRequest("WithH", "TestUser").enqueue();
 
         addAndStartEngine();
         addAndStartEngine("localhost4");
 
         TestHelpers.waitForRunning(1, 5000, cnx);
-        int i2 = jqmClient.newJobRequest("WithH", "TestUser").enqueue();
+        long i2 = jqmClient.newJobRequest("WithH", "TestUser").enqueue();
         sleep(2);
-        int i3 = jqmClient.newJobRequest("WithoutH", "TestUser").enqueue();
+        long i3 = jqmClient.newJobRequest("WithoutH", "TestUser").enqueue();
 
         TestHelpers.waitForRunning(2, 5000, cnx);
         sleep(1); // Additional - check no more than two running!

@@ -15,8 +15,6 @@ import java.util.concurrent.Semaphore;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import com.enioka.jqm.cli.bootstrap.CommandLine;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -29,12 +27,13 @@ import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
-import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import com.enioka.jqm.cli.bootstrap.CommandLine;
 
 class OsgiRuntime
 {
@@ -81,14 +80,11 @@ class OsgiRuntime
         Map<String, String> osgiConfig = new HashMap<>();
         osgiConfig.put(Constants.FRAMEWORK_STORAGE, tmpPath);
         osgiConfig.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-                "com.enioka.jqm.cli.bootstrap;version=1.0.0,org.slf4j;version=1.999.0,org.slf4j.spi;version=1.999.0,org.slf4j.helpers;version=1.999.0,ch.qos.logback.classic;version=1.999.0,ch.qos.logback.classic.spi;version=1.999.0,ch.qos.logback.core;version=1.999.0,ch.qos.logback.core.rolling;version=1.999.0,javax.security.auth.x500;version=1.999.0,org.apache.commons.logging");
-        osgiConfig.put("org.osgi.framework.startlevel.beginning", "1"); // 0 is framework, 1 is framework extension, 5 is normal.
+                "com.enioka.jqm.cli.bootstrap;version=1.0.0,org.slf4j;version=2.999.0,org.slf4j.spi;version=2.999.0,org.slf4j.helpers;version=2.999.0,org.slf4j;version=1.999.0,org.slf4j.spi;version=1.999.0,org.slf4j.helpers;version=1.999.0,ch.qos.logback.classic;version=1.999.0,ch.qos.logback.classic.spi;version=1.999.0,ch.qos.logback.core;version=1.999.0,ch.qos.logback.core.rolling;version=1.999.0,javax.security.auth.x500;version=1.999.0,org.apache.commons.logging");
+        osgiConfig.put("org.osgi.framework.startlevel.beginning", "0"); // 0 is framework, 1 is framework extension, 5 is normal.
         osgiConfig.put("felix.auto.deploy.action", ""); // Disable auto deploy
-        osgiConfig.put("org.apache.cxf.osgi.http.transport.disable", "true"); // remove /cxf
         osgiConfig.put("org.apache.felix.http.enable", "false");
         osgiConfig.put("org.apache.felix.https.enable", "false");
-        osgiConfig.put("org.apache.aries.spifly.auto.consumers", "jakarta.*");
-        osgiConfig.put("org.apache.aries.spifly.auto.providers", "com.sun.*");
         osgiConfig.put("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         osgiConfig.put("eclipse.log.enabled", "false");
 
@@ -109,8 +105,9 @@ class OsgiRuntime
         Framework framework = factory.newFramework(osgiConfig);
         try
         {
-            framework.start();
-            jqmlogger.debug("Framework started");
+            jqmlogger.debug("Initializing OSGi framework.");
+            framework.init();
+            jqmlogger.debug("Framework initialized");
         }
         catch (BundleException e)
         {
@@ -121,7 +118,7 @@ class OsgiRuntime
         // we prefer to use standard OSGi classes rather than Felix ones (which would be cleaner)
         BundleContext ctx = framework.getBundleContext();
 
-        // load our bundles
+        // load priority bundles - the ones defining framework extensions like spi-fly and url wrapper.
         jqmlogger.debug("Installing level 1 bundles...");
         List<Bundle> levelBundles = new ArrayList<>();
         for (String file : new File(levelOneLibPath).list())
@@ -143,40 +140,45 @@ class OsgiRuntime
         }
         levelBundles.clear();
 
+        // Now that extensions are installed, start the framework.
+        try
+        {
+            framework.start();
+        }
+        catch (BundleException e)
+        {
+            jqmlogger.error("Could not initialize OSGi framework", e);
+            System.exit(999);
+        }
+        setStartLevel(framework, 2);
+
+        // Install all the standard bundles
         jqmlogger.debug("Installing standard bundles...");
         for (String file : new File(libPath).list())
         {
             String path = new File(libPath, file).toURI().toString();
             if (loadedBundles.add(file))
             {
-                tryInstallBundle(ctx, path);
+                var b = tryInstallBundle(ctx, path, 5);
+                if (b != null)
+                {
+                    levelBundles.add(b);
+                }
             }
         }
 
-        // Start the bundles
-        Semaphore waitForLevelChange = new Semaphore(0);
-        framework.adapt(FrameworkStartLevel.class).setStartLevel(5, new FrameworkListener()
-        {
-            @Override
-            public void frameworkEvent(FrameworkEvent event)
-            {
-                if (event.getType() == FrameworkEvent.STARTLEVEL_CHANGED)
-                {
-                    waitForLevelChange.release();
-                }
-            }
-        });
-        try
-        {
-            waitForLevelChange.acquire();
-        }
-        catch (InterruptedException e)
-        {
-            jqmlogger.warn("Weird interruption while starting the framework");
-        }
-        for (Bundle bundle : ctx.getBundles())
+        // Start the standard bundles
+        jqmlogger.debug("Starting standard bundles...");
+        for (Bundle bundle : levelBundles)
         {
             tryStartBundle(bundle);
+        }
+
+        setStartLevel(framework, 5);
+
+        if (jqmlogger.isDebugEnabled())
+        {
+            dumpContext(ctx);
         }
 
         // get our main entry point service
@@ -197,13 +199,22 @@ class OsgiRuntime
         return cli;
     }
 
-    private static Bundle tryInstallBundle(BundleContext ctx, String path)
-    {
-        return tryInstallBundle(ctx, path, 5);
-    }
-
     private static Bundle tryInstallBundle(BundleContext ctx, String path, int startLevel)
     {
+        // SUPER DUPER HACK: SPI-Fly client weaving is not working on Liquibase when org.osgi.util.tracker-1.5.4 is started before it.
+        // This tracker is very useful and needed by the Eclipse whiteboard, so we cannot remove it.
+        // Why oh why...
+        if (path.contains("liquibase"))
+        {
+            startLevel = 1;
+        }
+        if (path.contains("tracker"))
+        {
+            startLevel = 5;
+        }
+        // end of hack
+        ////////////////////////////////////
+
         jqmlogger.trace("tryInstallBundle {}", path);
         File testPath = new File(path.replace("file:", ""));
         if (!path.endsWith("jar") || !testPath.exists() || testPath.isDirectory())
@@ -217,7 +228,7 @@ class OsgiRuntime
         boolean isBundle = true;
         try
         {
-            jqmlogger.debug("Testing whether {} is an OSGi bundle", path);
+            jqmlogger.trace("Testing whether {} is an OSGi bundle", path);
             jarFile = new JarFile(testPath);
             Manifest m = jarFile.getManifest();
 
@@ -226,9 +237,10 @@ class OsgiRuntime
                 return null;
             }
 
-            isBundle = m.getMainAttributes().getValue("Bundle-SymbolicName") != null;
+            var name = m.getMainAttributes().getValue("Bundle-SymbolicName");
+            isBundle = name != null;
             newJarVersion = m.getMainAttributes().getValue("Bundle-Version");
-            jqmlogger.debug("Answer is {}", isBundle);
+            jqmlogger.trace("Answer is {} - bundle name is {}", isBundle, name);
         }
         catch (IOException e)
         {
@@ -295,11 +307,15 @@ class OsgiRuntime
         if ((bundle.adapt(BundleRevision.class).getTypes() & BundleRevision.TYPE_FRAGMENT) != 0)
         {
             // Do not start fragments
+            jqmlogger.debug("Fragment bundle {} does not need to be started", bundle.getSymbolicName());
+            dumpBundleDebugInfo(bundle);
             return;
         }
         if (bundle.getState() == Bundle.ACTIVE)
         {
             // Already started.
+            jqmlogger.debug("Bundle {} is already started", bundle.getSymbolicName());
+            dumpBundleDebugInfo(bundle);
             return;
         }
         if (bundle == null || bundle.getSymbolicName() == null)
@@ -318,17 +334,79 @@ class OsgiRuntime
             jqmlogger.error("Could not start bundle " + bundle.getSymbolicName(), e);
         }
 
+        dumpBundleDebugInfo(bundle);
+    }
+
+    /**
+     * Debug logging, helpful when looking for an OSGi lib conflict
+     *
+     * @param bundle
+     *            bundle to analyze
+     */
+    private static void dumpBundleDebugInfo(Bundle bundle)
+    {
         jqmlogger.debug("Bundle {} in version {} is in state {}", bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
-        if (bundle.getRegisteredServices() != null)
+        if (bundle.getRegisteredServices() != null && bundle.getRegisteredServices().length > 0)
         {
+            jqmlogger.debug("\tServices provided:");
             for (ServiceReference<?> sr : bundle.getRegisteredServices())
             {
-                jqmlogger.debug("\t\t " + sr.getClass().getCanonicalName());
+                jqmlogger.debug("\t\t{} - {} {}", sr.getProperty(org.osgi.framework.Constants.OBJECTCLASS),
+                        sr.getProperty(org.osgi.service.component.ComponentConstants.COMPONENT_NAME),
+                        sr.getProperty("serviceloader.mediator") != null ? "mediator service" : "");
             }
-            for (BundleCapability wire : bundle.adapt(BundleWiring.class).getCapabilities(null))
+        }
+        if (bundle.adapt(BundleWiring.class) != null)
+        {
+            if (bundle.adapt(BundleWiring.class).getCapabilities(BundleRevision.PACKAGE_NAMESPACE).size() > 0)
             {
-                jqmlogger.debug(wire.getNamespace());
+                jqmlogger.debug("\tPackages exposed:");
+                for (var wire : bundle.adapt(BundleWiring.class).getCapabilities(BundleRevision.PACKAGE_NAMESPACE))
+                {
+                    jqmlogger.debug("\t\t{}", wire.toString());
+                }
             }
+            if (bundle.adapt(BundleWiring.class).getRequiredResourceWires(BundleRevision.PACKAGE_NAMESPACE).size() > 0)
+            {
+                jqmlogger.debug("\tPackages consumed:");
+                for (var wire : bundle.adapt(BundleWiring.class).getRequiredResourceWires(BundleRevision.PACKAGE_NAMESPACE))
+                {
+                    jqmlogger.debug("\t\t{}", wire.toString());
+                }
+            }
+        }
+    }
+
+    private static void dumpContext(BundleContext ctx)
+    {
+        for (var bundle : ctx.getBundles())
+        {
+            dumpBundleDebugInfo(bundle);
+        }
+    }
+
+    private static void setStartLevel(Framework framework, int level)
+    {
+        Semaphore waitForLevelChange = new Semaphore(0);
+        framework.adapt(FrameworkStartLevel.class).setStartLevel(level, new FrameworkListener()
+        {
+            @Override
+            public void frameworkEvent(FrameworkEvent event)
+            {
+                if (event.getType() == FrameworkEvent.STARTLEVEL_CHANGED)
+                {
+                    waitForLevelChange.release();
+                }
+            }
+        });
+        try
+        {
+            waitForLevelChange.acquire();
+            jqmlogger.debug("Start level was correctly set to {}", level);
+        }
+        catch (InterruptedException e)
+        {
+            jqmlogger.warn("Weird interruption while starting the framework");
         }
     }
 }

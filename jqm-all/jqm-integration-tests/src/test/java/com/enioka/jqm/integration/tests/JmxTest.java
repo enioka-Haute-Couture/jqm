@@ -43,7 +43,7 @@ public class JmxTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
                 "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
-        int i = jqmClient.newJobRequest("KillApp", "TestUser").enqueue();
+        Long i = jqmClient.newJobRequest("KillApp", "TestUser").enqueue();
 
         // Set JMX server on free ports
         ServerSocket s1 = new ServerSocket(0);
@@ -96,7 +96,7 @@ public class JmxTest extends JqmBaseTest
         }
         JavaJobInstanceTrackerMBean proxy = JMX.newMBeanProxy(mbsc, killBean, JavaJobInstanceTrackerMBean.class);
         Assert.assertEquals("KillApp", proxy.getApplicationName());
-        Assert.assertEquals((Integer) i, proxy.getId());
+        Assert.assertEquals(i, proxy.getId());
         Assert.assertEquals("TestUser", proxy.getUser());
 
         // Elements that are not set or testable reproductibly, but should not raise any exception

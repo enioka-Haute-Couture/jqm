@@ -42,7 +42,7 @@ public class ClassloaderManager
     /**
      * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}). Key is Cl object ID.
      */
-    private Map<Integer, PayloadClassLoader> persistentClassLoaders = new HashMap<>();
+    private Map<Long, PayloadClassLoader> persistentClassLoaders = new HashMap<Long, PayloadClassLoader>();
 
     /**
      * The different runners which may be involved inside the class loaders.
@@ -253,7 +253,7 @@ public class ClassloaderManager
             jqmlogger.info("Closing persistent jar class loader {}", e.getKey());
             e.getValue().tryClose();
         }
-        for (Map.Entry<Integer, PayloadClassLoader> e : persistentClassLoaders.entrySet())
+        for (Map.Entry<Long, PayloadClassLoader> e : persistentClassLoaders.entrySet())
         {
             jqmlogger.info("Closing persistent keyed class loader {}", e.getKey());
             e.getValue().tryClose();

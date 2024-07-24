@@ -30,7 +30,7 @@ public class QuantityResourceManager extends ResourceManagerBase
     private int previousMaxUnits = 0;
 
     private int defaultConsumption;
-    private Map<Integer, Integer> runningJobs = new HashMap<>(10);
+    private Map<Long, Integer> runningJobs = new HashMap<Long, Integer>(10);
 
     QuantityResourceManager(ResourceManager rm)
     {

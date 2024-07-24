@@ -37,3 +37,4 @@ serious/JobBaseAPI/nullnull
 *dependency-reduced-pom.xml
 **/sphinx/_build
 **/tmp/
+**/.idea/

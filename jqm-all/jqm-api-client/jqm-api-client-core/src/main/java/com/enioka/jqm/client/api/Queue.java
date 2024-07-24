@@ -35,19 +35,19 @@ public class Queue implements Serializable
 {
     private static final long serialVersionUID = 5730264060976148489L;
 
-    private int id;
+    private long id;
     private String name;
     private String description;
 
     /**
      * Each queue has a unique ID
      */
-    public int getId()
+    public long getId()
     {
         return id;
     }
 
-    public void setId(int id)
+    public void setId(long id)
     {
         this.id = id;
     }
