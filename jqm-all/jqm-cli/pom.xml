@@ -34,13 +34,17 @@
             <artifactId>jqm-clusternode</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-jndi-context</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-        <!-- Used for the OSGi main interface -->
+        <!-- Used for the main startup interface -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-cli-bootstrap</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>

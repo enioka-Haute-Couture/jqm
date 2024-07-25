@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -47,7 +48,6 @@ public class DeliverableTest extends JqmBaseTest
 
         int id = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable1.txt").run(this);
-        this.waitForWsStart();
 
         List<InputStream> tmp = jqmClient.getJobDeliverablesContent(id);
         // Assert.assertTrue(tmp.get(0).available() > 0);
@@ -70,7 +70,6 @@ public class DeliverableTest extends JqmBaseTest
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable2.txt").run(this);
-        this.waitForWsStart();
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -100,7 +99,6 @@ public class DeliverableTest extends JqmBaseTest
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable3.txt").run(this);
-        this.waitForWsStart();
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable3.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -128,13 +126,12 @@ public class DeliverableTest extends JqmBaseTest
         cnx.commit();
 
         JqmClientFactory.reset();
-        JqmClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./conf/trusted.jks");
+        JqmClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./target/server/conf/trusted.jks");
         JqmClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
-        jqmClient = JqmClientFactory.getClient();
+        jqmClient = JqmClientFactory.getClient(IDbClientFactory.class);
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable4.txt").run(this);
-        this.waitForWsStart();
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable4.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved

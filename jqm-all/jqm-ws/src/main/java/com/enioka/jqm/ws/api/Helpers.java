@@ -17,7 +17,9 @@ package com.enioka.jqm.ws.api;
 
 import java.util.Properties;
 
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClient;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -46,4 +48,8 @@ public final class Helpers
         return db.getConn();
     }
 
+    public static JqmClient getClient()
+    {
+        return JqmClientFactory.getClient(IDbClientFactory.class);
+    }
 }

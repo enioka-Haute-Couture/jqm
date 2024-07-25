@@ -110,11 +110,6 @@
             <outputDirectory></outputDirectory>
             <destName>jqm.jar</destName>
         </file>
-        <file>
-            <source>${project.build.directory}/jakarta.annotation-api.old.jar</source>
-            <outputDirectory>bundle</outputDirectory>
-            <destName>jqm.jar</destName>
-        </file>
     </files>
 
     <dependencySets>
@@ -126,7 +121,6 @@
             <scope>compile</scope>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.apache.felix:org.apache.felix.framework</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.slf4j:jul-to-slf4j</include>
                 <include>org.slf4j:jcl-over-slf4j</include>
@@ -135,38 +129,16 @@
             </includes>
         </dependencySet>
 
-        <!-- OSGi level 1 = framework extensions -->
+        <!-- Normal plugins (JQM itself) -->
         <dependencySet>
-            <outputDirectory>bundle/level1</outputDirectory>
+            <outputDirectory>plugins</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <scope>runtime</scope>
             <useTransitiveFiltering>true</useTransitiveFiltering>
-            <excludes>
-                <exclude>org.apache.felix:org.apache.felix.framework</exclude>
-                <exclude>org.slf4j:slf4j-api</exclude>
-                <exclude>org.slf4j:jul-to-slf4j</exclude>
-                <exclude>org.slf4j:jcl-over-slf4j</exclude>
-                <exclude>ch.qos.logback:*</exclude>
-                <exclude>com.enioka.jqm:jqm-cli-bootstrap</exclude>
-            </excludes>
-        </dependencySet>
-
-        <!-- Normal bundles (JQM itself) -->
-        <dependencySet>
-            <outputDirectory>bundle</outputDirectory>
-            <useProjectArtifact>false</useProjectArtifact>
-            <unpack>false</unpack>
-            <scope>provided</scope>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <excludes>
-                <exclude>org.hsqldb</exclude>
-                <exclude>org.apache.tomcat</exclude>
-                <exclude>com.sun.mail</exclude>
-                <exclude>org.osgi:osgi.*</exclude>                <!-- OSGi APIs are actually provided by the framework -->
-                <exclude>junit:junit</exclude>
-                <exclude>com.enioka.jqm:jqm-providers</exclude>
-            </excludes>
+            <includes>
+                <include>*:*:jar</include>
+            </includes>
         </dependencySet>
 
         <!-- Demos -->
@@ -182,22 +154,25 @@
             </includes>
         </dependencySet>
 
+        <!-- webapp -->
+        <dependencySet>
+            <outputDirectory>webapp</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>com.enioka.jqm:jqm-ws:war</include>
+            </includes>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+        </dependencySet>
+
         <!-- Drivers -->
         <dependencySet>
             <outputDirectory>ext</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <scope>provided</scope>
-            <includes>
-                <include>org.hsqldb:hsqldb</include>
-                <include>org.apache.tomcat:tomcat-jdbc</include>
-                <include>org.apache.tomcat:tomcat-juli</include>
-                <include>com.enioka.jqm:jqm-providers</include>
-                <include>com.enioka.jqm:jqm-api</include>
-                <include>jakarta.mail:jakarta.mail-api</include>
-                <include>com.sun.activation:jakarta.activation</include>
-                <include>org.eclipse.angus:angus-mail</include>
-            </includes>
         </dependencySet>
     </dependencySets>
 </assembly>

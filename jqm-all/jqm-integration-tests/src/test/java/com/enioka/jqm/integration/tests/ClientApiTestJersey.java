@@ -42,8 +42,6 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
 
         addAndStartEngine("wsnode");
 
-        this.waitForWsStart();
-
         n = Node.select_single(cnx, "node_select_by_key", "wsnode");
 
         // Set client properties to use this node.
@@ -58,7 +56,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
         cnx.commit();
 
         JqmClientFactory.reset();
-        jqmClient = JqmClientFactory.getClient();
+        jqmClient = JqmClientFactory.getClient(IWsClientFactory.class);
     }
 
     @Test(expected = JqmInvalidRequestException.class)

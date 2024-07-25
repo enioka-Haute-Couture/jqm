@@ -146,19 +146,14 @@ public class TestHelpers
             try
             {
                 // Conf dir may contain certificates and certificate stores
-                if ((new File("./conf")).isDirectory())
+                if ((new File("./target/server/conf")).isDirectory())
                 {
-                    FileUtils.deleteDirectory(new File("./conf"));
+                    FileUtils.deleteDirectory(new File("./target/server/conf"));
                 }
                 // All logs
-                if ((new File("./logs")).isDirectory())
+                if ((new File("./target/server/logs")).isDirectory())
                 {
-                    FileUtils.deleteDirectory(new File("./logs"));
-                }
-                // The war...
-                if ((new File("./webapp")).isDirectory())
-                {
-                    FileUtils.deleteDirectory(new File("./webapp"));
+                    FileUtils.deleteDirectory(new File("./target/server/logs"));
                 }
                 // Where files created by payloads are stored
                 File f = TestHelpers.node == null ? null : new File(TestHelpers.node.getDlRepo());

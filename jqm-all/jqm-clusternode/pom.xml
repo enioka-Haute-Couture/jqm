@@ -21,6 +21,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Add a web server in the mix if needed -->
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-webserver-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Needed for job auto importer -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>

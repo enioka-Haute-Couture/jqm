@@ -1,5 +1,7 @@
 package com.enioka.jqm.cli;
 
+import java.util.ServiceLoader;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -9,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.enioka.jqm.cli.bootstrap.CommandLine;
+import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**
  * Main entry point of the CLI (which is also the entry point for the daemon).
@@ -19,7 +23,7 @@ public class CliParserService implements CommandLine
     private static final Logger jqmlogger = (Logger) LoggerFactory.getLogger(CliParserService.class);
 
     @Override
-    public int runOsgiCommand(String[] args)
+    public int runServiceCommand(String[] args)
     {
         return CliParserService.runCommand(args);
     }
@@ -35,7 +39,8 @@ public class CliParserService implements CommandLine
 
     public static int runCommand(String[] args)
     {
-        // CommonService.setLogFileName("cli");
+        // JNDI registration - most commands need a JNDI context.
+        ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
         // Create parser
         JCommander jc = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
@@ -47,6 +52,12 @@ public class CliParserService implements CommandLine
                 .addCommand(new CommandUpdateSchema()).build();
         jc.setColumnSize(160);
         jc.setCaseSensitiveOptions(false);
+
+        if (args == null || args.length == 0)
+        {
+            jc.usage();
+            return 1;
+        }
 
         // We do not bother with a non-command parsing for global help.
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help") || args[0].equals("-?") || args[0].equals("/?")))

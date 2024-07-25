@@ -11,7 +11,7 @@
 
     <artifactId>jqm-ws</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <url>http://jqm.readthedocs.org</url>
     <description>JQM web API implementation and administration UI</description>
 
@@ -144,70 +144,17 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <!-- For OSGi: copy shiro ini file inside the Shiro-accessible classpath -->
-                    <execution>
-                        <id>copy-resources-osgi</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/webapp/WEB-INF</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>shiro.ini</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- For react: copy build into dist folder -->
-                    <execution>
-                        <id>copy-resources-react</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/target/classes/dist</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${spa.build.repo}</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>**/**</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- For auth (webapp content is not automatically copied in a jar) -->
-                    <execution>
-                        <id>copy-resources-authstatic</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/target/classes/auth</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/src/main/webapp/auth</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>*</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${plugin.war.version}</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/react/build</directory>
+                            <filtering>true</filtering>
+                        </resource>
+                    </webResources>
+                </configuration>
             </plugin>
 
         </plugins>
@@ -221,25 +168,22 @@
             <version>${jakarta.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
             <version>${jaxrs.api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>${jakarta.xml.bind-api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.http.whiteboard</artifactId>
-            <version>${osgi.httpwhiteboard.version}</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jakarta.xml.bind-api.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -251,6 +195,7 @@
             <classifier>jakarta</classifier>
         </dependency>
 
+        <!-- PKI for certificate creation in admin API -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-pki</artifactId>

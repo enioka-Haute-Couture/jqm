@@ -22,10 +22,10 @@ public class ClusterNode
 
         try
         {
-            // ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
-
+            // Retrieve engine service (always a new one)
             this.jqmEngine = ServiceLoaderHelper.getService(ServiceLoader.load(JqmEngineOperations.class), false);
 
+            // Go. The callback will be called once the engine is up to allow the end if the init sequence.
             jqmEngine.start(this.nodeName, new EngineCallback());
             jqmEngine.join();
             return 0;

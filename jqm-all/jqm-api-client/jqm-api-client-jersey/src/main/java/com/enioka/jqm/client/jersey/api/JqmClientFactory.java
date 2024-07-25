@@ -2,6 +2,9 @@ package com.enioka.jqm.client.jersey.api;
 
 import java.util.Properties;
 
+import org.kohsuke.MetaInfServices;
+
+import com.enioka.jqm.client.api.IClientFactory;
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.shared.IWsClientFactory;
 
@@ -11,7 +14,8 @@ import com.enioka.jqm.client.shared.IWsClientFactory;
  * The factory also holds the client cache - clients are cached to avoid creating useless objects and connections. (it is possible to create
  * a non-cached client but this is not the default)
  */
-class JqmClientFactory implements IWsClientFactory
+@MetaInfServices({ IWsClientFactory.class, IClientFactory.class })
+public class JqmClientFactory implements IWsClientFactory
 {
     /**
      * Return the default client. Note this client is shared in the static context. (said otherwise: the same client is always returned

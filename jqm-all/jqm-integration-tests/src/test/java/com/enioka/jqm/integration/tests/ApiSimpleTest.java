@@ -57,8 +57,6 @@ public class ApiSimpleTest extends JqmBaseTest
 
         addAndStartEngine();
 
-        this.waitForWsStart();
-
         port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         jqmlogger.info("Jetty port seen by client is {}", port);
     }

@@ -44,8 +44,6 @@ public class JettyTest extends JqmBaseTest
 
     private void waitStartup()
     {
-        this.waitForWsStart();
-
         port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         jqmlogger.info("Jetty port seen by client is {}", port);
     }
@@ -81,7 +79,7 @@ public class JettyTest extends JqmBaseTest
 
         // HTTPS client - with
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        try (var instream = new FileInputStream(new File("./conf/trusted.jks")))
+        try (var instream = new FileInputStream(new File("./target/server/conf/trusted.jks")))
         {
             trustStore.load(instream, "SuperPassword".toCharArray());
         }
@@ -125,7 +123,7 @@ public class JettyTest extends JqmBaseTest
 
         // Server auth against trusted CA root certificate
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        FileInputStream instream = new FileInputStream(new File("./conf/trusted.jks"));
+        FileInputStream instream = new FileInputStream(new File("./target/server/conf/trusted.jks"));
         try
         {
             trustStore.load(instream, "SuperPassword".toCharArray());
@@ -136,9 +134,10 @@ public class JettyTest extends JqmBaseTest
         }
 
         // Client auth
-        JdbcCa.prepareClientStore(cnx, "CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert", "./conf/client.cer");
+        JdbcCa.prepareClientStore(cnx, "CN=testuser", "./target/server/conf/client.pfx", "SuperPassword", "client-cert",
+                "./target/server/conf/client.cer");
         KeyStore clientStore = KeyStore.getInstance("PKCS12");
-        instream = new FileInputStream(new File("./conf/client.pfx"));
+        instream = new FileInputStream(new File("./target/server/conf/client.pfx"));
         try
         {
             clientStore.load(instream, "SuperPassword".toCharArray());

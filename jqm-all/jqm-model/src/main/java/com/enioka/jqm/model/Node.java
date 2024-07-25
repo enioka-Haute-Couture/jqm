@@ -344,7 +344,7 @@ public class Node implements Serializable
         res.repo = repo;
         res.loadApiAdmin = false;
         res.loadApiClient = false;
-        res.loapApiSimple = false;
+        res.loapApiSimple = true;
         res.enabled = true;
         res.stop = false;
 

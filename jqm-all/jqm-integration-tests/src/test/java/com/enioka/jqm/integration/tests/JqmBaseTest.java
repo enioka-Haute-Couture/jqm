@@ -24,7 +24,6 @@ import java.util.ServiceLoader;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -41,6 +40,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.clusternode.EngineCallback;
 import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.Db;
@@ -103,7 +103,7 @@ public class JqmBaseTest
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
         JqmClientFactory.reset();
-        jqmClient = JqmClientFactory.getClient();
+        jqmClient = JqmClientFactory.getClient(IDbClientFactory.class);
 
         if (db == null)
         {
@@ -247,11 +247,6 @@ public class JqmBaseTest
         {
             // not an issue in tests
         }
-    }
-
-    protected void waitForWsStart()
-    {
-        throw new NotImplementedException();
     }
 
     protected void simulateDbFailure()

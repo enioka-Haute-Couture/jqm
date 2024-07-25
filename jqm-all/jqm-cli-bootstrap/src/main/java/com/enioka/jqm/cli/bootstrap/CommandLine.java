@@ -12,7 +12,7 @@ public interface CommandLine
      *            CLI arguments
      * @return return code
      */
-    public int runOsgiCommand(String[] args);
+    public int runServiceCommand(String[] args);
 
     /**
      * If an engine is running, kill it.
