@@ -16,6 +16,7 @@
     "LineCount.includes": [
         "**/*.java",
         "**/*.js",
+        "**/*.ts",
         "**/*.html",
     ],
     "LineCount.excludes": [
@@ -41,7 +42,8 @@
         "**/archetype-resources/**",
         "**/META-INF/maven/**",
         "**/target/",
-        "**/webapp/dist/"
+        "**/webapp/dist/",
+        "**/react/",
     ],
     "java.autobuild.enabled": true,
     "java.test.defaultConfig": "it",
@@ -54,14 +56,11 @@
                 "java.naming/javax.naming.spi=ALL-UNNAMED"
             ],
         },
-        {
-            "name": "web",
-            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests-ws"
-        }
     ],
     "java.maven.downloadSources": true,
     "java.import.gradle.enabled": false,
     "java.import.maven.enabled": true,
+    "java.compile.nullAnalysis.mode": "automatic",
     "java.codeGeneration.useBlocks": true,
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
@@ -78,5 +77,4 @@
     "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
     "esbonio.sphinx.confDir": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
     "restructuredtext.builtDocumentationPath": "${workspaceFolder}/jqm-all/jqm-doc/src/site/sphinx/_build/html",
-    "restructuredtext.languageServer.disabled": true
 }

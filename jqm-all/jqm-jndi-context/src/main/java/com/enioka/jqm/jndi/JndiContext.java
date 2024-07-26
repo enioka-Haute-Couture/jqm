@@ -110,11 +110,6 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
             resetSingletons();
             return null;
         }
-        if (name.startsWith("internal://xml/"))
-        {
-            ResourceParser.resourceFile = name.substring(15);
-            return null;
-        }
         if (name.equals("cl://ext")) // special case needed for tests, as the ext CL will always be the same (shared between OSGi runners)
         {
             return this.extResources;

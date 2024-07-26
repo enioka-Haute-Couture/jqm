@@ -55,4 +55,8 @@ public interface JqmSynchronousTester extends AutoCloseable
      * Synchronously start the job inside the embedded JQM engine.
      */
     public com.enioka.jqm.client.api.JobInstance run();
+
+    // Remove exception from AutoCloseable
+    @Override
+    void close();
 }

@@ -247,4 +247,8 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * @throws FileNotFoundException
      */
     public InputStream getDeliverableContent(Deliverable file) throws FileNotFoundException;
+
+    // Remove exception from AutoCloseable
+    @Override
+    void close();
 }

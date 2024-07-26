@@ -18,9 +18,10 @@ import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
 import com.enioka.jqm.client.api.State;
-import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
@@ -52,6 +53,16 @@ public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
 
     public JqmAsynchronousTesterImpl()
     {
+        // Main resource is jdbc/test and uses a memory url, meaning db is created on first use.
+        System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml,resources_internal.xml");
+        System.setProperty("com.enioka.jqm.cl.allow_system_cl", "true");
+
+        // JNDI substrate
+        ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
+
+        // Db connexion should now work.
+        cnx = DbManager.getDb(Common.dbProperties()).getConn();
+
         resetAllData();
     }
 
@@ -263,6 +274,8 @@ public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
 
         hasStarted = false;
         this.engines.clear();
+        this.queues.clear();
+        this.nodes.clear();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -272,6 +285,7 @@ public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
     @Override
     public void close()
     {
+        stop();
         if (cnx != null)
         {
             cnx.close();
@@ -283,45 +297,20 @@ public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
     @Override
     public void cleanupOperationalDbData()
     {
-        cnx.runUpdate("deliverable_delete_all");
-        cnx.runUpdate("message_delete_all");
-        cnx.runUpdate("history_delete_all");
-        cnx.runUpdate("jiprm_delete_all");
-        cnx.runUpdate("ji_delete_all");
-        cnx.commit();
+        Common.cleanupOperationalDbData(cnx);
     }
 
     @Override
     public void cleanupAllJobDefinitions()
     {
-        cleanupOperationalDbData();
-
-        cnx.runUpdate("jdprm_delete_all");
-        cnx.runUpdate("jd_delete_all");
-        cnx.runUpdate("cl_delete_all");
-        cnx.commit();
+        Common.cleanupAllJobDefinitions(cnx);
     }
 
     @Override
     public void resetAllData()
     {
         stop();
-        cleanupAllJobDefinitions();
-
-        cnx.runUpdate("dp_delete_all");
-        cnx.runUpdate("q_delete_all");
-        cnx.runUpdate("node_delete_all");
-
-        DefaultConfigurationService.updateConfiguration(cnx);
-        cnx.runUpdate("q_delete_all"); // remove default queue created by DefaultConfigurationService
-        GlobalParameter.setParameter(cnx, "defaultConnection", "");
-        addGlobalParameter("disableWsApi", "true");
-        addGlobalParameter("logFilePerLaunch", "false");
-
-        this.queues.clear();
-        this.nodes.clear();
-
-        cnx.commit();
+        Common.resetAllData(cnx);
     }
 
     ///////////////////////////////////////////////////////////////////////////

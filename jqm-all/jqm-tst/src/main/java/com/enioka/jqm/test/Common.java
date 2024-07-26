@@ -9,8 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 
+import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
 
 final class Common
@@ -89,5 +91,42 @@ final class Common
                 d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next(), 0, d.getName(),
                 d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(), clId,
                 d.getPathType());
+    }
+
+    public static void cleanupOperationalDbData(DbConn cnx)
+    {
+        cnx.runUpdate("deliverable_delete_all");
+        cnx.runUpdate("message_delete_all");
+        cnx.runUpdate("history_delete_all");
+        cnx.runUpdate("jiprm_delete_all");
+        cnx.runUpdate("ji_delete_all");
+        cnx.commit();
+    }
+
+    public static void cleanupAllJobDefinitions(DbConn cnx)
+    {
+        cleanupOperationalDbData(cnx);
+
+        cnx.runUpdate("jdprm_delete_all");
+        cnx.runUpdate("jd_delete_all");
+        cnx.runUpdate("cl_delete_all");
+        cnx.commit();
+    }
+
+    public static void resetAllData(DbConn cnx)
+    {
+        cleanupAllJobDefinitions(cnx);
+
+        cnx.runUpdate("dp_delete_all");
+        cnx.runUpdate("q_delete_all");
+        cnx.runUpdate("node_delete_all");
+
+        DefaultConfigurationService.updateConfiguration(cnx);
+        cnx.runUpdate("q_delete_all"); // remove default queue created by DefaultConfigurationService
+        GlobalParameter.setParameter(cnx, "defaultConnection", "");
+        GlobalParameter.setParameter(cnx, "disableWsApi", "true");
+        GlobalParameter.setParameter(cnx, "logFilePerLaunch", "false");
+
+        cnx.commit();
     }
 }

@@ -24,16 +24,16 @@ public class JqmTesterAsyncTest2
     @Test
     public void testOne()
     {
-        JqmAsynchronousTester tester = ServiceLoader.load(JqmAsynchronousTester.class).findFirst().get().createSingleNodeOneQueue()
-                .addSimpleJobDefinitionFromClasspath(Payload1.class).start();
+        try (var tester = ServiceLoader.load(JqmAsynchronousTester.class).findFirst().get().createSingleNodeOneQueue()
+                .addSimpleJobDefinitionFromClasspath(Payload1.class).start())
+        {
 
-        tester.enqueue("Payload1");
-        tester.waitForResults(1, 10000, 0);
+            tester.enqueue("Payload1");
+            tester.waitForResults(1, 10000, 0);
 
-        Assert.assertEquals(1, tester.getOkCount());
-        Assert.assertEquals(1, tester.getHistoryAllCount());
-
-        tester.stop();
+            Assert.assertEquals(1, tester.getOkCount());
+            Assert.assertEquals(1, tester.getHistoryAllCount());
+        }
     }
 
     // Test multiple enqueues

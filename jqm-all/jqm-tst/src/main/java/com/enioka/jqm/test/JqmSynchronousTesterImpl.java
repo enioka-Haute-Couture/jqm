@@ -10,7 +10,7 @@ import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
-import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDef.PathType;
@@ -41,13 +41,19 @@ public class JqmSynchronousTesterImpl implements JqmSynchronousTester
     public JqmSynchronousTesterImpl()
     {
         // Main resource is jdbc/jqm and uses a memory url, meaning db is created on first use.
-        System.setProperty("com.enioka.jqm.resourceFiles", "resources_internal.xml");
+        System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml,resources_internal.xml");
+        System.setProperty("com.enioka.jqm.cl.allow_system_cl", "true");
+
+        // JNDI substrate
+        ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
         // Db connexion should now work.
         cnx = DbManager.getDb(Common.dbProperties()).getConn();
 
-        // Needed parameters
-        GlobalParameter.setParameter(cnx, "defaultConnection", "");
+        // Just in case
+        Common.resetAllData(cnx);
+
+        // Db is ready
         cnx.commit();
 
         // Create node
@@ -59,7 +65,7 @@ public class JqmSynchronousTesterImpl implements JqmSynchronousTester
 
         cnx.commit();
 
-        // Finaly get the runner
+        // Finally get the runner
         this.runner = ServiceLoaderHelper.getService(ServiceLoader.load(JqmSingleRunnerOperations.class));
     }
 

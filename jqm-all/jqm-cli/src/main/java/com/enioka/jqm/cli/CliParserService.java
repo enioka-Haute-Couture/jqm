@@ -81,15 +81,7 @@ public class CliParserService implements CommandLine
         if (command.settingsFile != null)
         {
             jqmlogger.info("Using alternative settings file {}", command.settingsFile);
-            try
-            {
-                InitialContext.doLookup("internal://xml/" + command.settingsFile); // Ugly internal hack: side effect on lookup.
-            }
-            catch (NamingException e)
-            {
-                jqmlogger.error("Could not set settings file", e);
-                return 1;
-            }
+            System.setProperty("com.enioka.jqm.resourceFiles", command.settingsFile);
         }
 
         // Go.

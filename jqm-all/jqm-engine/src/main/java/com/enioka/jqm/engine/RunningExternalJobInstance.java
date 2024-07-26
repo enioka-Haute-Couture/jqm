@@ -67,7 +67,6 @@ class RunningExternalJobInstance implements Runnable
         List<String> args = new ArrayList<>();
 
         args.add(java_path);
-        args.add("-Dcom.enioka.jqm.service.osgi.rootdir=" + rootPath);
         args.addAll(Arrays.asList(opts.split(" ")));
         args.add("-jar");
         args.add(FilenameUtils.concat(rootPath, "jqm.jar"));
@@ -84,6 +83,7 @@ class RunningExternalJobInstance implements Runnable
         {
             jqmlogger.debug("Starting external JVM for ID " + jobId);
             p = pb.start();
+            jqmlogger.debug("External process was started with PID {}", p.pid());
         }
         catch (IOException e)
         {

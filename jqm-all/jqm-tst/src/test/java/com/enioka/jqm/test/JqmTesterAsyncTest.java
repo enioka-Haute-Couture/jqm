@@ -25,7 +25,7 @@ public class JqmTesterAsyncTest
     @AfterClass
     public static void afterClass()
     {
-        tester.stop();
+        tester.close();
     }
 
     @Test

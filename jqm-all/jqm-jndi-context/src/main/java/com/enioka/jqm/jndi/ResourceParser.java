@@ -41,7 +41,6 @@ import org.w3c.dom.NodeList;
  */
 final class ResourceParser
 {
-    static String resourceFile = "resources.xml";
     private static Map<String, JndiResourceDescriptor> xml = null;
 
     private ResourceParser()
@@ -54,11 +53,17 @@ final class ResourceParser
         if (xml == null)
         {
             xml = new HashMap<String, JndiResourceDescriptor>();
-            importXml(resourceFile, false);
+            boolean atLeastOneXmlLoaded = false;
 
-            for (String file : System.getProperty("com.enioka.jqm.resourceFiles", ",").split(","))
+            var resourceFileList = System.getProperty("com.enioka.jqm.resourceFiles", "resources.xml,");
+            for (String file : resourceFileList.split(","))
             {
-                importXml(file, true);
+                atLeastOneXmlLoaded = importXml(file, true) || atLeastOneXmlLoaded;
+            }
+
+            if (!atLeastOneXmlLoaded)
+            {
+                throw new NamingException("No resource file from list [" + resourceFileList + "] found in classpath");
             }
         }
         if (xml.containsKey(alias))
@@ -100,20 +105,21 @@ final class ResourceParser
         }
     }
 
-    private static void importXml(String fileName, boolean optional) throws NamingException
+    private static boolean importXml(String fileName, boolean optional) throws NamingException
     {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
         // The resource file is either inside /conf (added to classpath by packaging) or inside test classpath (Maven resource path).
         try (InputStream is = ClassLoader.getSystemResourceAsStream(fileName))
         {
+            boolean atLeastOneResourceLoaded = false;
             if (is == null && !optional)
             {
                 throw new JqmRuntimeException("Cannot find in class path resource file named " + fileName);
             }
             if (is == null && optional)
             {
-                return;
+                return false;
             }
 
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -169,7 +175,7 @@ final class ResourceParser
 
                 if (resourceClass == null || jndiAlias == null || factory == null)
                 {
-                    throw new NamingException("could not load the resource file " + resourceFile);
+                    throw new NamingException("could not load the resource file " + fileName);
                 }
 
                 JndiResourceDescriptor jrd = new JndiResourceDescriptor(resourceClass, description, scope, auth, factory, singleton);
@@ -177,8 +183,10 @@ final class ResourceParser
                 {
                     jrd.add(new StringRefAddr(prm.getKey(), prm.getValue()));
                 }
+                atLeastOneResourceLoaded = true;
                 xml.put(jndiAlias, jrd);
             }
+            return atLeastOneResourceLoaded;
         }
         catch (Exception e)
         {

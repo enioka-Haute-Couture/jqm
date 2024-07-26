@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import org.apache.commons.io.FileUtils;
@@ -148,7 +149,9 @@ public class TestHelpers
                 // Conf dir may contain certificates and certificate stores
                 if ((new File("./target/server/conf")).isDirectory())
                 {
-                    FileUtils.deleteDirectory(new File("./target/server/conf"));
+                    var toDelete = new File("./target/server/conf")
+                            .listFiles((dir, name) -> name.endsWith(".cer") || name.endsWith(".jks") || name.endsWith(".pfx"));
+                    Arrays.asList(toDelete).forEach(f -> f.delete());
                 }
                 // All logs
                 if ((new File("./target/server/logs")).isDirectory())
