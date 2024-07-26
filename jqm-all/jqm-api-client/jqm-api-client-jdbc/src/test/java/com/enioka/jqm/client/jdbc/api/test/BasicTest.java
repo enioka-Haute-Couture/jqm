@@ -34,17 +34,18 @@ import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple tests for checking query syntax (no data).
  */
 public class BasicTest
 {
-    private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(BasicTest.class);
 
     @BeforeClass
     public static void beforeClass()

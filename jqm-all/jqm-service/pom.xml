@@ -59,58 +59,12 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Generate dependency tree for pax exam-->
-            <plugin>
-                <groupId>org.apache.servicemix.tooling</groupId>
-                <artifactId>depends-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-depends-file</id>
-                        <goals>
-                            <goal>generate-depends-file</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Copy annotations in another version to package -->
-            <!-- Annoying - HK2 needs this, and Maven hates multiple versions of same jar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${plugin.dependency.version}</version>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>jakarta.annotation</groupId>
-                            <artifactId>jakarta.annotation-api</artifactId>
-                            <version>2.1.1</version>
-                            <type>jar</type>
-                            <overWrite>false</overWrite>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <destFileName>jakarta.annotation-api.old.jar</destFileName>
-                        </artifactItem>
-                    </artifactItems>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
     <!-- compile (default)  = actual lib needed by this artifact  -->
     <!-- runtime = an engine plugin (engine class path) -->
-    <!-- provided = an ext lib (payload class path)  -->
+    <!-- provided = an ext lib (payload and engine class path)  -->
     <dependencies>
         <!-- Main entry point interface -->
         <dependency>
@@ -177,20 +131,13 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-engine-api</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope> <!-- needed in this project to start a node! -->
+            <scope>runtime</scope>
         </dependency>
-
 
         <!-- Engine plugins for the base distribution -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-spring</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-jndi-context</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
@@ -203,6 +150,13 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-java</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-jndi-context</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>

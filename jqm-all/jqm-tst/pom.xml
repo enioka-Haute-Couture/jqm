@@ -39,6 +39,11 @@
             <artifactId>jqm-jndi-context</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Ext/Drivers -->
         <dependency>
