@@ -149,6 +149,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-java</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
