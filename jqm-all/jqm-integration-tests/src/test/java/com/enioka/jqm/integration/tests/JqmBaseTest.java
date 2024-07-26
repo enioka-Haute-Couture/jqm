@@ -25,7 +25,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -84,15 +83,6 @@ public class JqmBaseTest
 
             System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
             ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
-        }
-    }
-
-    @AfterClass
-    public static void afterClass()
-    {
-        if (s != null)
-        {
-            s.close();
         }
     }
 
