@@ -123,8 +123,8 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
         // Given explicitly
         this.p.putAll(p);
 
-        // JAX-RS client builder may come from OSGi
-        ClientBuilder bld = ClientBuilder.newBuilder(); // Uses service loader internally
+        // JAX-RS client builder comes from service loader (directly used by the jax-rs API)
+        ClientBuilder bld = ClientBuilder.newBuilder();
         jqmlogger.info("Using JAX-RS client builder from service loader");
 
         ///////////////////////////////////////

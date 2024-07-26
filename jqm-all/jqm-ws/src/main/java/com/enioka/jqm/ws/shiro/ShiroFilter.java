@@ -33,7 +33,6 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
     @Override
     public void init() throws Exception
     {
-        // Load the ini file from current CL to avoid CL-hell in OSGi.
         String enableWsApiAuth = this.getContextInitParam("enableWsApiAuth");
         boolean load = true;
 

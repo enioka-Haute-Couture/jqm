@@ -2,8 +2,7 @@ package com.enioka.jqm.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 
 @Parameters(commandNames = "New-Ji", commandDescription = "Create a new execution request.")
 class CommandNewJi extends CommandBase
@@ -15,7 +14,7 @@ class CommandNewJi extends CommandBase
     int doWork()
     {
         jqmlogger.info("Will enqueue application named " + applicationName + " without parameter overloads");
-        jqmlogger.info("Request ID is: " + JqmClientFactory.getClient(IDbClientFactory.class).enqueue(applicationName, "CommandLineUser"));
+        jqmlogger.info("Request ID is: " + JqmDbClientFactory.getClient().enqueue(applicationName, "CommandLineUser"));
         return 0;
     }
 }

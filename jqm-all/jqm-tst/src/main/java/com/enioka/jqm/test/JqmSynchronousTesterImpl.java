@@ -22,8 +22,7 @@ import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.api.JqmSynchronousTester;
 
 /**
- * Actual implementation of {@link JqmSynchronousTester}. Interface/implementation split only exists in order to allow easier interaction
- * from outside the OSGi world.
+ * Actual implementation of {@link JqmSynchronousTester}.
  */
 @MetaInfServices(JqmSynchronousTester.class)
 public class JqmSynchronousTesterImpl implements JqmSynchronousTester

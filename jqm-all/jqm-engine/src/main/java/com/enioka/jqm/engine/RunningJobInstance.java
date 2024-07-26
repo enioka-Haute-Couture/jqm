@@ -11,9 +11,13 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.enioka.jqm.api.JobRunnerException;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.client.shared.SimpleApiSecurity;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -27,11 +31,6 @@ import com.enioka.jqm.model.State;
 import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The role of this class is to track the actual run of a JI. An instance is created when the engine decides a JI should run. It delegates
@@ -363,7 +362,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     {
         Properties props = new Properties();
         props.put("com.enioka.jqm.jdbc.contextobject", DbManager.getDb());
-        JqmClientFactory.getClient("uncached", props, false, IDbClientFactory.class).killJob(this.ji.getId());
+        JqmDbClientFactory.getClient("uncached", props, false).killJob(this.ji.getId());
     }
 
     void handleInstruction(Instruction instruction)

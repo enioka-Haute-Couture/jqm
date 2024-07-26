@@ -18,8 +18,7 @@ package com.enioka.jqm.ws.api;
 import java.util.Properties;
 
 import com.enioka.jqm.client.api.JqmClient;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -35,7 +34,7 @@ public final class Helpers
 
         Properties p = new Properties();
         p.put("com.enioka.jqm.jdbc.contextobject", db); // Share the DataSource in engine and client.
-        JqmClientFactory.setProperties(p);
+        JqmDbClientFactory.setProperties(p);
     }
 
     private Helpers()
@@ -50,6 +49,6 @@ public final class Helpers
 
     public static JqmClient getClient()
     {
-        return JqmClientFactory.getClient(IDbClientFactory.class);
+        return JqmDbClientFactory.getClient();
     }
 }

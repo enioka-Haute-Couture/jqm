@@ -40,7 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Simple tests for checking query syntax (no data). No use of OSGi here, as this lib can be used outside a framework.
+ * Simple tests for checking query syntax (no data).
  */
 public class BasicTest
 {

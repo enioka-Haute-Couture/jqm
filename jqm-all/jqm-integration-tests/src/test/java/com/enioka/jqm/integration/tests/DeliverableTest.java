@@ -20,14 +20,13 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
-import com.enioka.jqm.model.GlobalParameter;
-import com.enioka.jqm.test.helpers.TestHelpers;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.enioka.jqm.client.api.JqmDbClientFactory;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 /**
  * Test deliverable retrieval through the JDBC API + WS call for the file itself. No client configuration needed as temporary passwords are
@@ -125,10 +124,10 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
         cnx.commit();
 
-        JqmClientFactory.reset();
-        JqmClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./target/server/conf/trusted.jks");
-        JqmClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
-        jqmClient = JqmClientFactory.getClient(IDbClientFactory.class);
+        JqmDbClientFactory.reset();
+        JqmDbClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./target/server/conf/trusted.jks");
+        JqmDbClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
+        jqmClient = JqmDbClientFactory.getClient();
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable4.txt").run(this);

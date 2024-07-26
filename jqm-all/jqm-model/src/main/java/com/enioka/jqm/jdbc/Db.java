@@ -376,8 +376,7 @@ public class Db
     }
 
     /**
-     * Creates the adapter for the target database. The list of available adapters comes either from the OSGi service registry or from a
-     * property.
+     * Creates the adapter for the target database. The list of available adapters comes either from ServiceLoader or from a property.
      */
     private void initAdapter(Properties p)
     {

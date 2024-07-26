@@ -16,24 +16,10 @@
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
+                <!-- Filtering is used to add project version to a resource file -->
                 <filtering>true</filtering>
             </testResource>
         </testResources>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${plugin.jar.version}</version>
-                <inherited>false</inherited>
-                <configuration>
-                    <archive>
-                        <!-- Do not inherit "fetch OSGi manifest" config -->
-                        <manifestFile combine.self="override"></manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencies>

@@ -9,7 +9,6 @@ import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
-// TODO: remove OSGi boilerplate, put it in cluster-node.
 @Parameters(commandNames = "Start-Single", commandDescription = "Internal JQM use only. Starts an already ATTRIBUTED job instance synchronously.", hidden = true)
 class CommandStartSingle extends CommandBase
 {
@@ -22,7 +21,7 @@ class CommandStartSingle extends CommandBase
         var engine = ServiceLoaderHelper.getService(ServiceLoader.load(JqmSingleRunnerOperations.class));
         if (engine == null)
         {
-            throw new JqmInitError("No jqm engine service instance available - check jqm-engine bundle is started");
+            throw new JqmInitError("No jqm engine service instance available - check jqm-engine plugin is present");
         }
 
         JobInstance res = engine.runAtOnce(id);

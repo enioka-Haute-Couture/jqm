@@ -38,8 +38,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JqmClient;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.clusternode.EngineCallback;
 import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.Db;
@@ -92,8 +91,8 @@ public class JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
-        JqmClientFactory.reset();
-        jqmClient = JqmClientFactory.getClient(IDbClientFactory.class);
+        JqmDbClientFactory.reset();
+        jqmClient = JqmDbClientFactory.getClient();
 
         if (db == null)
         {

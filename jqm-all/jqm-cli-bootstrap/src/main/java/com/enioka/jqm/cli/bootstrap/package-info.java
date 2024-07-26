@@ -1,5 +1,5 @@
 /**
- * Special package which will be inside system loader, not the OSGi loader. This allows the program embedding the OSGi framework to access
- * the CLI running inside the OSGi framework without too many hacks.
+ * Special package which will be inside system class loader, not the engine class loader. This allows the program embedding the engine to
+ * access the CLI without too many hacks.
  */
 package com.enioka.jqm.cli.bootstrap;

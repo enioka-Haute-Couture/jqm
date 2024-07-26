@@ -2,8 +2,7 @@ package com.enioka.jqm.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 
 @Parameters(commandNames = "Get-JiStatus", commandDescription = "Fetch the status of a running or ended job instance.")
 class CommandGetJiStatus extends CommandBase
@@ -14,7 +13,7 @@ class CommandGetJiStatus extends CommandBase
     @Override
     int doWork()
     {
-        jqmlogger.info("Status is: " + JqmClientFactory.getClient(IDbClientFactory.class).getJob(id).getState());
+        jqmlogger.info("Status is: " + JqmDbClientFactory.getClient().getJob(id).getState());
         return 0;
     }
 }

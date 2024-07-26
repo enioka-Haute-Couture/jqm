@@ -14,6 +14,7 @@ Multi-layered means that inside modules a structure must be respected for easier
 * Model
 * DAL/repository - the layer responsible for JDBC communication with the database
 * Services, implementing the business requirements. (the bulk of the JQM code)
+* Presentation, with a React application using the public web services API
 
 The communication between layers is done through direct manipulation of instances which are created directly (no injection) or through the use of the injection of interfaces at the frontier of extension points.
 
@@ -25,27 +26,25 @@ Plugin system
 Principles
 ===============
 
-JQM uses the OSGi specification (implemented by the Apache Felix Framework but only spec-compliant APIs are used) to define its plugins.
+JQM uses the ServiceLoader API to define its plugins.
 
 This means that extensions points are defined by:
 
 * a normal Java interface
-* the use of one or many implementations of the interface exposed as OSGi declarative services (scr).
+* the use of one or many implementations of the interface exposed as JPMS/ServiceLoader services (scr).
 
-Only annotations are allowed to define services in code. Activators are frowned upon.
+Only annotations are allowed to define services in code - not XML.
 
-Other than that, public packages are signaled by a decorator inside package-info.java, which is compulsory for every package in the JQM code with at least a javadoc.
+Other than that, public packages are signaled by a comment inside package-info.java, which is compulsory for every package in the JQM code with at least a javadoc.
 
-Please note that OSGi has a lot of other functionalities. They are not used
-For JQM, OSGi is a static plugin system and an API surface control system. Nothing more.
-Particularly, OSGi offers "hot reload" or "hot patching" of programs - we do not care about this at all in an asynchronous system which can be restarted easily.
+For JQM, JPMS is a static plugin system and an API surface control system. Nothing more.
 
 Finally, extension points APIs muste be treated as if they were public APIs. This is not the case, but is compulsory for lowering the overall cost of maintenance
 (it is a lot better when plugins do not have to be rewritten every JQM version...)
 
 .. warning:: JQM plugin system is internal. It is not meant for third party plugins. If the JQM maintainers want to break ascending compatibility in the plugin APIs, they can do so without notice.
 
-.. note:: OSGi does not leak outside JQM. OSGi has no influence on the jobs themselves - they still have the same non-OSGi class loader as described in the dedicated section.
+.. note:: JPMS does not leak outside JQM. JPMS has no influence on the jobs themselves - they still have the same class loader as described in the dedicated section.
 
 Extension points
 ==================
@@ -55,6 +54,7 @@ Current extension points
 * runners, implementing the `JobRunner` API. They are responsible for actually launching a job instance. For example, the shell runner is able to launch shell command lines.
 * database adapters, implementing the `DbAdapter` API. They are responsible for everything which is specific to a given database (adapt SQL, migration scripts...)
 * resource schedulers, responsible for the management of a single resource type that can be used in the queuing algorithms (tokens, RAM availability, etc)
+* Implementations of the client API. We have two and only two, with no hope for more: JDBC and web service/Jersey. This makes the "extension" point a bit of a misnomer, but it was still very practical to expose the clients as services.
 
 Future extension points:
 
@@ -62,7 +62,6 @@ Future extension points:
 
 Actually not an extension point but one could be fooled:
 
-* Implementations of the client API. We have two and only two, with no hope for more: JDBC and web service/Jersey. Also, these are used by other programs and therefore must be used in a normal non-OSGi context.
 * Providers - these are simply a set of JNDI resource providers which are loaded by job through normal Java APIs.
 * Handlers - hum. Well. Now we think about these...
 
@@ -100,7 +99,7 @@ However, this is not true for the administration GUI which does such operations.
 It is however the most sorry part of the JQM and cleaning it up is a goal of future JQM versions with already open PRs.
 
 There is one exception to the "all SQL is inside `jqm-model`" principle. The Query API allows to construct arbitrary queries on `History` rows and therefore creates dynamic SQL queries.
-This code is not inside `jqm-model` but directly inside the client implementation, and then run like any other query through the DB abstraction technical layer.
+This code is not inside `jqm-model` but directly inside the client implementation, and then runs like any other query through the DB abstraction technical layer.
 
 Engine core
 ===============
@@ -122,13 +121,13 @@ Cluster node
 ================
 
 An engine is simply an instance of `JqmEngine` started with a given configuration. That configuration is provided by `jqm-clusternode` which provides the configuration and the needed plugins.
-It also starts a web server for each node.
+It also starts a web server for each node if configured so.
 
 It is basically the "standard distribution" of the JQM engine.
 
 It is exposed through start/stop verbs of the `jqm-cli` project, which is the entry point to everything JQM.
 
-Finally, there is a last artifact important here: `jqm-service` which provides the OSGi framework in which to run everything else. This is the packaging project, producing the standard distribution zip file.
+Finally, there is a last artifact important here: `jqm-service` which bootstraps the CLI inside a class loader containing all the plugins. This is the packaging project, producing the standard distribution zip file.
 
 Web API & GUI
 ****************
@@ -148,7 +147,5 @@ The controller part is implemented by standard JAX-RS services.
 The view part is implemented inside a ReactJS client.
 
 
-In terms of hosting, everything is hosted by the Apache Felix implementation of the OSGi HTTP/Rest whiteboard.
-Which is basically an OSGi-compatible version of Jetty.
-This will allow in the future to extend web services and UI inside OSGi plugins.
-
+In terms of hosting, everything is hosted by an embedded jetty server with Jersey as the JAX-RS implementation, and Jackson as the XML/JSON marshaller.
+We only use standard Jakarta APIs for everything web-related on the Java side so as to make future evolutions easier.

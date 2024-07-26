@@ -4,9 +4,8 @@ import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
@@ -84,7 +83,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
                 // The stop order may come from SIGTERM or SIGINT - in which case, the payload is not aware it should stop.
                 try
                 {
-                    JqmClientFactory.getClient(IDbClientFactory.class).killJob(jobId);
+                    JqmDbClientFactory.getClient().killJob(jobId);
                 }
                 catch (JqmInvalidRequestException e)
                 {

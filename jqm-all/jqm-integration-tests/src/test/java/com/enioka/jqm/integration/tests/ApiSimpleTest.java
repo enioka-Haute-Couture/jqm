@@ -32,8 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.enioka.jqm.client.api.JobInstance;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
@@ -104,7 +103,7 @@ public class ApiSimpleTest extends JqmBaseTest
         TestHelpers.waitFor(1, 10000, cnx);
 
         // Check run is OK & parameters have been correctly processed
-        JobInstance ji = JqmClientFactory.getClient(IDbClientFactory.class).getJob(jid);
+        JobInstance ji = JqmDbClientFactory.getClient().getJob(jid);
         Assert.assertEquals(com.enioka.jqm.client.api.State.ENDED, ji.getState());
         Assert.assertEquals(2, ji.getParameters().size());
         Assert.assertEquals("newvalue2", ji.getParameters().get("arg2"));

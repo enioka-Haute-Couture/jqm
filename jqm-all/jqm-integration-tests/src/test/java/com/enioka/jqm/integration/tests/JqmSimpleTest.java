@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import org.junit.Assert;
+
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-
-import org.junit.Assert;
 
 public class JqmSimpleTest
 {
@@ -113,8 +112,8 @@ public class JqmSimpleTest
         {
             test.addAndStartEngine(nodeName);
         }
-        Integer i = JqmClientFactory.getClient(IDbClientFactory.class).newJobRequest("TestJqmApplication", "TestUser")
-                .setSessionID(sessionId).setParameters(runtimePrms).enqueue();
+        Integer i = JqmDbClientFactory.getClient().newJobRequest("TestJqmApplication", "TestUser").setSessionID(sessionId)
+                .setParameters(runtimePrms).enqueue();
         TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, cnx);
         if (waitMsMin > 0)
         {

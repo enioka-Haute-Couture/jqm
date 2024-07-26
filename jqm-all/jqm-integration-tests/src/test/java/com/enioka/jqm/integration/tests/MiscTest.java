@@ -58,10 +58,8 @@ public class MiscTest extends JqmBaseTest
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imap");
         int nbMail = 0;
-        ClassLoader previous = Thread.currentThread().getContextClassLoader();
         try
         {
-            Thread.currentThread().setContextClassLoader(null); // OSGi + EE...
             Session session = Session.getInstance(props, null);
             Store store = session.getStore();
             store.connect("localhost", 10143, "testlogin", "testpassword");
@@ -71,10 +69,6 @@ public class MiscTest extends JqmBaseTest
         catch (Exception mex)
         {
             mex.printStackTrace();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(previous);
         }
         Assert.assertEquals(1, nbMail);
     }

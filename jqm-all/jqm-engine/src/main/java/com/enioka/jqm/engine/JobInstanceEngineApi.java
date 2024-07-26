@@ -10,16 +10,17 @@ import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientException;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.client.api.Query;
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
-import com.enioka.jqm.runner.api.JqmKillException;
-import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
-import com.enioka.jqm.shared.misc.Closer;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.GlobalParameter;
@@ -27,11 +28,9 @@ import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.State;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.enioka.jqm.runner.api.JqmKillException;
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
+import com.enioka.jqm.shared.misc.Closer;
 
 /**
  * For each running job instance, JQM has a callback interface {@link JobManager} allowing the JI to call some JQM APIs without the need of
@@ -274,7 +273,7 @@ class JobInstanceEngineApi implements JobManager
 
     private JqmClient getJqmClient()
     {
-        return JqmClientFactory.getClient(IDbClientFactory.class);
+        return JqmDbClientFactory.getClient();
     }
 
     private void handleInstructions()

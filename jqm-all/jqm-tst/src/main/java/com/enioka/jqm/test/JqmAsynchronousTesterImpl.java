@@ -31,8 +31,7 @@ import com.enioka.jqm.test.api.JqmAsynchronousTester;
 import com.enioka.jqm.test.api.TestJobDefinition;
 
 /**
- * Actual implementation of {@link JqmAsynchronousTester}. Interface/implementation split only exists in order to allow easier interaction
- * from outside the OSGi world.
+ * Actual implementation of {@link JqmAsynchronousTester}.
  */
 @MetaInfServices(JqmAsynchronousTester.class)
 public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester

@@ -359,9 +359,6 @@
                             <directory>plugins</directory>
                         </fileset>
                         <fileset>
-                            <directory>bundle</directory>
-                        </fileset>
-                        <fileset>
                             <directory>target</directory>
                         </fileset>
                     </filesets>

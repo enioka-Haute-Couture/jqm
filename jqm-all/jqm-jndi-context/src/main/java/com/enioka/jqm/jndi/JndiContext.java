@@ -105,12 +105,12 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
             serverName = name.split("//")[1];
             return null;
         }
-        if (name.startsWith("internal://reset")) // For easier tests, as this is a global singleton hard to wire in bundles...
+        if (name.startsWith("internal://reset")) // For easier tests, as this is a global singleton hard to wire in plugins...
         {
             resetSingletons();
             return null;
         }
-        if (name.equals("cl://ext")) // special case needed for tests, as the ext CL will always be the same (shared between OSGi runners)
+        if (name.equals("cl://ext")) // special case needed for tests, as the ext CL will always be the same (shared between all CLs)
         {
             return this.extResources;
         }

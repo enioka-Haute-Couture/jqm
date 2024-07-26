@@ -3,8 +3,7 @@ package com.enioka.jqm.engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.client.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.IDbClientFactory;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -197,7 +196,7 @@ class CronScheduler implements Runnable, TaskCollector
         @Override
         public void execute(TaskExecutionContext context) throws RuntimeException
         {
-            JqmClientFactory.getClient(IDbClientFactory.class).newJobRequest("", "cron").setScheduleId(sj.getId()).enqueue();
+            JqmDbClientFactory.getClient().newJobRequest("", "cron").setScheduleId(sj.getId()).enqueue();
         }
 
     }

@@ -4,9 +4,7 @@ Logging
 For JQM itself
 *******************
 
-JQM itself uses the `slf4j` logging API everywhere. Behind the API, it uses `org.apache.felix.logback` which is an implementation of the OSGi logging specification using logback.
-
-.. note:: why not use directly the OSGi logging service to log instead of slf4j? Because we avoid too many dependencies on OSGi when the subject is not directly about modularity.
+JQM itself uses the `slf4j` logging API everywhere. Behind the API, it uses `logback`.
 
 In turn, we have a logging configuration which will create a file JQM_ROOT/jqm.log per day (max size 1GB) and archive the latest five files, purging the older ones.
 

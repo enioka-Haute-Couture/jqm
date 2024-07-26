@@ -93,20 +93,4 @@
         </profile>
     </profiles>
 
-    <!-- Remove default BND configuration - these are not OSGi bundles. -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${plugin.jar.version}</version>
-                <configuration>
-                    <archive combine.self="override">
-                    </archive>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
-
 </project>

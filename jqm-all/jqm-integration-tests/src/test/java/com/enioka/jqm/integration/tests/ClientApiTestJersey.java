@@ -3,21 +3,20 @@ package com.enioka.jqm.integration.tests;
 import java.io.IOException;
 import java.util.Properties;
 
-import jakarta.ws.rs.NotAuthorizedException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientException;
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.shared.IWsClientFactory;
-import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmWsClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.repository.UserManagementRepository;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import jakarta.ws.rs.NotAuthorizedException;
 
 /**
  * Run all the client tests, but this time with a WS client.
@@ -50,13 +49,13 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
                 "http://" + (n.getDns().equals("0.0.0.0") ? "localhost" : n.getDns()) + ":" + n.getPort() + "/ws/client");
         p.put("com.enioka.jqm.ws.login", "test");
         p.put("com.enioka.jqm.ws.password", "testpassword");
-        JqmClientFactory.setProperties(p);
+        JqmWsClientFactory.setProperties(p);
 
         UserManagementRepository.createUserIfMissing(cnx, "test", "testpassword", "test user for WS Junit tests", "client power user");
         cnx.commit();
 
-        JqmClientFactory.reset();
-        jqmClient = JqmClientFactory.getClient(IWsClientFactory.class);
+        JqmWsClientFactory.reset();
+        jqmClient = JqmWsClientFactory.getClient();
     }
 
     @Test(expected = JqmInvalidRequestException.class)
@@ -79,7 +78,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
         temp.putAll(p);
         temp.put("com.enioka.jqm.ws.password", "testpasswordXXX");
 
-        JqmClient wrongClient = JqmClientFactory.getClient("name", temp, false, IWsClientFactory.class);
+        JqmClient wrongClient = JqmWsClientFactory.getClient("name", temp, false);
 
         try
         {
