@@ -12,7 +12,7 @@ public class JqmTesterTest
     @Test
     public void testOne()
     {
-        JobInstance res = JqmSynchronousTesterImpl.create("com.enioka.jqm.test.Payload1").run();
+        JobInstance res = DefaultJqmSynchronousTester.create("com.enioka.jqm.test.Payload1").run();
         Assert.assertEquals(State.ENDED, res.getState());
     }
 
@@ -20,7 +20,7 @@ public class JqmTesterTest
     @Test
     public void testTwo()
     {
-        JobInstance res = JqmSynchronousTesterImpl.create("com.enioka.jqm.test.Payload2").addParameter("arg1", "testvalue").run();
+        JobInstance res = DefaultJqmSynchronousTester.create("com.enioka.jqm.test.Payload2").addParameter("arg1", "testvalue").run();
         Assert.assertEquals(State.ENDED, res.getState());
     }
 
@@ -28,7 +28,7 @@ public class JqmTesterTest
     @Test
     public void testThree()
     {
-        JobInstance res = JqmSynchronousTesterImpl.create("com.enioka.jqm.test.Payload3").addParameter("arg1", "testvalue").run();
+        JobInstance res = DefaultJqmSynchronousTester.create("com.enioka.jqm.test.Payload3").addParameter("arg1", "testvalue").run();
         Assert.assertEquals(State.ENDED, res.getState());
     }
 
@@ -36,7 +36,7 @@ public class JqmTesterTest
     @Test
     public void testFour()
     {
-        JobInstance res = JqmSynchronousTesterImpl.create(Payload3.class).addParameter("arg1", "testvalue").run();
+        JobInstance res = DefaultJqmSynchronousTester.create(Payload3.class).addParameter("arg1", "testvalue").run();
         Assert.assertEquals(State.ENDED, res.getState());
     }
 }

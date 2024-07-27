@@ -34,7 +34,7 @@ import com.enioka.jqm.test.api.TestJobDefinition;
  * Actual implementation of {@link JqmAsynchronousTester}.
  */
 @MetaInfServices(JqmAsynchronousTester.class)
-public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
+public class DefaultJqmAsynchronousTester implements JqmAsynchronousTester
 {
     private Map<String, JqmEngineOperations> engines = new HashMap<>();
     private Map<String, Node> nodes = new HashMap<>();
@@ -50,7 +50,7 @@ public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
     // CONSTRUCTION
     ///////////////////////////////////////////////////////////////////////////
 
-    public JqmAsynchronousTesterImpl()
+    public DefaultJqmAsynchronousTester()
     {
         // Main resource is jdbc/test and uses a memory url, meaning db is created on first use.
         System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml,resources_internal.xml");
@@ -70,7 +70,7 @@ public class JqmAsynchronousTesterImpl implements JqmAsynchronousTester
      */
     public static JqmAsynchronousTester create()
     {
-        return new JqmAsynchronousTesterImpl();
+        return new DefaultJqmAsynchronousTester();
     }
 
     @Override

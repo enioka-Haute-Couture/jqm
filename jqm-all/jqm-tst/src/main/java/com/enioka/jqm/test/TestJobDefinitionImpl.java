@@ -42,13 +42,13 @@ class TestJobDefinitionImpl implements TestJobDefinition
     boolean classLoaderTracing = false;
 
     // Internal
-    JqmAsynchronousTesterImpl tester;
+    DefaultJqmAsynchronousTester tester;
 
     ///////////////////////////////////////////////////////////////////////////
     // CONSTRUCTION
     ///////////////////////////////////////////////////////////////////////////
 
-    private TestJobDefinitionImpl(JqmAsynchronousTesterImpl tester)
+    private TestJobDefinitionImpl(DefaultJqmAsynchronousTester tester)
     {
         this.tester = tester;
     }
@@ -68,7 +68,7 @@ class TestJobDefinitionImpl implements TestJobDefinition
      * @return the object itself (fluid API)
      */
     public static TestJobDefinitionImpl createFromClassPath(String name, String description, Class<? extends Object> testedClass,
-            JqmAsynchronousTesterImpl tester)
+            DefaultJqmAsynchronousTester tester)
     {
         TestJobDefinitionImpl res = new TestJobDefinitionImpl(tester);
         res.name = name;
@@ -95,7 +95,7 @@ class TestJobDefinitionImpl implements TestJobDefinition
      * @return
      */
     public static TestJobDefinitionImpl createFromJar(String name, String description, String testedClassCanonicalName, String jarPath,
-            JqmAsynchronousTesterImpl tester)
+            DefaultJqmAsynchronousTester tester)
     {
         TestJobDefinitionImpl res = new TestJobDefinitionImpl(tester);
         res.name = name;

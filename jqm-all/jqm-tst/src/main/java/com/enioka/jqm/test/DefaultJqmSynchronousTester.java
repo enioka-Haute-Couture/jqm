@@ -25,7 +25,7 @@ import com.enioka.jqm.test.api.JqmSynchronousTester;
  * Actual implementation of {@link JqmSynchronousTester}.
  */
 @MetaInfServices(JqmSynchronousTester.class)
-public class JqmSynchronousTesterImpl implements JqmSynchronousTester
+public class DefaultJqmSynchronousTester implements JqmSynchronousTester
 {
     private DbConn cnx = null;
     private File resDirectoryPath;
@@ -37,7 +37,7 @@ public class JqmSynchronousTesterImpl implements JqmSynchronousTester
     private Integer q = null;
     private Integer ji = null;
 
-    public JqmSynchronousTesterImpl()
+    public DefaultJqmSynchronousTester()
     {
         // Main resource is jdbc/jqm and uses a memory url, meaning db is created on first use.
         System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml,resources_internal.xml");
@@ -76,7 +76,7 @@ public class JqmSynchronousTesterImpl implements JqmSynchronousTester
      */
     public static JqmSynchronousTester create(String className)
     {
-        return new JqmSynchronousTesterImpl().setJobClass(className);
+        return new DefaultJqmSynchronousTester().setJobClass(className);
     }
 
     /**
@@ -87,7 +87,7 @@ public class JqmSynchronousTesterImpl implements JqmSynchronousTester
      */
     public static JqmSynchronousTester create(Class<?> clazz)
     {
-        return new JqmSynchronousTesterImpl().setJobClass(clazz);
+        return new DefaultJqmSynchronousTester().setJobClass(clazz);
     }
 
     @Override

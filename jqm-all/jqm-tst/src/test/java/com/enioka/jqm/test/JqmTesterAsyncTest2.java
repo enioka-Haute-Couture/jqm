@@ -40,7 +40,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testTwo()
     {
-        JqmAsynchronousTester tester = JqmAsynchronousTesterImpl.create().createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromClasspath(Payload1.class).start();
 
         tester.enqueue("Payload1");
@@ -59,7 +59,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testThree()
     {
-        JqmAsynchronousTester tester = JqmAsynchronousTesterImpl.create().createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromLibrary("payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar").start();
 
         tester.enqueue("payload1");
@@ -76,7 +76,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testFour() throws IOException
     {
-        JqmAsynchronousTester tester = JqmAsynchronousTesterImpl.create().createSingleNodeOneQueue().setNodesLogLevel("TRACE")
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue().setNodesLogLevel("TRACE")
                 .addSimpleJobDefinitionFromLibrary("payload1", "pyl.EngineApiSendDeliverable", "../jqm-tests/jqm-test-pyl/target/test.jar")
                 .start();
 
@@ -103,7 +103,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testFive()
     {
-        JqmAsynchronousTester tester = JqmAsynchronousTesterImpl.create().createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromClasspath(Payload3.class).start();
         tester.enqueue("Payload3");
 
