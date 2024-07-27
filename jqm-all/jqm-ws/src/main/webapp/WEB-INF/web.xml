@@ -31,6 +31,7 @@
         <dispatcher>ASYNC</dispatcher>
     </filter-mapping>
 
+    <!-- Basic static file serving servlet -->
     <servlet>
         <servlet-name>default</servlet-name>
         <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
@@ -40,7 +41,7 @@
         </init-param>
         <init-param>
             <param-name>dirAllowed</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
         <init-param>
             <param-name>welcomeServlets</param-name>

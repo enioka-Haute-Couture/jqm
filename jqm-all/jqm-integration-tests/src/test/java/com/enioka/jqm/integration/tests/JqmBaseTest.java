@@ -294,7 +294,7 @@ public class JqmBaseTest
     }
 
     /**
-     * This test simply tests pax exam loads.
+     * This test simply tests junit works.
      */
     @Test
     public void testContainerStarts()
