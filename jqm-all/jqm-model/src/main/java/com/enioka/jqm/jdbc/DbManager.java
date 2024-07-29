@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,19 +48,6 @@ public final class DbManager
         return db;
     }
 
-    private static boolean isOsgiContext()
-    {
-        try
-        {
-            return DbManager.class.getClassLoader().loadClass("org.osgi.framework.BundleReference") != null
-                    && FrameworkUtil.getBundle(DbManager.class) != null;
-        }
-        catch (ClassNotFoundException e)
-        {
-            return false;
-        }
-    }
-
     private static void initDbIfNeeded(Properties overloadProps)
     {
         if (db == null)
@@ -79,14 +65,6 @@ public final class DbManager
                         if (overloadProps != null)
                         {
                             props.putAll(overloadProps);
-                        }
-
-                        // If not osgi we may need to specify the db adapter plugin list with the ones embedded in the standard distribution
-                        // Otherwise there would be no adapters available to load!
-                        if (!isOsgiContext() && props.getProperty("com.enioka.jqm.jdbc.adapters") == null)
-                        {
-                            props.setProperty("com.enioka.jqm.jdbc.adapters",
-                                    "com.enioka.jqm.jdbc.impl.pg.DbImplPg,com.enioka.jqm.jdbc.impl.hsql.DbImplHsql,com.enioka.jqm.jdbc.impl.oracle.DbImplOracle,com.enioka.jqm.jdbc.impl.mysql.DbImplMySql8,com.enioka.jqm.jdbc.impl.mysql.DbImplMySql,com.enioka.jqm.jdbc.impl.db2.DbImplDb2");
                         }
 
                         // Connect to DB.

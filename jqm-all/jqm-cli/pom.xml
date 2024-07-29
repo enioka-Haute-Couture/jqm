@@ -21,26 +21,33 @@
             <version>${jcommander.version}</version>
         </dependency>
 
-        <!-- We directly integrate the XML import/export functions in some commands -->
-        <dependency>
+        <!-- JQM libs needed for the CLI commands -->
+        <dependency> <!-- We directly integrate the XML import/export functions in some commands -->
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- JQM libs needed for the CLI commands -->
-        <dependency>
+        <dependency> <!-- start a node -->
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-clusternode</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-jndi-context</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency> <!-- Direct CRUD done in some verbs -->
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-admin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-        <!-- Used for the OSGi main interface -->
+        <!-- Used for the main startup interface -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-cli-bootstrap</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>

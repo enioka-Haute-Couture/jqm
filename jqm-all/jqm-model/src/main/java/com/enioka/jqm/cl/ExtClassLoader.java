@@ -70,7 +70,7 @@ public final class ExtClassLoader
 
         // List all jars inside ext directory
         File extDir = new File(getRootDir(), "ext/");
-        jqmlogger.info("Using {} as JQM_ROOT directory", extDir);
+        jqmlogger.info("Using {} as JQM_ROOT/ext directory", extDir);
         if (extDir.isDirectory())
         {
             jqmlogger.debug("Using {} as ext resource directory", extDir.getAbsolutePath());
@@ -147,8 +147,7 @@ public final class ExtClassLoader
             rootPath = System.getProperty("com.enioka.jqm.alternateJqmRoot", null);
             if (rootPath == null)
             {
-                // logger class because it is always shared with the host, not ever in an OSGi CL and cannot be unloaded.
-                File currentJar = new File(org.slf4j.Logger.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                File currentJar = new File(ExtClassLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 rootPath = currentJar.getParentFile().getParent(); // log lib is always inside JQM_ROOT/lib.
             }
         }

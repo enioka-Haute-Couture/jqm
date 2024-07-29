@@ -25,8 +25,6 @@
                 <inherited>false</inherited>
                 <configuration>
                     <archive>
-                        <!-- Do not inherit "fetch OSGi manifest" config -->
-                        <manifestFile combine.self="override"></manifestFile>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
@@ -37,22 +35,6 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-            </plugin>
-
-            <!-- This is not an OSGi bundle! -->
-            <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-maven-plugin</artifactId>
-                <version>${plugin.bnd.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>PROCESS_BUNDLES</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- Create package -->
@@ -77,85 +59,14 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Generate dependency tree for pax exam-->
-            <plugin>
-                <groupId>org.apache.servicemix.tooling</groupId>
-                <artifactId>depends-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-depends-file</id>
-                        <goals>
-                            <goal>generate-depends-file</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Copy annotations in another version to package -->
-            <!-- Annoying - HK2 needs this, and Maven hates multiple versions of same jar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${plugin.dependency.version}</version>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>jakarta.annotation</groupId>
-                            <artifactId>jakarta.annotation-api</artifactId>
-                            <version>2.1.1</version>
-                            <type>jar</type>
-                            <overWrite>false</overWrite>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <destFileName>jakarta.annotation-api.old.jar</destFileName>
-                        </artifactItem>
-                    </artifactItems>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
-    <profiles>
-        <!-- A profile adding a CLI when using debug property. -->
-        <profile>
-            <activation>
-                <property>
-                    <name>debug</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <!-- DEBUG - a CLI -->
-                <dependency>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.gogo.shell</artifactId>
-                    <version>1.1.4</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.gogo.command</artifactId>
-                    <version>1.1.2</version>
-                </dependency>
-
-            </dependencies>
-        </profile>
-    </profiles>
-
-    <!-- runtime  = bundle start level 1  -->
-    <!-- provided = bundle start level 5  -->
+    <!-- compile (default)  = actual lib needed by this artifact  -->
+    <!-- runtime = an engine plugin (engine class path) -->
+    <!-- provided = an ext lib (payload and engine class path)  -->
     <dependencies>
-        <!-- API exposed to the OSGi host by the OSGi libs -->
+        <!-- Main entry point interface -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-cli-bootstrap</artifactId>
@@ -163,152 +74,15 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- ================ OSGI framework ================== -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr</artifactId>
-            <version>${felix.scr.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.configadmin</artifactId>
-            <version>${felix.configadmin.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.http.jetty</artifactId>
-            <version>${felix.http.whiteboard.version}</version>
-            <scope>provided</scope>
-            <!-- This is an uber-jar, no need for dependencies -->
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.osgi-technology.rest</groupId>
-            <artifactId>org.eclipse.osgitech.rest</artifactId>
-            <version>${jakartars.whiteboard.implem.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.osgi-technology.rest</groupId>
-            <artifactId>org.eclipse.osgitech.rest.servlet.whiteboard</artifactId>
-            <version>${jakartars.whiteboard.implem.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.osgi-technology.rest</groupId>
-            <artifactId>org.eclipse.osgitech.rest.sse</artifactId>
-            <version>${jakartars.whiteboard.implem.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.http.whiteboard</artifactId>
-            <version>${osgi.http.whiteboard.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component</artifactId>
-            <version>${osgi.component.service.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JSON support -->
+        <!-- Serviceloader helper -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-jackson-osgi-jaxrs-config</artifactId>
+            <artifactId>jqm-shared</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-osgi</artifactId>
-            <version>${jaxb.impl.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.spifly</groupId>
-            <artifactId>org.apache.aries.spifly.dynamic.framework.extension</artifactId>
-            <version>${aries.spifly.version}</version>
-            <!-- Level 1 compulsory - must be loaded before service providers -->
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- Support for wrapping non-osgi libs -->
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-wrap</artifactId>
-            <version>${pax.url.version}</version>
-            <!-- level1 - some level 2+ libs are not OSGi -->
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- APIs implemented by CXF/Whiteboard -->
-        <dependency> <!-- All javax/jakarta versions for servlets! -->
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.http.servlet-api</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.xml.soap</groupId>
-            <artifactId>jakarta.xml.soap-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.xml.ws</groupId>
-            <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>${jakarta.ws-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>${jaxrs.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <version>${jakarta.annotation.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>${jakarta.xml.bind-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- The one and only logging API used everywhere -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <!-- Goes to normal libs -->
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.log</artifactId>
-            <version>1.5.0</version>
-        </dependency>
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
@@ -343,68 +117,71 @@
         <!-- Main goal: encapsulate the engine. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-cli</artifactId>
+            <artifactId>jqm-clusternode</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-api</artifactId>
+            <artifactId>jqm-cli</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-engine-api</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Engine plugins for the base distribution -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-runner-basic</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-spring</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-providers</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-jndi-context</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-shell</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-java</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <!-- This is an uber-jar (for now) -->
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-jndi-context</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- The website itself -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-ws</artifactId>
+            <type>war</type>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Use Jetty for serving the website -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-webserver-jetty</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
 
@@ -435,6 +212,22 @@
             <groupId>org.eclipse.angus</groupId>
             <artifactId>angus-mail</artifactId>
             <version>${mail.implem.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Basic providers -->
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-providers</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Base JQM API, needed for JobManager -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 

@@ -12,9 +12,9 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 
-import org.osgi.service.component.annotations.Component;
+import org.kohsuke.MetaInfServices;
 
-@Component(service = DbAdapter.class, property = { "Adapter-Type:String=hsql" })
+@MetaInfServices
 public class DbImplHsql extends DbAdapter
 {
     @Override

@@ -18,10 +18,12 @@
 
 package com.enioka.jqm.service;
 
-import com.enioka.jqm.cli.bootstrap.CommandLine;
+import java.util.ServiceLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.cli.bootstrap.CommandLine;
 
 /**
  * Starter class & parameter parsing
@@ -31,7 +33,7 @@ public class Main
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(Main.class);
 
-    private static CommandLine osgiEntryPoint;
+    private static CommandLine cliService;
 
     private Main()
     {
@@ -57,9 +59,9 @@ public class Main
     static void stop(String[] args)
     {
         jqmlogger.info("Service stop");
-        if (osgiEntryPoint != null)
+        if (cliService != null)
         {
-            osgiEntryPoint.stopIfRunning();
+            cliService.stopIfRunning();
         }
     }
 
@@ -71,7 +73,20 @@ public class Main
      */
     public static void main(String[] args)
     {
-        osgiEntryPoint = OsgiRuntime.newFramework();
-        System.exit(osgiEntryPoint.runOsgiCommand(args));
+        var engineCl = new EngineClassLoader();
+        Thread.currentThread().setContextClassLoader(engineCl);
+
+        // We do not use the ServiceLoaderHelper here to simplify class loading.
+        var sl = ServiceLoader.load(CommandLine.class, engineCl);
+
+        var res = sl.findFirst();
+        if (res.isEmpty())
+        {
+            jqmlogger.error("No service implementation found. Exiting.");
+            System.exit(1);
+        }
+
+        cliService = res.get();
+        System.exit(cliService.runServiceCommand(args));
     }
 }

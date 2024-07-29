@@ -14,10 +14,5 @@
     <description>A few shared helpers. Not a public API.</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
     </dependencies>
 </project>

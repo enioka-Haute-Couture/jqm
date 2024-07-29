@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import com.enioka.jqm.client.api.Deliverable;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
-import com.enioka.jqm.tester.api.JqmAsynchronousTester;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.test.api.JqmAsynchronousTester;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -23,23 +24,23 @@ public class JqmTesterAsyncTest2
     @Test
     public void testOne()
     {
-        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
-                .addSimpleJobDefinitionFromClasspath(Payload1.class).start();
+        try (var tester = ServiceLoader.load(JqmAsynchronousTester.class).findFirst().get().createSingleNodeOneQueue()
+                .addSimpleJobDefinitionFromClasspath(Payload1.class).start())
+        {
 
-        tester.enqueue("Payload1");
-        tester.waitForResults(1, 10000, 0);
+            tester.enqueue("Payload1");
+            tester.waitForResults(1, 10000, 0);
 
-        Assert.assertEquals(1, tester.getOkCount());
-        Assert.assertEquals(1, tester.getHistoryAllCount());
-
-        tester.stop();
+            Assert.assertEquals(1, tester.getOkCount());
+            Assert.assertEquals(1, tester.getHistoryAllCount());
+        }
     }
 
     // Test multiple enqueues
     @Test
     public void testTwo()
     {
-        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromClasspath(Payload1.class).start();
 
         tester.enqueue("Payload1");
@@ -58,7 +59,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testThree()
     {
-        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromLibrary("payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar").start();
 
         tester.enqueue("payload1");
@@ -75,7 +76,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testFour() throws IOException
     {
-        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue().setNodesLogLevel("TRACE")
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue().setNodesLogLevel("TRACE")
                 .addSimpleJobDefinitionFromLibrary("payload1", "pyl.EngineApiSendDeliverable", "../jqm-tests/jqm-test-pyl/target/test.jar")
                 .start();
 
@@ -102,7 +103,7 @@ public class JqmTesterAsyncTest2
     @Test
     public void testFive()
     {
-        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromClasspath(Payload3.class).start();
         tester.enqueue("Payload3");
 

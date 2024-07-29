@@ -1,7 +1,8 @@
 package com.enioka.jqm.cli.bootstrap;
 
 /**
- * Interface implemented by the CLI parsing service. Used as a pivot between the system class loader or the OSGi host and the OSGi world.
+ * Interface implemented by the CLI parsing service. Used as a pivot between the system class loader and the host class loader (usually the
+ * one created by jqm-service).
  */
 public interface CommandLine
 {
@@ -12,7 +13,7 @@ public interface CommandLine
      *            CLI arguments
      * @return return code
      */
-    public int runOsgiCommand(String[] args);
+    public int runServiceCommand(String[] args);
 
     /**
      * If an engine is running, kill it.

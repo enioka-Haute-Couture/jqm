@@ -1,6 +1,10 @@
 package com.enioka.jqm.integration.tests;
 
-import javax.inject.Inject;
+import java.util.ServiceLoader;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
@@ -8,22 +12,26 @@ import com.enioka.jqm.cli.bootstrap.CommandLine;
 import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 public class CliTest extends JqmBaseTest
 {
-    @Inject
     CommandLine parser;
+
+    @Before
+    public void beforeEachTest1()
+    {
+        parser = ServiceLoaderHelper.getService(ServiceLoader.load(CommandLine.class));
+    }
 
     @Test
     public void testCliChangeUser()
     {
         DefaultConfigurationService.updateConfiguration(cnx);
-        parser.runOsgiCommand(new String[] { "Reset-User", "--login", "myuser", "-p", "mypassword", "--roles", "administrator", "client" });
+        parser.runServiceCommand(
+                new String[] { "Reset-User", "--login", "myuser", "-p", "mypassword", "--roles", "administrator", "client" });
 
         RUser u = RUser.selectlogin(cnx, "myuser");
 
@@ -42,10 +50,11 @@ public class CliTest extends JqmBaseTest
         }
         Assert.assertTrue(client && admin);
 
-        parser.runOsgiCommand(new String[] { "Reset-User", "--login", "myuser", "--password", "mypassword", "--roles", "administrator" });
+        parser.runServiceCommand(
+                new String[] { "Reset-User", "--login", "myuser", "--password", "mypassword", "--roles", "administrator" });
         Assert.assertEquals(1, u.getRoles(cnx).size());
 
-        parser.runOsgiCommand(
+        parser.runServiceCommand(
                 new String[] { "Reset-User", "--login", "myuser", "-p", "mypassword", "--roles", "administrator", "config admin" });
         Assert.assertEquals(2, u.getRoles(cnx).size());
     }
@@ -60,7 +69,7 @@ public class CliTest extends JqmBaseTest
         cnx.runUpdate("debug_jj_update_node_by_id", TestHelpers.node.getId(), i);
         cnx.commit();
 
-        parser.runOsgiCommand(new String[] { "Start-Single", "--id", String.valueOf(i) });
+        parser.runServiceCommand(new String[] { "Start-Single", "--id", String.valueOf(i) });
 
         // This is not really a one shot JVM, so let's reset log4j
         /*
@@ -84,7 +93,7 @@ public class CliTest extends JqmBaseTest
         Assert.assertEquals(3, MetaService.getNodeQueueMappings(cnx, target.getId()).size());
 
         // Capital letter -> should be ignored.
-        parser.runOsgiCommand(
+        parser.runServiceCommand(
                 new String[] { "Install-NodeTemPlate", "-t", TestHelpers.nodeMix.getName(), "-n", TestHelpers.node.getName() });
 
         target = MetaService.getNode(cnx, TestHelpers.node.getId());

@@ -93,28 +93,4 @@
         </profile>
     </profiles>
 
-    <!-- Remove default BND configuration - these are not OSGi bundles. -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${plugin.jar.version}</version>
-                <configuration>
-                    <archive combine.self="override">
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-maven-plugin</artifactId>
-                <version>${plugin.bnd.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

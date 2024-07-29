@@ -1,15 +1,15 @@
 package com.enioka.jqm.engine;
 
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.client.api.JqmDbClientFactory;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.ScheduledJob;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import it.sauronsoftware.cron4j.Scheduler;
 import it.sauronsoftware.cron4j.SchedulingPattern;
@@ -196,7 +196,7 @@ class CronScheduler implements Runnable, TaskCollector
         @Override
         public void execute(TaskExecutionContext context) throws RuntimeException
         {
-            JqmClientFactory.getClient().newJobRequest("", "cron").setScheduleId(sj.getId()).enqueue();
+            JqmDbClientFactory.getClient().newJobRequest("", "cron").setScheduleId(sj.getId()).enqueue();
         }
 
     }

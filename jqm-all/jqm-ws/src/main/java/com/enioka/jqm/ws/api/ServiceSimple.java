@@ -22,12 +22,25 @@ import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.client.api.JobRequest;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.model.Deliverable;
+import com.enioka.jqm.model.Node;
+
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.FormParam;
@@ -41,32 +54,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
 
-import com.enioka.admin.JqmAdminApiException;
-import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.model.Deliverable;
-import com.enioka.jqm.model.Node;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.input.ReversedLinesFileReader;
-import org.apache.commons.lang.StringUtils;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A minimal API designed to interact well with CLI tools such as schedulers. Some of its methods (file retrieval) are also used by the two
  * other sets of APIs.
  *
  */
-@Component(service = ServiceSimple.class, configurationPolicy = ConfigurationPolicy.REQUIRE, scope = ServiceScope.SINGLETON)
-@JakartarsResource
 @Path("/simple")
 public class ServiceSimple
 {
@@ -74,16 +66,9 @@ public class ServiceSimple
 
     private Integer jqmNodeId = null;
 
-    @Activate
-    public void onServiceActivation(Map<String, Object> properties)
+    public ServiceSimple(@Context ServletContext context)
     {
-        if (!properties.containsKey("jqmnodeid"))
-        {
-            throw new JqmAdminApiException("OSGi configuration for ServiceSimple does not contain a valid node ID");
-        }
-
-        jqmNodeId = (int) properties.get("jqmnodeid"); // small int - cannot be null.
-        log.info("\tStarting ServiceSimple with node ID {}", jqmNodeId);
+        jqmNodeId = Integer.parseInt(context.getInitParameter("jqmnodeid").toString());
     }
 
     /////////////////////////////////////////////////////////////
@@ -119,7 +104,7 @@ public class ServiceSimple
     @Produces(MediaType.TEXT_PLAIN)
     public String getStatus(@QueryParam("id") int id)
     {
-        return JqmClientFactory.getClient().getJob(id).getState().toString();
+        return Helpers.getClient().getJob(id).getState().toString();
     }
 
     /////////////////////////////////////////////////////////////
@@ -263,7 +248,7 @@ public class ServiceSimple
             user = security.getUserPrincipal().getName();
         }
 
-        JobRequest jd = JqmClientFactory.getClient().newJobRequest(applicationName, user);
+        JobRequest jd = Helpers.getClient().newJobRequest(applicationName, user);
 
         jd.setModule(module);
         jd.setEmail(mail);

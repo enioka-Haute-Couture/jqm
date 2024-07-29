@@ -22,8 +22,9 @@ import java.util.Properties;
 
 import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.client.api.Query.Sort;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.client.api.State;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -33,17 +34,18 @@ import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Simple tests for checking query syntax (no data). No use of OSGi here, as this lib can be used outside a framework.
+ * Simple tests for checking query syntax (no data).
  */
 public class BasicTest
 {
-    private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(BasicTest.class);
 
     @BeforeClass
     public static void beforeClass()
@@ -221,8 +223,8 @@ public class BasicTest
 
             Properties p2 = new Properties();
             p2.put("com.enioka.jqm.jdbc.contextobject", db);
-            List<com.enioka.jqm.client.api.JobInstance> res = JqmClientFactory.getClient("test", p2, false).newQuery()
-                    .setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortDesc(Sort.ID).setPageSize(1)
+            List<com.enioka.jqm.client.api.JobInstance> res = JqmClientFactory.getClient("test", p2, false, IDbClientFactory.class)
+                    .newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortDesc(Sort.ID).setPageSize(1)
                     .setApplicationName("appName").invoke();
 
             Assert.assertEquals(1, res.size());

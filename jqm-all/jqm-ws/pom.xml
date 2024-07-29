@@ -11,7 +11,7 @@
 
     <artifactId>jqm-ws</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <url>http://jqm.readthedocs.org</url>
     <description>JQM web API implementation and administration UI</description>
 
@@ -144,90 +144,19 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <!-- For OSGi: copy shiro ini file inside the Shiro-accessible classpath -->
-                    <execution>
-                        <id>copy-resources-osgi</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/webapp/WEB-INF</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>shiro.ini</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- For react: copy build into dist folder -->
-                    <execution>
-                        <id>copy-resources-react</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/target/classes/dist</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${spa.build.repo}</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>**/**</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <!-- For auth (webapp content is not automatically copied in a jar) -->
-                    <execution>
-                        <id>copy-resources-authstatic</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/target/classes/auth</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/src/main/webapp/auth</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>*</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-maven-plugin</artifactId>
-                <version>${plugin.bnd.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${plugin.war.version}</version>
                 <configuration>
-                    <bnd>
-                        <![CDATA[
-                        # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources - JAR, not WAR or WAB
-                        # Web-ContextPath: /ws
-                        # BND issue with multi version jars. https://github.com/bndtools/bnd/issues/2227
-                        -fixupmessages: "Classes found in the wrong directory";is:=warning
-                        -removeheaders: Private-Package
-                        # Import packages: add packages used in shiro.ini file (not parsed by bnd)
-                        Import-Package: *, org.apache.shiro.authc.credential, org.apache.shiro.web.session.mgt, org.apache.shiro.session.mgt
-                    ]]>
-                    </bnd>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/react/build</directory>
+                            <filtering>true</filtering>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
@@ -239,25 +168,16 @@
             <version>${jakarta.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
             <version>${jaxrs.api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>${jakarta.xml.bind-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.http.whiteboard</artifactId>
-            <version>${osgi.httpwhiteboard.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -267,72 +187,9 @@
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
             <classifier>jakarta</classifier>
-            <scope>provided</scope> <!-- remove provided when solved -->
-            <!-- Exclude all deps - see https://shiro.apache.org/jakarta-ee.html -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-            <classifier>jakarta</classifier>
-            <version>${shiro.version}</version>
-            <scope>provided</scope> <!-- remove provided when solved -->
-        </dependency>
-        <!-- start of temp workaround -->
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-osgi-repackaging-shiro</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>*</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-crypto-hash</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-config-ogdl</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-cache</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-crypto-cipher</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro.crypto</groupId>
-            <artifactId>shiro-hashes-bcrypt</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <!-- end of temp deps for shiro issue -->
 
-
+        <!-- PKI for certificate creation in admin API -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-pki</artifactId>
@@ -354,14 +211,6 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-xml</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <!-- Some log -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Stupid java IO APIs solution -->

@@ -2,16 +2,17 @@ package com.enioka.jqm.ws.plumbing;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Legacy code. Stays here as may be useful again in a normal servlet context.
+ * Runs cleanup code when the web application is stopped.
  */
-// @WebListener
+@WebListener
 public class Ctx implements ServletContextListener
 {
     static Logger log = LoggerFactory.getLogger(Ctx.class);
@@ -26,6 +27,6 @@ public class Ctx implements ServletContextListener
     public void contextDestroyed(ServletContextEvent sce)
     {
         log.debug("Cleaning connections during WS application shutdown");
-        JqmClientFactory.getClient().dispose();
+        JqmClientFactory.reset();
     }
 }

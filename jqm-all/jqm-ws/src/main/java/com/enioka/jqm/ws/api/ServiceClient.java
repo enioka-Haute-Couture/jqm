@@ -18,7 +18,22 @@ package com.enioka.jqm.ws.api;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.client.api.Deliverable;
+import com.enioka.jqm.client.api.JobDef;
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.JobRequest;
+import com.enioka.jqm.client.api.Query;
+import com.enioka.jqm.client.api.Queue;
+import com.enioka.jqm.client.api.QueueStatus;
+import com.enioka.jqm.client.api.State;
+import com.enioka.jqm.client.shared.JobRequestBaseImpl;
+import com.enioka.jqm.client.shared.QueryBaseImpl;
+import com.enioka.jqm.client.shared.SelfDestructFileStream;
+import com.enioka.jqm.ws.plumbing.HttpCache;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
@@ -32,44 +47,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
-import com.enioka.jqm.client.api.Deliverable;
-import com.enioka.jqm.client.api.JobDef;
-import com.enioka.jqm.client.api.JobInstance;
-import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.client.api.Query;
-import com.enioka.jqm.client.api.Queue;
-import com.enioka.jqm.client.api.QueueStatus;
-import com.enioka.jqm.client.api.State;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
-import com.enioka.jqm.client.shared.JobRequestBaseImpl;
-import com.enioka.jqm.client.shared.QueryBaseImpl;
-import com.enioka.jqm.client.shared.SelfDestructFileStream;
-import com.enioka.jqm.ws.plumbing.HttpCache;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The main web service class for doing operations on JobInstances.
  */
-
-@Component(service = ServiceClient.class, configurationPolicy = ConfigurationPolicy.REQUIRE, scope = ServiceScope.SINGLETON)
-@JakartarsResource
 @Path("/client")
 public class ServiceClient
 {
     static Logger log = LoggerFactory.getLogger(ServiceClient.class);
-
-    @Activate
-    public void onServiceActivation(Map<String, Object> properties)
-    {
-        log.info("\tStarting ServiceClient");
-    }
 
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
@@ -83,7 +67,7 @@ public class ServiceClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JobInstance enqueueObject(JobRequestBaseImpl jd)
     {
-        JobRequest target = JqmClientFactory.getClient().newJobRequest(jd.getApplicationName(), jd.getUser());
+        JobRequest target = Helpers.getClient().newJobRequest(jd.getApplicationName(), jd.getUser());
 
         target.setApplication(jd.getApplication());
         target.setEmail(jd.getEmail());
@@ -133,49 +117,49 @@ public class ServiceClient
     @POST
     public int enqueueFromHistory(@PathParam("id") int jobIdToCopy)
     {
-        return JqmClientFactory.getClient().enqueueFromHistory(jobIdToCopy);
+        return Helpers.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
     @Path("ji/cancelled/{jobId}")
     @POST
     public void cancelJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().cancelJob(jobId);
+        Helpers.getClient().cancelJob(jobId);
     }
 
     @Path("ji/waiting/{jobId}")
     @DELETE
     public void deleteJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().deleteJob(jobId);
+        Helpers.getClient().deleteJob(jobId);
     }
 
     @Path("ji/killed/{jobId}")
     @POST
     public void killJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().killJob(jobId);
+        Helpers.getClient().killJob(jobId);
     }
 
     @Path("schedule/{scheduleId}")
     @DELETE
     public void removeRecurrence(@PathParam("scheduleId") int scheduleId)
     {
-        JqmClientFactory.getClient().removeRecurrence(scheduleId);
+        Helpers.getClient().removeRecurrence(scheduleId);
     }
 
     @Path("ji/paused/{jobId}")
     @POST
     public void pauseQueuedJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().pauseQueuedJob(jobId);
+        Helpers.getClient().pauseQueuedJob(jobId);
     }
 
     @Path("ji/paused/{jobId}")
     @DELETE
     public void resumeQueuedJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().resumeQueuedJob(jobId);
+        Helpers.getClient().resumeQueuedJob(jobId);
     }
 
     public void resumeJob(@PathParam("jobId") int jobId)
@@ -187,14 +171,14 @@ public class ServiceClient
     @POST
     public void pauseRunningJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().pauseRunningJob(jobId);
+        Helpers.getClient().pauseRunningJob(jobId);
     }
 
     @Path("ji/running/paused/{jobId}")
     @DELETE
     public void resumeRunningJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().resumeRunningJob(jobId);
+        Helpers.getClient().resumeRunningJob(jobId);
     }
 
     // Not exposed directly - we prefer objects to primitive types
@@ -208,7 +192,7 @@ public class ServiceClient
     @DELETE
     public JobInstance restartCrashedJobObject(@PathParam("jobId") int jobId)
     {
-        int i = JqmClientFactory.getClient().restartCrashedJob(jobId);
+        int i = Helpers.getClient().restartCrashedJob(jobId);
         return getJob(i);
     }
 
@@ -216,33 +200,33 @@ public class ServiceClient
     @POST
     public void setJobQueue(@PathParam("jobId") int jobId, @PathParam("queueId") int queueId)
     {
-        JqmClientFactory.getClient().setJobQueue(jobId, queueId);
+        Helpers.getClient().setJobQueue(jobId, queueId);
     }
 
     // No need to expose. Client side work.
 
     public void setJobQueue(int jobId, Queue queue)
     {
-        JqmClientFactory.getClient().setJobQueue(jobId, queue);
+        Helpers.getClient().setJobQueue(jobId, queue);
     }
 
     @POST
     @Path("ji/{jobId}/position/{newPosition}")
     public void setJobQueuePosition(@PathParam("jobId") int jobId, @PathParam("newPosition") int newPosition)
     {
-        JqmClientFactory.getClient().setJobQueuePosition(jobId, newPosition);
+        Helpers.getClient().setJobQueuePosition(jobId, newPosition);
     }
 
     @POST
     @Path("ji/{jobId}/priority/{priority}")
     public void setJobPriority(@PathParam("jobId") int jobId, @PathParam("priority") int priority)
     {
-        JqmClientFactory.getClient().setJobPriority(jobId, priority);
+        Helpers.getClient().setJobPriority(jobId, priority);
     }
 
     public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") Calendar whenToRun)
     {
-        JqmClientFactory.getClient().setJobRunAfter(jobId, whenToRun);
+        Helpers.getClient().setJobRunAfter(jobId, whenToRun);
     }
 
     @POST
@@ -251,28 +235,28 @@ public class ServiceClient
     {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(whenToRun);
-        JqmClientFactory.getClient().setJobRunAfter(jobId, c);
+        Helpers.getClient().setJobRunAfter(jobId, c);
     }
 
     @POST
     @Path("schedule/{scheduleId}/queue/{queueId}")
     public void setScheduleQueue(@PathParam("scheduleId") int scheduleId, @PathParam("queueId") int queueId)
     {
-        JqmClientFactory.getClient().setScheduleQueue(scheduleId, queueId);
+        Helpers.getClient().setScheduleQueue(scheduleId, queueId);
     }
 
     @POST
     @Path("schedule/{scheduleId}/cron/{cronExpression}")
     public void setScheduleRecurrence(@PathParam("scheduleId") int scheduleId, @PathParam("cronExpression") String cronExpression)
     {
-        JqmClientFactory.getClient().setScheduleRecurrence(scheduleId, cronExpression);
+        Helpers.getClient().setScheduleRecurrence(scheduleId, cronExpression);
     }
 
     @POST
     @Path("schedule/{scheduleId}/priority/{priority}")
     public void setSchedulePriority(@PathParam("scheduleId") int scheduleId, @PathParam("priority") int priority)
     {
-        JqmClientFactory.getClient().setSchedulePriority(scheduleId, priority);
+        Helpers.getClient().setSchedulePriority(scheduleId, priority);
     }
 
     @GET
@@ -281,7 +265,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public JobInstance getJob(@PathParam("jobId") int jobId)
     {
-        return JqmClientFactory.getClient().getJob(jobId);
+        return Helpers.getClient().getJob(jobId);
     }
 
     @GET
@@ -290,7 +274,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<JobInstance> getJobs()
     {
-        return JqmClientFactory.getClient().getJobs();
+        return Helpers.getClient().getJobs();
     }
 
     @GET
@@ -299,7 +283,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<JobInstance> getActiveJobs()
     {
-        return JqmClientFactory.getClient().getActiveJobs();
+        return Helpers.getClient().getActiveJobs();
     }
 
     @Path("user/{username}/ji")
@@ -308,7 +292,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<JobInstance> getUserActiveJobs(@PathParam("username") String userName)
     {
-        return JqmClientFactory.getClient().getUserActiveJobs(userName);
+        return Helpers.getClient().getUserActiveJobs(userName);
     }
 
     @Path("ji/query")
@@ -317,7 +301,7 @@ public class ServiceClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Query getJobsQuery(QueryBaseImpl query)
     {
-        Query target = JqmClientFactory.getClient().newQuery();
+        Query target = Helpers.getClient().newQuery();
 
         target.setApplicationName(query.getApplicationName());
         target.setBeganRunningAfter(query.getBeganRunningAfter());
@@ -360,7 +344,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<String> getJobMessages(@PathParam("jobId") int jobId)
     {
-        return JqmClientFactory.getClient().getJobMessages(jobId);
+        return Helpers.getClient().getJobMessages(jobId);
     }
 
     // Not exposed. Use getJob => progress
@@ -376,7 +360,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
     {
-        return JqmClientFactory.getClient().getJobDeliverables(jobId);
+        return Helpers.getClient().getJobDeliverables(jobId);
     }
 
     // Not exposed. Returning a list of files is a joke anyway... Loop should be
@@ -393,7 +377,7 @@ public class ServiceClient
     @POST
     public InputStream getDeliverableContent(Deliverable file, @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getDeliverableContent(file);
+        SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getDeliverableContent(file);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
         return fs;
     }
@@ -403,7 +387,7 @@ public class ServiceClient
     @GET
     public InputStream getDeliverableContent(@PathParam("id") int delId, @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getDeliverableContent(delId);
+        SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getDeliverableContent(delId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
         return fs;
     }
@@ -413,7 +397,7 @@ public class ServiceClient
     @GET
     public InputStream getJobLogStdErr(@PathParam("jobId") int jobId, @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getJobLogStdErr(jobId);
+        SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getJobLogStdErr(jobId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
         return fs;
     }
@@ -423,7 +407,7 @@ public class ServiceClient
     @GET
     public InputStream getJobLogStdOut(@PathParam("jobId") int jobId, @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getJobLogStdOut(jobId);
+        SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getJobLogStdOut(jobId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
         return fs;
     }
@@ -434,12 +418,12 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<Queue> getQueues()
     {
-        return JqmClientFactory.getClient().getQueues();
+        return Helpers.getClient().getQueues();
     }
 
     public void pauseQueue(Queue q)
     {
-        JqmClientFactory.getClient().pauseQueue(q);
+        Helpers.getClient().pauseQueue(q);
     }
 
     @Path("q/{qId}/pause")
@@ -448,7 +432,7 @@ public class ServiceClient
     {
         Queue q = new Queue();
         q.setId(qId);
-        JqmClientFactory.getClient().pauseQueue(q);
+        Helpers.getClient().pauseQueue(q);
     }
 
     public void resumeQueue(Queue q)
@@ -462,7 +446,7 @@ public class ServiceClient
     {
         Queue q = new Queue();
         q.setId(qId);
-        JqmClientFactory.getClient().resumeQueue(q);
+        Helpers.getClient().resumeQueue(q);
     }
 
     public void clearQueue(Queue q)
@@ -476,7 +460,7 @@ public class ServiceClient
     {
         Queue q = new Queue();
         q.setId(qId);
-        JqmClientFactory.getClient().clearQueue(q);
+        Helpers.getClient().clearQueue(q);
     }
 
     @Path("q/{qId}/status")
@@ -490,7 +474,7 @@ public class ServiceClient
 
     public QueueStatus getQueueStatus(Queue q)
     {
-        return JqmClientFactory.getClient().getQueueStatus(q);
+        return Helpers.getClient().getQueueStatus(q);
     }
 
     @Path("q/{qId}/enabled-capacity")
@@ -504,7 +488,7 @@ public class ServiceClient
 
     public int getQueueEnabledCapacity(Queue q)
     {
-        return JqmClientFactory.getClient().getQueueEnabledCapacity(q);
+        return Helpers.getClient().getQueueEnabledCapacity(q);
     }
 
     public void dispose()
@@ -520,7 +504,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<JobDef> getJobDefinitions()
     {
-        return JqmClientFactory.getClient().getJobDefinitions();
+        return Helpers.getClient().getJobDefinitions();
     }
 
     @Path("jd/{applicationName}")
@@ -530,7 +514,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
     {
-        return JqmClientFactory.getClient().getJobDefinitions(application);
+        return Helpers.getClient().getJobDefinitions(application);
     }
 
     @Path("jd/name/{name}")
@@ -539,7 +523,7 @@ public class ServiceClient
     @HttpCache("public, max-age=60")
     public JobDef getJobDefinition(@PathParam("name") String name)
     {
-        return JqmClientFactory.getClient().getJobDefinition(name);
+        return Helpers.getClient().getJobDefinition(name);
     }
 
     @Path("ji/query")
@@ -548,7 +532,7 @@ public class ServiceClient
     @HttpCache("public, max-age=3600")
     public Query getEmptyQuery()
     {
-        return JqmClientFactory.getClient().newQuery();
+        return Helpers.getClient().newQuery();
     }
 
     @Path("jr")
@@ -557,7 +541,7 @@ public class ServiceClient
     @HttpCache("public, max-age=3600")
     public JobRequest getEmptyJobRequest()
     {
-        return JqmClientFactory.getClient().newJobRequest("appName", "rsapi user");
+        return Helpers.getClient().newJobRequest("appName", "rsapi user");
     }
 
 }

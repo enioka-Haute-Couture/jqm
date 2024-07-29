@@ -9,16 +9,11 @@ import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.Provider;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsExtension;
-
 /**
  * The provider behind the {@link HttpCache} annotation. It is simply a {@link ContainerResponseFilter} that looks for the aforementioned
  * annotation and adds the <code>Cache-Control</code> header to the HTTP response if found.
  */
 @Provider
-@JakartarsExtension
-@Component
 public class HttpCacheImpl implements ContainerResponseFilter
 {
     @Override

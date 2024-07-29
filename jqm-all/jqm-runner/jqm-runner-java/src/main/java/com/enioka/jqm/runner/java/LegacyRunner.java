@@ -4,18 +4,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobRunnerException;
-
-import org.osgi.service.component.annotations.Component;
+import org.kohsuke.MetaInfServices;
 
 import com.enioka.jqm.api.JavaJobRunner;
+import com.enioka.jqm.api.JobBase;
+import com.enioka.jqm.api.JobRunnerException;
 
 /**
  * A runner for the deprecated "JobBase" type of jobs.
  */
 @SuppressWarnings("deprecation")
-@Component(service = JavaJobRunner.class, property = { "Plugin-Type=JavaJobRunner", "JavaJobRunner-Type=legacy" })
+@MetaInfServices(JavaJobRunner.class)
 public class LegacyRunner implements JavaJobRunner
 {
     public LegacyRunner()

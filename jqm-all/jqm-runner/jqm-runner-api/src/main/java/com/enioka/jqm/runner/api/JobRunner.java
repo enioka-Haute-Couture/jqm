@@ -11,7 +11,7 @@ import com.enioka.jqm.model.JobInstance;
  * <br>
  * Implementors should always specify a no-args constructor for runners.
  */
-public interface JobRunner
+public interface JobRunner extends AutoCloseable
 {
     /**
      * Called when a new job instance reaches the {@link com.enioka.jqm.model.State#ATTRIBUTED} state, to determine which runner should be
@@ -19,10 +19,10 @@ public interface JobRunner
      * This method should have no side effect and be thread safe.<br>
      * Decisions should be taken only on the basis of the provided arguments and never from external elements (system counters...). Decision
      * results are cached by the engine.
-     * 
+     *
      * @param toRun
-     *                  the resolved element which should be run.
-     * 
+     *            the resolved element which should be run.
+     *
      * @return true of this runner can run it. Returning true is not a guarantee that this specific runner will be selected for the actual
      *         launch, as others may be able to launch it too.
      */
@@ -30,7 +30,7 @@ public interface JobRunner
 
     /**
      * The job runner should create a new tracker - but NOT launch it.
-     * 
+     *
      * @param toRun
      * @return
      */

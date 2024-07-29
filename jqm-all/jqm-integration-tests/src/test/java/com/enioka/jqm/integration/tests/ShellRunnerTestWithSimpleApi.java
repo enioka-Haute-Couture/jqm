@@ -30,16 +30,9 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 public class ShellRunnerTestWithSimpleApi extends JqmBaseTest
 {
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
-
     /**
      * In this test, a first shell command calls the simple web API with JQM-provided parameters to enqueue a second job (a simple echo).
      */

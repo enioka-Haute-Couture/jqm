@@ -3,21 +3,20 @@ package com.enioka.jqm.integration.tests;
 import java.io.IOException;
 import java.util.Properties;
 
-import jakarta.ws.rs.NotAuthorizedException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientException;
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.jersey.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmWsClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.repository.UserManagementRepository;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.ops4j.pax.exam.Option;
+import jakarta.ws.rs.NotAuthorizedException;
 
 /**
  * Run all the client tests, but this time with a WS client.
@@ -26,12 +25,6 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
 {
     private Node n;
     private Properties p;
-
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
 
     @Before
     public void before() throws IOException
@@ -48,10 +41,6 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
 
         addAndStartEngine("wsnode");
 
-        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
-
         n = Node.select_single(cnx, "node_select_by_key", "wsnode");
 
         // Set client properties to use this node.
@@ -60,13 +49,13 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
                 "http://" + (n.getDns().equals("0.0.0.0") ? "localhost" : n.getDns()) + ":" + n.getPort() + "/ws/client");
         p.put("com.enioka.jqm.ws.login", "test");
         p.put("com.enioka.jqm.ws.password", "testpassword");
-        JqmClientFactory.setProperties(p);
+        JqmWsClientFactory.setProperties(p);
 
         UserManagementRepository.createUserIfMissing(cnx, "test", "testpassword", "test user for WS Junit tests", "client power user");
         cnx.commit();
 
-        JqmClientFactory.resetClient();
-        jqmClient = JqmClientFactory.getClient();
+        JqmWsClientFactory.reset();
+        jqmClient = JqmWsClientFactory.getClient();
     }
 
     @Test(expected = JqmInvalidRequestException.class)
@@ -89,7 +78,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
         temp.putAll(p);
         temp.put("com.enioka.jqm.ws.password", "testpasswordXXX");
 
-        JqmClient wrongClient = JqmClientFactory.getClient("name", temp, false);
+        JqmClient wrongClient = JqmWsClientFactory.getClient("name", temp, false);
 
         try
         {

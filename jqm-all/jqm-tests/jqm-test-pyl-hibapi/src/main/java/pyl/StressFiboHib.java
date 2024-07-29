@@ -3,7 +3,7 @@ package pyl;
 import java.util.Properties;
 
 import com.enioka.jqm.api.JobManager;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
 
 public class StressFiboHib implements Runnable
 {
