@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ServiceLoader;
 import java.sql.SQLException;
 
+import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import org.kohsuke.MetaInfServices;
 
 import com.enioka.jqm.client.api.JobInstance;
@@ -19,7 +20,7 @@ import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
 import com.enioka.jqm.model.State;
-import com.enioka.jqm.model.updater.api.DbSchemaManager;
+import com.enioka.jqm.model.updater.DbSchemaManager;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.api.JqmSynchronousTester;
 
@@ -49,6 +50,7 @@ public class DefaultJqmSynchronousTester implements JqmSynchronousTester
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
         // Db connexion should now work.
+        var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
         var db = DbManager.getDb(Common.dbProperties());
         try (var cnx = db.getDataSource().getConnection())
         {

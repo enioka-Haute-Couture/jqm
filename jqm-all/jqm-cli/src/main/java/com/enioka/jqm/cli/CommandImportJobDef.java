@@ -28,7 +28,7 @@ class CommandImportJobDef extends CommandBase
         {
             try
             {
-                cnx.runSelectSingle("q_select_default", Integer.class);
+                cnx.runSelectSingle("q_select_default", Long.class);
             }
             catch (NoResultException e)
             {

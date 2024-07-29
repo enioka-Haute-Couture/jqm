@@ -18,20 +18,12 @@
 
 package com.enioka.jqm.model;
 
+import com.enioka.jqm.jdbc.*;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import com.enioka.jqm.jdbc.DatabaseException;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jdbc.NonUniqueResultException;
-import com.enioka.jqm.jdbc.QueryResult;
+import java.util.*;
 
 public class RUser implements Serializable
 {
@@ -224,7 +216,7 @@ public class RUser implements Serializable
         return newId;
     }
 
-    public static void set_roles(DbConn cnx, int userId, String... role_names)
+    public static void set_roles(DbConn cnx, long userId, String... role_names)
     {
         cnx.runUpdate("user_remove_all_roles_by_id", userId);
         Set<String> roles = new HashSet<>();

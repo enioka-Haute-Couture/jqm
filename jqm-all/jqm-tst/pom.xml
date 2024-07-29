@@ -44,6 +44,11 @@
             <artifactId>jqm-api-client-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-model-updater-api</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>
 
         <!-- Ext/Drivers -->
         <dependency>
@@ -69,6 +74,7 @@
             <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>
 

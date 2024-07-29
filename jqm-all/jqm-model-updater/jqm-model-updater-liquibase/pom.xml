@@ -32,12 +32,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- This dep is exluded by liquibase, but needed by opencsv OSGi manifest... -->
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>

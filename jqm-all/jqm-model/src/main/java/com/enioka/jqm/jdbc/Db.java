@@ -1,5 +1,13 @@
 package com.enioka.jqm.jdbc;
 
+import com.enioka.jqm.model.updater.DbSchemaManager;
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
+import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -7,16 +15,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.ServiceLoader;
-
-import javax.naming.InitialContext;
-import javax.naming.NameNotFoundException;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.model.updater.api.DbSchemaManager;
-import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**
  * Entry point for all database-related operations, from initialization to schema upgrade, as well as creating sessions for querying the
@@ -114,7 +112,7 @@ public class Db
                 {
                     msg += " - " + e.getCause().getLocalizedMessage();
                     jqmlogger.error(
-                            "Database not available: " + msg + ". Retry " + retries + "/" + retryCount + ". Waiting for database...");
+                        "Database not available: " + msg + ". Retry " + retries + "/" + retryCount + ". Waiting for database...");
 
                     try
                     {
@@ -228,22 +226,16 @@ public class Db
     private boolean checkDbIsReady()
     {
         String dbAdaptersProp = p.getProperty("com.enioka.jqm.jdbc.adapters");
-        if ((dbAdaptersProp == null || dbAdaptersProp.isEmpty()) && FrameworkUtil.getBundle(getClass()) != null)
+        if (dbAdaptersProp == null || dbAdaptersProp.isEmpty())
         {
-            // OSGi case
             try (var cnx = _ds.getConnection())
             {
-                var context = FrameworkUtil.getBundle(getClass()).getBundleContext();
-                var serviceRef = context.getServiceReference(DbSchemaManager.class);
-                if (serviceRef != null)
+                var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
+                if (dbSchemaManager != null)
                 {
-                    var dbSchemaManager = context.getService(serviceRef);
-                    if (dbSchemaManager != null)
-                    {
-                        jqmlogger
-                                .debug("Checking if database schema is up to date using full Liquibase service inside an OSGi environment");
-                        return dbSchemaManager.isUpToDate(cnx);
-                    }
+                    jqmlogger
+                        .debug("Checking if database schema is up to date using full Liquibase service inside an OSGi environment");
+                    return dbSchemaManager.isUpToDate(cnx);
                 }
             }
             catch (Exception e)
@@ -252,7 +244,7 @@ public class Db
             }
         }
 
-        // If here: not OSGi or no Liquibase service available.
+        // If here no Liquibase service available.
         jqmlogger.debug("Checking if database schema is up to date using direct JDBC connection");
         try (DbConn cnx = this.getConn())
         {
@@ -271,7 +263,8 @@ public class Db
     }
 
     /**
-     * Creates the adapter for the target database. The list of available adapters comes either from ServiceLoader or from a property.
+     * Creates the adapter for the target database. The list of available adapters comes either from the OSGi service registry or from a
+     * property.
      */
     private void selectAdapter(Properties p)
     {
@@ -280,7 +273,7 @@ public class Db
             DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
             jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
-                    + meta.getDatabaseMinorVersion());
+                + meta.getDatabaseMinorVersion());
 
             // Find the correct db apdater
             jqmlogger.info("Database adapter search: using METAINF services");

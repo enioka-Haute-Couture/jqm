@@ -20,22 +20,12 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
+import com.enioka.jqm.client.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.client.api.Deliverable;
-import com.enioka.jqm.client.api.JobDef;
-import com.enioka.jqm.client.api.JobInstance;
-import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.client.api.JqmClient;
-import com.enioka.jqm.client.api.Query;
-import com.enioka.jqm.client.api.Queue;
-import com.enioka.jqm.client.api.QueueStatus;
-import com.enioka.jqm.client.api.State;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SelfDestructFileStream;
@@ -68,9 +58,8 @@ public class ServiceClient
     private boolean standaloneMode;
     private String localIp;
 
-    @Activate
-    public void onServiceActivation(Map<String, Object> properties)
-    {
+
+    public ServiceClient() {
         log.info("\tStarting ServiceClient");
         standaloneMode = Boolean.parseBoolean(
             GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
@@ -296,13 +285,14 @@ public class ServiceClient
     {
         JqmClient client;
         if (standaloneMode && !ipFromId(jobId).equals(localIp)) {
+            // TODO move to a helper
             // Redirect to distant node with Jersey client
             final var p = new Properties();
             p.setProperty("com.enioka.jqm.ws.url", "http://" + ipFromId(jobId) + ":1789/ws/client");
-            client = com.enioka.jqm.client.jersey.api.JqmClientFactory.getClient(null, p, false);
+            client = JqmWsClientFactory.getClient();
         } else {
             // Use local node with JDBC client
-            client = com.enioka.jqm.client.jdbc.api.JqmClientFactory.getClient();
+            client = JqmDbClientFactory.getClient();
         }
         return client.getJob(jobId);
     }

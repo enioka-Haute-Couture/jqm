@@ -5,6 +5,7 @@ import java.util.ServiceLoader;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.enioka.jqm.cli.api.CommandBase;
 import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class CliParserService implements CommandLine
         jc.parse(args);
         CommandBase command = (CommandBase) jc.getCommands().get(jc.getParsedCommand()).getObjects().get(0);
 
-        if (command.help)
+        if (command.isHelp())
         {
             jc.usage();
             return 0;
@@ -77,10 +78,10 @@ public class CliParserService implements CommandLine
 
         // It is possible to actually switch from one environment to another by setting a different 'settings' file.
         // (and therefore a different datasource)
-        if (command.settingsFile != null)
+        if (command.getSettingsFile() != null)
         {
-            jqmlogger.info("Using alternative settings file {}", command.settingsFile);
-            System.setProperty("com.enioka.jqm.resourceFiles", command.settingsFile);
+            jqmlogger.info("Using alternative settings file {}", command.getSettingsFile());
+            System.setProperty("com.enioka.jqm.resourceFiles", command.getSettingsFile());
         }
 
         // Go.

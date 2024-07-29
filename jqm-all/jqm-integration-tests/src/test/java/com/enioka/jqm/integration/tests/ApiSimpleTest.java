@@ -15,6 +15,17 @@
  */
 package com.enioka.jqm.integration.tests;
 
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -26,18 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.enioka.jqm.client.api.JobInstance;
-import com.enioka.jqm.client.api.JqmDbClientFactory;
-import com.enioka.jqm.model.GlobalParameter;
-import com.enioka.jqm.model.Node;
-import com.enioka.jqm.model.State;
-import com.enioka.jqm.test.helpers.CreationTools;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 /**
  * Tests of the simple web API.
@@ -142,7 +141,7 @@ public class ApiSimpleTest extends JqmBaseTest
         long jid = 0;
         try
         {
-            jid = Integer.parseInt(result);
+            jid = Long.parseLong(result);
         }
         catch (Exception e)
         {

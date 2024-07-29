@@ -15,6 +15,7 @@
  */
 package com.enioka.jqm.integration.tests;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.enioka.jqm.model.updater.DbSchemaManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -61,9 +63,6 @@ public class JqmBaseTest
     protected DbConn cnx;
 
     protected static DebugHsqlDbServer s;
-
-    @Inject
-    DbSchemaManager dbSchemaManager;
 
     JqmClient jqmClient;
 
@@ -105,7 +104,7 @@ public class JqmBaseTest
             p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
             p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
             db = DbManager.getDb(p);
-
+            var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
             try (var cnx = db.getDataSource().getConnection())
             {
                 dbSchemaManager.updateSchema(cnx);

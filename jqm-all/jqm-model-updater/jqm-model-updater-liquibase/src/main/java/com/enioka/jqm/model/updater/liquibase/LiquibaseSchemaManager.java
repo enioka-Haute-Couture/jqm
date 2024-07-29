@@ -1,19 +1,16 @@
 package com.enioka.jqm.model.updater.liquibase;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.model.updater.api.DbSchemaManager;
+import com.enioka.jqm.model.updater.DbSchemaManager;
 
 import liquibase.Scope;
 import liquibase.changelog.ChangeSet;
@@ -31,7 +28,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 /**
  * Encapsulates the logic to update the database schema using Liquibase.
  */
-@Component(service = DbSchemaManager.class, scope = ServiceScope.SINGLETON, immediate = true)
+@MetaInfServices(DbSchemaManager.class)
 public class LiquibaseSchemaManager implements DbSchemaManager
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(LiquibaseSchemaManager.class);

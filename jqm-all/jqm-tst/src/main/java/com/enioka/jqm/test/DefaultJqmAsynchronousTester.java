@@ -19,6 +19,7 @@ import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
 import com.enioka.jqm.client.api.State;
+import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -27,7 +28,7 @@ import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
-import com.enioka.jqm.model.updater.api.DbSchemaManager;
+import com.enioka.jqm.model.updater.DbSchemaManager;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.api.JqmAsynchronousTester;
 import com.enioka.jqm.test.api.TestJobDefinition;
@@ -62,6 +63,7 @@ public class DefaultJqmAsynchronousTester implements JqmAsynchronousTester
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
         // Db connexion should now work.
+        var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
         var db = DbManager.getDb(Common.dbProperties());
         try (var cnx = db.getDataSource().getConnection())
         {

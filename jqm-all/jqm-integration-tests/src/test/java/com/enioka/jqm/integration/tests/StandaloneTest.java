@@ -12,20 +12,11 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 import static com.enioka.jqm.shared.misc.StandaloneHelpers.ipFromId;
 
 public class StandaloneTest extends JqmBaseTest {
-    private Node n;
-    private Properties p;
     private String localIp;
-
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
 
     @Before
     public void before() throws UnknownHostException {

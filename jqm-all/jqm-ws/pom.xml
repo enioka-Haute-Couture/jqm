@@ -194,6 +194,7 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-pki</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- For the client API -->
@@ -201,26 +202,31 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-api-client-jdbc</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-api-client-jersey</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-admin</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-xml</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-shared</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Stupid java IO APIs solution -->

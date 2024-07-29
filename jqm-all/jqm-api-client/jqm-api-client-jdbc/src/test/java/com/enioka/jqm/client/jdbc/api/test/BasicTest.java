@@ -35,6 +35,7 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.updater.liquibase.LiquibaseSchemaManager;
 
+import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

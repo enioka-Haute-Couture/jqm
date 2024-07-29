@@ -25,6 +25,11 @@
             <artifactId>jqm-model-updater-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-model-updater-liquibase</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

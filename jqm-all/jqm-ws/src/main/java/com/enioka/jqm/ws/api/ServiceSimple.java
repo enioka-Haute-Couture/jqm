@@ -68,7 +68,7 @@ public class ServiceSimple
 
     public ServiceSimple(@Context ServletContext context)
     {
-        jqmNodeId = Integer.parseInt(context.getInitParameter("jqmnodeid").toString());
+        jqmNodeId = Long.parseLong(context.getInitParameter("jqmnodeid").toString());
     }
 
     /////////////////////////////////////////////////////////////

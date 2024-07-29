@@ -112,7 +112,7 @@ public class JqmSimpleTest
         {
             test.addAndStartEngine(nodeName);
         }
-        Long i = JqmClientFactory.getClient().newJobRequest("TestJqmApplication", "TestUser").setSessionID(sessionId)
+        Long i = JqmDbClientFactory.getClient().newJobRequest("TestJqmApplication", "TestUser").setSessionID(sessionId)
                 .setParameters(runtimePrms).enqueue();
         TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, cnx);
         if (waitMsMin > 0)

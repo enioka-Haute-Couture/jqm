@@ -1,4 +1,4 @@
-package com.enioka.jqm.model.updater.api;
+package com.enioka.jqm.model.updater;
 
 import java.sql.Connection;
 
