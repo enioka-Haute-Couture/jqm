@@ -63,6 +63,10 @@
 			<key>enableWsApiAuth</key>
 			<value>false</value>
 		</parameter>
+        <parameter>
+            <key>enableWsApiSsl</key>
+            <value>false</value>
+        </parameter>
 		<parameter>
 			<key>mavenRepo</key>
 			<value>http://repo1.maven.org/maven2/,https://oss.sonatype.org/content/repositories/snapshots/</value>

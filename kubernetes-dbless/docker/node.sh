@@ -62,7 +62,7 @@ then
         java -jar jqm.jar Update-Schema
 
         echo "### Creating node ${JQM_NODE_NAME}"
-        java -jar jqm.jar New-Node ${JQM_NODE_NAME}
+        java -jar jqm.jar New-Node -n ${JQM_NODE_NAME}
 
         # mark the node as existing
         echo 1 > /jqm/db/${JQM_NODE_NAME}

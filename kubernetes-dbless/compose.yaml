@@ -1,0 +1,30 @@
+services:
+    jqm:
+        image: enioka/jqm-standalone
+        build:
+            context: ../
+            dockerfile: ./kubernetes-dbless/docker/Dockerfile
+        deploy:
+            mode: replicated
+            replicas: 1
+        ports:
+            - "1789:1789"
+        networks:
+            - loadbalancing
+
+    nginx:
+        build:
+            context: ./docker
+            dockerfile: nginx.Dockerfile
+        container_name: nginx
+        ports:
+            - "80:80"
+        networks:
+            - loadbalancing
+        depends_on:
+            - jqm
+
+networks:
+    loadbalancing:
+
+
