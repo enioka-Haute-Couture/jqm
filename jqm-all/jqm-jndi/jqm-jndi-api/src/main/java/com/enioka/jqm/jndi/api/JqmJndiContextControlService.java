@@ -8,7 +8,7 @@ public interface JqmJndiContextControlService
     void registerIfNeeded();
 
     /**
-     * Clean all singleton resources from the JNDI context.
+     * Clean what can be cleaned from the context
      */
-    void reset();
+    void clean();
 }

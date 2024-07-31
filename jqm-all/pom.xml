@@ -141,7 +141,7 @@
         <module>jqm-ws</module>
         <module>jqm-api-client</module>
         <module>jqm-test-helpers</module>
-        <module>jqm-jndi-context</module>
+        <module>jqm-jndi</module>
         <module>jqm-engine-api</module>
         <module>jqm-engine</module>
         <module>jqm-providers</module>

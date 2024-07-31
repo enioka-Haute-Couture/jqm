@@ -13,7 +13,8 @@ public class JndiContextControlService implements JqmJndiContextControlService
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JndiContextControlService.class);
 
-    private static JndiContext context = null;
+    private JndiContext context = null;
+    private InternalPoller poller = null;
 
     @Override
     public void registerIfNeeded()
@@ -25,6 +26,12 @@ public class JndiContextControlService implements JqmJndiContextControlService
                 context = new JndiContext();
                 NamingManager.setInitialContextFactoryBuilder(context);
             }
+
+            if (poller == null)
+            {
+                poller = new InternalPoller(context);
+                poller.start("JNDI");
+            }
         }
         catch (Exception e)
         {
@@ -35,8 +42,13 @@ public class JndiContextControlService implements JqmJndiContextControlService
     }
 
     @Override
-    public void reset()
+    public void clean()
     {
+        if (poller != null)
+        {
+            poller.stop();
+            poller = null;
+        }
         if (context != null)
         {
             // Release as many resources as possible from the JRE singleton.
