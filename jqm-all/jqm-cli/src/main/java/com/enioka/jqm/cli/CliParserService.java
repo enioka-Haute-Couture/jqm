@@ -2,9 +2,6 @@ package com.enioka.jqm.cli;
 
 import java.util.ServiceLoader;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import com.enioka.jqm.cli.api.CommandBase;
 import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
@@ -13,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.JCommander;
 import com.enioka.jqm.cli.bootstrap.CommandLine;
 import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
+import com.enioka.jqm.model.updater.cli.DbUpdateVerb;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**
@@ -49,7 +47,8 @@ public class CliParserService implements CommandLine
                 .addCommand(new CommandGetRole()).addCommand(new CommandImportClusterConfiguration()).addCommand(new CommandImportJobDef())
                 .addCommand(new CommandImportQueue()).addCommand(new CommandInstallNodeTemplate()).addCommand(new CommandNewJi())
                 .addCommand(new CommandNewNode()).addCommand(new CommandResetRoot()).addCommand(new CommandResetUser())
-                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle()).build();
+                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle())
+                .addCommand(new DbUpdateVerb()).build();
         jc.setColumnSize(160);
         jc.setCaseSensitiveOptions(false);
 

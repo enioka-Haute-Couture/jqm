@@ -41,6 +41,11 @@
             <artifactId>jqm-admin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency> <!-- Update-Schema -->
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-model-updater-cli</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Used for the main startup interface -->
         <dependency>
