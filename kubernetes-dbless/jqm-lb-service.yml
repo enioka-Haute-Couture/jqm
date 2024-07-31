@@ -14,6 +14,6 @@ spec:
     ports:
         - port: 1789  # Keep in mind the ingress can only reach one port of your service
           protocol: TCP
-          targetPort: 80  # FIXME: 80 for NGINX, 1789 for JQM
+          targetPort: 1789
     selector:
         app: jqm

@@ -78,6 +78,11 @@ then
         # Jobs
         echo "### Importing local job definitions inside database"
         java -jar jqm.jar Import-JobDef -f ./jobs/
+
+        # WS
+        echo "### Disabling WS auth"
+        java -jar jqm.jar Set-WebConfiguration -c ENABLE_HTTP_GUI
+        java -jar jqm.jar Set-WebConfiguration -c DISABLE_AUTHENTICATION
     else
         echo "### Node ${JQM_NODE_NAME} already exists inside database configuration, skipping config"
     fi

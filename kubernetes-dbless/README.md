@@ -16,6 +16,8 @@ database is not the intended use for it, and as such, some limitations are requi
 
 - Each individual node still requires a local database to function. For now, only in-memory HSQLDB is supported.
 
+- Web Service Authentication is ***disabled***.
+
 - Each individual node requires a unique IPv4 address. This IPv4 will be used by the node to assign job IDs. A node may
   only enqueue up to 1 million jobs, after that threshold, behavior is undefined and may lead to malfunctions, so the
   node should be restarted to clear its database. The `1789` port of each node needs to be exposed to other nodes.
@@ -91,10 +93,5 @@ Other useful commands:
 
 When changing kubernetes yml's, only the corresponding `kubectl apply` commands need to be run.
 
-## WIP
-
-At the moment, all probes on JQM are disabled because the app does not work. We need the probes turned off otherwise the
-load balancer will not route any request to the pods even if the queried container is not the one struggling.
-
-Also, the load balancer currently redirects to port 80, which belongs to NGINX. This is only to test if we do get a
-successful connection when calling the load balancer with `curl`. JQM is unavailable.
+To check that JQM is running, you can use `curl http://localhost:80/ws/simple/localnode/health` (or the load balancer's
+EXTERNAL IP if ingress is disabled), it should reply with "Pollers are polling - IP: <pod ip>".

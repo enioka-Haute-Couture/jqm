@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +38,10 @@ import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.Deliverable;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 
 import jakarta.servlet.ServletContext;
@@ -285,8 +289,7 @@ public class ServiceSimple
     @GET
     @Path("localnode/health")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getLocalNodeHealth() throws MalformedObjectNameException
-    {
+    public String getLocalNodeHealth() throws MalformedObjectNameException, UnknownHostException {
         // Local service only - not enabled when running on top of Tomcat & co.
         Node n = getLocalNodeIfRunningOnJqm();
         if (n == null)
@@ -331,6 +334,13 @@ public class ServiceSimple
             throw new ErrorDto("JQM node has is not working as expected", "", 11, Status.SERVICE_UNAVAILABLE);
         }
 
-        return "Pollers are polling";
+        final var standaloneMode = Boolean.parseBoolean(
+            GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
+
+        if (standaloneMode) {
+            return "Pollers are polling - IP: " + Inet4Address.getLocalHost().getHostAddress();
+        } else {
+            return "Pollers are polling";
+        }
     }
 }
