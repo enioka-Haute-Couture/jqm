@@ -139,6 +139,7 @@ public class TestHelpers
         cnx.runUpdate("clehprm_delete_all");
         cnx.runUpdate("cleh_delete_all");
         cnx.runUpdate("cl_delete_all");
+        cnx.runUpdate("restart_sequence");
 
         cnx.commit();
 
