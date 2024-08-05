@@ -51,20 +51,16 @@ public class LiquibaseSchemaManager implements DbSchemaManager
 
     private <T> T updateLiquibaseCommand(Connection connection, String commandName, Function<UpdateReportParameters, T> resultMapper)
     {
-        try
+        try (var db =  getLiquibaseDb(connection))
         {
             var commandScope = new CommandScope(commandName) //
-                    .addArgumentValue("database", getLiquibaseDb(connection)) //
+                    .addArgumentValue("database", db) //
                     .addArgumentValue("changelogFile", LIQUIBASE_CHANGELOG);
 
-            var result = new CommandResults[1]; // Array is just an easy hack to get a final variable in the lambda
 
-            // Run the command inside a scope setting the search path to the current classloader, so as to work both inside and outside
-            // OSGi.
-            Scope.child("resourceAccessor", new ClassLoaderResourceAccessor(LiquibaseSchemaManager.class.getClassLoader()),
-                    () -> result[0] = commandScope.execute());
+            var result = commandScope.execute();
 
-            var report = (UpdateReportParameters) result[0].getResult("updateReport");
+            var report = (UpdateReportParameters) result.getResult("updateReport");
 
             if (!report.getSuccess())
             {
@@ -93,13 +89,12 @@ public class LiquibaseSchemaManager implements DbSchemaManager
 
     public boolean isUpToDate(Connection connection)
     {
-        try
+        try (var db =  getLiquibaseDb(connection))
         {
             var commandScope = new CommandScope("status") //
-                    .addArgumentValue("database", getLiquibaseDb(connection)).addArgumentValue("changelogFile", LIQUIBASE_CHANGELOG);
+                    .addArgumentValue("database", db).addArgumentValue("changelogFile", LIQUIBASE_CHANGELOG);
 
-            Scope.child("resourceAccessor", new ClassLoaderResourceAccessor(LiquibaseSchemaManager.class.getClassLoader()),
-                    () -> commandScope.execute());
+            commandScope.execute();
             var u = (StatusCommandStep) commandScope.getCommand().getPipeline().get(commandScope.getCommand().getPipeline().size() - 1);
             List<ChangeSet> changeSets = new ArrayList<>();
             try
@@ -111,7 +106,6 @@ public class LiquibaseSchemaManager implements DbSchemaManager
             {
                 throw new RuntimeException("Could not list unrun changesets", e);
             }
-
             return changeSets.isEmpty();
         }
         catch (Exception e)

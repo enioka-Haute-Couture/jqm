@@ -250,7 +250,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
             // Standalone sequence reinit
             final var standaloneMode = Boolean.parseBoolean(
-                GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
+                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
             if (standaloneMode) {
                 final var localIp = Inet4Address.getLocalHost().getHostAddress();
                 cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idSequenceBaseFromIp(localIp));

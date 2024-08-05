@@ -187,6 +187,12 @@
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
             <classifier>jakarta</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- PKI for certificate creation in admin API -->
@@ -194,6 +200,13 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-pki</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bc.version}</version>
             <scope>provided</scope>
         </dependency>
 

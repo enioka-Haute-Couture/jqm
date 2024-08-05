@@ -521,7 +521,7 @@ public class JobInstance implements Serializable
 
                 tmp.q = Queue.map(rs, 24);
                 tmp.jd = JobDef.map(rs, 28);
-                tmp.n = Node.map(cnx, rs, 46);
+                tmp.n = Node.map(cnx, rs, 47);
 
                 res.add(tmp);
             }
