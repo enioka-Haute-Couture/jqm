@@ -179,7 +179,7 @@ public interface Query
      * @param jobInstanceId
      *            the job instance ID
      */
-    public Query setJobInstanceId(long jobInstanceId);
+    public Query setJobInstanceId(Long jobInstanceId);
 
     /**
      * Some job instances are launched by other job instances (linked jobs which launch one another). This allows to QueryInterface all job
@@ -188,7 +188,7 @@ public interface Query
      * @param parentId
      *            the ID of the parent job instance.
      */
-    public Query setParentId(long parentId);
+    public Query setParentId(Long parentId);
 
     /**
      * The application name is the name of the job definition - the same name that is given in the Job Definition XML. This allows to query
@@ -388,7 +388,7 @@ public interface Query
      * For querying jobs on a given queue. The list of queues can be retrieved through {@link JqmClient#getQueues()}.<br>
      * Ignored if setQueueName is used.
      */
-    public Query setQueueId(long queueId);
+    public Query setQueueId(Long queueId);
 
     /**
      * For querying jobs that have run or are running on a specific JQM node.

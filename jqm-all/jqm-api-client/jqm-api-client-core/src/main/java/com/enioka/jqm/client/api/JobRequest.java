@@ -190,7 +190,7 @@ public interface JobRequest extends Serializable
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
      */
-    public JobRequest setScheduleId(long id);
+    public JobRequest setScheduleId(Long id);
 
     /**
      * <strong>Optional</strong><br>

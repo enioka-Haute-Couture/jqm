@@ -439,7 +439,7 @@ public class JobRequestBaseImpl implements JobRequest
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
      */
-    public JobRequest setScheduleId(long id)
+    public JobRequest setScheduleId(Long id)
     {
         this.scheduleId = id;
         return this;

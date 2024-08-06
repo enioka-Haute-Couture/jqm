@@ -182,7 +182,7 @@ public class QueryBaseImpl implements Query
     }
 
     @Override
-    public Query setJobInstanceId(long jobInstanceId)
+    public Query setJobInstanceId(Long jobInstanceId)
     {
         this.jobInstanceId = jobInstanceId;
         return this;
@@ -194,7 +194,7 @@ public class QueryBaseImpl implements Query
     }
 
     @Override
-    public Query setParentId(long parentId)
+    public Query setParentId(Long parentId)
     {
         this.parentId = parentId;
         return this;
@@ -505,7 +505,7 @@ public class QueryBaseImpl implements Query
     }
 
     @Override
-    public Query setQueueId(long queueId)
+    public Query setQueueId(Long queueId)
     {
         this.queueId = queueId;
         return this;
