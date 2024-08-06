@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SelfDestructFileStream;
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.ws.plumbing.HttpCache;
@@ -61,8 +62,11 @@ public class ServiceClient
 
     public ServiceClient() {
         log.info("\tStarting ServiceClient");
-        standaloneMode = Boolean.parseBoolean(
-            GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
+
+        try (DbConn cnx = DbManager.getDb().getConn()) {
+            standaloneMode = Boolean.parseBoolean(
+                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+        }
 
         if (standaloneMode) {
             try {
@@ -289,7 +293,7 @@ public class ServiceClient
             // Redirect to distant node with Jersey client
             final var p = new Properties();
             p.setProperty("com.enioka.jqm.ws.url", "http://" + ipFromId(jobId) + ":1789/ws/client");
-            client = JqmWsClientFactory.getClient();
+            client = JqmWsClientFactory.getClient(ipFromId(jobId), p, false);
         } else {
             // Use local node with JDBC client
             client = JqmDbClientFactory.getClient();

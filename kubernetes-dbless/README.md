@@ -60,13 +60,7 @@ kubectl delete ingress jqm-ingress
 kubectl delete service jqm-lb
 kubectl delete deployment jqm
 
-# Package the application
-cd ./jqm-all
-/snap/intellij-idea-ultimate/510/plugins/maven/lib/maven3/bin/mvn clean install -DskipTests || exit 1
-cd ..
-
 # Build the image
-# Be careful, we need to be able to COPY the `target/` directories of jqm-all, which the .dockerignore blocks by default
 docker build --no-cache -t enioka/jqm-standalone -f ./kubernetes-dbless/docker/Dockerfile . || exit 1
 
 # Import the image into Microk8s, otherwise it will try to pull from dockerio

@@ -47,7 +47,7 @@ do
 done
 
 echo "Found replicas:"
-printf '- %s\n' "${ips[@]}"
+printf ' %s\n' "${ips[@]}"
 
 echo ""
 echo "# TEST 1/3 - RESULT                      #"
@@ -97,7 +97,7 @@ failures=0
 last_success=0
 while [ ${#tested_ips[@]} -lt $REPLICAS ] && [ $attempt -lt $ATTEMPTS ]
 do
-    sleep 3
+    sleep 1
     attempt=$((attempt + 1))
     echo "Attempt $attempt/$ATTEMPTS:"
 
@@ -161,14 +161,17 @@ attempt=0
 failures=0
 while [ $attempt -lt $ATTEMPTS ]  # No way to verify which replicas were hit with this test
 do
-    sleep 3
+    sleep 1
     attempt=$((attempt + 1))
     echo "Attempt $attempt/$ATTEMPTS:"
 
     #result=`curl -s $URL/ws/client/ji/192168024001000156`  # Force a redirect to a non-existent node to test error case
     result=`curl -s $URL/ws/client/ji/$last_success`  # Normal call
-    if ! [[ $result =~ ^\{\"id\":.*$ ]]
+    #     JSON version of the output          XML version of the output
+    if [[ "$result" =~ ^\{\"id\":.*$ ]] || [[ "$result" =~ ^\<\?xml\ version=\"1.0\"\ encoding=\"UTF-8\"\ standalone=\"yes\"\?\>\<jobInstance\>\<id\>.*$ ]]
     then
+        echo "  OK: Job found"
+    else
         echo "  KO: Job not found. Error:"
 
         echo ""
@@ -177,8 +180,6 @@ do
         echo ""
 
         failures=$((failures + 1))
-    else
-        echo "  OK: Job found"
     fi
 done
 

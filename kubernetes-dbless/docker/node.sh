@@ -28,7 +28,7 @@ echo "<resource
     minIdle='2'
     maxIdle='5'
     maxWait='30000'
-    initialSize='5'
+    initialSize='10'
     removeAbandonedTimeout='3600'
     removeAbandoned='true'
     logAbandoned='true'

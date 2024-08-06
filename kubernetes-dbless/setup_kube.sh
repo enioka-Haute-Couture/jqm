@@ -5,11 +5,6 @@ kubectl delete ingress jqm-ingress
 kubectl delete service jqm-lb
 kubectl delete deployment jqm
 
-# Package the application
-cd ./jqm-all
-/snap/intellij-idea-ultimate/510/plugins/maven/lib/maven3/bin/mvn clean install -DskipTests || exit 1
-cd ..
-
 # Build the image
 docker build --no-cache -t enioka/jqm-standalone -f ./kubernetes-dbless/docker/Dockerfile . || exit 1
 

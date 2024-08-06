@@ -334,13 +334,15 @@ public class ServiceSimple
             throw new ErrorDto("JQM node has is not working as expected", "", 11, Status.SERVICE_UNAVAILABLE);
         }
 
-        final var standaloneMode = Boolean.parseBoolean(
-            GlobalParameter.getParameter(DbManager.getDb().getConn(), "wsStandaloneMode", "false"));
+        try (DbConn cnx = DbManager.getDb().getConn()) {
+            final var standaloneMode = Boolean.parseBoolean(
+                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
 
-        if (standaloneMode) {
-            return "Pollers are polling - IP: " + Inet4Address.getLocalHost().getHostAddress();
-        } else {
-            return "Pollers are polling";
+            if (standaloneMode) {
+                return "Pollers are polling - IP: " + Inet4Address.getLocalHost().getHostAddress();
+            } else {
+                return "Pollers are polling";
+            }
         }
     }
 }
