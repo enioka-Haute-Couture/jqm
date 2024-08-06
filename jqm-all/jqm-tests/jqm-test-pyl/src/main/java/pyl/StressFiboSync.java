@@ -34,7 +34,7 @@ public class StressFiboSync extends JobBase
 
         if (Integer.parseInt(this.getParameters().get("p1")) <= 100)
         {
-            int i = enQueueSynchronously(jm.applicationName(), "Luke", null, null, null, null, null, null, null, p);
+            Long i = enQueueSynchronously(jm.applicationName(), "Luke", null, null, null, null, null, null, null, p);
             System.out.println("Synchronous job finished: " + i);
         }
 

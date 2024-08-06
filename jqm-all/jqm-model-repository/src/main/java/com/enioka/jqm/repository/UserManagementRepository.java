@@ -1,15 +1,14 @@
 package com.enioka.jqm.repository;
 
-import java.util.List;
-
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
-
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.lang.util.ByteSource;
+
+import java.util.List;
 
 public class UserManagementRepository
 {
@@ -48,7 +47,7 @@ public class UserManagementRepository
     {
         try
         {
-            int userId = cnx.runSelectSingle("user_select_id_by_key", Integer.class, login);
+            long userId = cnx.runSelectSingle("user_select_id_by_key", Long.class, login);
             cnx.runUpdate("user_update_enable_by_id", userId);
             RUser.set_roles(cnx, userId, roles);
         }

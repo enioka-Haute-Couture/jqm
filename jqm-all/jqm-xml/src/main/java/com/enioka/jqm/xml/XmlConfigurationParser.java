@@ -39,10 +39,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JndiObjectResource;
@@ -207,7 +205,7 @@ public class XmlConfigurationParser
                 // Merge
                 q.update(cnx);
 
-                int queueId = Queue.select_key(cnx, name).getId();
+                long queueId = Queue.select_key(cnx, name).getId();
 
                 // Mappings
                 NodeList mList = qElement.getElementsByTagName("mapping");
@@ -227,7 +225,7 @@ public class XmlConfigurationParser
                     boolean enabled = Boolean.parseBoolean(mElement.getElementsByTagName("enabled").item(0).getTextContent().trim());
 
                     // existing mapping?
-                    int nodeId = com.enioka.jqm.model.Node.select_single(cnx, "node_select_by_key", nodeName).getId();
+                    long nodeId = com.enioka.jqm.model.Node.select_single(cnx, "node_select_by_key", nodeName).getId();
 
                     DeploymentParameter dp = null;
                     for (DeploymentParameter dpp : mappings)

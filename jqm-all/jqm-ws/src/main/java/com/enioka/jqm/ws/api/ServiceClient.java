@@ -16,23 +16,22 @@
 package com.enioka.jqm.ws.api;
 
 import java.io.InputStream;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Properties;
 
+import com.enioka.jqm.client.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.client.api.Deliverable;
-import com.enioka.jqm.client.api.JobDef;
-import com.enioka.jqm.client.api.JobInstance;
-import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.client.api.Query;
-import com.enioka.jqm.client.api.Queue;
-import com.enioka.jqm.client.api.QueueStatus;
-import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SelfDestructFileStream;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.ws.plumbing.HttpCache;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,6 +46,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
+import static com.enioka.jqm.shared.misc.StandaloneHelpers.ipFromId;
+
 /**
  * The main web service class for doing operations on JobInstances.
  */
@@ -54,6 +55,27 @@ import jakarta.ws.rs.core.MediaType;
 public class ServiceClient
 {
     static Logger log = LoggerFactory.getLogger(ServiceClient.class);
+
+    private boolean standaloneMode;
+    private String localIp;
+
+
+    public ServiceClient() {
+        log.info("\tStarting ServiceClient");
+
+        try (DbConn cnx = DbManager.getDb().getConn()) {
+            standaloneMode = Boolean.parseBoolean(
+                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+        }
+
+        if (standaloneMode) {
+            try {
+                localIp = Inet4Address.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
@@ -88,7 +110,7 @@ public class ServiceClient
             target.startHeld();
         }
 
-        int i = target.enqueue();
+        long i = target.enqueue();
 
         JobInstance ji = new JobInstance();
         ji.setId(i);
@@ -115,68 +137,68 @@ public class ServiceClient
 
     @Path("ji/{id}")
     @POST
-    public int enqueueFromHistory(@PathParam("id") int jobIdToCopy)
+    public Long enqueueFromHistory(@PathParam("id") long jobIdToCopy)
     {
         return Helpers.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
     @Path("ji/cancelled/{jobId}")
     @POST
-    public void cancelJob(@PathParam("jobId") int jobId)
+    public void cancelJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().cancelJob(jobId);
     }
 
     @Path("ji/waiting/{jobId}")
     @DELETE
-    public void deleteJob(@PathParam("jobId") int jobId)
+    public void deleteJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().deleteJob(jobId);
     }
 
     @Path("ji/killed/{jobId}")
     @POST
-    public void killJob(@PathParam("jobId") int jobId)
+    public void killJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().killJob(jobId);
     }
 
     @Path("schedule/{scheduleId}")
     @DELETE
-    public void removeRecurrence(@PathParam("scheduleId") int scheduleId)
+    public void removeRecurrence(@PathParam("scheduleId") long scheduleId)
     {
         Helpers.getClient().removeRecurrence(scheduleId);
     }
 
     @Path("ji/paused/{jobId}")
     @POST
-    public void pauseQueuedJob(@PathParam("jobId") int jobId)
+    public void pauseQueuedJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().pauseQueuedJob(jobId);
     }
 
     @Path("ji/paused/{jobId}")
     @DELETE
-    public void resumeQueuedJob(@PathParam("jobId") int jobId)
+    public void resumeQueuedJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().resumeQueuedJob(jobId);
     }
 
-    public void resumeJob(@PathParam("jobId") int jobId)
+    public void resumeJob(@PathParam("jobId") long jobId)
     {
         resumeQueuedJob(jobId);
     }
 
     @Path("ji/running/paused/{jobId}")
     @POST
-    public void pauseRunningJob(@PathParam("jobId") int jobId)
+    public void pauseRunningJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().pauseRunningJob(jobId);
     }
 
     @Path("ji/running/paused/{jobId}")
     @DELETE
-    public void resumeRunningJob(@PathParam("jobId") int jobId)
+    public void resumeRunningJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().resumeRunningJob(jobId);
     }
@@ -190,48 +212,48 @@ public class ServiceClient
     @Path("ji/crashed/{jobId}")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @DELETE
-    public JobInstance restartCrashedJobObject(@PathParam("jobId") int jobId)
+    public JobInstance restartCrashedJobObject(@PathParam("jobId") long jobId)
     {
-        int i = Helpers.getClient().restartCrashedJob(jobId);
+        long i = Helpers.getClient().restartCrashedJob(jobId);
         return getJob(i);
     }
 
     @Path("q/{queueId: [0-9]+}/{jobId: [0-9]+}")
     @POST
-    public void setJobQueue(@PathParam("jobId") int jobId, @PathParam("queueId") int queueId)
+    public void setJobQueue(@PathParam("jobId") long jobId, @PathParam("queueId") long queueId)
     {
         Helpers.getClient().setJobQueue(jobId, queueId);
     }
 
     // No need to expose. Client side work.
 
-    public void setJobQueue(int jobId, Queue queue)
+    public void setJobQueue(Long jobId, Queue queue)
     {
         Helpers.getClient().setJobQueue(jobId, queue);
     }
 
     @POST
     @Path("ji/{jobId}/position/{newPosition}")
-    public void setJobQueuePosition(@PathParam("jobId") int jobId, @PathParam("newPosition") int newPosition)
+    public void setJobQueuePosition(@PathParam("jobId") long jobId, @PathParam("newPosition") int newPosition)
     {
         Helpers.getClient().setJobQueuePosition(jobId, newPosition);
     }
 
     @POST
     @Path("ji/{jobId}/priority/{priority}")
-    public void setJobPriority(@PathParam("jobId") int jobId, @PathParam("priority") int priority)
+    public void setJobPriority(@PathParam("jobId") long jobId, @PathParam("priority") int priority)
     {
         Helpers.getClient().setJobPriority(jobId, priority);
     }
 
-    public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") Calendar whenToRun)
+    public void setJobRunAfter(@PathParam("jobId") long jobId, @PathParam("whenToRun") Calendar whenToRun)
     {
         Helpers.getClient().setJobRunAfter(jobId, whenToRun);
     }
 
     @POST
     @Path("ji/{jobId}/delay/{whenToRun}")
-    public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") long whenToRun)
+    public void setJobRunAfter(@PathParam("jobId") long jobId, @PathParam("whenToRun") long whenToRun)
     {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(whenToRun);
@@ -240,21 +262,21 @@ public class ServiceClient
 
     @POST
     @Path("schedule/{scheduleId}/queue/{queueId}")
-    public void setScheduleQueue(@PathParam("scheduleId") int scheduleId, @PathParam("queueId") int queueId)
+    public void setScheduleQueue(@PathParam("scheduleId") long scheduleId, @PathParam("queueId") long queueId)
     {
         Helpers.getClient().setScheduleQueue(scheduleId, queueId);
     }
 
     @POST
     @Path("schedule/{scheduleId}/cron/{cronExpression}")
-    public void setScheduleRecurrence(@PathParam("scheduleId") int scheduleId, @PathParam("cronExpression") String cronExpression)
+    public void setScheduleRecurrence(@PathParam("scheduleId") long scheduleId, @PathParam("cronExpression") String cronExpression)
     {
         Helpers.getClient().setScheduleRecurrence(scheduleId, cronExpression);
     }
 
     @POST
     @Path("schedule/{scheduleId}/priority/{priority}")
-    public void setSchedulePriority(@PathParam("scheduleId") int scheduleId, @PathParam("priority") int priority)
+    public void setSchedulePriority(@PathParam("scheduleId") long scheduleId, @PathParam("priority") int priority)
     {
         Helpers.getClient().setSchedulePriority(scheduleId, priority);
     }
@@ -263,9 +285,20 @@ public class ServiceClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("ji/{jobId}")
     @HttpCache("public, max-age=60")
-    public JobInstance getJob(@PathParam("jobId") int jobId)
+    public JobInstance getJob(@PathParam("jobId") long jobId)
     {
-        return Helpers.getClient().getJob(jobId);
+        JqmClient client;
+        if (standaloneMode && !ipFromId(jobId).equals(localIp)) {
+            // TODO move to a helper
+            // Redirect to distant node with Jersey client
+            final var p = new Properties();
+            p.setProperty("com.enioka.jqm.ws.url", "http://" + ipFromId(jobId) + ":1789/ws/client");
+            client = JqmWsClientFactory.getClient(ipFromId(jobId), p, false);
+        } else {
+            // Use local node with JDBC client
+            client = JqmDbClientFactory.getClient();
+        }
+        return client.getJob(jobId);
     }
 
     @GET
@@ -342,14 +375,14 @@ public class ServiceClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @HttpCache("public, max-age=60")
-    public List<String> getJobMessages(@PathParam("jobId") int jobId)
+    public List<String> getJobMessages(@PathParam("jobId") long jobId)
     {
         return Helpers.getClient().getJobMessages(jobId);
     }
 
     // Not exposed. Use getJob => progress
 
-    public int getJobProgress(int jobId)
+    public int getJobProgress(long jobId)
     {
         throw new NotSupportedException();
     }
@@ -358,7 +391,7 @@ public class ServiceClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @HttpCache("public, max-age=60")
-    public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
+    public List<Deliverable> getJobDeliverables(@PathParam("jobId") long jobId)
     {
         return Helpers.getClient().getJobDeliverables(jobId);
     }
@@ -366,7 +399,7 @@ public class ServiceClient
     // Not exposed. Returning a list of files is a joke anyway... Loop should be
     // client-side.
 
-    public List<InputStream> getJobDeliverablesContent(int jobId)
+    public List<InputStream> getJobDeliverablesContent(long jobId)
     {
         throw new NotSupportedException();
     }
@@ -385,7 +418,7 @@ public class ServiceClient
     @Path("ji/files/{id}")
     @Produces("application/octet-stream")
     @GET
-    public InputStream getDeliverableContent(@PathParam("id") int delId, @Context HttpServletResponse res)
+    public InputStream getDeliverableContent(@PathParam("id") long delId, @Context HttpServletResponse res)
     {
         SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getDeliverableContent(delId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
@@ -395,7 +428,7 @@ public class ServiceClient
     @Path("ji/{jobId}/stderr")
     @Produces("application/octet-stream")
     @GET
-    public InputStream getJobLogStdErr(@PathParam("jobId") int jobId, @Context HttpServletResponse res)
+    public InputStream getJobLogStdErr(@PathParam("jobId") long jobId, @Context HttpServletResponse res)
     {
         SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getJobLogStdErr(jobId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
@@ -405,7 +438,7 @@ public class ServiceClient
     @Path("ji/{jobId}/stdout")
     @Produces("application/octet-stream")
     @GET
-    public InputStream getJobLogStdOut(@PathParam("jobId") int jobId, @Context HttpServletResponse res)
+    public InputStream getJobLogStdOut(@PathParam("jobId") long jobId, @Context HttpServletResponse res)
     {
         SelfDestructFileStream fs = (SelfDestructFileStream) Helpers.getClient().getJobLogStdOut(jobId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
@@ -428,7 +461,7 @@ public class ServiceClient
 
     @Path("q/{qId}/pause")
     @POST
-    public void pauseQueue(@PathParam("qId") int qId)
+    public void pauseQueue(@PathParam("qId") long qId)
     {
         Queue q = new Queue();
         q.setId(qId);
@@ -442,7 +475,7 @@ public class ServiceClient
 
     @Path("q/{qId}/pause")
     @DELETE
-    public void resumeQueue(@PathParam("qId") int qId)
+    public void resumeQueue(@PathParam("qId") long qId)
     {
         Queue q = new Queue();
         q.setId(qId);
@@ -456,7 +489,7 @@ public class ServiceClient
 
     @Path("q/{qId}/clear")
     @POST
-    public void clearQueue(@PathParam("qId") int qId)
+    public void clearQueue(@PathParam("qId") long qId)
     {
         Queue q = new Queue();
         q.setId(qId);
@@ -465,7 +498,7 @@ public class ServiceClient
 
     @Path("q/{qId}/status")
     @GET
-    public QueueStatus getQueueStatus(@PathParam("qId") int qId)
+    public QueueStatus getQueueStatus(@PathParam("qId") long qId)
     {
         Queue q = new Queue();
         q.setId(qId);
@@ -479,7 +512,7 @@ public class ServiceClient
 
     @Path("q/{qId}/enabled-capacity")
     @GET
-    public int getQueueEnabledCapacity(@PathParam("qId") int qId)
+    public int getQueueEnabledCapacity(@PathParam("qId") long qId)
     {
         Queue q = new Queue();
         q.setId(qId);

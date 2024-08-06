@@ -156,7 +156,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
 
         for (JavaJobRunner runner : allowedRunners)
         {
-            Boolean canRun = false;
+            boolean canRun = false;
 
             canRun = runner.canRun(c);
 

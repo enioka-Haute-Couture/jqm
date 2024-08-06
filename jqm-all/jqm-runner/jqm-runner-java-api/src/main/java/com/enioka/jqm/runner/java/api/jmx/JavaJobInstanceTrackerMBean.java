@@ -74,7 +74,7 @@ public interface JavaJobInstanceTrackerMBean
     /**
      * The unique ID of the launch. It holds no special meaning.
      */
-    Integer getId();
+    Long getId();
 
     /**
      * Number of seconds the job instance has been running.

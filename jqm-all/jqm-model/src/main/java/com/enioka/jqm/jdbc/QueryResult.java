@@ -3,9 +3,9 @@ package com.enioka.jqm.jdbc;
 public class QueryResult
 {
     public int nbUpdated = 0;
-    public Integer generatedKey = null;
+    public Long generatedKey = null;
 
-    public Integer getGeneratedId()
+    public Long getGeneratedId()
     {
         return generatedKey;
     }

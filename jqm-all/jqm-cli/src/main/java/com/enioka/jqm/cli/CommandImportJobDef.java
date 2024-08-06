@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -21,13 +22,13 @@ class CommandImportJobDef extends CommandBase
     private List<String> xmlPathes = new ArrayList<>();
 
     @Override
-    int doWork()
+    public int doWork()
     {
         try (DbConn cnx = DbManager.getDb().getConn())
         {
             try
             {
-                cnx.runSelectSingle("q_select_default", Integer.class);
+                cnx.runSelectSingle("q_select_default", Long.class);
             }
             catch (NoResultException e)
             {

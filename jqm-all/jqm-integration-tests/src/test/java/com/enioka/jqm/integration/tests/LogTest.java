@@ -34,7 +34,7 @@ public class LogTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         cnx.commit();
-        int i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         addAndStartEngine();
         TestHelpers.waitFor(1, 20000, cnx);
 

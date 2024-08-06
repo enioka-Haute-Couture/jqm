@@ -27,30 +27,30 @@ public class QueueMappingDto implements Serializable
 {
     private static final long serialVersionUID = -5650890125510347623L;
 
-    private Integer id;
-    private Integer nodeId;
+    private Long id;
+    private Long nodeId;
     private Integer nbThread;
     private Integer pollingInterval;
-    private Integer queueId;
+    private Long queueId;
     private String nodeName, queueName;
     private Boolean enabled = true;
 
-    public Integer getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
+    public void setId(Long id)
     {
         this.id = id;
     }
 
-    public Integer getNodeId()
+    public Long getNodeId()
     {
         return nodeId;
     }
 
-    public void setNodeId(Integer nodeId)
+    public void setNodeId(Long nodeId)
     {
         this.nodeId = nodeId;
     }
@@ -75,12 +75,12 @@ public class QueueMappingDto implements Serializable
         this.pollingInterval = pollingInterval;
     }
 
-    public Integer getQueueId()
+    public Long getQueueId()
     {
         return queueId;
     }
 
-    public void setQueueId(Integer queueId)
+    public void setQueueId(Long queueId)
     {
         this.queueId = queueId;
     }

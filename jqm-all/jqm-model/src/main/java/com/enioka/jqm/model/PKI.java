@@ -35,18 +35,18 @@ public class PKI implements Serializable
 {
     private static final long serialVersionUID = -1830546620049033739L;
 
-    private Integer id;
+    private long id;
     private String prettyName;
 
     private String pemPK;
     private String pemCert;
 
-    public Integer getId()
+    public long getId()
     {
         return id;
     }
 
-    void setId(Integer id)
+    void setId(long id)
     {
         this.id = id;
     }
@@ -90,7 +90,7 @@ public class PKI implements Serializable
             {
                 PKI tmp = new PKI();
 
-                tmp.id = rs.getInt(1);
+                tmp.id = rs.getLong(1);
                 tmp.pemCert = rs.getString(2);
                 tmp.pemPK = rs.getString(3);
                 tmp.prettyName = rs.getString(4);
@@ -120,7 +120,7 @@ public class PKI implements Serializable
         return pp.get(0);
     }
 
-    public static int create(DbConn cnx, String alias, String pemPK, String pemCert)
+    public static long create(DbConn cnx, String alias, String pemPK, String pemCert)
     {
         QueryResult qr = cnx.runUpdate("pki_insert", pemCert, pemPK, alias);
         return qr.getGeneratedId();

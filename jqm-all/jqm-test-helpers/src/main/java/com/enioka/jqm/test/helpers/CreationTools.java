@@ -65,56 +65,56 @@ public class CreationTools
 
     // TODO: simplify all these overloads (test impact)
 
-    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
-            String jp, Integer queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, DbConn cnx)
+    public static long createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+                                    String jp, Long queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+                                    String keyword2, String keyword3, boolean highlander, DbConn cnx)
     {
         return createJobDef(description, canBeRestarted, javaClassName, parameters, jp, queueId, maxTimeRunning, applicationName,
                 application, module, keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
     }
 
-    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
-            String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, DbConn cnx)
+    public static long createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+                                    String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+                                    String keyword2, String keyword3, boolean highlander, DbConn cnx)
     {
         return createJobDef(description, canBeRestarted, javaClassName, parameters, jp, queue.getId(), maxTimeRunning, applicationName,
                 application, module, keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
     }
 
-    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
-            String jp, int queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext)
+    public static long createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+                                    String jp, Long queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+                                    String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext)
     {
         return createJobDef(descripton, canBeRestarted, javaClassName, parameters, jp, queue, maxTimeRunning, applicationName, application,
                 module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, false, null, false, PathType.FS);
     }
 
-    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
-            String jp, int queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
-            boolean childFirstClassLoader)
+    public static long createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+                                    String jp, Long queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+                                    String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
+                                    boolean childFirstClassLoader)
     {
         return createJobDef(descripton, canBeRestarted, javaClassName, parameters, jp, queue, maxTimeRunning, applicationName, application,
                 module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, null, false,
                 PathType.FS);
     }
 
-    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
-            String jp, int queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
-            boolean childFirstClassLoader, String hiddenJavaClasses)
+    public static long createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+                                    String jp, Long queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+                                    String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
+                                    boolean childFirstClassLoader, String hiddenJavaClasses)
     {
         return createJobDef(descripton, canBeRestarted, javaClassName, parameters, jp, queue, maxTimeRunning, applicationName, application,
                 module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses,
                 false, PathType.FS);
     }
 
-    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
-            String jp, Integer queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
-            boolean childFirstClassLoader, String hiddenJavaClasses, boolean classLoaderTracing, PathType pathType)
+    public static long createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+                                    String jp, Long queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+                                    String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
+                                    boolean childFirstClassLoader, String hiddenJavaClasses, boolean classLoaderTracing, PathType pathType)
     {
-        Integer clId = null;
+        Long clId = null;
 
         if (specificIsolationContext != null || childFirstClassLoader || hiddenJavaClasses != null)
         {
@@ -131,7 +131,7 @@ public class CreationTools
             }
         }
 
-        int i = JobDef.create(cnx, description, javaClassName, parameters == null ? new HashMap<>() : parameters, jp, queueId,
+        long i = JobDef.create(cnx, description, javaClassName, parameters == null ? new HashMap<>() : parameters, jp, queueId,
                 maxTimeRunning, applicationName, application, module, keyword1, keyword2, keyword3, highlander, clId, pathType);
 
         cnx.commit();
@@ -140,14 +140,14 @@ public class CreationTools
 
     // ------------------ DATABASEPROP --------------------------------
 
-    public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
-            String validationQuery, Map<String, String> parameters)
+    public static long createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
+                                          String validationQuery, Map<String, String> parameters)
     {
         return createDatabaseProp(name, driver, url, user, pwd, cnx, validationQuery, parameters, true);
     }
 
-    public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
-            String validationQuery, Map<String, String> parameters, boolean singleton)
+    public static long createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
+                                          String validationQuery, Map<String, String> parameters, boolean singleton)
     {
         HashMap<String, String> prms = new HashMap<>();
         prms.put("testWhileIdle", "true");

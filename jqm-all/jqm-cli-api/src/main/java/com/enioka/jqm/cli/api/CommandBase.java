@@ -1,4 +1,4 @@
-package com.enioka.jqm.cli;
+package com.enioka.jqm.cli.api;
 
 import com.beust.jcommander.Parameter;
 
@@ -9,19 +9,29 @@ import org.slf4j.LoggerFactory;
  * Base class for all CLI commands. Command naming must follow powershell cmdlet conventions (see
  * https://docs.microsoft.com/en-us/powershell/developer/cmdlet/approved-verbs-for-windows-powershell-commands)
  */
-abstract class CommandBase
+public abstract class CommandBase
 {
     protected static Logger jqmlogger = LoggerFactory.getLogger(CommandBase.class);
 
     @Parameter(names = { "-s",
             "--settings" }, description = "Path (inside JQM_ROOT/conf/) to JQM properties file. Default is resources.xml.", required = false)
-    String settingsFile;
+    protected String settingsFile;
 
     @Parameter(names = { "-h", "--help", "/?", "-?" }, description = "Display command help.", help = true)
-    boolean help = false;
+    protected boolean help = false;
 
     /**
      * Actually run the command.
      */
-    abstract int doWork();
+    public abstract int doWork();
+
+    public String getSettingsFile()
+    {
+        return settingsFile;
+    }
+
+    public boolean isHelp()
+    {
+        return help;
+    }
 }

@@ -62,70 +62,69 @@ public class EngineCallback implements JqmEngineHandler
     @Override
     public void onNodeConfigurationRead(Node node)
     {
-        DbConn cnx = DbManager.getDb().getConn();
+        try (DbConn cnx = DbManager.getDb().getConn()) {
 
-        // Main log levels comes from configuration
-        CommonService.setLogLevel(node.getRootLogLevel());
-        this.logLevel = node.getRootLogLevel();
+            // Main log levels comes from configuration
+            CommonService.setLogLevel(node.getRootLogLevel());
+            this.logLevel = node.getRootLogLevel();
 
-        // Jetty
-        this.webServer = ServiceLoaderHelper.getService(ServiceLoader.load(WebServer.class), false);
-        webServerConfig = new WebServerConfiguration();
-        webServerConfig.setHost(node.getDns());
-        webServerConfig.setPort(node.getPort());
+            // Jetty
+            this.webServer = ServiceLoaderHelper.getService(ServiceLoader.load(WebServer.class), false);
+            webServerConfig = new WebServerConfiguration();
+            webServerConfig.setHost(node.getDns());
+            webServerConfig.setPort(node.getPort());
 
-        var rootPath = System.getProperty("com.enioka.jqm.alternateJqmRoot", null);
-        if (rootPath == null || rootPath.isEmpty())
-        {
-            rootPath = ".";
+            var rootPath = System.getProperty("com.enioka.jqm.alternateJqmRoot", null);
+            if (rootPath == null || rootPath.isEmpty())
+            {
+                rootPath = ".";
+            }
+
+            webServerConfig.setWsEnabled(!Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApi", "false")));
+            webServerConfig.setStartSimple(
+                    node.getLoapApiSimple() && !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiSimple", "false")));
+            webServerConfig.setStartClient(
+                    node.getLoadApiClient() && !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiClient", "false")));
+            webServerConfig.setStartAdmin(
+                    node.getLoadApiAdmin() && !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiAdmin", "false")));
+            webServerConfig.setUseTls(Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiSsl", "true")));
+
+            var useInternalPki = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableInternalPki", "true"));
+            var pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
+            if (webServerConfig.isUseTls() && useInternalPki)
+            {
+                jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
+                JdbcCa.prepareWebServerStores(cnx, "CN=" + node.getDns(), rootPath + "/conf/keystore.pfx", rootPath + "/conf/trusted.jks",
+                        pfxPassword, node.getDns(), rootPath + "/conf/server.cer", rootPath + "/conf/ca.cer");
+            }
+
+            webServerConfig.setKeyStorePassword(pfxPassword);
+            webServerConfig.setTrustStorePassword(pfxPassword);
+            webServerConfig.setKeyStorePath(rootPath + "/conf/keystore.pfx");
+            webServerConfig.setTrustStorePath(rootPath + "/conf/trusted.jks");
+
+            webServerConfig.setWarPath(rootPath + "/webapp/jqm-ws.war");
+            webServerConfig.setLocalNodeId(node.getId());
+
+            this.webServer.start(webServerConfig);
+
+            // Update node if port was changed
+            var newPort = this.webServer.getActualPort();
+            if (newPort != node.getPort())
+            {
+                node.setPort(newPort);
+                cnx.runUpdate("node_update_port_by_id", newPort, node.getId());
+                cnx.commit();
+            }
+
+            // Deployment scanner
+            String gp2 = GlobalParameter.getParameter(cnx, "directoryScannerRoot", "");
+            if (!gp2.isEmpty())
+            {
+                scanner = new DirectoryScanner(gp2, node);
+                (new Thread(scanner)).start();
+            }
         }
-
-        webServerConfig.setWsEnabled(!Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApi", "false")));
-        webServerConfig.setStartSimple(
-                node.getLoapApiSimple() && !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiSimple", "false")));
-        webServerConfig.setStartClient(
-                node.getLoadApiClient() && !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiClient", "false")));
-        webServerConfig.setStartAdmin(
-                node.getLoadApiAdmin() && !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiAdmin", "false")));
-        webServerConfig.setUseTls(Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiSsl", "true")));
-
-        var useInternalPki = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableInternalPki", "true"));
-        var pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
-        if (webServerConfig.isUseTls() && useInternalPki)
-        {
-            jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
-            JdbcCa.prepareWebServerStores(cnx, "CN=" + node.getDns(), rootPath + "/conf/keystore.pfx", rootPath + "/conf/trusted.jks",
-                    pfxPassword, node.getDns(), rootPath + "/conf/server.cer", rootPath + "/conf/ca.cer");
-        }
-
-        webServerConfig.setKeyStorePassword(pfxPassword);
-        webServerConfig.setTrustStorePassword(pfxPassword);
-        webServerConfig.setKeyStorePath(rootPath + "/conf/keystore.pfx");
-        webServerConfig.setTrustStorePath(rootPath + "/conf/trusted.jks");
-
-        webServerConfig.setWarPath(rootPath + "/webapp/jqm-ws.war");
-        webServerConfig.setLocalNodeId(node.getId());
-
-        this.webServer.start(webServerConfig);
-
-        // Update node if port was changed
-        var newPort = this.webServer.getActualPort();
-        if (newPort != node.getPort())
-        {
-            node.setPort(newPort);
-            cnx.runUpdate("node_update_port_by_id", newPort, node.getId());
-            cnx.commit();
-        }
-
-        // Deployment scanner
-        String gp2 = GlobalParameter.getParameter(cnx, "directoryScannerRoot", "");
-        if (!gp2.isEmpty())
-        {
-            scanner = new DirectoryScanner(gp2, node);
-            (new Thread(scanner)).start();
-        }
-
-        cnx.close();
     }
 
     @Override

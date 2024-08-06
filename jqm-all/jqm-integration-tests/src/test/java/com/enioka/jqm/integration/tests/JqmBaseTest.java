@@ -15,15 +15,18 @@
  */
 package com.enioka.jqm.integration.tests;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Properties;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.enioka.jqm.model.updater.DbSchemaManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -48,6 +51,8 @@ import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
 import com.enioka.jqm.test.helpers.TestHelpers;
+
+import static com.enioka.jqm.shared.misc.StandaloneHelpers.idSequenceBaseFromIp;
 
 public class JqmBaseTest
 {
@@ -86,7 +91,7 @@ public class JqmBaseTest
     }
 
     @Before
-    public void beforeEachTest() throws NamingException
+    public void beforeEachTest() throws NamingException, SQLException
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
@@ -97,7 +102,15 @@ public class JqmBaseTest
         if (db == null)
         {
             // In all cases load the datasource. (the helper itself will load the property file if any).
-            db = DbManager.getDb();
+            Properties p = new Properties();
+            p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
+            p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
+            db = DbManager.getDb(p);
+            var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
+            try (var cnx = db.getDataSource().getConnection())
+            {
+                dbSchemaManager.updateSchema(cnx);
+            }
         }
 
         cnx = getNewDbSession();

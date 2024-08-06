@@ -104,9 +104,9 @@ public class XmlJobDefParser
         DocumentBuilder dBuilder;
 
         // Result fields
-        Map<String, Integer> createdQueues = new HashMap<>();
+        Map<String, Long> createdQueues = new HashMap<>();
         JobDef jd = null;
-        Integer queueId = null;
+        Long queueId = null;
 
         try
         {
@@ -290,7 +290,7 @@ public class XmlJobDefParser
                     else if (q == null)
                     {
                         // Queue not specified in XML (and no queue already specified inside DB) => default queue
-                        queueId = cnx.runSelectSingle("q_select_default", Integer.class);
+                        queueId = cnx.runSelectSingle("q_select_default", Long.class);
                         jd.setQueue(queueId);
                     }
 

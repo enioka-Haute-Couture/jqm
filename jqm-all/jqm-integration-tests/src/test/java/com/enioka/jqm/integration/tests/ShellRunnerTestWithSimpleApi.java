@@ -68,7 +68,7 @@ public class ShellRunnerTestWithSimpleApi extends JqmBaseTest
                     "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         }
 
-        int i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
 
         addAndStartEngine();
         TestHelpers.waitFor(2, 20000, cnx);
@@ -97,7 +97,7 @@ public class ShellRunnerTestWithSimpleApi extends JqmBaseTest
                     PathType.DEFAULTSHELLCOMMAND);
         }
 
-        int i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
         GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "500");
 
         addAndStartEngine();

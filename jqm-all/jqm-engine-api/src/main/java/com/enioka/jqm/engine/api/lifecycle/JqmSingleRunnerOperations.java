@@ -11,5 +11,5 @@ public interface JqmSingleRunnerOperations
      * @param jobInstanceId
      * @return
      */
-    public JobInstance runAtOnce(int jobInstanceId);
+    public JobInstance runAtOnce(long jobInstanceId);
 }

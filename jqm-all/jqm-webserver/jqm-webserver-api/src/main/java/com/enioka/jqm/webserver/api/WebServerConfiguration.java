@@ -11,7 +11,7 @@ public class WebServerConfiguration
     private boolean wsEnabled = false, startSimple = false, startClient = false, startAdmin = false;
 
     // Some services need to access the local node configuration
-    private int localNodeId;
+    private long localNodeId;
 
     // TLS
     private boolean useTls = false;
@@ -138,12 +138,12 @@ public class WebServerConfiguration
         this.warPath = warPath;
     }
 
-    public int getLocalNodeId()
+    public long getLocalNodeId()
     {
         return localNodeId;
     }
 
-    public void setLocalNodeId(int localNodeId)
+    public void setLocalNodeId(long localNodeId)
     {
         this.localNodeId = localNodeId;
     }

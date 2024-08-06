@@ -38,9 +38,9 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobInstance
 {
-    private Integer id;
+    private long id;
     private String applicationName;
-    private Integer parent;
+    private Long parent;
     private String user;
     private String sessionID;
     private State state;
@@ -62,12 +62,12 @@ public class JobInstance
     /**
      * The Job Instance ID, i.e. the unique identifier of the execution request. This is a key for numerous {@link JqmClient} functions.
      */
-    public Integer getId()
+    public long getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
+    public void setId(long id)
     {
         this.id = id;
     }
@@ -75,12 +75,12 @@ public class JobInstance
     /**
      * The ID of the parent job that has enqueued this job instance. Null if the execution request was not done by a running job.
      */
-    public Integer getParent()
+    public Long getParent()
     {
         return parent;
     }
 
-    public void setParent(Integer parent)
+    public void setParent(Long parent)
     {
         this.parent = parent;
     }
@@ -126,7 +126,7 @@ public class JobInstance
 
     /**
      * Position in the queue. 0 if running.<br>
-     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
+     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(long)} call and may not be up to date!</strong>
      */
     public Long getPosition()
     {
@@ -184,7 +184,7 @@ public class JobInstance
     /**
      * An optional integer that running user code may update from time to time. Used to give an idea of the progress of the job instance.
      * <br>
-     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
+     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(long)} call and may not be up to date!</strong>
      */
     public Integer getProgress()
     {
@@ -199,7 +199,7 @@ public class JobInstance
     /**
      * An optional list of strings that running user code may emit from time to time. Used to give an idea of the progress of the job
      * instance.<br>
-     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
+     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(long)} call and may not be up to date!</strong>
      */
     public List<String> getMessages()
     {

@@ -74,7 +74,7 @@ public class JettyTest extends JqmBaseTest
         // Launch a job so as to be able to query its status later
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        int i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         TestHelpers.waitFor(1, 10000, cnx);
 
         // HTTPS client - with
@@ -118,7 +118,7 @@ public class JettyTest extends JqmBaseTest
         // Launch a job so as to be able to query its status later
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        int i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         TestHelpers.waitFor(1, 10000, cnx);
 
         // Server auth against trusted CA root certificate

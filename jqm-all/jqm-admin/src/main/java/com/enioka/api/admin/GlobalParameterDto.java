@@ -29,16 +29,16 @@ public class GlobalParameterDto implements Serializable
 {
     private static final long serialVersionUID = -4836332110468430277L;
 
-    private Integer id;
+    private Long id;
     private String key;
     private String value;
 
-    public Integer getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
+    public void setId(Long id)
     {
         this.id = id;
     }

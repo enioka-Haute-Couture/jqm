@@ -129,6 +129,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-model-updater-cli</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jqm-engine-api</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
@@ -150,6 +156,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-jersey</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>

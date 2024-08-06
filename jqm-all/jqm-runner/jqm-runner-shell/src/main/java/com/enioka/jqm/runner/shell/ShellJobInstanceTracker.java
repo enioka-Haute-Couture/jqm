@@ -271,7 +271,7 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
     }
 
     @Override
-    public Integer getId()
+    public Long getId()
     {
         return this.ji.getId();
     }

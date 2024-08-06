@@ -32,7 +32,7 @@ public class Deliverable
 {
     private String filePath;
     private String fileFamily;
-    private Integer id;
+    private long id;
     private String originalName;
 
     /**
@@ -41,7 +41,7 @@ public class Deliverable
      * @param filePath
      * @param fileName
      */
-    public Deliverable(String filePath, String fileFamily, Integer id, String originalName)
+    public Deliverable(String filePath, String fileFamily, Long id, String originalName)
     {
         this.filePath = filePath;
         this.fileFamily = fileFamily;
@@ -77,7 +77,7 @@ public class Deliverable
     /**
      * Unique ID of the file. This is purely technical and has no meaning to end users.
      */
-    public Integer getId()
+    public long getId()
     {
         return id;
     }
@@ -100,7 +100,7 @@ public class Deliverable
         this.fileFamily = fileFamily;
     }
 
-    void setId(Integer id)
+    void setId(long id)
     {
         this.id = id;
     }

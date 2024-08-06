@@ -80,7 +80,7 @@ public class JqmTesterAsyncTest2
                 .addSimpleJobDefinitionFromLibrary("payload1", "pyl.EngineApiSendDeliverable", "../jqm-tests/jqm-test-pyl/target/test.jar")
                 .start();
 
-        int jobId = JqmClientFactory.getClient().newJobRequest("payload1", "tesuser").addParameter("fileName", "marsu.txt")
+        long jobId = JqmClientFactory.getClient().newJobRequest("payload1", "tesuser").addParameter("fileName", "marsu.txt")
                 .addParameter("filepath", "./").enqueue();
         tester.waitForResults(1, 10000, 0);
 

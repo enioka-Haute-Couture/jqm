@@ -1,19 +1,15 @@
 package com.enioka.jqm.test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Properties;
-
 import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Properties;
 
 final class Common
 {
@@ -49,6 +45,7 @@ final class Common
     {
         Properties p = new Properties();
         p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+        p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
         p.put("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
         return p;
     }
@@ -82,9 +79,9 @@ final class Common
         return version;
     }
 
-    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Integer> queues)
+    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Long> queues)
     {
-        int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
+        long clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
                 d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
 
         JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),

@@ -10,6 +10,7 @@ import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueMappingDto;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 
@@ -26,7 +27,7 @@ class CommandInstallNodeTemplate extends CommandBase
     private String networkInterface;
 
     @Override
-    int doWork()
+    public int doWork()
     {
         try (DbConn cnx = DbManager.getDb().getConn())
         {

@@ -16,13 +16,13 @@ public class ScheduledJob implements Serializable
 {
     private static final long serialVersionUID = 7928212054684657247L;
 
-    private Integer id = null;
+    private Long id = null;
 
     private String cronExpression;
 
     private Calendar lastUpdated;
 
-    private Integer queue;
+    private Long queue;
 
     private Integer priority;
 
@@ -48,7 +48,7 @@ public class ScheduledJob implements Serializable
      *
      * @return the ID.
      */
-    public Integer getId()
+    public Long getId()
     {
         return this.id;
     }
@@ -58,7 +58,7 @@ public class ScheduledJob implements Serializable
      *
      * @param id
      */
-    public ScheduledJob setId(Integer id)
+    public ScheduledJob setId(Long id)
     {
         this.id = id;
         return this;
@@ -111,7 +111,7 @@ public class ScheduledJob implements Serializable
      *
      * @return
      */
-    public Integer getQueue()
+    public Long getQueue()
     {
         return queue;
     }
@@ -121,7 +121,7 @@ public class ScheduledJob implements Serializable
      *
      * @param queue
      */
-    public ScheduledJob setQueue(Integer queue)
+    public ScheduledJob setQueue(Long queue)
     {
         this.queue = queue;
         return this;

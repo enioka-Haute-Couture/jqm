@@ -142,7 +142,7 @@ public class DbImplMySql extends DbAdapter
             {
                 throw new NoResultException("The query returned zero rows when one was expected.");
             }
-            q.preGeneratedKey = rs.getInt(1);
+            q.preGeneratedKey = rs.getLong(1);
             q.parameters.add(0, q.preGeneratedKey);
         }
         catch (SQLException e)

@@ -22,5 +22,5 @@ public interface JqmClientEnqueueCallback
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public int enqueue(JobRequestBaseImpl runRequest);
+    public Long enqueue(JobRequestBaseImpl runRequest);
 }

@@ -4,6 +4,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.GlobalParameter;
@@ -16,7 +17,7 @@ class CommandSetWebConfiguration extends CommandBase
     private Action action;
 
     @Override
-    int doWork()
+    public int doWork()
     {
         try (DbConn cnx = DbManager.getDb().getConn())
         {
