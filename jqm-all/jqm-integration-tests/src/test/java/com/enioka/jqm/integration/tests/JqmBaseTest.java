@@ -52,6 +52,8 @@ import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+import static com.enioka.jqm.shared.misc.StandaloneHelpers.idSequenceBaseFromIp;
+
 public class JqmBaseTest
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);

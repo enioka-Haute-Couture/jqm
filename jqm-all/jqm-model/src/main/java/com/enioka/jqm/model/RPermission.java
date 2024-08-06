@@ -34,7 +34,7 @@ public class RPermission implements Serializable
     private long id;
     private String name;
 
-    private int role;
+    private long role;
 
     public long getId()
     {
@@ -56,12 +56,12 @@ public class RPermission implements Serializable
         this.name = name;
     }
 
-    public int getRole()
+    public long getRole()
     {
         return role;
     }
 
-    public void setRole(int role)
+    public void setRole(long role)
     {
         this.role = role;
     }
@@ -77,7 +77,7 @@ public class RPermission implements Serializable
 
                 tmp.id = rs.getLong(1);
                 tmp.name = rs.getString(2);
-                tmp.role = rs.getInt(3);
+                tmp.role = rs.getLong(3);
                 res.add(tmp);
             }
         }

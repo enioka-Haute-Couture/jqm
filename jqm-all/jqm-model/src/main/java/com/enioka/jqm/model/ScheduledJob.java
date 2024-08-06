@@ -142,7 +142,7 @@ public class ScheduledJob
                     // ID, KEYNAME, VALUE, JOB_SCHEDULE
                     String key = rs.getString(2);
                     String val = rs.getString(3);
-                    int sj = rs.getInt(4);
+                    long sj = rs.getLong(4);
 
                     while (res.get(currentSJ).id != sj)
                     {

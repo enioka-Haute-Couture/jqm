@@ -262,7 +262,7 @@ public class MetaService
                 while (rs.next())
                 {
                     String key = rs.getString(2);
-                    int id = rs.getInt(1);
+                    long id = rs.getLong(1);
 
                     if (!dto.getParameters().containsKey(key))
                     {
