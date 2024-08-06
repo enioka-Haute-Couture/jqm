@@ -52,11 +52,6 @@
             <artifactId>jqm-dbadapter-db2</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-dbadapter-db2</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Test -->
         <dependency>
