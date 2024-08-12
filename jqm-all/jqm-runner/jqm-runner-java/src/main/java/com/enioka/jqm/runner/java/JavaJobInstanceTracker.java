@@ -139,7 +139,7 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
         // Go! (launches the main function in the startup class designated in the manifest)
         try
         {
-            jobClassLoader.launchJar(job, job.getPrms(), clm, handler);
+            jobClassLoader.launchJar(job, job.getPrms(), clm, handler, engineCallback.getExtensionModuleLayer());
             return State.ENDED;
         }
         catch (JqmKillException e)

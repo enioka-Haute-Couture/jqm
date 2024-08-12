@@ -90,7 +90,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
      *            given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h)
+    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h, ModuleLayer parentModuleLayer)
             throws JobRunnerException
     {
         // 1 - Create the proxy.
@@ -117,8 +117,17 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         Class c = null;
         try
         {
-            // using payload CL, i.e. this very object
-            c = loadClass(classQualifiedName);
+            String[] classModuleSegments = classQualifiedName.split("/");
+            if (classModuleSegments.length > 1)
+            {
+                ModuleLayer ml = ModuleManager.createModuleLayerIfNeeded(this, parentModuleLayer, job);
+                c = ml.findLoader(classModuleSegments[0]).loadClass(classModuleSegments[1]);
+            }
+            else
+            {
+                // using payload CL, i.e. this very object
+                c = loadClass(classQualifiedName);
+            }
         }
         catch (Exception e)
         {
@@ -215,7 +224,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
                         + allowedRunners);
     }
 
-    private Class<?> loadFromParentCL(String name) throws ClassNotFoundException
+    private Class<?> findFromParentCL(String name) throws ClassNotFoundException
     {
         for (Pattern pattern : hiddenJavaClassesPatterns)
         {
@@ -227,11 +236,11 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
                 return super.findClass(name);
             }
         }
-        return loadClass(name, false);
+        return super.findClass(name);
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException
+    public Class<?> findClass(String name) throws ClassNotFoundException
     {
         Class<?> c = null;
 
@@ -260,7 +269,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
                 if (c == null)
                 {
                     // jqmlogger.trace("found in parent " + name);
-                    c = loadFromParentCL(name);
+                    c = findFromParentCL(name);
                 }
                 else
                 {
@@ -275,7 +284,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         else
         {
             // Default behavior
-            c = loadFromParentCL(name);
+            c = findFromParentCL(name);
         }
 
         return c;

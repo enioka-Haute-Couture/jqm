@@ -50,6 +50,9 @@ class ClassLoaderLeakCleaner
 
         // Bean cache
         Introspector.flushCaches();
+
+        // Runaway threads
+        cleanThreads();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -74,6 +77,30 @@ class ClassLoaderLeakCleaner
         catch (Exception e)
         {
             jqmlogger.warn("An error occured during JDBC connections cleanup - connections may leak", e);
+        }
+    }
+
+    private static void cleanThreads()
+    {
+        ThreadGroup tg = Thread.currentThread().getThreadGroup();
+
+        synchronized (tg)
+        {
+            Thread[] threads = new Thread[tg.activeCount()];
+            int tCount = tg.enumerate(threads);
+
+            for (int i = 0; i < tCount; i++)
+            {
+                Thread t = threads[i];
+                if (t == null || t == Thread.currentThread())
+                {
+                    continue;
+                }
+
+                jqmlogger.warn("Runaway thread. Cleaner has interrupted thread {}", t.getName());
+                t.setContextClassLoader(null);
+                t.interrupt();
+            }
         }
     }
 }
