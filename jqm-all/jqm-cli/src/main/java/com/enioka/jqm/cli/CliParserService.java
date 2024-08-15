@@ -41,14 +41,23 @@ public class CliParserService implements CommandLine
         // JNDI registration - most commands need a JNDI context.
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
+        // Get commands registred as services
+        var additionalCommands = ServiceLoaderHelper.getServices(ServiceLoader.load(CommandBase.class));
+
         // Create parser
-        JCommander jc = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
+        var jcBuilder = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
                 .addCommand(new CommandGetEngineVersion()).addCommand(new CommandGetJiStatus()).addCommand(new CommandGetNodeCount())
                 .addCommand(new CommandGetRole()).addCommand(new CommandImportClusterConfiguration()).addCommand(new CommandImportJobDef())
                 .addCommand(new CommandImportQueue()).addCommand(new CommandInstallNodeTemplate()).addCommand(new CommandNewJi())
                 .addCommand(new CommandNewNode()).addCommand(new CommandResetRoot()).addCommand(new CommandResetUser())
-                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle())
-                .addCommand(new DbUpdateVerb()).build();
+                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle());
+
+        for (var command : additionalCommands)
+        {
+            jcBuilder.addCommand(command);
+        }
+        var jc = jcBuilder.build();
+
         jc.setColumnSize(160);
         jc.setCaseSensitiveOptions(false);
 

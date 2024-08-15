@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import org.kohsuke.MetaInfServices;
+
 import com.beust.jcommander.Parameters;
 import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.jdbc.Db;
@@ -11,6 +13,7 @@ import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.updater.DbSchemaManager;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
+@MetaInfServices(CommandBase.class)
 @Parameters(commandNames = "Get-SchemaSql", commandDescription = "Displays the database schema SQL commands needed to make it up to date.")
 public class GetSchemaUpdateSqlVerb extends CommandBase
 {

@@ -32,7 +32,7 @@ public class DbImplDb2 extends DbAdapter
     @Override
     public String adaptSql(String sql)
     {
-        return sql.replace("MEMORY TABLE", "TABLE").replace("UNIX_MILLIS()", "JQM_PK.nextval").replace("IN(UNNEST(?))", "IN(?)")
+        return sql.replace("UNIX_MILLIS()", "JQM_PK.nextval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("FROM (VALUES(0))", "FROM SYSIBM.SYSDUMMY1").replace("BOOLEAN", "SMALLINT").replace("__T__", this.tablePrefix)
                 .replace("true", "1").replace("false", "0");
     }

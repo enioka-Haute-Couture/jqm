@@ -112,7 +112,7 @@ public class Db
                 {
                     msg += " - " + e.getCause().getLocalizedMessage();
                     jqmlogger.error(
-                        "Database not available: " + msg + ". Retry " + retries + "/" + retryCount + ". Waiting for database...");
+                            "Database not available: " + msg + ". Retry " + retries + "/" + retryCount + ". Waiting for database...");
 
                     try
                     {
@@ -233,8 +233,7 @@ public class Db
                 var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
                 if (dbSchemaManager != null)
                 {
-                    jqmlogger
-                        .debug("Checking if database schema is up to date using full Liquibase service inside an OSGi environment");
+                    jqmlogger.debug("Checking if database schema is up to date using full Liquibase service");
                     return dbSchemaManager.isUpToDate(cnx);
                 }
             }
@@ -263,8 +262,8 @@ public class Db
     }
 
     /**
-     * Creates the adapter for the target database. The list of available adapters comes either from the OSGi service registry or from a
-     * property.
+     * Creates the adapter for the target database. The list of available adapters comes either from the ServiceLoader service registry or
+     * from a property.
      */
     private void selectAdapter(Properties p)
     {
@@ -273,7 +272,7 @@ public class Db
             DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
             jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
-                + meta.getDatabaseMinorVersion());
+                    + meta.getDatabaseMinorVersion());
 
             // Find the correct db apdater
             jqmlogger.info("Database adapter search: using METAINF services");

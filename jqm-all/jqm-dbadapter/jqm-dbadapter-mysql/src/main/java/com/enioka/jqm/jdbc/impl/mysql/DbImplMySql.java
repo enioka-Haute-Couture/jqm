@@ -43,7 +43,7 @@ public class DbImplMySql extends DbAdapter
         {
             return "";
         }
-        return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "?").replace(" DOUBLE", " DOUBLE PRECISION")
+        return sql.replace("JQM_PK.nextval", "?").replace(" DOUBLE", " DOUBLE PRECISION")
                 .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(UTC_TIMESTAMP() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")

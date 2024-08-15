@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import org.kohsuke.MetaInfServices;
 
 import com.beust.jcommander.Parameters;
 import com.enioka.jqm.cli.api.CommandBase;
@@ -12,6 +13,7 @@ import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.updater.DbSchemaManager;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
+@MetaInfServices(CommandBase.class)
 @Parameters(commandNames = "Test-Schema", commandDescription = "Test if the database schema is up to date.")
 public class TestDbUpToDateVerb extends CommandBase
 {

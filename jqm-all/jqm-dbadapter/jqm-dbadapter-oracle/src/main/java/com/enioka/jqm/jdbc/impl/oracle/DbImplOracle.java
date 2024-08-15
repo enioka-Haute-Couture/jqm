@@ -45,8 +45,7 @@ public class DbImplOracle extends DbAdapter
     @Override
     public String adaptSql(String sql)
     {
-        return sql.replace("MEMORY TABLE", "TABLE")
-                .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
+        return sql.replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(CURRENT_TIMESTAMP - 1/1440)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(CURRENT_TIMESTAMP - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
                 .replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix)

@@ -17,7 +17,6 @@
     <logger name="org.apache.aries" level="warn" />
     <logger name="org.apache.cxf" level="warn" />
     <logger name="org.apache.shiro" level="info" />
-    <logger name="org.apache.aries.spifly.BaseActivator" level="warn" />
 
     <root level="info">
         <appender-ref ref="consoleAppender" />
