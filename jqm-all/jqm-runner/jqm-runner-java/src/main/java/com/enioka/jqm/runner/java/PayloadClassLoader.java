@@ -90,8 +90,8 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
      *            given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h, ModuleLayer parentModuleLayer)
-            throws JobRunnerException
+    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h,
+            ModuleLayer parentModuleLayer) throws JobRunnerException
     {
         // 1 - Create the proxy.
         Object proxy = null;
@@ -237,6 +237,24 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
             }
         }
         return super.findClass(name);
+    }
+
+    @Override
+    protected Class<?> findClass(String moduleName, String name)
+    {
+        // We must overload this - otherwise default ClassLoader implementation is used and null is always returned when moduleName is
+        // non-null.
+        // We can cheat here, as we know there is always a single CL in the module layer.
+        jqmlogger.trace("FINDING CLASS: {}/{}", moduleName, name);
+        try
+        {
+            Class<?> res = findClass(name);
+            return res != null && res.getModule().getName().equals(moduleName) ? res : null;
+        }
+        catch (ClassNotFoundException e)
+        {
+            return null; // This is the default behavior of the default implementation.
+        }
     }
 
     @Override

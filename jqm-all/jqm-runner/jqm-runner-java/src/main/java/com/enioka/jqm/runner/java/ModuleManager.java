@@ -6,42 +6,26 @@ import java.lang.module.ModuleDescriptor;
 import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import com.enioka.jqm.model.JobInstance;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.model.JobInstance;
+
 public final class ModuleManager
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(ModuleManager.class);
 
-    // This class would be a lambda in Java8+
-    private static class ClMapper implements Function<String, ClassLoader>
-    {
-        private PayloadClassLoader cl;
-
-        public ClMapper(PayloadClassLoader cl)
-        {
-            this.cl = cl;
-        }
-
-        @Override
-        public ClassLoader apply(String t)
-        {
-            return cl;
-        }
-    }
-
     public static ModuleLayer createModuleLayerIfNeeded(PayloadClassLoader cl, ModuleLayer parentModuleLayer, JobInstance ji)
     {
         // TODO : cache layer if needed.
+        var loadedModuleNames = new HashSet<String>();
 
         // Test if the target is a module (just for information sake)
         File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepo()).getAbsolutePath(), ji.getJD().getJarPath()));
@@ -54,62 +38,53 @@ public final class ModuleManager
         {
             String mainModuleName = finder.findAll().iterator().next().descriptor().name();
             jqmlogger.debug("Root file {} is a JPMS module, using JPMS module layer. Root module name is {}", jarFile.getAbsolutePath(),
-                mainModuleName);
+                    mainModuleName);
         }
 
-        // Convert URL to path (no streams in Java 6...)
-        Path[] paths = new Path[cl.getURLs().length];
-        for (int i = 0; i < cl.getURLs().length; i++)
+        // Module path determination. We consider all files inside the JI path to be module roots.
+        // Therefore take all URLs in the class loader including parents (i.e. potentially including ext CL).
+        var pathList = new ArrayList<Path>(cl.getURLs().length);
+        ClassLoader currentCL = cl;
+        while (currentCL instanceof URLClassLoader) // meaning stop at the system class loader
         {
-            try
+            for (var url : cl.getURLs())
             {
-                paths[i] = Path.of(cl.getURLs()[i].toURI());
-            }
-            catch (URISyntaxException e)
-            {
-                throw new JqmPayloadException("wrong JPMS configuration", e);
-            }
-        }
-        if (cl.getParent() instanceof URLClassLoader)
-        {
-            jqmlogger.debug("JPMS module detected, adding parent classloader to module path");
-            paths = new Path[cl.getURLs().length + ((URLClassLoader) cl.getParent()).getURLs().length];
-            for (int i = 0; i < cl.getURLs().length; i++)
-            {
-                try
+                var path = getPathSafe(url);
+                var mf = ModuleFinder.of(path);
+                var moduleName = mf.findAll().stream().map(ModuleReference::descriptor).map(ModuleDescriptor::name).findFirst()
+                        .orElse(null);
+                if (moduleName == null || (!parentModuleLayer.findModule(moduleName).isPresent() && loadedModuleNames.add(moduleName)))
                 {
-                    paths[i] = Path.of(cl.getURLs()[i].toURI());
+                    pathList.add(path);
                 }
-                catch (URISyntaxException e)
+                else
                 {
-                    throw new JqmPayloadException("wrong JPMS configuration", e);
+                    jqmlogger.warn("Module {} is present multiple times in the module path, keeping parent version", moduleName);
                 }
             }
-            for (int i = 0; i < ((URLClassLoader) cl.getParent()).getURLs().length; i++)
-            {
-                try
-                {
-                    paths[i + cl.getURLs().length] = Path.of(((URLClassLoader) cl.getParent()).getURLs()[i].toURI());
-                }
-                catch (URISyntaxException e)
-                {
-                    throw new JqmPayloadException("wrong JPMS configuration", e);
-                }
-            }
+            currentCL = cl.getParent();
         }
 
-        jqmlogger.debug("JPMS module path is {}", (Object) paths);
+        var paths = pathList.toArray(new Path[pathList.size()]);
+        jqmlogger.debug("JPMS module path is {}", pathList);
 
-        // Add all files inside the JI path inside the new layer configuration as module roots.
-        ModuleFinder moduleFinder = ModuleFinder.of(paths);
-        Set<String> moduleNames = moduleFinder.findAll().stream().map(ModuleReference::descriptor).map(ModuleDescriptor::name)
-            .collect(Collectors.toUnmodifiableSet());
-
-        // TODO: before/after according to child/parent first
-        Configuration cf = parentModuleLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), moduleNames);
-        ModuleLayer layer = parentModuleLayer.defineModules(cf, new ClMapper(cl));
+        // Create layer, using same class loader for all modules.
+        var moduleFinder = ModuleFinder.of(paths);
+        Configuration cf = parentModuleLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), loadedModuleNames);
+        ModuleLayer layer = parentModuleLayer.defineModules(cf, (String t) -> cl);
 
         return layer;
     }
 
+    private static Path getPathSafe(URL url)
+    {
+        try
+        {
+            return Path.of(url.toURI());
+        }
+        catch (URISyntaxException e)
+        {
+            throw new JqmPayloadException("wrong JPMS configuration", e);
+        }
+    }
 }

@@ -3,7 +3,6 @@ module com.enioka.jqm.tests.jpms
     ///////////////////////////////////////////
     // For payload with JQM API test
     requires com.enioka.jqm.payload.api;
-    requires java.naming;
 
     exports com.enioka.jqm.tests.jpms;
 
