@@ -5,7 +5,7 @@ Defining a resource
 *************************
 
 Resources are defined inside the JQM database, and are therefore accessible from all JQM nodes.
-By 'resource' JNDI means an object that can be created through a (provided) 
+By 'resource' JNDI means an object that can be created through a (provided)
 `ObjectFactory <http://docs.oracle.com/javase/7/docs/api/javax/naming/spi/ObjectFactory.html>`_. There are multiple factories provided with JQM, concerning databases,
 files & URLs which are detailed below. Moreover, the :term:`payload` may provide whatever factories it needs, such as a JMS driver (example also below).
 
@@ -31,7 +31,7 @@ The following elements are needed for every resource, and are defined in the mai
 For every resource type (and therefore, every ObjectFactory), there may be different parameters: connection strings, paths, ports, ... These
 parameters are to be put inside the table JndiObjectResourceParameter.
 
-The JNDI alias is free to choose - even if conventions exist. Please note that JQM only provides a root context, and no subcontexts. Therefore, in all 
+The JNDI alias is free to choose - even if conventions exist. Please note that JQM only provides a root context, and no subcontexts. Therefore, in all
 lookups, the given alias will searched 'as provided' (including case) inside the database.
 
 Singletons
@@ -42,7 +42,7 @@ resource is made by the engine itself in its own class context, and not inside t
 following reasons:
 
 * Many resources are actually to be shared between payloads, such as a connection pool
-* Very often, the payload will expect to be returned the same resource when making multiple JNDI lookups, not a different one on each call. Once again, 
+* Very often, the payload will expect to be returned the same resource when making multiple JNDI lookups, not a different one on each call. Once again,
   one would expect to be returned the same connection pool on each call, and definitely not to have a new pool created on each call!
 * Some resources are dangerous to create inside the payload's context. As stated in :doc:`../jobs/writing_payloads`, loading a JDBC driver creates
   memory leaks (actually, class loader leaks). By delegating this to the engine, the issue disappears.
@@ -50,7 +50,7 @@ following reasons:
 Singleton resources are created the first time they are looked up, and kept forever afterwards.
 
 As singleton resources are created by the engine, the jar files containing resource & resource factory must be available to the engine class loader.
-For this reason, the jar files must be placed manually inside the $JQM_ROOT/ext directory (and they do not need to be placed inside the 
+For this reason, the jar files must be placed manually inside the $JQM_ROOT/ext directory (and they do not need to be placed inside the
 dependencies of the payload, even if it does not hurt to have them there when the default parent-first class loading is used). For a resource which provider is within the payload, being
 a singleton is impossible - the engine class context has no access to the payload class context.
 
@@ -61,7 +61,7 @@ By default, the $JQM_ROOT/ext directory contains the following providers, ready 
 * the HSQLDB driver
 
 Besides the HSQLDB driver, which can be removed if another database is used, the provided jars should never be removed. Jars added
-later (custom resources, other JDBC drivers, ...) can of course be removed. 
+later (custom resources, other JDBC drivers, ...) can of course be removed.
 Also of note: it is not because a jar is inside 'ext' that the corresponding resources can only be singletons. They can be standard as well.
 
 
@@ -89,8 +89,6 @@ create class loader leaks otherwise.
 | Parameter name | Value                                   |
 +================+=========================================+
 | maxActive      | max number of pooled connections        |
-+----------------+-----------------------------------------+
-| driverClassName| class of the db JDBC driver             |
 +----------------+-----------------------------------------+
 | url            | database url (see db documentation)     |
 +----------------+-----------------------------------------+

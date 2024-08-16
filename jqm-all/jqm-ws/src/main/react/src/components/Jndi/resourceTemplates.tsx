@@ -80,10 +80,6 @@ resourceTemplates["jndiOracle"] = {
             value: "jqm",
         },
         {
-            key: "driverClassName",
-            value: "oracle.jdbc.OracleDriver",
-        },
-        {
             key: "url",
             value: "jdbc:oracle:thin:@serverdns:1521/TEST",
         },
@@ -180,10 +176,6 @@ resourceTemplates["jndiPs"] = {
             value: "jqm",
         },
         {
-            key: "driverClassName",
-            value: "org.postgresql.Driver",
-        },
-        {
             key: "url",
             value: "jdbc:postgresql://127.0.0.1:5432/jqm",
         },
@@ -266,10 +258,6 @@ resourceTemplates["jndiMySql"] = {
         {
             key: "password",
             value: "jqm",
-        },
-        {
-            key: "driverClassName",
-            value: "com.mysql.jdbc.Driver",
         },
         {
             key: "url",
@@ -372,10 +360,6 @@ resourceTemplates["jndiHsqlDb"] = {
             value: "jqm",
         },
         {
-            key: "driverClassName",
-            value: "org.hsqldb.jdbcDriver",
-        },
-        {
             key: "url",
             value: "jdbc:hsqldb:file:db/dbfilename;shutdown=true;hsqldb.write_delay=false",
         },
@@ -438,10 +422,6 @@ resourceTemplates["jndiOtherDb"] = {
         {
             key: "password",
             value: "jqm",
-        },
-        {
-            key: "driverClassName",
-            value: "x.y.Driver",
         },
         {
             key: "url",

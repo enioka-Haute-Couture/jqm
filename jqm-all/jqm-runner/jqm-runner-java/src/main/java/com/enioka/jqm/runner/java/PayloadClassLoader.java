@@ -224,19 +224,28 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
                         + allowedRunners);
     }
 
-    private Class<?> findFromParentCL(String name) throws ClassNotFoundException
+    private Class<?> loadFromParentCL(String name) throws ClassNotFoundException
     {
+        boolean loadFromParent = true;
         for (Pattern pattern : hiddenJavaClassesPatterns)
         {
             Matcher matcher = pattern.matcher(name);
             if (matcher.matches())
             {
                 jqmlogger.debug("Class " + name + " will not be loaded by parent CL because it matches hiddenJavaClasses parameter");
-                // Invoke findClass in order to find the class.
-                return super.findClass(name);
+                loadFromParent = false;
             }
         }
-        return super.findClass(name);
+        try
+        {
+            return loadFromParent
+                    ? (this.getParent() != null ? this.getParent().loadClass(name) : ClassLoader.getPlatformClassLoader().loadClass(name))
+                    : null;
+        }
+        catch (ClassNotFoundException e)
+        {
+            return null;
+        }
     }
 
     @Override
@@ -258,54 +267,44 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
     }
 
     @Override
-    public Class<?> findClass(String name) throws ClassNotFoundException
+    public Class<?> loadClass(String name) throws ClassNotFoundException
     {
-        Class<?> c = null;
-
-        if (tracing)
+        // Check if class was already loaded
+        var c = findLoadedClass(name);
+        if (c != null)
         {
-            jqmlogger.debug("Loading : " + name);
+            return c;
         }
 
         if (childFirstClassLoader)
         {
-            // Check if class was already loaded
-            c = findLoadedClass(name);
-
-            if (c == null)
+            // Look here first if requested (not the default)
+            c = findClass(name);
+            if (c != null)
             {
-                // Try to find class from URLClassLoader
-                try
-                {
-                    c = super.findClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    //
-                }
-                // If nothing was found, try parent class loader
-                if (c == null)
-                {
-                    // jqmlogger.trace("found in parent " + name);
-                    c = findFromParentCL(name);
-                }
-                else
-                {
-                    // jqmlogger.trace("found in child " + name);
-                }
-            }
-            else
-            {
-                // jqmlogger.trace("name already loaded");
+                return c;
             }
         }
-        else
+
+        // Default behavior: ask parent
+        c = loadFromParentCL(name);
+        if (c != null)
         {
-            // Default behavior
-            c = findFromParentCL(name);
+            return c;
         }
 
-        return c;
+        if (!childFirstClassLoader)
+        {
+            // Default behaviour : if not found in parent, look here.
+            c = findClass(name);
+            if (c != null)
+            {
+                return c;
+            }
+        }
+
+        // If here, we have lost
+        return null;
     }
 
     public boolean isChildFirstClassLoader()
