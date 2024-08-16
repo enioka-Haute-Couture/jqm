@@ -312,7 +312,7 @@ public class XmlConfigurationParser
                     while (rs.next())
                     {
                         String key = rs.getString(2);
-                        int id = rs.getInt(1);
+                        var id = rs.getLong(1);
 
                         if (!prms.containsKey(key))
                         {
