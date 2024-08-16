@@ -384,8 +384,8 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         if (!mayBeShared)
         {
             // First: free the hounds, er, the CL leak hunter
-            ClassLoaderLeakCleaner.clean(this);
             ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
+            ClassLoaderLeakCleaner.clean(this);
 
             // Then try to call CL.close()
             Method m = null;

@@ -92,8 +92,9 @@ class ClassLoaderLeakCleaner
             for (int i = 0; i < tCount; i++)
             {
                 Thread t = threads[i];
-                if (t == null || t == Thread.currentThread())
+                if (t == null || t == Thread.currentThread() || t.getContextClassLoader() != Thread.currentThread().getContextClassLoader())
                 {
+                    // Only kill threads that are not the current one and that are an issue, that is prevent GC of the classloader.
                     continue;
                 }
 
