@@ -1,14 +1,21 @@
 package com.enioka.jqm.cl;
 
 import java.io.File;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleDescriptor;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReference;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 
@@ -23,15 +30,18 @@ public final class ExtClassLoader
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(ExtClassLoader.class);
 
-    public static ClassLoader instance = initClassLoader();
+    public static ModuleLayer moduleLayerInstance;
+    public static ClassLoader classLoaderInstance;
+
+    static {
+        initInstances();
+    }
 
     private ExtClassLoader()
     {}
 
-    private static ClassLoader initClassLoader()
+    private static void initInstances()
     {
-        ClassLoader extClassLoader;
-
         // Java 8?
         boolean tmpBool = false;
         Method getPlatformClassLoaderMethod = null;
@@ -75,35 +85,52 @@ public final class ExtClassLoader
         {
             jqmlogger.debug("Using {} as ext resource directory", extDir.getAbsolutePath());
 
-            // Create classloader
-            final URL[] aUrls = getJarsInDirectoryRecursive(extDir).toArray(new URL[0]);
-            for (URL u : aUrls)
-            {
-                jqmlogger.trace(u.toString());
-            }
-            extClassLoader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
-            {
-                @Override
-                public URLClassLoader run()
-                {
-                    // Java 8 : parent is default system CL, also called bootstrap CL which has all JDK classes.
-                    // Java 9 and above: parent is the platform CL, which holds the same classes.
-                    return new URLClassLoader(aUrls, parentCl);
+            // Find candidate jars
+            final List<File> lJarFiles = getJarsInDirectoryRecursive(extDir);
+            final List<URL> lUrls = new ArrayList<>();
+            final List<Path> lPaths = new ArrayList<>();
+            for (final File file : lJarFiles) {
+                try {
+                    lUrls.add(file.toURI().toURL());
+                    lPaths.add(file.toPath());
+                    jqmlogger.trace("\tAdded EXT path {}", file.toURI());
+                } catch (MalformedURLException e) {
+                    // This should be unreachable because the error was already handled in getJarsInDirectoryRecursive()
+                    throw new IllegalStateException(e);
                 }
-            });
+            }
+
+            // Create classloader
+            final ModuleFinder moduleFinder = ModuleFinder.of(lPaths.toArray(new Path[0]));
+            Set<String> moduleNames = moduleFinder.findAll().stream()
+                .map(ModuleReference::descriptor)
+                .map(ModuleDescriptor::name)
+                .collect(Collectors.toUnmodifiableSet());
+            Configuration cf = ModuleLayer.boot().configuration().resolveAndBind(ModuleFinder.of(), moduleFinder, moduleNames);
+            moduleLayerInstance = ModuleLayer.boot().defineModulesWithOneLoader(cf, parentCl);
+            classLoaderInstance = moduleLayerInstance.modules().isEmpty()
+                ? AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
+                    {
+                        @Override
+                        public URLClassLoader run()
+                        {
+                            // Java 8 : parent is default system CL, also called bootstrap CL which has all JDK classes.
+                            // Java 9 and above: parent is the platform CL, which holds the same classes.
+                            return new URLClassLoader(lUrls.toArray(new URL[0]), parentCl);
+                        }
+                    })
+                : moduleLayerInstance.modules().iterator().next().getClassLoader();
         }
         else
         {
             // No /ext directory means nothing to load.
-            return parentCl;
+            classLoaderInstance = parentCl;
         }
-
-        return extClassLoader;
     }
 
-    private static List<URL> getJarsInDirectoryRecursive(File root)
+    private static List<File> getJarsInDirectoryRecursive(File root)
     {
-        List<URL> result = new ArrayList<>(10);
+        List<File> result = new ArrayList<>(10);
 
         if (!root.isDirectory() || !root.canExecute())
         {
@@ -116,7 +143,8 @@ public final class ExtClassLoader
             {
                 try
                 {
-                    result.add(f.toURI().toURL());
+                    f.toURI().toURL(); // Still filter out files that cause URL problems
+                    result.add(f);
                 }
                 catch (MalformedURLException e)
                 {

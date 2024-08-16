@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resources>	
-	<!-- HSQL configuration. This used a file, which is only suitable for single node deployments -->
-	<resource 
-	      name="jdbc/jqm"
-          auth="Container"
-          type="javax.sql.DataSource"
-          factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-          testWhileIdle="true"
-          testOnBorrow="false"
-          testOnReturn="true"
-          validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"
-          initSQL="SET TIME ZONE INTERVAL '0:00' HOUR TO MINUTE"
-          validationInterval="1000"
-          timeBetweenEvictionRunsMillis="30000"
-          maxActive="100"
-          minIdle="10"
-          maxWait="10000"
-          initialSize="10"
-          removeAbandonedTimeout="3600"
-          removeAbandoned="true"
-          logAbandoned="true"
-          minEvictableIdleTimeMillis="60000"
-          jmxEnabled="true"
-          username="SA"
-          password=""
-          driverClassName="org.hsqldb.jdbcDriver"
-          url="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false"
-          singleton="true"/>
+<resources>
+    <!-- HSQL configuration. This used a file, which is only suitable for single node deployments -->
+    <resource
+        name="jdbc/jqm"
+        auth="Container"
+        type="javax.sql.DataSource"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        testWhileIdle="true"
+        testOnBorrow="false"
+        testOnReturn="true"
+        validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"
+        initSQL="SET TIME ZONE INTERVAL '0:00' HOUR TO MINUTE"
+        validationInterval="1000"
+        timeBetweenEvictionRunsMillis="30000"
+        maxActive="100"
+        minIdle="10"
+        maxWait="10000"
+        initialSize="10"
+        removeAbandonedTimeout="3600"
+        removeAbandoned="true"
+        logAbandoned="true"
+        minEvictableIdleTimeMillis="60000"
+        jmxEnabled="true"
+        username="SA"
+        password=""
+        url="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false"
+        singleton="true" />
 
-	<!-- Oracle configuration. -->
-<!--          
-     <resource 
+    <!-- Oracle configuration. -->
+    <!--
+     <resource
 	      name="jdbc/jqm"
           auth="Container"
           type="javax.sql.DataSource"
@@ -52,7 +51,6 @@
           jmxEnabled="true"
           username="JQM"
           password="jqm"
-          driverClassName="oracle.jdbc.OracleDriver"
           url="jdbc:oracle:thin:@winoracle:1521/TEST"
           connectionProperties="v$session.program=JQM;"
           singleton="true"
@@ -60,9 +58,9 @@
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
 -->
 
-	<!-- PostgreSQL configuration. -->
-<!--
-    <resource 
+    <!-- PostgreSQL configuration. -->
+    <!--
+    <resource
           name="jdbc/jqm"
           auth="Container"
           type="javax.sql.DataSource"
@@ -84,15 +82,14 @@
           jmxEnabled="true"
           username="jqm"
           password="jqm"
-          driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://127.0.0.1:5432/jqm"
           singleton="true"/>
 -->
 
 
-	<!-- MySQL configuration. -->
-<!--
-	<resource 
+    <!-- MySQL configuration. -->
+    <!--
+	<resource
 	      name="jdbc/jqm"
           auth="Container"
           type="javax.sql.DataSource"
@@ -114,9 +111,8 @@
           jmxEnabled="true"
           username="jqm"
           password="jqm"
-          driverClassName="com.mysql.jdbc.Driver"
           url="jdbc:mysql://pic:3306/jqm?useSSL=false&amp;disableMariaDbDriver"
           singleton="true"
-          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/> 
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/>
 -->
 </resources>

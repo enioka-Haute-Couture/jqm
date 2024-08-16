@@ -2,25 +2,24 @@
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-	<New id="jqm" class="org.eclipse.jetty.plus.jndi.Resource">
-		<Arg></Arg>
-		<Arg>jdbc/jqm</Arg>
-		<Arg>
-			<New class="org.apache.tomcat.jdbc.pool.DataSource">
-				<Set name="testWhileIdle">true</Set>
-				<Set name="testOnBorrow">true</Set>
-				<Set name="testOnReturn">true</Set>
-				<Set name="validationQuery">SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS</Set>
-				<Set name="maxActive">100</Set>
-				<Set name="minIdle">2</Set>
-				<Set name="initialSize">10</Set>
-				<Set name="jmxEnabled">false</Set>
+    <New id="jqm" class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg></Arg>
+        <Arg>jdbc/jqm</Arg>
+        <Arg>
+            <New class="org.apache.tomcat.jdbc.pool.DataSource">
+                <Set name="testWhileIdle">true</Set>
+                <Set name="testOnBorrow">true</Set>
+                <Set name="testOnReturn">true</Set>
+                <Set name="validationQuery">SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS</Set>
+                <Set name="maxActive">100</Set>
+                <Set name="minIdle">2</Set>
+                <Set name="initialSize">10</Set>
+                <Set name="jmxEnabled">false</Set>
 
-				<Set name="username">SA</Set>
-				<!--<Set name="password">sa</Set> -->
-				<Set name="url">jdbc:hsqldb:hsql://localhost/jqm</Set>
-				<Set name="driverClassName">org.hsqldb.jdbcDriver</Set>
-			</New>
-		</Arg>
-	</New>
+                <Set name="username">SA</Set>
+                <!--<Set name="password">sa</Set> -->
+                <Set name="url">jdbc:hsqldb:hsql://localhost/jqm</Set>
+            </New>
+        </Arg>
+    </New>
 </Configure>
