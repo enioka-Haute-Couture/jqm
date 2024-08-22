@@ -225,6 +225,30 @@
             <version>${commons.lang.version}</version>
         </dependency>
 
+        <!-- Register our custom objectmapper -->
+        <dependency>
+            <artifactId>jqm-serializer-jackson</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
+            <exclusions>
+                <!-- We only need the lib itself in webapp class path in order for it to be scanned
+                for annotations. The rest is coming from server class path -->
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Do not package slf4j - use server version -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+
         <!-- Sample DB & DB pool for tests only -->
         <dependency>
             <groupId>org.apache.tomcat</groupId>
