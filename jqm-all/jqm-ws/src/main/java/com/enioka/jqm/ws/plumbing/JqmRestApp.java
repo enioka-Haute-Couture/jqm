@@ -15,7 +15,8 @@
  */
 package com.enioka.jqm.ws.plumbing;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -41,62 +42,55 @@ public class JqmRestApp extends Application
     @Context
     public ServletContext context;
 
-    @Override
-    public Set<Class<?>> getClasses()
-    {
-        // TODO: most of these should work with simple annotation scanning.
-        log.debug("\tStarting REST WS app class configuration");
-        HashSet<Class<?>> res = new HashSet<>();
-
-        // Load the exception mappers
-        res.add(ErrorHandler.class);
-        res.add(JqmExceptionMapper.class);
-        res.add(JqmInternalExceptionMapper.class);
-
-        // Logger
-        res.add(ExceptionLogger.class);
-
-        // Load the cache annotation helper
-        res.add(HttpCacheImpl.class);
-
-        // Load the actual services
-        startService(ServiceSimple.class, "startSimple", res, false);
-        startService(ServiceClient.class, "startClient", res, true);
-        startService(ServiceAdmin.class, "startAdmin", res, true);
-
-        // Done
-        return res;
-    }
+    private boolean alreadyRun = false;
 
     public JqmRestApp()
     {
         log.debug("Starting REST WS app");
     }
 
-    private void startService(Class<?> service, String paramName, HashSet<Class<?>> res, boolean defaultStart)
+    @Override
+    public Set<Class<?>> getClasses()
+    {
+        if (alreadyRun)
+        {
+            return null;
+        }
+        alreadyRun = true;
+
+        log.debug("\tStarting REST WS app class configuration");
+
+        // Log service status
+        logServiceStatus(ServiceSimple.class, "startSimple");
+        logServiceStatus(ServiceClient.class, "startClient");
+        logServiceStatus(ServiceAdmin.class, "startAdmin");
+
+        // Done
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getProperties()
+    {
+        var res = new HashMap<String, Object>();
+        // We do not need the descriptor, and a compatible JAXB context is not provided in the JQM server.
+        res.put("jersey.config.server.wadl.disableWadl", "true");
+        return res;
+    }
+
+    private void logServiceStatus(Class<?> service, String paramName)
     {
         if (this.context != null && this.context.getInitParameter(paramName) != null)
         {
             var start = Boolean.parseBoolean(this.context.getInitParameter(paramName));
             if (start)
             {
-                log.debug("\t\tRegistering service {}", service.getName());
-                res.add(service);
+                log.info("\t\tService {} enabled", service.getName());
             }
             else
             {
-                log.debug("\t\tService {} is not configured to start", service.getName());
+                log.info("\t\tService {} is not configured to start", service.getName());
             }
-        }
-        else if (defaultStart)
-        {
-            // No parameter = deployment in a normal servlet container.
-            log.debug("\t\tRegistering service {} (standard war deployment)", service.getName());
-            res.add(service);
-        }
-        else
-        {
-            log.debug("\t\tService {} is not configured to start in a standard web deployment", service.getName());
         }
     }
 }

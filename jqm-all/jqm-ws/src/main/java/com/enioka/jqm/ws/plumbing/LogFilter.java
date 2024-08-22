@@ -24,7 +24,7 @@ public class LogFilter implements Filter
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
-        log.info("Initializing custom log filter inside WS app");
+        log.debug("Initializing custom log filter inside WS app");
         // Nothing to do
     }
 

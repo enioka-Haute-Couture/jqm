@@ -256,14 +256,11 @@ public class JettyServer implements WebServer
         webAppContext.setDisplayName("JqmWebServices");
 
         // Allow access to the extensions directory, but not engine classes.
-        /*
-         * try { webAppContext.setClassLoader(new IsolatedClassLoader(webAppContext)); } catch (IOException e) { throw new
-         * JqmInitError("Could not create isolated class loader", e); }
-         */
+        WebAppContext.addServerClasses(server, "-org.eclipse.jetty.servlet.DefaultServlet");
+        WebAppContext.addSystemClasses(server, "org.slf4j,org.slf4j.bridge");
 
         // Avoid annoying default Jetty configuration that loads classes outside the classpath...
         webAppContext.setDefaultsDescriptor(null);
-        WebAppContext.addServerClasses(server, "-org.eclipse.jetty.servlet.DefaultServlet");
 
         // JQM configuration should be on the classpath
         try
@@ -274,7 +271,7 @@ public class JettyServer implements WebServer
         {
             throw new JqmInitError("Could not add JQM configuration to the webapp classpath", e);
         }
-        // webAppContext.setInitParameter("jqmnode", node.getName());
+
         webAppContext.setInitParameter("jqmnodeid", configuration.getLocalNodeId() + "");
         webAppContext.setInitParameter("startSimple", configuration.isStartSimple() + "");
         webAppContext.setInitParameter("startClient", configuration.isStartClient() + "");
