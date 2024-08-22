@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useSnackbar } from "notistack";
 import React from "react";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 
 
 export const useNotificationService = () => {
@@ -12,7 +12,7 @@ export const useNotificationService = () => {
         (reason: any) => {
 
             const action = (key: any) => {
-                return (<Button onClick={() => { closeSnackbar(key) }}>
+                return (<Button onClick={() => { closeSnackbar(key) }} sx={{ color: "white" }}>
                     Dismiss
                 </Button>);
             }

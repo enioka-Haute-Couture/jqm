@@ -1,7 +1,8 @@
 import React from "react";
-import { Switch } from "@material-ui/core";
-import DoneIcon from "@material-ui/icons/Done";
-import BlockIcon from "@material-ui/icons/Block";
+import { Switch } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
+import BlockIcon from "@mui/icons-material/Block";
+import { MUIDataTableMeta } from "mui-datatables";
 
 export const renderBooleanCell =
     (
@@ -9,17 +10,17 @@ export const renderBooleanCell =
         isChecked: boolean | null,
         setBoolean: Function
     ) =>
-    (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return (
-                <Switch
-                    checked={isChecked!!}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                        setBoolean(event.target.checked)
-                    }
-                />
-            );
-        } else {
-            return value ? <DoneIcon /> : <BlockIcon />;
-        }
-    };
+        (value: any, tableMeta: MUIDataTableMeta) => {
+            if (editingRowId === tableMeta.rowIndex) {
+                return (
+                    <Switch
+                        checked={isChecked!!}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                            setBoolean(event.target.checked)
+                        }
+                    />
+                );
+            } else {
+                return value ? <DoneIcon /> : <BlockIcon />;
+            }
+        };

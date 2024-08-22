@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import DescriptionIcon from "@material-ui/icons/Description";
-import {
-    renderInputCell,
-    renderBooleanCell,
-    renderActionsCell,
-} from "../TableCells";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Container, Grid, IconButton, Tooltip } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DescriptionIcon from "@mui/icons-material/Description";
 import useNodesApi from "./useNodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
+import {
+    renderActionsCell,
+    renderBooleanCell,
+    renderInputCell,
+} from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 
@@ -44,14 +44,14 @@ export const NodesPage: React.FC = () => {
     }, []);
 
     const handleOnViewLogs = useCallback(
-        async (tableMeta) => {
+        async (tableMeta: MUIDataTableMeta) => {
             fetchNodeLogs(tableMeta.rowData[3]);
         },
         [fetchNodeLogs]
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [nodeId, stop, lastSeenAlive] = tableMeta.rowData;
             const { value: name } = nameInputRef.current!;
             const { value: dns } = dnsInputRef.current!;
@@ -88,7 +88,7 @@ export const NodesPage: React.FC = () => {
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
-    const handleOnEdit = useCallback((tableMeta) => {
+    const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setEnabled(tableMeta.rowData[12]);
         setLoapApiSimple(tableMeta.rowData[13]);
         setLoadApiClient(tableMeta.rowData[14]);
@@ -318,24 +318,22 @@ export const NodesPage: React.FC = () => {
         print: false,
         selectableRows: "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    <Tooltip title={"Refresh"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"refresh"}
-                            onClick={() => fetchNodes()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton color="default" aria-label={"help"}>
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+            return <>
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => fetchNodes()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton color="default" aria-label={"help"} size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
     };
 

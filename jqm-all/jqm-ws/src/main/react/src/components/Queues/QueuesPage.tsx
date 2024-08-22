@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import {
-    renderInputCell,
-    renderBooleanCell,
-    renderActionsCell,
-} from "../TableCells";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Container, Grid, IconButton, Tooltip } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useSnackbar } from "notistack";
 import { CreateQueueDialog } from "./CreateQueueDialog";
 import useQueueAPI from "./QueueAPI";
+import {
+    renderActionsCell,
+    renderBooleanCell,
+    renderInputCell,
+} from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
-import { useSnackbar } from "notistack";
 
 const QueuesPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -38,7 +38,7 @@ const QueuesPage: React.FC = () => {
     const { canUserAccess } = useAuth();
 
     const handleOnDelete = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [queueId] = tableMeta.rowData;
             deleteQueues([queueId]);
         },
@@ -46,7 +46,7 @@ const QueuesPage: React.FC = () => {
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [queueId] = tableMeta.rowData;
             const { value: name } = queueNameInputRef.current!;
             const { value: description } = descriptionInputRef.current!;
@@ -70,7 +70,7 @@ const QueuesPage: React.FC = () => {
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
-    const handleOnEdit = useCallback((tableMeta) => {
+    const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setDefaultQueue(tableMeta.rowData[3]);
         setEditingRowId(tableMeta.rowIndex);
     }, []);
@@ -145,42 +145,40 @@ const QueuesPage: React.FC = () => {
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.queue, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    {canUserAccess(PermissionObjectType.queue, PermissionAction.create) &&
-                        <Tooltip title={"Add line"}>
-                            <>
-                                <IconButton
-                                    color="default"
-                                    aria-label={"add"}
-                                    onClick={() => setShowDialog(true)}
-                                >
-                                    <AddCircleIcon />
-                                </IconButton>
-                                <CreateQueueDialog
-                                    showDialog={showDialog}
-                                    closeDialog={() => setShowDialog(false)}
-                                    createQueue={createQueue}
-                                    canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
-                                />
-                            </>
-                        </Tooltip>}
-                    <Tooltip title={"Refresh"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"refresh"}
-                            onClick={() => fetchQueues()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton color="default" aria-label={"help"}>
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+            return <>
+                {canUserAccess(PermissionObjectType.queue, PermissionAction.create) &&
+                    <Tooltip title={"Add line"}>
+                        <>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowDialog(true)}
+                                size="large">
+                                <AddCircleIcon />
+                            </IconButton>
+                            <CreateQueueDialog
+                                showDialog={showDialog}
+                                closeDialog={() => setShowDialog(false)}
+                                createQueue={createQueue}
+                                canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
+                            />
+                        </>
+                    </Tooltip>}
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => fetchQueues()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton color="default" aria-label={"help"} size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index

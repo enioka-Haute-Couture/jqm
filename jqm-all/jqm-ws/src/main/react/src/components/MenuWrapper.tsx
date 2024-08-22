@@ -1,104 +1,108 @@
 import React from "react";
-import clsx from "clsx";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
+import { CSSObject, styled, Theme, useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import CssBaseline from "@mui/material/CssBaseline";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
 import { NavLink } from "react-router-dom";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import HomeIcon from "@material-ui/icons/Home";
-import SyncAltIcon from "@material-ui/icons/SyncAlt";
-import SettingsIcon from "@material-ui/icons/Settings";
-import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
-import AssignmentIcon from "@material-ui/icons/Assignment";
-import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
-import SecurityIcon from "@material-ui/icons/Security";
-import GroupWorkIcon from "@material-ui/icons/GroupWork";
-import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
-import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import HomeIcon from "@mui/icons-material/Home";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
+import SecurityIcon from "@mui/icons-material/Security";
+import GroupWorkIcon from "@mui/icons-material/GroupWork";
+import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import { Button, Menu, MenuItem } from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
 import { PermissionAction, PermissionObjectType, useAuth } from "../utils/AuthService";
-import { Button, Menu, MenuItem } from "@material-ui/core";
-import { AccountCircle } from "@material-ui/icons";
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: "flex",
+
+const openedMixin = (theme: Theme): CSSObject => ({
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+    }),
+    overflowX: 'hidden',
+});
+
+const closedMixin = (theme: Theme): CSSObject => ({
+    transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden',
+    width: `calc(${theme.spacing(7)} + 1px)`,
+    [theme.breakpoints.up('sm')]: {
+        width: `calc(${theme.spacing(8)} + 1px)`,
     },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(["width", "margin"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    appBarShift: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(["width", "margin"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    menuButton: {
-        marginRight: 36,
-    },
-    hide: {
-        display: "none",
-    },
-    drawer: {
-        width: drawerWidth,
-        flexShrink: 0,
-        whiteSpace: "nowrap",
-    },
-    drawerOpen: {
-        width: drawerWidth,
-        transition: theme.transitions.create("width", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    drawerClose: {
-        transition: theme.transitions.create("width", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        overflowX: "hidden",
-        width: theme.spacing(7) + 1,
-        [theme.breakpoints.up("sm")]: {
-            width: theme.spacing(9) + 1,
-        },
-    },
-    toolbar: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-    },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3),
-    },
-    title: {
-        flexGrow: 1
-    }
+});
+
+const DrawerHeader = styled('div')(({ theme }: { theme: Theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
 }));
 
+interface AppBarProps extends MuiAppBarProps {
+    open?: boolean;
+}
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+    ({ theme, open }) => ({
+        width: drawerWidth,
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        boxSizing: 'border-box',
+        ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+        }),
+        ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+        }),
+    }),
+);
+
 export default function MenuWrapper(props: any) {
-    const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -122,29 +126,24 @@ export default function MenuWrapper(props: any) {
         setAnchorEl(null);
     };
 
-
     return (
-        <div className={classes.root}>
+        <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar
-                position="fixed"
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
-                })}
-            >
+            <AppBar position="fixed" open={open}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
-                        className={clsx(classes.menuButton, {
-                            [classes.hide]: open,
-                        })}
+                        sx={{
+                            marginRight: 5,
+                            ...(open && { display: 'none' }),
+                        }}
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap className={classes.title}>
+                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                         JQM v3
                     </Typography>
 
@@ -161,15 +160,6 @@ export default function MenuWrapper(props: any) {
                         <Menu
                             id="menu-appbar"
                             anchorEl={anchorEl}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
                             open={openUserMenu}
                             onClose={handleClose}
                         >
@@ -179,28 +169,12 @@ export default function MenuWrapper(props: any) {
 
                 </Toolbar>
             </AppBar>
-            <Drawer
-                variant="permanent"
-                className={clsx(classes.drawer, {
-                    [classes.drawerOpen]: open,
-                    [classes.drawerClose]: !open,
-                })}
-                classes={{
-                    paper: clsx({
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open,
-                    }),
-                }}
-            >
-                <div className={classes.toolbar}>
+            <Drawer variant="permanent" open={open}>
+                <DrawerHeader>
                     <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === "rtl" ? (
-                            <ChevronRightIcon />
-                        ) : (
-                            <ChevronLeftIcon />
-                        )}
+                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                     </IconButton>
-                </div>
+                </DrawerHeader>
                 <Divider />
                 <List>
                     <ListItem button key={"home"} component={NavLink} to="/">
@@ -337,10 +311,10 @@ export default function MenuWrapper(props: any) {
                         )}
                 </List>
             </Drawer>
-            <main className={classes.content}>
-                <div className={classes.toolbar} />
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                <DrawerHeader />
                 {props.children}
-            </main>
-        </div >
+            </Box>
+        </Box>
     );
 }

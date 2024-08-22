@@ -1,8 +1,8 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { User } from "./User";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { Role } from "../Roles/Role";
-import { User } from "./User";
 
 const API_URL = "/admin/user";
 

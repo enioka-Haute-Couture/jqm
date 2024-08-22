@@ -1,12 +1,12 @@
 import {
+    Button,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
+    DialogTitle,
     TextField,
-    DialogActions,
-    Button,
-} from "@material-ui/core";
+} from "@mui/material";
 import React, { useState } from "react";
 
 export const ChangePasswordDialog: React.FC<{
@@ -37,6 +37,7 @@ export const ChangePasswordDialog: React.FC<{
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setPassword(event.target.value);
                     }}
+                    variant="standard"
                 />
             </DialogContent>
             <DialogActions>

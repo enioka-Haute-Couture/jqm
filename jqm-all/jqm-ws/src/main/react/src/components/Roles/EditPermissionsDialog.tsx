@@ -1,25 +1,27 @@
 import {
+    Button,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
-    DialogActions,
-    Button,
+    DialogTitle,
+    FormControl,
+    IconButton,
+    Input,
+    InputLabel,
+    MenuItem,
     Paper,
+    Select,
+    SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    IconButton,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-} from "@material-ui/core";
-import React, { useState } from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
+} from "@mui/material";
+import React, { ReactNode, useState } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const PERMISSION_ACTIONS: { [code: string]: string } = {
     read: "read",
@@ -56,133 +58,131 @@ export const PermissionsForm: React.FC<{
         Object.entries(PERMISSION_OBJECT_TYPES)[0][0]
     );
 
-    return (
-        <>
-            <FormControl
-                style={{
-                    margin: "8px",
-                    minWidth: 200,
-                }}
-            >
-                <InputLabel id="action-select-label">Action</InputLabel>
-                <Select
-                    labelId="action-select-label"
-                    fullWidth
-                    value={newAction}
-                    onChange={(
-                        event: React.ChangeEvent<{ value: unknown }>
-                    ) => {
+    return <>
+        <FormControl
+            style={{
+                margin: "8px",
+                minWidth: 200,
+            }}
+        >
+            <InputLabel id="action-select-label">Action</InputLabel>
+            <Select
+                input={<Input />}
+                labelId="action-select-label"
+                fullWidth
+                value={newAction}
+                onChange={
+                    (event: SelectChangeEvent<string>, child: ReactNode) => {
                         setNewAction(event.target.value as string);
                     }}
-                >
-                    {Object.entries(PERMISSION_ACTIONS).map(
-                        ([actionCode, actionLabel]) => (
-                            <MenuItem key={actionCode} value={actionCode}>
-                                {actionLabel}
-                            </MenuItem>
-                        )
-                    )}
-                </Select>
-            </FormControl>
-            <FormControl
-                style={{
-                    margin: "8px",
-                    minWidth: 200,
-                }}
             >
-                <InputLabel id="object-type-select-label">
-                    On object of type
-                </InputLabel>
-                <Select
-                    labelId="object-type-select-label"
-                    fullWidth
-                    value={newObjectType}
-                    onChange={(
-                        event: React.ChangeEvent<{ value: unknown }>
-                    ) => {
+                {Object.entries(PERMISSION_ACTIONS).map(
+                    ([actionCode, actionLabel]) => (
+                        <MenuItem key={actionCode} value={actionCode}>
+                            {actionLabel}
+                        </MenuItem>
+                    )
+                )}
+            </Select>
+        </FormControl>
+        <FormControl
+            style={{
+                margin: "8px",
+                minWidth: 200,
+            }}
+        >
+            <InputLabel id="object-type-select-label">
+                On object of type
+            </InputLabel>
+            <Select
+                input={<Input />}
+                labelId="object-type-select-label"
+                fullWidth
+                value={newObjectType}
+                onChange={
+                    (event: SelectChangeEvent<string>, child: ReactNode) => {
                         setNewObjectType(event.target.value as string);
                     }}
-                >
-                    {Object.entries(PERMISSION_OBJECT_TYPES).map(
-                        ([objectTypeCode, objectTypeLabel]) => (
-                            <MenuItem
-                                key={objectTypeCode}
-                                value={objectTypeCode}
-                            >
-                                {objectTypeLabel}
-                            </MenuItem>
-                        )
-                    )}
-                </Select>
-            </FormControl>
-            <Button
-                variant="contained"
-                size="small"
-                style={{ marginTop: "16px" }}
-                disabled={permissions.includes(`${newObjectType}:${newAction}`)}
-                onClick={() => {
-                    setPermissions([
-                        ...permissions,
-                        `${newObjectType}:${newAction}`,
-                    ]);
-                }}
-                color="primary"
             >
-                Add permission
-            </Button>
-            <TableContainer component={Paper}>
-                <Table size="small" aria-label="Permissions">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Code</TableCell>
-                            <TableCell>Action</TableCell>
-                            <TableCell>Object type</TableCell>
-                            <TableCell>Actions</TableCell>
+                {Object.entries(PERMISSION_OBJECT_TYPES).map(
+                    ([objectTypeCode, objectTypeLabel]) => (
+                        <MenuItem
+                            key={objectTypeCode}
+                            value={objectTypeCode}
+                        >
+                            {objectTypeLabel}
+                        </MenuItem>
+                    )
+                )}
+            </Select>
+        </FormControl>
+        <Button
+            variant="contained"
+            size="small"
+            style={{ marginTop: "16px" }}
+            disabled={permissions.includes(`${newObjectType}:${newAction}`)}
+            onClick={() => {
+                setPermissions([
+                    ...permissions,
+                    `${newObjectType}:${newAction}`,
+                ]);
+            }}
+            color="primary"
+        >
+            Add permission
+        </Button>
+        <TableContainer component={Paper}>
+            <Table size="small" aria-label="Permissions">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Code</TableCell>
+                        <TableCell>Action</TableCell>
+                        <TableCell>Object type</TableCell>
+                        <TableCell>Actions</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {permissions.map((permission, index) => (
+                        <TableRow key={permission}>
+                            <TableCell component="th" scope="row">
+                                {permission}
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    PERMISSION_ACTIONS[
+                                    permission.split(":")[1]
+                                    ]
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    PERMISSION_OBJECT_TYPES[
+                                    permission.split(":")[0]
+                                    ]
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {" "}
+                                <IconButton
+                                    color="default"
+                                    aria-label={"delete"}
+                                    onClick={() => {
+                                        setPermissions(
+                                            permissions.filter(
+                                                (_, i) => i !== index
+                                            )
+                                        );
+                                    }}
+                                    size="large">
+                                    <DeleteIcon />
+                                </IconButton>
+                            </TableCell>
                         </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {permissions.map((permission, index) => (
-                            <TableRow key={permission}>
-                                <TableCell component="th" scope="row">
-                                    {permission}
-                                </TableCell>
-                                <TableCell>
-                                    {
-                                        PERMISSION_ACTIONS[
-                                        permission.split(":")[1]
-                                        ]
-                                    }
-                                </TableCell>
-                                <TableCell>
-                                    {
-                                        PERMISSION_OBJECT_TYPES[
-                                        permission.split(":")[0]
-                                        ]
-                                    }
-                                </TableCell>
-                                <TableCell>
-                                    {" "}
-                                    <IconButton
-                                        color="default"
-                                        aria-label={"delete"}
-                                        onClick={() => {
-                                            setPermissions(
-                                                permissions.filter(
-                                                    (_, i) => i !== index
-                                                )
-                                            );
-                                        }}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </>
-    );
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    </>;
 };
 
 export const EditPermissionsDialog: React.FC<{
@@ -213,7 +213,6 @@ export const EditPermissionsDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={closeDialog}

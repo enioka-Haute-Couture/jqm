@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
     Button,
     FormControl,
@@ -7,30 +7,33 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    SelectChangeEvent,
     Switch,
-} from "@material-ui/core";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { Queue } from "../Queues/Queue";
+    Theme
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import { JobDefinition, JobType } from "./JobDefinition";
 import { SpecificPropertiesForm } from "./EditSpecificPropertiesDialog";
+import { Queue } from "../Queues/Queue";
 
 const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-        FormControlLabel: {
-            padding: theme.spacing(0, 0, 0),
-            margin: theme.spacing(0, 0, 0, 0),
-            alignItems: "start",
-        },
-    })
+({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+    Switch: {
+        padding: theme.spacing(0, 0, 1),
+    },
+    Select: {
+        margin: theme.spacing(1, 0, 3)
+    }
+})
 );
 
 export const CreateJobDefinitionDialog: React.FC<{
@@ -67,6 +70,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                         setApplicationName(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -76,17 +80,16 @@ export const CreateJobDefinitionDialog: React.FC<{
                         setDescription(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
 
-                <FormControl fullWidth style={{ marginBottom: "16px" }}>
+                <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="queue-id-select-label">Queue*</InputLabel>
                     <Select
                         labelId="queue-id-select-label"
                         fullWidth
                         value={queueId}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
+                        onChange={(event: SelectChangeEvent<number>, child: ReactNode) => {
                             setQueueId(event.target.value as number);
                         }}
                         input={<Input />}
@@ -99,9 +102,8 @@ export const CreateJobDefinitionDialog: React.FC<{
                     </Select>
                 </FormControl>
 
-                <FormGroup>
+                <FormGroup className={classes.Switch}>
                     <FormControlLabel
-                        className={classes.FormControlLabel}
                         control={
                             <Switch
                                 checked={enabled}
@@ -113,12 +115,11 @@ export const CreateJobDefinitionDialog: React.FC<{
                             />
                         }
                         label="Enabled"
-                        labelPlacement="top"
+                        labelPlacement="end"
                     />
                 </FormGroup>
-                <FormGroup>
+                <FormGroup className={classes.Switch}>
                     <FormControlLabel
-                        className={classes.FormControlLabel}
                         control={
                             <Switch
                                 checked={highlander}
@@ -130,11 +131,11 @@ export const CreateJobDefinitionDialog: React.FC<{
                             />
                         }
                         label="Highlander"
-                        labelPlacement="top"
+                        labelPlacement="end"
                     />
                 </FormGroup>
 
-                <FormControl fullWidth style={{ marginBottom: "16px" }}>
+                <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="job-type-select-label">
                         Job type*
                     </InputLabel>
@@ -142,9 +143,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                         labelId="job-type-select-label"
                         fullWidth
                         value={jobType}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
+                        onChange={(event: SelectChangeEvent<JobType>, child: ReactNode) => {
                             let jobType = event.target.value as JobType;
                             if (jobType === JobType.shell) {
                                 setPathType("DEFAULTSHELLCOMMAND");
@@ -160,7 +159,6 @@ export const CreateJobDefinitionDialog: React.FC<{
                         input={<Input />}
                     >
                         {Object.keys(JobType).map((key) => {
-                            // console.log(key);
                             return (
                                 <MenuItem key={key} value={key}>
                                     {key}
@@ -181,7 +179,6 @@ export const CreateJobDefinitionDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
@@ -229,6 +226,6 @@ export const CreateJobDefinitionDialog: React.FC<{
                     Create
                 </Button>
             </DialogActions>
-        </Dialog>
+        </Dialog >
     );
 };

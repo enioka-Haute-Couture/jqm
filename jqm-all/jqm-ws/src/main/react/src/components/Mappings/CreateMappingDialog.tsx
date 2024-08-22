@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
     Button,
     FormControl,
@@ -6,30 +6,33 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    SelectChangeEvent,
     Switch,
-} from "@material-ui/core";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+    Theme,
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import { Mapping } from "./Mapping";
 import { Queue } from "../Queues/Queue";
 import { Node } from "../Nodes/Node";
 
 const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-        FormControlLabel: {
-            padding: theme.spacing(0, 0, 0),
-            margin: theme.spacing(0, 0, 0, 0),
-            alignItems: "start",
-        },
-    })
+({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+    FormControlLabel: {
+        padding: theme.spacing(0, 0, 1),
+    },
+    Select: {
+        margin: theme.spacing(1, 0, 3)
+    }
+})
 );
 
 export const CreateMappingDialog: React.FC<{
@@ -53,17 +56,16 @@ export const CreateMappingDialog: React.FC<{
         >
             <DialogTitle>Create queue</DialogTitle>
             <DialogContent>
-                <FormControl fullWidth>
+                <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="node-id-select-label">Node*</InputLabel>
                     <Select
                         labelId="node-id-select-label"
                         fullWidth
                         value={nodeId}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
-                            setNodeId(event.target.value as number);
-                        }}
+                        onChange={
+                            (event: SelectChangeEvent<number>, child: ReactNode) => {
+                                setNodeId(event.target.value as number);
+                            }}
                         input={<Input />}
                     >
                         {nodes!.map((node: Node) => (
@@ -73,17 +75,16 @@ export const CreateMappingDialog: React.FC<{
                         ))}
                     </Select>
                 </FormControl>
-                <FormControl fullWidth>
+                <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="queue-id-select-label">Queue*</InputLabel>
                     <Select
                         labelId="queue-id-select-label"
                         fullWidth
                         value={queueId}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
-                            setQueueId(event.target.value as number);
-                        }}
+                        onChange={
+                            (event: SelectChangeEvent<number>, child: ReactNode) => {
+                                setQueueId(event.target.value as number);
+                            }}
                         input={<Input />}
                     >
                         {queues!.map((queue: Queue) => (
@@ -102,6 +103,7 @@ export const CreateMappingDialog: React.FC<{
                     }}
                     type="number"
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -112,6 +114,7 @@ export const CreateMappingDialog: React.FC<{
                     }}
                     type="number"
                     fullWidth
+                    variant="standard"
                 />
                 <FormControlLabel
                     className={classes.FormControlLabel}
@@ -126,12 +129,11 @@ export const CreateMappingDialog: React.FC<{
                         />
                     }
                     label="Enabled"
-                    labelPlacement="top"
+                    labelPlacement="end"
                 />
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}

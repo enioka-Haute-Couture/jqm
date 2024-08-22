@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
     Button,
     FormControl,
@@ -7,25 +7,34 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    SelectChangeEvent,
     Switch,
-} from "@material-ui/core";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+    Theme
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { DatePicker } from "@mui/x-date-pickers";
 import { User } from "./User";
-import { KeyboardDatePicker } from "@material-ui/pickers";
 import { Role } from "../Roles/Role";
 
 const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-    })
+({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+    Switch: {
+        padding: theme.spacing(0, 0, 1),
+    },
+    DatePicker: {
+        margin: theme.spacing(3, 0, 0),
+    }
+
+})
 );
 
 export const CreateUserDialog: React.FC<{
@@ -57,6 +66,7 @@ export const CreateUserDialog: React.FC<{
                         setLogin(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -67,6 +77,7 @@ export const CreateUserDialog: React.FC<{
                         setEmail(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -76,8 +87,10 @@ export const CreateUserDialog: React.FC<{
                         setFullName(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
-                <FormGroup>
+                <FormGroup
+                    className={classes.Switch}>
                     <FormControlLabel
                         control={
                             <Switch
@@ -100,11 +113,10 @@ export const CreateUserDialog: React.FC<{
                         labelId="user-roles-select-label"
                         fullWidth
                         value={userRoles}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
-                            setUserRoles(event.target.value as number[]);
-                        }}
+                        onChange={
+                            (event: SelectChangeEvent<number[]>, child: ReactNode) => {
+                                setUserRoles(event.target.value as number[]);
+                            }}
                         input={<Input />}
                     >
                         {roles!.map((role: Role) => (
@@ -114,25 +126,18 @@ export const CreateUserDialog: React.FC<{
                         ))}
                     </Select>
                 </FormControl>
-                <KeyboardDatePicker
-                    disableToolbar
-                    variant="inline"
-                    format="dd/MM/yyyy"
-                    margin="normal"
+                <DatePicker
+                    className={classes.DatePicker}
                     label="Expiration date"
-                    id="date-picker-inline"
+                    format="dd/MM/yyyy"
                     value={expirationDate}
                     onChange={(date) => {
                         setExpirationDate(date);
-                    }}
-                    KeyboardButtonProps={{
-                        "aria-label": "change date",
                     }}
                 />
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
@@ -162,6 +167,6 @@ export const CreateUserDialog: React.FC<{
                     Create
                 </Button>
             </DialogActions>
-        </Dialog>
+        </Dialog >
     );
 };

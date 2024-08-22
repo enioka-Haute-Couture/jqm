@@ -1,29 +1,28 @@
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     Button,
-    TextField,
-    createStyles,
-    makeStyles,
-    Theme,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     FormControl,
     FormControlLabel,
+    FormHelperText,
     FormLabel,
     Radio,
     RadioGroup,
-    FormHelperText,
-} from "@material-ui/core";
+    TextField,
+    Theme,
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import React, { useState } from "react";
 import { JobDefinitionSpecificProperties, JobType } from "./JobDefinition";
 
 const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-    })
+({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+})
 );
 
 export const SpecificPropertiesForm: React.FC<{
@@ -62,6 +61,7 @@ export const SpecificPropertiesForm: React.FC<{
                                 setJarPath(event.target.value);
                             }}
                             fullWidth
+                            variant="standard"
                         />
                         <TextField
                             className={classes.TextField}
@@ -76,6 +76,7 @@ export const SpecificPropertiesForm: React.FC<{
                                 setJavaClassName(event.target.value);
                             }}
                             fullWidth
+                            variant="standard"
                         />
                     </>
                 )}
@@ -91,6 +92,7 @@ export const SpecificPropertiesForm: React.FC<{
                             setJarPath(event.target.value);
                         }}
                         fullWidth
+                        variant="standard"
                     />
                 )}
                 {jobType === JobType.shell && (
@@ -139,6 +141,7 @@ export const SpecificPropertiesForm: React.FC<{
                                 setJarPath(event.target.value);
                             }}
                             fullWidth
+                            variant="standard"
                         />
                     </>
                 )}
@@ -181,7 +184,6 @@ export const EditSpecificPropertiesDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={closeDialog}

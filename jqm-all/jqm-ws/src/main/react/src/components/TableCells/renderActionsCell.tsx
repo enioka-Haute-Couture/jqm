@@ -1,9 +1,10 @@
 import React from "react";
-import { IconButton, Link, Tooltip } from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import CreateIcon from "@material-ui/icons/Create";
-import SaveIcon from "@material-ui/icons/Save";
-import CancelIcon from "@material-ui/icons/Cancel";
+import { IconButton, Link, Tooltip } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CreateIcon from "@mui/icons-material/Create";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { MUIDataTableMeta } from "mui-datatables";
 
 export interface extraActionItem {
     title: string;
@@ -23,90 +24,87 @@ export const renderActionsCell =
         canDelete: boolean,
         extraActionItems: extraActionItem[] = [],
     ) =>
-        (value: any, tableMeta: any) => {
+        (value: any, tableMeta: MUIDataTableMeta) => {
             if (editingRowId === tableMeta.rowIndex) {
-                return (
-                    <>
-                        <Tooltip title={"Cancel changes"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"cancel"}
-                                onClick={() => onCancel(tableMeta)}
-                            >
-                                <CancelIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title={"Save changes"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"save"}
-                                onClick={() => onSave(tableMeta)}
-                            >
-                                <SaveIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </>
-                );
+                return <>
+                    <Tooltip title={"Cancel changes"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"cancel"}
+                            onClick={() => onCancel(tableMeta)}
+                            size="large">
+                            <CancelIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"Save changes"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"save"}
+                            onClick={() => onSave(tableMeta)}
+                            size="large">
+                            <SaveIcon />
+                        </IconButton>
+                    </Tooltip>
+                </>;
             } else {
-                return (
-                    <> {extraActionItems.map((extraActionItem) => (
-                        <Tooltip
-                            key={extraActionItem.title}
-                            title={extraActionItem.title}
-                        >
-                            {extraActionItem.getLinkURL ?
-                                (
-                                    <IconButton
-                                        component={Link}
-                                        href={extraActionItem.getLinkURL!(tableMeta)}
-                                        aria-label={extraActionItem.title}
-                                    >
-                                        {extraActionItem.addIcon(tableMeta)}
-                                    </IconButton>)
-                                :
-                                (
-                                    <IconButton
-                                        color="default"
-                                        aria-label={extraActionItem.title}
-                                        onClick={() => {
-                                            if (extraActionItem.action) {
-                                                extraActionItem.action!(tableMeta)
-                                            }
-                                        }
-                                        }
-                                    >
-                                        {extraActionItem.addIcon(tableMeta)}
-                                    </IconButton>
-                                )
-
-                            }
-
-                        </Tooltip>
-                    ))
-                    }
-
-                        {canEdit &&
-                            <Tooltip title={"Edit line"}>
+                return <> {extraActionItems.map((extraActionItem) => (
+                    <Tooltip
+                        key={extraActionItem.title}
+                        title={extraActionItem.title}
+                    >
+                        {extraActionItem.getLinkURL ?
+                            (
+                                <IconButton
+                                    component={Link}
+                                    href={extraActionItem.getLinkURL!(tableMeta)}
+                                    aria-label={extraActionItem.title}
+                                    size="large">
+                                    {extraActionItem.addIcon(tableMeta)}
+                                </IconButton>)
+                            :
+                            (
                                 <IconButton
                                     color="default"
-                                    aria-label={"edit"}
-                                    onClick={() => onEdit(tableMeta)}
-                                >
-                                    <CreateIcon />
+                                    aria-label={extraActionItem.title}
+                                    onClick={() => {
+                                        if (extraActionItem.action) {
+                                            extraActionItem.action!(tableMeta)
+                                        }
+                                    }
+                                    }
+                                    size="large">
+                                    {extraActionItem.addIcon(tableMeta)}
                                 </IconButton>
-                            </Tooltip>
+                            )
+
                         }
-                        {onDelete && canDelete && (
-                            <Tooltip title={"Delete line"}>
-                                <IconButton
-                                    color="default"
-                                    aria-label={"delete"}
-                                    onClick={() => onDelete(tableMeta)}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Tooltip>
-                        )}
-                    </>);
+
+                    </Tooltip>
+                ))
+                }
+
+                    {canEdit &&
+                        <Tooltip title={"Edit line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"edit"}
+                                onClick={() => onEdit(tableMeta)}
+                                size="large">
+                                <CreateIcon />
+                            </IconButton>
+                        </Tooltip>
+                    }
+                    {onDelete && canDelete && (
+                        <Tooltip title={"Delete line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"delete"}
+                                onClick={() => onDelete(tableMeta)}
+                                size="large">
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                </>;
             }
         };

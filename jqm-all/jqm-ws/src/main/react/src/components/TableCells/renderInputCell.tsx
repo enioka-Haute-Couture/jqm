@@ -1,6 +1,7 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField/TextField";
-import { Tooltip } from "@material-ui/core";
+import TextField from "@mui/material/TextField/TextField";
+import { Tooltip } from "@mui/material";
+import { MUIDataTableMeta } from "mui-datatables";
 
 export const renderInputCell =
     (
@@ -9,34 +10,35 @@ export const renderInputCell =
         toolTip: boolean = false,
         inputType: string = "text"
     ) =>
-    (value: any, tableMeta: any) => {
-        const key = tableMeta.rowData[0];
-        if (editingRowId === tableMeta.rowIndex) {
-            const defaultDescription = tableMeta.rowData
-                ? tableMeta.rowData[tableMeta.columnIndex]
-                : "";
-            return (
-                <TextField
-                    key={`${key}-edit`}
-                    defaultValue={defaultDescription}
-                    inputRef={inputRef}
-                    fullWidth
-                    margin="normal"
-                    inputProps={{
-                        style: { fontSize: "0.875rem" },
-                    }}
-                    type={inputType}
-                />
-            );
-        } else {
-            const textField = getTextField(`${key}-display`, value, inputType);
-            return toolTip && value != null ? (
-                <Tooltip title={value}>{textField}</Tooltip>
-            ) : (
-                textField
-            );
-        }
-    };
+        (value: any, tableMeta: MUIDataTableMeta) => {
+            const key = tableMeta.rowData[0];
+            if (editingRowId === tableMeta.rowIndex) {
+                const defaultDescription = tableMeta.rowData
+                    ? tableMeta.rowData[tableMeta.columnIndex]
+                    : "";
+                return (
+                    <TextField
+                        key={`${key}-edit`}
+                        defaultValue={defaultDescription}
+                        inputRef={inputRef}
+                        fullWidth
+                        margin="normal"
+                        inputProps={{
+                            style: { fontSize: "0.875rem" },
+                        }}
+                        type={inputType}
+                        variant="standard"
+                    />
+                );
+            } else {
+                const textField = getTextField(`${key}-display`, value, inputType);
+                return toolTip && value != null ? (
+                    <Tooltip title={value}>{textField}</Tooltip>
+                ) : (
+                    textField
+                );
+            }
+        };
 
 const getTextField = (key: string, value: string, inputType: string) => (
     <TextField
@@ -54,5 +56,6 @@ const getTextField = (key: string, value: string, inputType: string) => (
             },
         }}
         type={inputType}
+        variant="standard"
     />
 );

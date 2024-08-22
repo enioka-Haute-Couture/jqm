@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { Parameter } from "./Parameter";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
-import { Parameter } from "./Parameter";
 
 const apiUrl = "/admin/prm";
 

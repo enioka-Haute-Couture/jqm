@@ -1,9 +1,9 @@
 import React, {
     createContext,
-    FunctionComponent,
+    ReactNode,
+    useCallback,
     useContext,
     useEffect,
-    useCallback,
     useState,
 } from "react";
 import APIService from "./APIService";
@@ -58,7 +58,7 @@ const defaultAuth: AuthInfo = {
 const AuthContext = createContext<AuthInfo>(defaultAuth);
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: FunctionComponent = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [authState, setAuthState] = useState<AuthState>(defaultAuthState);
 
     useEffect(() => {

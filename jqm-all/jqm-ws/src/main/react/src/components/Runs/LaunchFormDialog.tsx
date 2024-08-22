@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
     Button,
     FormControl,
@@ -13,31 +13,36 @@ import {
     Radio,
     RadioGroup,
     Select,
+    SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Theme,
     Typography,
-} from "@material-ui/core";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField/TextField";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { JobInstanceParameters } from "./JobInstance";
 import { JobLaunchParameters } from "./JobLaunchParameters";
-import DeleteIcon from "@material-ui/icons/Delete";
 import { JobDefinition } from "../JobDefinitions/JobDefinition";
 
 const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 1),
-        },
-    })
+({
+    TextField: {
+        padding: theme.spacing(0, 0, 1),
+    },
+    Select: {
+        margin: theme.spacing(1, 0, 3),
+    }
+})
 );
 
 export const LaunchFormDialog: React.FC<{
@@ -66,7 +71,7 @@ export const LaunchFormDialog: React.FC<{
         >
             <DialogTitle>New launch</DialogTitle>
             <DialogContent>
-                <FormControl fullWidth style={{ marginBottom: "16px" }}>
+                <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="application-name-select-label">
                         Application name*
                     </InputLabel>
@@ -74,17 +79,16 @@ export const LaunchFormDialog: React.FC<{
                         labelId="application-name-select-label"
                         fullWidth
                         value={applicationName}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
-                            const jobDefinition = jobDefinitions.find(
-                                (jd) =>
-                                    jd.applicationName ===
-                                    (event.target.value as string)
-                            )!;
-                            setApplicationName(jobDefinition.applicationName);
-                            setParameters(jobDefinition.parameters);
-                        }}
+                        onChange={
+                            (event: SelectChangeEvent<string>, child: ReactNode) => {
+                                const jobDefinition = jobDefinitions.find(
+                                    (jd) =>
+                                        jd.applicationName ===
+                                        (event.target.value as string)
+                                )!;
+                                setApplicationName(jobDefinition.applicationName);
+                                setParameters(jobDefinition.parameters);
+                            }}
                         input={<Input />}
                     >
                         {jobDefinitions?.map((jobDefinition: JobDefinition) => (
@@ -107,6 +111,7 @@ export const LaunchFormDialog: React.FC<{
                     }}
                     fullWidth
                     helperText="Name that will appear in the history"
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -117,6 +122,7 @@ export const LaunchFormDialog: React.FC<{
                     }}
                     fullWidth
                     helperText="Optional data that will appear in the history"
+                    variant="standard"
                 />
                 <FormControl
                     component="fieldset"
@@ -160,6 +166,7 @@ export const LaunchFormDialog: React.FC<{
                     }}
                     fullWidth
                     helperText="Higher priority job instances run before the others and have a bigger CPU share."
+                    variant="standard"
                 />
 
                 <Typography variant="h6">Parameters</Typography>
@@ -171,6 +178,7 @@ export const LaunchFormDialog: React.FC<{
                         setKey(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -180,6 +188,7 @@ export const LaunchFormDialog: React.FC<{
                         setValue(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
 
                 <Button
@@ -230,7 +239,7 @@ export const LaunchFormDialog: React.FC<{
                                                     )
                                                 );
                                             }}
-                                        >
+                                            size="large">
                                             <DeleteIcon />
                                         </IconButton>
                                     </TableCell>
@@ -242,7 +251,6 @@ export const LaunchFormDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}

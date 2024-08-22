@@ -1,25 +1,23 @@
 import React, { useState } from "react";
+import { Button, Theme } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField/TextField";
 import { Parameter } from "./Parameter";
-import { Button } from "@material-ui/core";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-        FormControlLabel: {
-            padding: theme.spacing(0, 0, 0),
-            margin: theme.spacing(0, 0, 0, 0),
-            alignItems: "start",
-        },
-    })
-);
+const useStyles = makeStyles((theme: Theme) => ({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+    FormControlLabel: {
+        padding: theme.spacing(0, 0, 0),
+        margin: theme.spacing(0, 0, 0, 0),
+        alignItems: "start",
+    },
+}));
 
 export const CreateParameterDialog: React.FC<{
     showDialog: boolean;
@@ -45,6 +43,7 @@ export const CreateParameterDialog: React.FC<{
                         setParameterName(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -54,11 +53,11 @@ export const CreateParameterDialog: React.FC<{
                         setParameterValue(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}

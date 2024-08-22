@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { JobDefinition, JobType } from "./JobDefinition";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
-import { JobDefinition, JobType } from "./JobDefinition";
 
 function pathTypeToJobType(pathType: string): JobType {
     switch (pathType) {
