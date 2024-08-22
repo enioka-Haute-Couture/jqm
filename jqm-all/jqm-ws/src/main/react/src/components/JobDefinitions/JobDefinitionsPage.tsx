@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     Badge,
     Container,
@@ -6,23 +6,14 @@ import {
     IconButton,
     MenuItem,
     Tooltip,
-} from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import ScheduleIcon from "@material-ui/icons/Schedule";
-import {
-    renderInputCell,
-    renderBooleanCell,
-    renderActionsCell,
-} from "../TableCells";
-import { useQueueAPI } from "../Queues/QueueAPI";
-import useJobDefinitionsAPI from "./JobDefinitionsAPI";
-import { renderArrayCell } from "../TableCells/renderArrayCell";
-import MappingsPage from "../Mappings/MappingsPage";
-import { Queue } from "../Queues/Queue";
-import { Typography } from "@material-ui/core";
+} from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import { Typography } from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
     JobDefinitionParameter,
     JobDefinitionSchedule,
@@ -30,13 +21,22 @@ import {
     JobDefinitionTags,
     JobType,
 } from "./JobDefinition";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { renderDialogCell } from "../TableCells/renderDialogCell";
+import useJobDefinitionsAPI from "./JobDefinitionsAPI";
 import { EditTagsDialog } from "./EditTagsDialog";
 import { EditSpecificPropertiesDialog } from "./EditSpecificPropertiesDialog";
 import { EditParametersDialog } from "./EditParametersDialog";
 import { CreateJobDefinitionDialog } from "./CreateJobDefinitionDialog";
 import { EditSchedulesDialog } from "./EditSchedulesDialog";
+import { renderDialogCell } from "../TableCells/renderDialogCell";
+import { Queue } from "../Queues/Queue";
+import MappingsPage from "../Mappings/MappingsPage";
+import { renderArrayCell } from "../TableCells/renderArrayCell";
+import { useQueueAPI } from "../Queues/QueueAPI";
+import {
+    renderActionsCell,
+    renderBooleanCell,
+    renderInputCell,
+} from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 
@@ -94,7 +94,7 @@ export const JobDefinitionsPage: React.FC = () => {
     }, []);
 
     const handleOnDelete = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [jobDefinitionId] = tableMeta.rowData;
             deleteJobDefinitions([jobDefinitionId]);
         },
@@ -102,7 +102,7 @@ export const JobDefinitionsPage: React.FC = () => {
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [jobDefinitionId] = tableMeta.rowData;
             const { value: applicationName } = applicationNameInputRef.current!;
             const { value: description } = descriptionInputRef.current!;
@@ -137,7 +137,7 @@ export const JobDefinitionsPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
 
-    const handleOnEdit = useCallback((tableMeta) => {
+    const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setQueueId(tableMeta.rowData[3]);
         setEnabled(tableMeta.rowData[4]);
         setHighlander(tableMeta.rowData[5]);
@@ -320,7 +320,7 @@ export const JobDefinitionsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: (value: any, tableMeta: any) => (
+                customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => (
                     <Typography
                         style={{ fontSize: "0.875rem", paddingTop: "5px" }}
                     >
@@ -383,7 +383,7 @@ export const JobDefinitionsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
-                customBodyRender: (value: any, tableMeta: any) => {
+                customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const rowSchedules = tableMeta.rowData[10];
                     const getBadge = (count: number) => (
                         <Badge badgeContent={count} color="primary">
@@ -440,35 +440,33 @@ export const JobDefinitionsPage: React.FC = () => {
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.jd, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    {canUserAccess(PermissionObjectType.jd, PermissionAction.create) &&
-                        <Tooltip title={"Add line"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowCreateDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                        </Tooltip>
-                    }
-                    <Tooltip title={"Refresh"}>
+            return <>
+                {canUserAccess(PermissionObjectType.jd, PermissionAction.create) &&
+                    <Tooltip title={"Add line"}>
                         <IconButton
                             color="default"
-                            aria-label={"refresh"}
-                            onClick={() => refresh()}
-                        >
-                            <RefreshIcon />
+                            aria-label={"add"}
+                            onClick={() => setShowCreateDialog(true)}
+                            size="large">
+                            <AddCircleIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton color="default" aria-label={"help"}>
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+                }
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => refresh()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton color="default" aria-label={"help"} size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index

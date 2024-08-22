@@ -10,18 +10,18 @@ import {
     TableHead,
     TableRow,
     Typography,
-} from "@material-ui/core";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
+} from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Link from "@mui/material/Link";
 import { JobInstance } from "./JobInstance";
-import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Link from "@material-ui/core/Link";
-import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 
 const formatDate = (date?: Date) => {
     if (date) {

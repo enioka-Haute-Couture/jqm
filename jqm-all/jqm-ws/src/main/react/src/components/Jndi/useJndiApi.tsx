@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { JndiResource } from "./JndiResource";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
-import { JndiResource } from "./JndiResource";
 
 const apiUrl = "/admin/jndi";
 

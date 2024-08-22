@@ -1,8 +1,8 @@
-import React from "react";
-import MenuItem from "@material-ui/core/MenuItem";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import React, { ReactNode } from "react";
+import MenuItem from "@mui/material/MenuItem";
+import ListSubheader from "@mui/material/ListSubheader";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { resourceTemplates } from "./resourceTemplates";
 import { JndiResource } from "./JndiResource";
 
@@ -83,13 +83,14 @@ export const ResourceDropDownMenu: React.FC<{
                 defaultValue=""
                 onOpen={() => onOpen()}
                 onClose={() => onClose()}
-                onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                    const val = event.target.value as string;
-                    const resource = resourceTemplates[val];
-                    if (resource && resource.name) {
-                        onSelectResource(resourceTemplates[val]);
-                    }
-                }}
+                onChange={
+                    (event: SelectChangeEvent<string>, child: ReactNode) => {
+                        const val = event.target.value as string;
+                        const resource = resourceTemplates[val];
+                        if (resource && resource.name) {
+                            onSelectResource(resourceTemplates[val]);
+                        }
+                    }}
                 MenuProps={{
                     anchorEl: menuPositiontRef.current,
                     style: { marginTop: "3.5rem" },

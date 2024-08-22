@@ -1,11 +1,13 @@
 import {
-    Select,
-    Input,
     FormControl,
+    Input,
+    Select,
+    SelectChangeEvent,
     Tooltip,
     Typography,
-} from "@material-ui/core";
-import React from "react";
+} from "@mui/material";
+import { MUIDataTableMeta } from "mui-datatables";
+import React, { ReactNode } from "react";
 
 const MAX_DISPLAY_SIZE = 50;
 
@@ -18,53 +20,51 @@ export const renderArrayCell =
         setEditingValue: Function,
         multiple: boolean = true
     ) =>
-    (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return (
-                <FormControl
-                    fullWidth
-                    style={{ maxWidth: "300px", paddingTop: "5px" }}
-                >
-                    <Select
-                        multiple={multiple}
+        (value: any, tableMeta: MUIDataTableMeta) => {
+            if (editingRowId === tableMeta.rowIndex) {
+                return (
+                    <FormControl
                         fullWidth
-                        value={editingValue ? editingValue!! : []}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
-                            if (multiple) {
-                                setEditingValue(event.target.value as number[]);
-                            } else {
-                                setEditingValue(event.target.value as number);
-                            }
-                        }}
-                        input={<Input />}
+                        style={{ maxWidth: "300px", paddingTop: "5px" }}
                     >
-                        {menuItems}
-                    </Select>
-                </FormControl>
-            );
-        } else {
-            if (value) {
-                var strValue = multiple
-                    ? (value as number[]).map(displayFunction).join(", ")
-                    : displayFunction(value as number);
+                        <Select
+                            multiple={multiple}
+                            fullWidth
+                            value={editingValue ? editingValue!! : []}
+                            onChange={(event: SelectChangeEvent<number[] | number>, child: ReactNode) => {
+                                if (multiple) {
+                                    setEditingValue(event.target.value as number[]);
+                                } else {
+                                    setEditingValue(event.target.value as number);
+                                }
+                            }}
+                            input={<Input />}
+                        >
+                            {menuItems}
+                        </Select>
+                    </FormControl>
+                );
+            } else {
+                if (value) {
+                    var strValue = multiple
+                        ? (value as number[]).map(displayFunction).join(", ")
+                        : displayFunction(value as number);
 
-                return strValue.length > MAX_DISPLAY_SIZE ? (
-                    <Tooltip title={strValue}>
+                    return strValue.length > MAX_DISPLAY_SIZE ? (
+                        <Tooltip title={strValue}>
+                            <Typography
+                                style={{ fontSize: "0.875rem", paddingTop: "5px" }}
+                            >
+                                {strValue.slice(0, MAX_DISPLAY_SIZE) + "..."}
+                            </Typography>
+                        </Tooltip>
+                    ) : (
                         <Typography
                             style={{ fontSize: "0.875rem", paddingTop: "5px" }}
                         >
-                            {strValue.slice(0, MAX_DISPLAY_SIZE) + "..."}
+                            {strValue}
                         </Typography>
-                    </Tooltip>
-                ) : (
-                    <Typography
-                        style={{ fontSize: "0.875rem", paddingTop: "5px" }}
-                    >
-                        {strValue}
-                    </Typography>
-                );
-            } else return "";
-        }
-    };
+                    );
+                } else return "";
+            }
+        };

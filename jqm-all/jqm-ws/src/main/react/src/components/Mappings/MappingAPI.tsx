@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { Mapping } from "./Mapping";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
-import { Mapping } from "./Mapping";
 
 const API_URL = "/admin/qmapping";
 

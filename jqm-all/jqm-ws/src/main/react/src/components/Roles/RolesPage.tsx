@@ -1,19 +1,19 @@
 import {
+    CircularProgress,
     Container,
     Grid,
-    CircularProgress,
     IconButton,
     Tooltip,
-} from "@material-ui/core";
-import MUIDataTable, { MUIDataTableColumnDef, SelectableRows } from "mui-datatables";
+} from "@mui/material";
+import MUIDataTable, { MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useRoleAPI } from "./RoleAPI";
-import { renderActionsCell, renderInputCell } from "../TableCells";
 import { EditPermissionsDialog } from "./EditPermissionsDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
+import { renderActionsCell, renderInputCell } from "../TableCells";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
@@ -58,7 +58,7 @@ const RolesPage: React.FC = () => {
     );
 
     const handleOnDelete = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [roleId] = tableMeta.rowData;
             deleteRoles([roleId]);
         },
@@ -66,7 +66,7 @@ const RolesPage: React.FC = () => {
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [roleId] = tableMeta.rowData;
             updateRow(roleId);
         },
@@ -75,7 +75,7 @@ const RolesPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
 
-    const handleOnEdit = useCallback((tableMeta) => {
+    const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setEditingRowId(tableMeta.rowIndex);
         setPermissions(tableMeta.rowData[3]);
     }, []);
@@ -156,41 +156,39 @@ const RolesPage: React.FC = () => {
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.role, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    {canUserAccess(PermissionObjectType.role, PermissionAction.create) &&
-                        <Tooltip title={"Add line"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowCreateDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                        </Tooltip>
-                    }
-                    <Tooltip title={"Refresh"}>
+            return <>
+                {canUserAccess(PermissionObjectType.role, PermissionAction.create) &&
+                    <Tooltip title={"Add line"}>
                         <IconButton
                             color="default"
-                            aria-label={"refresh"}
-                            onClick={() => fetchRoles()}
-                        >
-                            <RefreshIcon />
+                            aria-label={"add"}
+                            onClick={() => setShowCreateDialog(true)}
+                            size="large">
+                            <AddCircleIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"help"}
-                            onClick={() => {
-                                //
-                            }}
-                        >
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+                }
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => fetchRoles()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"help"}
+                        onClick={() => {
+                            //
+                        }}
+                        size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
 
         onRowsDelete: ({ data }: { data: any[] }) => {

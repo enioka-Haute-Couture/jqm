@@ -1,13 +1,9 @@
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     Button,
-    TextField,
-    createStyles,
-    makeStyles,
-    Theme,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     IconButton,
     Paper,
     Table,
@@ -16,18 +12,19 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-} from "@material-ui/core";
+    TextField,
+    Theme,
+} from "@mui/material";
 import React, { useState } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { makeStyles } from "@mui/styles";
 import { JobDefinitionParameter } from "./JobDefinition";
-import DeleteIcon from "@material-ui/icons/Delete";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-    })
-);
+const useStyles = makeStyles((theme: Theme) => ({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+}));
 
 export const EditParametersDialog: React.FC<{
     closeDialog: () => void;
@@ -63,6 +60,7 @@ export const EditParametersDialog: React.FC<{
                             setKey(event.target.value);
                         }}
                         fullWidth
+                        variant="standard"
                     />
                     <TextField
                         className={classes.TextField}
@@ -74,6 +72,7 @@ export const EditParametersDialog: React.FC<{
                             setValue(event.target.value);
                         }}
                         fullWidth
+                        variant="standard"
                     />
 
                     <Button
@@ -126,7 +125,7 @@ export const EditParametersDialog: React.FC<{
                                                         )
                                                     );
                                                 }}
-                                            >
+                                                size="large">
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>
@@ -139,7 +138,6 @@ export const EditParametersDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={closeDialog}

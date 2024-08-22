@@ -1,20 +1,21 @@
 import {
+    CircularProgress,
     Container,
     Grid,
-    CircularProgress,
     IconButton,
-    Tooltip,
     MenuItem,
-} from "@material-ui/core";
-import MUIDataTable, { MUIDataTableColumnDef, SelectableRows } from "mui-datatables";
+    Tooltip,
+} from "@mui/material";
+import MUIDataTable, { MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import GetAppIcon from '@material-ui/icons/GetApp';
-import VpnKeyIcon from "@material-ui/icons/VpnKey";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import GetAppIcon from '@mui/icons-material/GetApp';
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { useUserAPI } from "./UserAPI";
+import { CreateUserDialog } from "./CreateUserDialog";
 import {
     renderActionsCell,
     renderBooleanCell,
@@ -23,7 +24,6 @@ import {
 import { renderArrayCell } from "../TableCells/renderArrayCell";
 import { renderDateCell } from "../TableCells/renderDateCell";
 import { Role } from "../Roles/Role";
-import { CreateUserDialog } from "./CreateUserDialog";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 
@@ -96,7 +96,7 @@ const UsersPage: React.FC = () => {
     );
 
     const handleOnDelete = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [userId] = tableMeta.rowData;
             deleteUsers([userId]);
         },
@@ -104,7 +104,7 @@ const UsersPage: React.FC = () => {
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [userId] = tableMeta.rowData;
             updateRow(userId);
         },
@@ -113,7 +113,7 @@ const UsersPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
 
-    const handleOnEdit = useCallback((tableMeta) => {
+    const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setEditingRowId(tableMeta.rowIndex);
         setLocked(tableMeta.rowData[4]);
         setExpirationDate(tableMeta.rowData[5]);
@@ -238,7 +238,7 @@ const UsersPage: React.FC = () => {
                         {
                             title: "Download certificate",
                             addIcon: () => <GetAppIcon />,
-                            getLinkURL: (tableMeta: any) => {
+                            getLinkURL: (tableMeta: MUIDataTableMeta) => {
                                 const [userId] = tableMeta.rowData;
                                 return getCertificateDownloadURL(userId);
                             }
@@ -246,7 +246,7 @@ const UsersPage: React.FC = () => {
                         {
                             title: "Change password",
                             addIcon: () => <VpnKeyIcon />,
-                            action: (tableMeta: any) => {
+                            action: (tableMeta: MUIDataTableMeta) => {
                                 const [userId] = tableMeta.rowData;
                                 setChangePasswordUserId(userId);
                             },
@@ -263,41 +263,39 @@ const UsersPage: React.FC = () => {
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.user, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    {canUserAccess(PermissionObjectType.user, PermissionAction.create) &&
-                        <Tooltip title={"Add line"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowCreateDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                        </Tooltip>
-                    }
-                    <Tooltip title={"Refresh"}>
+            return <>
+                {canUserAccess(PermissionObjectType.user, PermissionAction.create) &&
+                    <Tooltip title={"Add line"}>
                         <IconButton
                             color="default"
-                            aria-label={"refresh"}
-                            onClick={() => refresh()}
-                        >
-                            <RefreshIcon />
+                            aria-label={"add"}
+                            onClick={() => setShowCreateDialog(true)}
+                            size="large">
+                            <AddCircleIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"help"}
-                            onClick={() => {
-                                //
-                            }}
-                        >
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+                }
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => refresh()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"help"}
+                        onClick={() => {
+                            //
+                        }}
+                        size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
 
         onRowsDelete: ({ data }: { data: any[] }) => {

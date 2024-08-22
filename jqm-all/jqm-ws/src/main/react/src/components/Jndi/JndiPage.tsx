@@ -1,21 +1,21 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import SettingsIcon from "@material-ui/icons/Settings";
-import {
-    renderInputCell,
-    renderBooleanCell,
-    renderActionsCell,
-} from "../TableCells";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Badge, Container, Grid, IconButton, Tooltip } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { EditParametersDialog } from "./EditParametersDialog";
 import useJndiApi from "./useJndiApi";
 import { JndiResource } from "./JndiResource";
 import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
-import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import {
+    renderActionsCell,
+    renderBooleanCell,
+    renderInputCell,
+} from "../TableCells";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 
 export const JndiPage: React.FC = () => {
@@ -43,7 +43,7 @@ export const JndiPage: React.FC = () => {
     }, [fetchResources, canUserAccess]);
 
     const handleOnDelete = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [paramId] = tableMeta.rowData;
             deleteResource([paramId]);
         },
@@ -51,7 +51,7 @@ export const JndiPage: React.FC = () => {
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [resourceId, auth, parameters] = tableMeta.rowData;
             const { value: name } = selectedNameRef.current!;
             const { value: type } = selectedTypeRef.current!;
@@ -85,7 +85,7 @@ export const JndiPage: React.FC = () => {
         setCurrentSelectedResource(null);
     }, []);
 
-    const handleOnEdit = useCallback((tableMeta) => {
+    const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setIsSingleton(tableMeta.rowData[6]);
         setEditingRowId(tableMeta.rowIndex);
         setCurrentSelectedResource({
@@ -180,7 +180,7 @@ export const JndiPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: false,
-                customBodyRender: (value: any, tableMeta: any) => {
+                customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const parameters = tableMeta.rowData[7];
                     const getBadge = (count: number) => (
                         <Badge badgeContent={count} color="primary">
@@ -239,51 +239,49 @@ export const JndiPage: React.FC = () => {
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    {canUserAccess(PermissionObjectType.jndi, PermissionAction.create) &&
-                        <>
-                            <Tooltip title={"Create new JNDI resource"}>
-                                <IconButton
-                                    color="default"
-                                    aria-label={"Create new JNDI resource"}
-                                    onClick={() => setShowDropDown(true)}
-                                >
-                                    <AddCircleIcon
-                                        innerRef={dropDownMenuPositionRef}
-                                    />
-                                </IconButton>
-                            </Tooltip>
-                            <ResourceDropDownMenu
-                                menuPositiontRef={dropDownMenuPositionRef}
-                                show={showDropDown}
-                                handleSet={setShowDropDown}
-                                onOpen={() => setShowDropDown(true)}
-                                onClose={() => setShowDropDown(false)}
-                                onSelectResource={(newResource: JndiResource) => {
-                                    delete newResource.uiName;
-                                    saveResource(newResource);
-                                    setShowDropDown(false);
-                                }}
-                            />
-                        </>
-                    }
-                    <Tooltip title={"Refresh"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"refresh"}
-                            onClick={() => fetchResources()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton color="default" aria-label={"help"}>
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+            return <>
+                {canUserAccess(PermissionObjectType.jndi, PermissionAction.create) &&
+                    <>
+                        <Tooltip title={"Create new JNDI resource"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"Create new JNDI resource"}
+                                onClick={() => setShowDropDown(true)}
+                                size="large">
+                                <AddCircleIcon
+                                    ref={dropDownMenuPositionRef}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <ResourceDropDownMenu
+                            menuPositiontRef={dropDownMenuPositionRef}
+                            show={showDropDown}
+                            handleSet={setShowDropDown}
+                            onOpen={() => setShowDropDown(true)}
+                            onClose={() => setShowDropDown(false)}
+                            onSelectResource={(newResource: JndiResource) => {
+                                delete newResource.uiName;
+                                saveResource(newResource);
+                                setShowDropDown(false);
+                            }}
+                        />
+                    </>
+                }
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => fetchResources()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton color="default" aria-label={"help"} size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index

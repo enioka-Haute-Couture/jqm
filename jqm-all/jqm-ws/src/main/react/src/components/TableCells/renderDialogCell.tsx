@@ -1,4 +1,5 @@
-import { Tooltip, Typography } from "@material-ui/core";
+import { Tooltip, Typography } from "@mui/material";
+import { MUIDataTableMeta } from "mui-datatables";
 import React from "react";
 
 export const renderDialogCell =
@@ -9,28 +10,28 @@ export const renderDialogCell =
         printContent: Function,
         onClickHandler: Function
     ) =>
-    (value: any, tableMeta: any) => {
-        return editingRowId === tableMeta.rowIndex ? (
-            <Tooltip title={editingRowId === tableMeta.rowIndex ? hint : ""}>
-                <Typography
-                    onClick={() => {
-                        const [id] = tableMeta.rowData;
-                        onClickHandler(id);
-                    }}
-                    style={{
-                        fontSize: "0.875rem",
-                        paddingTop: "13px",
-                        cursor: "pointer",
-                        paddingBottom: "6px",
-                        borderBottom: "1px solid black",
-                    }}
-                >
-                    {printContent(currentValue)}
+        (value: any, tableMeta: MUIDataTableMeta) => {
+            return editingRowId === tableMeta.rowIndex ? (
+                <Tooltip title={editingRowId === tableMeta.rowIndex ? hint : ""}>
+                    <Typography
+                        onClick={() => {
+                            const [id] = tableMeta.rowData;
+                            onClickHandler(id);
+                        }}
+                        style={{
+                            fontSize: "0.875rem",
+                            paddingTop: "13px",
+                            cursor: "pointer",
+                            paddingBottom: "6px",
+                            borderBottom: "1px solid black",
+                        }}
+                    >
+                        {printContent(currentValue)}
+                    </Typography>
+                </Tooltip>
+            ) : (
+                <Typography style={{ fontSize: "0.875rem", paddingTop: "5px" }}>
+                    {printContent(value)}
                 </Typography>
-            </Tooltip>
-        ) : (
-            <Typography style={{ fontSize: "0.875rem", paddingTop: "5px" }}>
-                {printContent(value)}
-            </Typography>
-        );
-    };
+            );
+        };

@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { renderInputCell, renderActionsCell } from "../TableCells";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Container, Grid, IconButton, Tooltip } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { CreateParameterDialog } from "./CreateParameterDialog";
 import useParametersApi from "./ParametersApi";
-import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import { renderActionsCell, renderInputCell } from "../TableCells";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const ClusterwideParametersPage: React.FC = () => {
@@ -34,7 +34,7 @@ const ClusterwideParametersPage: React.FC = () => {
     }, [fetchParameters, canUserAccess]);
 
     const handleOnDelete = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [paramId] = tableMeta.rowData;
             deleteParameter([paramId]);
         },
@@ -42,7 +42,7 @@ const ClusterwideParametersPage: React.FC = () => {
     );
 
     const handleOnSave = useCallback(
-        (tableMeta) => {
+        (tableMeta: MUIDataTableMeta) => {
             const [paramId] = tableMeta.rowData;
             const { value: key } = paramKeyInputRef.current!;
             const { value } = paramValueInputRef.current!;
@@ -57,7 +57,7 @@ const ClusterwideParametersPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
     const handleOnEdit = useCallback(
-        (tableMeta) => setEditingRowId(tableMeta.rowIndex),
+        (tableMeta: MUIDataTableMeta) => setEditingRowId(tableMeta.rowIndex),
         []
     );
 
@@ -118,42 +118,40 @@ const ClusterwideParametersPage: React.FC = () => {
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.prm, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
-            return (
-                <>
-                    {canUserAccess(PermissionObjectType.prm, PermissionAction.create) &&
-                        <Tooltip title={"Add line"}>
-                            <>
-                                <IconButton
-                                    color="default"
-                                    aria-label={"add"}
-                                    onClick={() => setShowDialog(true)}
-                                >
-                                    <AddCircleIcon />
-                                </IconButton>
-                                <CreateParameterDialog
-                                    showDialog={showDialog}
-                                    closeDialog={() => setShowDialog(false)}
-                                    createParameter={createParameter}
-                                />
-                            </>
-                        </Tooltip>
-                    }
-                    <Tooltip title={"Refresh"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"refresh"}
-                            onClick={() => fetchParameters()}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
+            return <>
+                {canUserAccess(PermissionObjectType.prm, PermissionAction.create) &&
+                    <Tooltip title={"Add line"}>
+                        <>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowDialog(true)}
+                                size="large">
+                                <AddCircleIcon />
+                            </IconButton>
+                            <CreateParameterDialog
+                                showDialog={showDialog}
+                                closeDialog={() => setShowDialog(false)}
+                                createParameter={createParameter}
+                            />
+                        </>
                     </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton color="default" aria-label={"help"}>
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+                }
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => fetchParameters()}
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton color="default" aria-label={"help"} size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index

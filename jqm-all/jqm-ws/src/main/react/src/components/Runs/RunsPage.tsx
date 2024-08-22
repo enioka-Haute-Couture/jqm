@@ -3,27 +3,27 @@ import {
     Container,
     Grid,
     IconButton,
+    ToggleButton,
+    ToggleButtonGroup,
     Tooltip,
     Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { FilterType, MUIDataTableState, SelectableRows } from "mui-datatables";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import useJobInstanceAPI from "./JobInstanceAPI";
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-import DescriptionIcon from "@material-ui/icons/Description";
-import StopIcon from "@material-ui/icons/Stop";
-import PauseIcon from "@material-ui/icons/Pause";
-import FlipCameraAndroidIcon from "@material-ui/icons/FlipCameraAndroid";
+import CircularProgress from "@mui/material/CircularProgress";
+import MUIDataTable, { FilterType, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
+import HelpIcon from "@mui/icons-material/Help";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import DescriptionIcon from "@mui/icons-material/Description";
+import StopIcon from "@mui/icons-material/Stop";
+import PauseIcon from "@mui/icons-material/Pause";
+import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { JobInstanceDetailsDialog } from "./JobInstanceDetailsDialog";
 import { LaunchFormDialog } from "./LaunchFormDialog";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import useJobDefinitionsAPI from "../JobDefinitions/JobDefinitionsAPI";
+import useJobInstanceAPI from "./JobInstanceAPI";
 import { SwitchJobQueueDialog } from "./SwitchJobQueueDialog";
+import useJobDefinitionsAPI from "../JobDefinitions/JobDefinitionsAPI";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 
@@ -244,116 +244,114 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
-                customBodyRender: (_value: any, tableMeta: any) => {
+                customBodyRender: (_value: any, tableMeta: MUIDataTableMeta) => {
                     const jobInstanceId = tableMeta.rowData[0];
                     const status = tableMeta.rowData[3];
 
-                    return (
-                        <>
-                            {!queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) && (
-                                <Tooltip key={"Relaunch"} title={"Relaunch"}>
-                                    <>
+                    return <>
+                        {!queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) && (
+                            <Tooltip key={"Relaunch"} title={"Relaunch"}>
+                                <>
+                                    <IconButton
+                                        color="default"
+                                        aria-label={"Relaunch"}
+                                        onClick={() => {
+                                            relaunchJob(jobInstanceId);
+                                        }}
+                                        disabled={status === "CANCELLED"}
+                                        size="large">
+                                        <RefreshIcon />
+                                    </IconButton>
+                                </>
+                            </Tooltip>
+                        )}
+                        {queryLiveInstances && (
+                            <>
+                                {canUserAccess(PermissionObjectType.job_instance, PermissionAction.update) &&
+                                    (
+                                        <>
+                                            <Tooltip key={"Kill"} title={"Kill"}>
+                                                <>
+                                                    <IconButton
+                                                        color="default"
+                                                        aria-label={"Kill"}
+                                                        onClick={() => {
+                                                            killJob(jobInstanceId);
+                                                        }}
+                                                        disabled={status === "HOLDED"}
+                                                        size="large">
+                                                        <StopIcon />
+                                                    </IconButton>
+                                                </>
+                                            </Tooltip>
+                                            {status === "HOLDED" ? (
+                                                <Tooltip
+                                                    key={"Resume"}
+                                                    title={"Resume"}
+                                                >
+                                                    <IconButton
+                                                        color="default"
+                                                        aria-label={"Resume"}
+                                                        onClick={() => {
+                                                            resumeJob(jobInstanceId);
+                                                        }}
+                                                        size="large">
+                                                        <PlayArrowIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            ) : (
+                                                <Tooltip key={"Pause"} title={"Pause"}>
+                                                    <IconButton
+                                                        color="default"
+                                                        aria-label={"Pause"}
+                                                        onClick={() => {
+                                                            pauseJob(jobInstanceId);
+                                                        }}
+                                                        size="large">
+                                                        <PauseIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </>
+                                    )
+                                }
+                                {canUserAccess(PermissionObjectType.queue_position, PermissionAction.update) &&
+                                    <Tooltip
+                                        key={"Switch queue"}
+                                        title={"Switch queue"}
+                                    >
                                         <IconButton
                                             color="default"
-                                            aria-label={"Relaunch"}
+                                            aria-label={"Switch queue"}
                                             onClick={() => {
-                                                relaunchJob(jobInstanceId);
+                                                setShowSwitchJobQueueId(
+                                                    jobInstanceId
+                                                );
                                             }}
-                                            disabled={status === "CANCELLED"}
-                                        >
-                                            <RefreshIcon />
+                                            size="large">
+                                            <FlipCameraAndroidIcon />
                                         </IconButton>
-                                    </>
-                                </Tooltip>
-                            )}
-                            {queryLiveInstances && (
-                                <>
-                                    {canUserAccess(PermissionObjectType.job_instance, PermissionAction.update) &&
-                                        (
-                                            <>
-                                                <Tooltip key={"Kill"} title={"Kill"}>
-                                                    <>
-                                                        <IconButton
-                                                            color="default"
-                                                            aria-label={"Kill"}
-                                                            onClick={() => {
-                                                                killJob(jobInstanceId);
-                                                            }}
-                                                            disabled={status === "HOLDED"}
-                                                        >
-                                                            <StopIcon />
-                                                        </IconButton>
-                                                    </>
-                                                </Tooltip>
-                                                {status === "HOLDED" ? (
-                                                    <Tooltip
-                                                        key={"Resume"}
-                                                        title={"Resume"}
-                                                    >
-                                                        <IconButton
-                                                            color="default"
-                                                            aria-label={"Resume"}
-                                                            onClick={() => {
-                                                                resumeJob(jobInstanceId);
-                                                            }}
-                                                        >
-                                                            <PlayArrowIcon />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                ) : (
-                                                    <Tooltip key={"Pause"} title={"Pause"}>
-                                                        <IconButton
-                                                            color="default"
-                                                            aria-label={"Pause"}
-                                                            onClick={() => {
-                                                                pauseJob(jobInstanceId);
-                                                            }}
-                                                        >
-                                                            <PauseIcon />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                )}
-                                            </>
-                                        )
-                                    }
-                                    {canUserAccess(PermissionObjectType.queue_position, PermissionAction.update) &&
-                                        <Tooltip
-                                            key={"Switch queue"}
-                                            title={"Switch queue"}
-                                        >
-                                            <IconButton
-                                                color="default"
-                                                aria-label={"Switch queue"}
-                                                onClick={() => {
-                                                    setShowSwitchJobQueueId(
-                                                        jobInstanceId
-                                                    );
-                                                }}
-                                            >
-                                                <FlipCameraAndroidIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    }
-                                </>
-                            )}
-                            <Tooltip
-                                key={"Show details"}
-                                title={"Show details"}
-                            >
-                                <IconButton
-                                    color="default"
-                                    aria-label={"Show details"}
-                                    onClick={() => {
-                                        setShowDetailsJobInstanceId(
-                                            jobInstanceId
-                                        );
-                                    }}
-                                >
-                                    <DescriptionIcon />
-                                </IconButton>
-                            </Tooltip>
-                        </>
-                    );
+                                    </Tooltip>
+                                }
+                            </>
+                        )}
+                        <Tooltip
+                            key={"Show details"}
+                            title={"Show details"}
+                        >
+                            <IconButton
+                                color="default"
+                                aria-label={"Show details"}
+                                onClick={() => {
+                                    setShowDetailsJobInstanceId(
+                                        jobInstanceId
+                                    );
+                                }}
+                                size="large">
+                                <DescriptionIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </>;
                 },
             },
         },
@@ -379,8 +377,6 @@ const RunsPage: React.FC = () => {
             </Typography>
         ),
         onTableChange: (action: string, tableState: MUIDataTableState) => {
-            console.log(action, tableState);
-
             switch (action) {
                 case "changePage":
                 case "sort":
@@ -399,62 +395,60 @@ const RunsPage: React.FC = () => {
             }
         },
         customToolbar: () => {
-            return (
-                <>
-                    <ToggleButtonGroup
-                        value={queryLiveInstances}
-                        exclusive
-                        onChange={(_, value) => {
-                            if (value !== null) {
-                                fetchJobInstances(
-                                    0,
-                                    rowsPerPage,
-                                    sortOrder,
-                                    value,
-                                    filterList!
-                                );
-                            }
+            return <>
+                <ToggleButtonGroup
+                    value={queryLiveInstances}
+                    exclusive
+                    onChange={(_, value) => {
+                        if (value !== null) {
+                            fetchJobInstances(
+                                0,
+                                rowsPerPage,
+                                sortOrder,
+                                value,
+                                filterList!
+                            );
+                        }
+                    }}
+                    size="small"
+                >
+                    <ToggleButton value={false}>Ended</ToggleButton>
+                    <ToggleButton value={true}>Active</ToggleButton>
+                </ToggleButtonGroup>
+                {canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) &&
+                    <Tooltip title={"New launch form"}>
+                        <>
+                            <IconButton
+                                color="default"
+                                aria-label={"New launch form"}
+                                onClick={() =>
+                                    fetchJobDefinitions().then(() =>
+                                        setShowLaunchFormDialog(true)
+                                    )
+                                }
+                                size="large">
+                                <AddCircleIcon />
+                            </IconButton>
+                        </>
+                    </Tooltip>
+                }
+                <Tooltip title={"Refresh"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"refresh"}
+                        onClick={() => {
+                            refresh();
                         }}
-                        size="small"
-                    >
-                        <ToggleButton value={false}>Ended</ToggleButton>
-                        <ToggleButton value={true}>Active</ToggleButton>
-                    </ToggleButtonGroup>
-                    {canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) &&
-                        <Tooltip title={"New launch form"}>
-                            <>
-                                <IconButton
-                                    color="default"
-                                    aria-label={"New launch form"}
-                                    onClick={() =>
-                                        fetchJobDefinitions().then(() =>
-                                            setShowLaunchFormDialog(true)
-                                        )
-                                    }
-                                >
-                                    <AddCircleIcon />
-                                </IconButton>
-                            </>
-                        </Tooltip>
-                    }
-                    <Tooltip title={"Refresh"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"refresh"}
-                            onClick={() => {
-                                refresh();
-                            }}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Help"}>
-                        <IconButton color="default" aria-label={"help"}>
-                            <HelpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
+                        size="large">
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={"Help"}>
+                    <IconButton color="default" aria-label={"help"} size="large">
+                        <HelpIcon />
+                    </IconButton>
+                </Tooltip>
+            </>;
         },
     };
 

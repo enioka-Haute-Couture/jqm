@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Link, Typography } from "@material-ui/core";
+import { Container, Link, Typography } from "@mui/material";
 
 const HomePage: React.FC = () => {
     return (

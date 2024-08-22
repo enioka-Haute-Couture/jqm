@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
     Button,
     FormControl,
@@ -6,12 +6,25 @@ import {
     InputLabel,
     MenuItem,
     Select,
-} from "@material-ui/core";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
+    SelectChangeEvent,
+    Theme,
+} from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import makeStyles from "@mui/styles/makeStyles";
 import { Queue } from "../Queues/Queue";
+
+const useStyles = makeStyles((theme: Theme) =>
+({
+
+    Select: {
+        margin: theme.spacing(1, 0, 3),
+    }
+})
+);
+
 
 export const SwitchJobQueueDialog: React.FC<{
     closeDialog: () => void;
@@ -19,7 +32,9 @@ export const SwitchJobQueueDialog: React.FC<{
     queues: Queue[];
     switchJobQueue: (jobId: number, queueId: number) => void;
 }> = ({ closeDialog, jobId, queues, switchJobQueue }) => {
-    const [queueId, setQueueId] = useState<number | null>();
+    const [queueId, setQueueId] = useState<number | undefined>();
+
+    const classes = useStyles();
 
     return (
         <Dialog
@@ -31,17 +46,16 @@ export const SwitchJobQueueDialog: React.FC<{
         >
             <DialogTitle>Switch job {jobId} queue</DialogTitle>
             <DialogContent>
-                <FormControl fullWidth style={{ marginBottom: "16px" }}>
+                <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="queue-select-label">Queue*</InputLabel>
                     <Select
                         labelId="queue-select-label"
                         fullWidth
                         value={queueId}
-                        onChange={(
-                            event: React.ChangeEvent<{ value: unknown }>
-                        ) => {
-                            setQueueId(event.target.value as number);
-                        }}
+                        onChange={
+                            (event: SelectChangeEvent<number>, child: ReactNode) => {
+                                setQueueId(event.target.value as number);
+                            }}
                         input={<Input />}
                     >
                         {queues!.map((queue: Queue) => (
@@ -54,7 +68,6 @@ export const SwitchJobQueueDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}

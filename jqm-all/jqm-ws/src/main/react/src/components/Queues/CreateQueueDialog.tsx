@@ -1,25 +1,24 @@
 import React, { useState } from "react";
+import { Button, Switch, Theme } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import { Queue } from "./Queue";
-import { Button, Switch } from "@material-ui/core";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-        FormControlLabel: {
-            padding: theme.spacing(0, 0, 0),
-            margin: theme.spacing(0, 0, 0, 0),
-            alignItems: "start",
-        },
-    })
+const useStyles = makeStyles((theme: Theme) => ({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+    FormControlLabel: {
+        padding: theme.spacing(0, 0, 0),
+        margin: theme.spacing(0, 0, 0, 0),
+        alignItems: "start",
+    },
+})
 );
 
 export const CreateQueueDialog: React.FC<{
@@ -48,6 +47,7 @@ export const CreateQueueDialog: React.FC<{
                         setQueueName(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -57,6 +57,7 @@ export const CreateQueueDialog: React.FC<{
                         setDescription(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <FormControlLabel
                     className={classes.FormControlLabel}
@@ -77,7 +78,6 @@ export const CreateQueueDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     onClick={closeDialog}
                     style={{ margin: "8px" }}

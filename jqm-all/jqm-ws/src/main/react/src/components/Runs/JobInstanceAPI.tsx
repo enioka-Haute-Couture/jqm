@@ -1,10 +1,10 @@
 import { MUISortOptions } from "mui-datatables";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { JobInstance } from "./JobInstance";
+import { JobLaunchParameters } from "./JobLaunchParameters";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import useQueueAPI from "../Queues/QueueAPI";
-import { JobInstance } from "./JobInstance";
-import { JobLaunchParameters } from "./JobLaunchParameters";
 
 const API_URL = "/client/ji";
 

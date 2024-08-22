@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+    Button,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
-    DialogActions,
-    Button,
+    DialogTitle,
+    IconButton,
     Paper,
     Table,
     TableBody,
@@ -13,13 +14,11 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    IconButton,
     TextField,
-    createStyles,
     Theme,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import DeleteIcon from "@material-ui/icons/Delete";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { JndiParameter, JndiResource } from "./JndiResource";
 
 export const JndiParametersTable: React.FC<{
@@ -61,6 +60,7 @@ export const JndiParametersTable: React.FC<{
                                         inputProps={{
                                             style: { fontSize: "0.875rem" },
                                         }}
+                                        variant="standard"
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -75,6 +75,7 @@ export const JndiParametersTable: React.FC<{
                                         inputProps={{
                                             style: { fontSize: "0.875rem" },
                                         }}
+                                        variant="standard"
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -88,7 +89,7 @@ export const JndiParametersTable: React.FC<{
                                                 )
                                             )
                                         }
-                                    >
+                                        size="large">
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>
@@ -101,13 +102,11 @@ export const JndiParametersTable: React.FC<{
     );
 };
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-    })
-);
+const useStyles = makeStyles((theme: Theme) => ({
+    TextField: {
+        padding: theme.spacing(0, 0, 3)
+    }
+}));
 
 export const EditParametersDialog: React.FC<{
     showDialog: boolean;
@@ -147,6 +146,7 @@ export const EditParametersDialog: React.FC<{
                             setNewParamName(event.target.value);
                         }}
                         fullWidth
+                        variant="standard"
                     />
                     <TextField
                         className={classes.TextField}
@@ -156,7 +156,7 @@ export const EditParametersDialog: React.FC<{
                             setNewParamValue(event.target.value);
                         }}
                         fullWidth
-
+                        variant="standard"
                     />
                     <Button
                         variant="contained"
@@ -186,7 +186,6 @@ export const EditParametersDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={closeDialog}

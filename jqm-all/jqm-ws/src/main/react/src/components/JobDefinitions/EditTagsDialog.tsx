@@ -1,25 +1,22 @@
 import {
+    Button,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
-    DialogActions,
-    Button,
+    DialogTitle,
     TextField,
-    createStyles,
-    makeStyles,
     Theme,
-} from "@material-ui/core";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import React, { useState } from "react";
 import { JobDefinitionTags } from "./JobDefinition";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        TextField: {
-            padding: theme.spacing(0, 0, 3),
-        },
-    })
-);
+const useStyles = makeStyles((theme: Theme) => ({
+    TextField: {
+        padding: theme.spacing(0, 0, 3),
+    },
+}));
 
 export const EditTagsDialog: React.FC<{
     closeDialog: () => void;
@@ -57,6 +54,7 @@ export const EditTagsDialog: React.FC<{
                         setApplication(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -66,6 +64,7 @@ export const EditTagsDialog: React.FC<{
                         setModule(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -75,6 +74,7 @@ export const EditTagsDialog: React.FC<{
                         setKeyword1(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -84,6 +84,7 @@ export const EditTagsDialog: React.FC<{
                         setKeyword2(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
@@ -93,11 +94,11 @@ export const EditTagsDialog: React.FC<{
                         setKeyword3(event.target.value);
                     }}
                     fullWidth
+                    variant="standard"
                 />
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
