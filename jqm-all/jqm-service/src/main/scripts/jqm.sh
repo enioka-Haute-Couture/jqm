@@ -220,7 +220,13 @@ jqm_import_queues() {
 }
 
 jqm_import_all_xml() {
-    $JAVA -jar $JQM_JAR Import-JobDef $(find jobs -name "*xml" -type f -printf " -f %p " | grep -v pom.xml)
+    if [[ "$OSTYPE" == "darwin"* ]] || [[ "$OSTYPE" == "freebsd"* ]]; then
+        # FreeBSD's find (also used in OSX) does not support -printf
+        JD_FILE_ARGS=$(find jobs -name "*xml" -type f -print0 | xargs -0 stat -f  " -f %N " | grep -v pom.xml)
+    else
+        JD_FILE_ARGS=$(find jobs -name "*xml" -type f -printf " -f %p " | grep -v pom.xml)
+    fi
+    $JAVA -jar $JQM_JAR Import-JobDef $JD_FILE_ARGS
 }
 
 jqm_export_job_def_xml() {
