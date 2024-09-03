@@ -6,7 +6,7 @@ kubectl delete service jqm-lb
 kubectl delete deployment jqm
 
 # Build the image
-docker build --no-cache -t enioka/jqm-standalone -f ./kubernetes-dbless/docker/Dockerfile . || exit 1
+docker build --progress=plain --no-cache --build-arg JQM_INIT_MODE=STANDALONE -t enioka/jqm-standalone -f ./docker/linux/Dockerfile . || exit 1
 
 # Import the image into Microk8s, otherwise it will try to pull from dockerio
 docker save -o ./jqm-standalone.tar enioka/jqm-standalone || exit 1
