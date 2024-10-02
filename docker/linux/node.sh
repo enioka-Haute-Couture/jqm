@@ -11,6 +11,18 @@ then
     export JQM_POOL_INIT_SQL="initSQL=\"${JQM_POOL_INIT_SQL}\""
 fi
 
+if [ "${JQM_INIT_MODE}" = "STANDALONE" ]
+then
+    export JQM_POOL_MAX="${JQM_POOL_MAX:-100}"
+    export JQM_CREATE_NODE_IF_MISSING=
+    export JQM_CREATE_NODE_TEMPLATE=
+else
+    export JQM_POOL_MAX="${JQM_POOL_MAX:-10}"
+    export JQM_CREATE_NODE_IF_MISSING="${JQM_CREATE_NODE_IF_MISSING:-0}"
+    export JQM_CREATE_NODE_TEMPLATE="${JQM_CREATE_NODE_TEMPLATE:-TEMPLATE_WEB}"
+fi
+
+
 echo "<resource
     name='jdbc/jqm'
     auth='Container'
@@ -52,8 +64,9 @@ then
     export JQM_NODE_WS_INTERFACE=$(hostname)
 fi
 
-if [ "${JQM_INIT_MODE}" = "SINGLE" ]
+if [ "${JQM_INIT_MODE}" = "SINGLE" ] || [ "${JQM_INIT_MODE}" = "STANDALONE" ]
 then
+    echo "### Checking configuration in database for node ${JQM_NODE_NAME} - Single mode."
     if [ ! -f /jqm/db/${JQM_NODE_NAME} ]
     then
         echo "#### Node does not exist (as seen by the container). Single node mode."
@@ -62,7 +75,7 @@ then
         java -jar jqm.jar Update-Schema
 
         echo "### Creating node ${JQM_NODE_NAME}"
-        java -jar jqm.jar New-Node ${JQM_NODE_NAME}
+        java -jar jqm.jar New-Node -n ${JQM_NODE_NAME}
 
         # mark the node as existing
         echo 1 > /jqm/db/${JQM_NODE_NAME}
@@ -77,6 +90,16 @@ then
         # Jobs
         echo "### Importing local job definitions inside database"
         java -jar jqm.jar Import-JobDef -f ./jobs/
+
+        if [ "${JQM_INIT_MODE}" = "STANDALONE" ]
+        then
+            # WS Auth setup. selfConfig settings seem to be overridden at some point which stops the nodes from accepting requests.
+            echo "### Disabling WS auth"
+            java -jar jqm.jar Set-WebConfiguration -c ENABLE_HTTP_GUI
+            java -jar jqm.jar Set-WebConfiguration -c DISABLE_AUTHENTICATION
+        fi
+    else
+        echo "### Node ${JQM_NODE_NAME} already exists inside database configuration, skipping config"
     fi
 fi
 

@@ -40,7 +40,7 @@ public class TestHelpers
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(TestHelpers.class);
 
-    public static Integer qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
+    public static Long qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
     public static Node node, node2, node3, nodeMix, nodeMix2;
 
     public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix, dpVipMix2;
@@ -48,7 +48,7 @@ public class TestHelpers
     public static void createTestData(DbConn cnx)
     {
         CreationTools.createJndiString(cnx, "string/debug", "a string which exists solely for test initialisation", "houba hop");
-        CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
         GlobalParameter.create(cnx, "mavenRepo", "http://repo1.maven.org/maven2/");

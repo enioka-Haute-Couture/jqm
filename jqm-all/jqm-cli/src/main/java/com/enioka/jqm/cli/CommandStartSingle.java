@@ -4,6 +4,7 @@ import java.util.ServiceLoader;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.model.JobInstance;
@@ -13,10 +14,10 @@ import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 class CommandStartSingle extends CommandBase
 {
     @Parameter(names = { "-i", "--id" }, description = "ID of the job instance to launch.", required = true)
-    private int id;
+    private Long id;
 
     @Override
-    int doWork()
+    public int doWork()
     {
         var engine = ServiceLoaderHelper.getService(ServiceLoader.load(JqmSingleRunnerOperations.class));
         if (engine == null)

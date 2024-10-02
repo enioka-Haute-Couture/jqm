@@ -20,12 +20,12 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
 {
     private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
 
-    public JobInstance runAtOnce(int jobInstanceId)
+    public JobInstance runAtOnce(long jobInstanceId)
     {
         return JqmSingleRunner.run(jobInstanceId);
     }
 
-    public static JobInstance run(int jobInstanceId)
+    public static JobInstance run(long jobInstanceId)
     {
         jqmlogger.debug("Single runner was asked to start with ID " + jobInstanceId);
         DbConn cnx = Helpers.getNewDbSession();
@@ -64,7 +64,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
 
         // Parameters
         final int poll = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "10000"));
-        final int jobId = job.getId();
+        final long jobId = job.getId();
 
         // Create run container
         RunnerManager manager = new RunnerManager(cnx);

@@ -160,22 +160,22 @@ public class EngineApiProxy implements InvocationHandler
         {
             return this.api.addDeliverable((String) args[0], (String) args[1]);
         }
-        else if ("waitChild".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        else if ("waitChild".equals(methodName) && classes.length == 1 && (args[0] instanceof Long))
         {
-            this.api.waitChild((Integer) args[0]);
+            this.api.waitChild((Long) args[0]);
             return null;
         }
-        else if ("hasEnded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        else if ("hasEnded".equals(methodName) && classes.length == 1 && (args[0] instanceof Long))
         {
-            return this.api.hasEnded((Integer) args[0]);
+            return this.api.hasEnded((Long) args[0]);
         }
-        else if ("hasSucceeded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        else if ("hasSucceeded".equals(methodName) && classes.length == 1 && (args[0] instanceof Long))
         {
-            return this.api.hasSucceeded((Integer) args[0]);
+            return this.api.hasSucceeded((Long) args[0]);
         }
-        else if ("hasFailed".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        else if ("hasFailed".equals(methodName) && classes.length == 1 && (args[0] instanceof Long))
         {
-            return this.api.hasFailed((Integer) args[0]);
+            return this.api.hasFailed((Long) args[0]);
         }
 
         throw new NoSuchMethodException(methodName);

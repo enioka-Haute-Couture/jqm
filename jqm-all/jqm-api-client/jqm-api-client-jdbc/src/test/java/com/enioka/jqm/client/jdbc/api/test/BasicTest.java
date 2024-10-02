@@ -15,6 +15,7 @@
  */
 package com.enioka.jqm.client.jdbc.api.test;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +28,14 @@ import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.updater.liquibase.LiquibaseSchemaManager;
 
+import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,11 +48,23 @@ import org.slf4j.LoggerFactory;
 public class BasicTest
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(BasicTest.class);
+    private static Db db;
 
     @BeforeClass
-    public static void beforeClass()
+    public static void beforeClass() throws SQLException
     {
-        JqmClientFactory.setProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+        // THe client has no option to initialise the database schema, so we do it explicitly.
+        JDBCDataSource ds = new JDBCDataSource();
+        ds.setDatabase("jdbc:hsqldb:mem:testdbengine");
+        var liquibaseHelper = new LiquibaseSchemaManager();
+        liquibaseHelper.updateSchema(ds.getConnection());
+
+        // We then reuse the same datasource to initialise the client. This is only needed because we use an in-memory database - we cannot
+        // close an reopen it easily. (it would be GC-ed and our new schema would be destroyed)
+        var props = new Properties();
+        props.put("com.enioka.jqm.jdbc.adapters", "com.enioka.jqm.jdbc.impl.hsql.DbImplHsql");
+        db = new Db(ds, props);
+        JqmClientFactory.setProperty("com.enioka.jqm.jdbc.contextobject", db);
     }
 
     @Test
@@ -70,8 +84,8 @@ public class BasicTest
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
         q.setInstanceModule("module");
-        q.setParentId(12);
-        q.setJobInstanceId(132);
+        q.setParentId(12L);
+        q.setJobInstanceId(132L);
         q.setQueryLiveInstances(true);
 
         q.setJobDefKeyword2("pouet2");
@@ -86,8 +100,8 @@ public class BasicTest
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
         q.setInstanceModule("module");
-        q.setParentId(12);
-        q.setJobInstanceId(132);
+        q.setParentId(12L);
+        q.setJobInstanceId(132L);
         q.setQueryLiveInstances(true);
 
         q.setEnqueuedBefore(Calendar.getInstance());
@@ -153,14 +167,14 @@ public class BasicTest
     public void testQueueNameId()
     {
         JqmClientFactory.getClient().newQuery().setQueueName("test").invoke();
-        JqmClientFactory.getClient().newQuery().setQueueId(12).invoke();
+        JqmClientFactory.getClient().newQuery().setQueueId(12L).invoke();
     }
 
     @Test
     public void testPaginationWithFilter()
     {
         JqmClientFactory.getClient().newQuery().setQueueName("test").setPageSize(10).invoke();
-        JqmClientFactory.getClient().newQuery().setQueueId(12).setPageSize(10).invoke();
+        JqmClientFactory.getClient().newQuery().setQueueId(12L).setPageSize(10).invoke();
     }
 
     @Test
@@ -194,7 +208,7 @@ public class BasicTest
     @Test
     public void testBug159()
     {
-        JqmClientFactory.getClient().newQuery().setJobInstanceId(1234).setQueryLiveInstances(true).setQueryHistoryInstances(false)
+        JqmClientFactory.getClient().newQuery().setJobInstanceId(1234L).setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .setPageSize(15).setFirstRow(0).invoke();
     }
 
@@ -208,11 +222,10 @@ public class BasicTest
     @Test
     public void testBug305()
     {
-        Db db = DbManager.getDb();
         try (DbConn cnx = db.getConn())
         {
-            int qId = Queue.create(cnx, "q1", "q1 description", true);
-            int jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
+            long qId = Queue.create(cnx, "q1", "q1 description", true);
+            long jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
                     false, null, PathType.FS);
 
             JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null,

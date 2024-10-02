@@ -104,9 +104,9 @@ public class MiscTest extends JqmBaseTest
         // tests on other databases
         AssumeHsqldb();
 
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42, "jqm-test-em",
@@ -122,7 +122,7 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testJobWithPersistenceUnitAndEngineApi() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         JqmSimpleTest.create(cnx, "pyl.CompatHibApi", "jqm-test-pyl-hibapi").expectOk(2).run(this);
     }
@@ -130,9 +130,9 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testJobWithPersistenceUnitAndEngineApiAndXmlParams() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", cnx,
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         cnx.commit();
 
@@ -190,7 +190,7 @@ public class MiscTest extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         /// Create a running job that should be cleaned at startup
-        int i1 = jqmClient.enqueue("jqm-test-em", "test");
+        Long i1 = jqmClient.enqueue("jqm-test-em", "test");
         cnx.runUpdate("ji_update_status_by_id", TestHelpers.node.getId(), i1);
         cnx.runUpdate("jj_update_run_by_id", i1);
         cnx.commit();
@@ -209,7 +209,7 @@ public class MiscTest extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         // Create a running job that should be cleaned at startup
-        int i = jqmClient.enqueue("jqm-test-em", "test");
+        Long i = jqmClient.enqueue("jqm-test-em", "test");
         cnx.runUpdate("ji_update_status_by_id", TestHelpers.node.getId(), i);
         cnx.commit();
 

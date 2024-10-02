@@ -39,7 +39,7 @@ public class DiscreteResourceManager extends ResourceManagerBase
     private class Token
     {
         private AtomicBoolean free = new AtomicBoolean(true);
-        private int jiId = 0;
+        private long jiId = 0L;
     }
 
     private int defaultConsumption;

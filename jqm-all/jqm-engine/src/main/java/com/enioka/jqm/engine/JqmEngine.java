@@ -19,6 +19,8 @@
 package com.enioka.jqm.engine;
 
 import java.lang.management.ManagementFactory;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,6 +48,7 @@ import com.enioka.jqm.engine.api.lifecycle.JqmEngineHandler;
 import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -59,6 +62,8 @@ import com.enioka.jqm.model.State;
 import com.enioka.jqm.repository.VersionRepository;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 import com.enioka.jqm.shared.misc.Closer;
+
+import static com.enioka.jqm.shared.misc.StandaloneHelpers.idSequenceBaseFromIp;
 
 /**
  * The engine itself. Everything starts in this class.
@@ -81,7 +86,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private ObjectName name;
 
     // Threads that together constitute the engine
-    private Map<Integer, QueuePoller> pollers = new HashMap<>();
+    private Map<Long, QueuePoller> pollers = new HashMap<>();
     private InternalPoller intPoller = null;
     private Thread intPollerThread = null;
     private CronScheduler scheduler = null;
@@ -242,6 +247,16 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             // Pollers
             syncPollers(cnx, this.node);
             jqmlogger.info("All required queues are now polled");
+
+            // Standalone sequence reinit
+            final var standaloneMode = Boolean.parseBoolean(
+                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+            if (standaloneMode) {
+                final var localIp = Inet4Address.getLocalHost().getHostAddress();
+                cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idSequenceBaseFromIp(localIp));
+            }
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
 
         // Internal poller (stop notifications, keep alive)
@@ -381,12 +396,12 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             }
 
             // Remove deleted pollers
-            for (int dp : this.pollers.keySet().toArray(new Integer[0]))
+            for (long dp : this.pollers.keySet())
             {
                 boolean found = false;
                 for (DeploymentParameter ndp : dps)
                 {
-                    if (ndp.getId().equals(dp))
+                    if (ndp.getId() == dp)
                     {
                         found = true;
                         break;
@@ -751,7 +766,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public long getCurrentlyRunningJobCount()
     {
-        Long nb = 0L;
+        long nb = 0L;
         for (QueuePoller p : this.pollers.values())
         {
             nb += p.getCurrentlyRunningJobCount();

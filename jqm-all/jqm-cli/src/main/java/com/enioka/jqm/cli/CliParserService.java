@@ -2,9 +2,7 @@ package com.enioka.jqm.cli;
 
 import java.util.ServiceLoader;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
+import com.enioka.jqm.cli.api.CommandBase;
 import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.JCommander;
 import com.enioka.jqm.cli.bootstrap.CommandLine;
 import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
+import com.enioka.jqm.model.updater.cli.DbUpdateVerb;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**
@@ -42,14 +41,23 @@ public class CliParserService implements CommandLine
         // JNDI registration - most commands need a JNDI context.
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
+        // Get commands registred as services
+        var additionalCommands = ServiceLoaderHelper.getServices(ServiceLoader.load(CommandBase.class));
+
         // Create parser
-        JCommander jc = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
+        var jcBuilder = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
                 .addCommand(new CommandGetEngineVersion()).addCommand(new CommandGetJiStatus()).addCommand(new CommandGetNodeCount())
                 .addCommand(new CommandGetRole()).addCommand(new CommandImportClusterConfiguration()).addCommand(new CommandImportJobDef())
                 .addCommand(new CommandImportQueue()).addCommand(new CommandInstallNodeTemplate()).addCommand(new CommandNewJi())
                 .addCommand(new CommandNewNode()).addCommand(new CommandResetRoot()).addCommand(new CommandResetUser())
-                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle())
-                .addCommand(new CommandUpdateSchema()).build();
+                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle());
+
+        for (var command : additionalCommands)
+        {
+            jcBuilder.addCommand(command);
+        }
+        var jc = jcBuilder.build();
+
         jc.setColumnSize(160);
         jc.setCaseSensitiveOptions(false);
 
@@ -70,7 +78,7 @@ public class CliParserService implements CommandLine
         jc.parse(args);
         CommandBase command = (CommandBase) jc.getCommands().get(jc.getParsedCommand()).getObjects().get(0);
 
-        if (command.help)
+        if (command.isHelp())
         {
             jc.usage();
             return 0;
@@ -78,10 +86,10 @@ public class CliParserService implements CommandLine
 
         // It is possible to actually switch from one environment to another by setting a different 'settings' file.
         // (and therefore a different datasource)
-        if (command.settingsFile != null)
+        if (command.getSettingsFile() != null)
         {
-            jqmlogger.info("Using alternative settings file {}", command.settingsFile);
-            System.setProperty("com.enioka.jqm.resourceFiles", command.settingsFile);
+            jqmlogger.info("Using alternative settings file {}", command.getSettingsFile());
+            System.setProperty("com.enioka.jqm.resourceFiles", command.getSettingsFile());
         }
 
         // Go.

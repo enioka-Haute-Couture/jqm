@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +38,10 @@ import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.Deliverable;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 
 import jakarta.servlet.ServletContext;
@@ -64,11 +68,11 @@ public class ServiceSimple
 {
     private static Logger log = LoggerFactory.getLogger(ServiceSimple.class);
 
-    private Integer jqmNodeId = null;
+    private Long jqmNodeId = null;
 
     public ServiceSimple(@Context ServletContext context)
     {
-        jqmNodeId = Integer.parseInt(context.getInitParameter("jqmnodeid").toString());
+        jqmNodeId = Long.parseLong(context.getInitParameter("jqmnodeid").toString());
     }
 
     /////////////////////////////////////////////////////////////
@@ -102,7 +106,7 @@ public class ServiceSimple
     @GET
     @Path("status")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getStatus(@QueryParam("id") int id)
+    public String getStatus(@QueryParam("id") long id)
     {
         return Helpers.getClient().getJob(id).getState().toString();
     }
@@ -114,7 +118,7 @@ public class ServiceSimple
     @GET
     @Path("stdout")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public InputStream getLogOut(@QueryParam("id") int id, @Context HttpServletResponse res, @Context SecurityContext security)
+    public InputStream getLogOut(@QueryParam("id") long id, @Context HttpServletResponse res, @Context SecurityContext security)
     {
         res.setHeader("Content-Disposition", "attachment; filename=" + id + ".stdout.txt");
         return getFile(FilenameUtils.concat("./logs", StringUtils.leftPad("" + id, 10, "0") + ".stdout.log"), security);
@@ -123,7 +127,7 @@ public class ServiceSimple
     @GET
     @Path("stderr")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public InputStream getLogErr(@QueryParam("id") int id, @Context HttpServletResponse res, @Context SecurityContext security)
+    public InputStream getLogErr(@QueryParam("id") long id, @Context HttpServletResponse res, @Context SecurityContext security)
     {
         res.setHeader("Content-Disposition", "attachment; filename=" + id + ".stderr.txt");
         return getFile(FilenameUtils.concat("./logs", StringUtils.leftPad("" + id, 10, "0") + ".stderr.log"), security);
@@ -238,10 +242,10 @@ public class ServiceSimple
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     public String enqueue(@FormParam("applicationname") String applicationName, @FormParam("module") String module,
-            @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
-            @FormParam("keyword3") String keyword3, @FormParam("parentid") Integer parentId, @FormParam("user") String user,
-            @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
-            @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
+                          @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
+                          @FormParam("keyword3") String keyword3, @FormParam("parentid") Long parentId, @FormParam("user") String user,
+                          @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
+                          @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
     {
         if (user == null && security != null && security.getUserPrincipal() != null)
         {
@@ -274,8 +278,8 @@ public class ServiceSimple
             log.trace("Adding a parameter: " + name + " - " + value);
         }
 
-        Integer i = jd.enqueue();
-        return i.toString();
+        long i = jd.enqueue();
+        return Long.toString(i);
     }
 
     /////////////////////////////////////////////////////////////
@@ -285,8 +289,7 @@ public class ServiceSimple
     @GET
     @Path("localnode/health")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getLocalNodeHealth() throws MalformedObjectNameException
-    {
+    public String getLocalNodeHealth() throws MalformedObjectNameException, UnknownHostException {
         // Local service only - not enabled when running on top of Tomcat & co.
         Node n = getLocalNodeIfRunningOnJqm();
         if (n == null)
@@ -331,6 +334,15 @@ public class ServiceSimple
             throw new ErrorDto("JQM node has is not working as expected", "", 11, Status.SERVICE_UNAVAILABLE);
         }
 
-        return "Pollers are polling";
+        try (DbConn cnx = DbManager.getDb().getConn()) {
+            final var standaloneMode = Boolean.parseBoolean(
+                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+
+            if (standaloneMode) {
+                return "Pollers are polling - IP: " + Inet4Address.getLocalHost().getHostAddress();
+            } else {
+                return "Pollers are polling";
+            }
+        }
     }
 }

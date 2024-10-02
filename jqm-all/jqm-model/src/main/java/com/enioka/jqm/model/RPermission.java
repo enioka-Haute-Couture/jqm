@@ -31,17 +31,17 @@ public class RPermission implements Serializable
 {
     private static final long serialVersionUID = 1234354709423603792L;
 
-    private Integer id;
+    private long id;
     private String name;
 
-    private int role;
+    private long role;
 
-    public Integer getId()
+    public long getId()
     {
         return id;
     }
 
-    void setId(Integer id)
+    void setId(long id)
     {
         this.id = id;
     }
@@ -56,12 +56,12 @@ public class RPermission implements Serializable
         this.name = name;
     }
 
-    public int getRole()
+    public long getRole()
     {
         return role;
     }
 
-    public void setRole(int role)
+    public void setRole(long role)
     {
         this.role = role;
     }
@@ -75,9 +75,9 @@ public class RPermission implements Serializable
             {
                 RPermission tmp = new RPermission();
 
-                tmp.id = rs.getInt(1);
+                tmp.id = rs.getLong(1);
                 tmp.name = rs.getString(2);
-                tmp.role = rs.getInt(3);
+                tmp.role = rs.getLong(3);
                 res.add(tmp);
             }
         }

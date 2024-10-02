@@ -69,7 +69,7 @@ public class FiboTest extends JqmBaseTest
             {
                 continue;
             }
-            Assert.assertEquals(h2.getParent(), h1.getId());
+            Assert.assertEquals((long) h2.getParent(), h1.getId());
             Assert.assertTrue(h2.getEndDate().compareTo(h1.getEndDate()) <= 0);
             Assert.assertTrue(h2.getEndDate().compareTo(h1.getBeganRunningDate()) > 0);
         }

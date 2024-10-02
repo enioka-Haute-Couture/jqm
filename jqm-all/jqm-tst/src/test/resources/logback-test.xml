@@ -2,7 +2,9 @@
     <!-- A console appender -->
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date{dd/MM HH:mm:ss.SSS}|%-5level|%-70.70thread|%35.35logger{1}|%exception%message%n</pattern>
+            <pattern>
+                %date{dd/MM.HH:mm:ss.SSS}|%-5level|%-70.70thread|%35.35logger{1}|%exception%message%n
+            </pattern>
         </encoder>
     </appender>
 
