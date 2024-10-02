@@ -171,7 +171,7 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "pollingInterval",
-            label: "Polling Interval*",
+            label: "Polling Interval (ms)*",
             options: {
                 hint: "The polling interval, in milliseconds. Never go below one second. If updated on an active engine, it is applied to the next loop (not the current one).",
                 filter: true,

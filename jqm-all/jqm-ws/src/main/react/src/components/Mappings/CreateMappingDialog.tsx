@@ -46,7 +46,7 @@ export const CreateMappingDialog: React.FC<{
 
     const [pollingInterval, setPollingInterval] = useState<string>("");
     const [nbThread, setNbThread] = useState<string>("");
-    const [enabled, setEnabled] = useState(false);
+    const [enabled, setEnabled] = useState(true);
     const classes = useStyles();
     return (
         <Dialog
@@ -96,7 +96,7 @@ export const CreateMappingDialog: React.FC<{
                 </FormControl>
                 <TextField
                     className={classes.TextField}
-                    label="Polling interval*"
+                    label="Polling interval (ms)*"
                     value={pollingInterval}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setPollingInterval(event.target.value);
