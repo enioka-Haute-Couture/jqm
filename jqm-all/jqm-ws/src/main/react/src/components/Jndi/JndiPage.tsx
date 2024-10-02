@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Badge, Container, Grid, IconButton, Tooltip } from "@mui/material";
+import { Badge, Box, Container, Grid, IconButton, Tooltip } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
@@ -17,6 +17,7 @@ import {
 } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { HelpDialog } from "../HelpDialog";
 
 export const JndiPage: React.FC = () => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -99,6 +100,8 @@ export const JndiPage: React.FC = () => {
         });
     }, []);
 
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
     const columns = [
         {
             name: "id",
@@ -117,6 +120,7 @@ export const JndiPage: React.FC = () => {
             name: "name",
             label: "JNDI Alias",
             options: {
+                hint: "The name that will be used by payloads during resource lookup.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -129,6 +133,7 @@ export const JndiPage: React.FC = () => {
             name: "type",
             label: "Type",
             options: {
+                hint: "The fully qualified name of the resource class. E.g. java.io.File.File",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -141,6 +146,7 @@ export const JndiPage: React.FC = () => {
             name: "factory",
             label: "Factory",
             options: {
+                hint: "The fully qualified name of the resource factory class. E.g. com.enioka.jqm.providers.FileFactory",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -153,6 +159,7 @@ export const JndiPage: React.FC = () => {
             name: "description",
             label: "Description",
             options: {
+                hint: "Free text to remember what the resource is for.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -165,6 +172,7 @@ export const JndiPage: React.FC = () => {
             name: "singleton",
             label: "Singleton",
             options: {
+                hint: "Tick for singleton resource. Differing from standard JNDI resource, a lookup on a singleton resource will always return the same instance (standard JNDI is: a new instance is created on each lookup). This is most helpful for connection pools, for which it is stupid to create a new instance on each call..",
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -277,7 +285,7 @@ export const JndiPage: React.FC = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
+                    <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
                 </Tooltip>
@@ -302,6 +310,16 @@ export const JndiPage: React.FC = () => {
 
     return resources ? (
         <Container maxWidth={false}>
+            <HelpDialog
+                isOpen={isHelpModalOpen}
+                onClose={() => setIsHelpModalOpen(false)}
+                title="JNDI Resources documentation"
+                header="Resources are Java objects which can be requested by jobs through a JNDI lookup."
+                descriptionParagraphs={[
+                    <>On this page, one may create or change resources. Creating a new resource does not require any reboot. Altering an already used <Box component="span" sx={{ fontWeight: 'bold' }}>singleton</Box> resource does require rebooting the nodes using it, as singleton resources are cached. Altering a non-singleton resource does not require any reboot.</>,
+                    "Please note that for a non-singleton resource, its class and factory class must be accessible to the payload: either in JQM_ROOT/ext or inside the payload's own dependencies. For a singleton resource, the classes must be inside ext (as they must be available to the engine itself, not only to the payload)."
+                ]}
+            />
             <MUIDataTable
                 title={"JNDI Resources"}
                 data={resources}

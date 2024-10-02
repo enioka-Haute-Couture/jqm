@@ -10,6 +10,7 @@ import useParametersApi from "./ParametersApi";
 import { renderActionsCell, renderInputCell } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { HelpDialog } from "../HelpDialog";
 
 const ClusterwideParametersPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -61,6 +62,8 @@ const ClusterwideParametersPage: React.FC = () => {
         []
     );
 
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
     const columns = [
         {
             name: "id",
@@ -73,6 +76,7 @@ const ClusterwideParametersPage: React.FC = () => {
             name: "key",
             label: "Key",
             options: {
+                hint: "The parameter key. Not necessarily unique.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -85,6 +89,7 @@ const ClusterwideParametersPage: React.FC = () => {
             name: "value",
             label: "Value",
             options: {
+                hint: "The value of the parameter",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -147,7 +152,7 @@ const ClusterwideParametersPage: React.FC = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
+                    <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
                 </Tooltip>
@@ -172,6 +177,15 @@ const ClusterwideParametersPage: React.FC = () => {
 
     return parameters ? (
         <Container maxWidth={false}>
+            <HelpDialog
+                isOpen={isHelpModalOpen}
+                onClose={() => setIsHelpModalOpen(false)}
+                title="Cluster-wide parameters documentation"
+                header="These parameters apply to every node inside the cluster."
+                descriptionParagraphs={[
+                    "On this page, one may change the global cluster parameters. Please see the full documentation for the parameters. The need to reboot after a change depends on the parameter."
+                ]}
+            />
             <MUIDataTable
                 title={"Cluster-wide parameters"}
                 data={parameters}
