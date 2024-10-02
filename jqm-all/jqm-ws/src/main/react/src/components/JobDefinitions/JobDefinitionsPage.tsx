@@ -386,7 +386,7 @@ export const JobDefinitionsPage: React.FC = () => {
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const rowSchedules = tableMeta.rowData[10];
                     const getBadge = (count: number) => (
-                        <Badge badgeContent={count} color="primary">
+                        <Badge badgeContent={count} color="primary" showZero>
                             <ScheduleIcon />
                         </Badge>
                     );
@@ -406,7 +406,7 @@ export const JobDefinitionsPage: React.FC = () => {
                                     setEditSchedulesJobDefinitionId(id);
                                 }}
                             >
-                                {getBadge(rowSchedules.length)}
+                                {getBadge(schedules.length)}
                             </span>
                         </Tooltip>
                     ) : (
