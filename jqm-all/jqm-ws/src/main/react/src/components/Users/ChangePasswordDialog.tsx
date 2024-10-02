@@ -42,7 +42,6 @@ export const ChangePasswordDialog: React.FC<{
             </DialogContent>
             <DialogActions>
                 <Button
-                    variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
