@@ -15,6 +15,7 @@ import {
 } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { HelpDialog } from "../HelpDialog";
 
 const QueuesPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -75,6 +76,8 @@ const QueuesPage: React.FC = () => {
         setEditingRowId(tableMeta.rowIndex);
     }, []);
 
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
     const columns = [
         {
             name: "id",
@@ -87,6 +90,7 @@ const QueuesPage: React.FC = () => {
             name: "name",
             label: "Name*",
             options: {
+                hint: "The name of the queue. This name is very important, as it the key used to designate the queue in the different APIs (for example, when submitting an execution request, one may specify by name a queue in which the request will wait). However, it can still be changed - internally, JQM uses an ID, not this name - the impact is only on the clients' side.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -99,6 +103,7 @@ const QueuesPage: React.FC = () => {
             name: "description",
             label: "Description",
             options: {
+                hint: "A free text description that appears in reports",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -111,6 +116,7 @@ const QueuesPage: React.FC = () => {
             name: "defaultQueue",
             label: "Is default",
             options: {
+                hint: "The queue used when none is specified. There can only be one default queue.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -174,7 +180,7 @@ const QueuesPage: React.FC = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
+                    <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
                 </Tooltip>
@@ -199,6 +205,15 @@ const QueuesPage: React.FC = () => {
 
     return queues ? (
         <Container maxWidth={false}>
+            <HelpDialog
+                isOpen={isHelpModalOpen}
+                onClose={() => setIsHelpModalOpen(false)}
+                title="Queues documentation"
+                header="These are FIFO (First In First Out) queues in which batch job execution requests will wait."
+                descriptionParagraphs={[
+                    "On this page, one may change the characteristics of queues. Changes on this page do not require node reboots.",
+                ]}
+            />
             <MUIDataTable
                 title={"Queues"}
                 data={queues}

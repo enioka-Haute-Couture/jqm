@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import MUIDataTable, { MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -244,7 +243,7 @@ const UsersPage: React.FC = () => {
                             }
                         },
                         {
-                            title: "Change password",
+                            title: "Change password. Passwords are ignored if a certificate is used. An empty password forces the use of a certificate.",
                             addIcon: () => <VpnKeyIcon />,
                             action: (tableMeta: MUIDataTableMeta) => {
                                 const [userId] = tableMeta.rowData;
@@ -282,17 +281,6 @@ const UsersPage: React.FC = () => {
                         onClick={() => refresh()}
                         size="large">
                         <RefreshIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title={"Help"}>
-                    <IconButton
-                        color="default"
-                        aria-label={"help"}
-                        onClick={() => {
-                            //
-                        }}
-                        size="large">
-                        <HelpIcon />
                     </IconButton>
                 </Tooltip>
             </>;

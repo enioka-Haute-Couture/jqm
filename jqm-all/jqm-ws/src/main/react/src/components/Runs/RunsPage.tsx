@@ -11,7 +11,6 @@ import {
 
 import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { FilterType, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
-import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -441,11 +440,6 @@ const RunsPage: React.FC = () => {
                         }}
                         size="large">
                         <RefreshIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
-                        <HelpIcon />
                     </IconButton>
                 </Tooltip>
             </>;

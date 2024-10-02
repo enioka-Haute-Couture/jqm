@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import MUIDataTable, { MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useRoleAPI } from "./RoleAPI";
@@ -120,6 +119,7 @@ const RolesPage: React.FC = () => {
             name: "permissions",
             label: "Permissions",
             options: {
+                hint: "What the role can do.",
                 filter: false,
                 sort: false,
                 customBodyRender: renderDialogCell(
@@ -175,17 +175,6 @@ const RolesPage: React.FC = () => {
                         onClick={() => fetchRoles()}
                         size="large">
                         <RefreshIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title={"Help"}>
-                    <IconButton
-                        color="default"
-                        aria-label={"help"}
-                        onClick={() => {
-                            //
-                        }}
-                        size="large">
-                        <HelpIcon />
                     </IconButton>
                 </Tooltip>
             </>;

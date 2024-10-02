@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Container, Grid, IconButton, Tooltip } from "@mui/material";
+import { Box, Container, Grid, IconButton, Tooltip } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
@@ -14,6 +14,7 @@ import {
 } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { HelpDialog } from "../HelpDialog";
 
 export const NodesPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -96,6 +97,8 @@ export const NodesPage: React.FC = () => {
         setEditingRowId(tableMeta.rowIndex);
     }, []);
 
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
     const columns = [
         {
             name: "id",
@@ -120,8 +123,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "Name*",
+            label: "Name**",
             options: {
+                hint: "The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the name given as a parameter to the node when starting. It is unique throughout the cluster. Default is server hostname in Windows, user name in Unix.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -135,6 +139,7 @@ export const NodesPage: React.FC = () => {
             name: "dns",
             label: "DNS to bind to*",
             options: {
+                hint: "The web APIs will bind on all interfaces that answer to a reverse DNS call of this name. Default is localhost, i.e. local-only binding.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -148,6 +153,7 @@ export const NodesPage: React.FC = () => {
             name: "port",
             label: "HTTP port*",
             options: {
+                hint: "The web APIs will bind on this port. Default is a random free port.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -159,8 +165,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "outputDirectory",
-            label: "File produced storage*",
+            label: "File produced storage**",
             options: {
+                hint: "Should batch jobs produce files, they would be stored in sub-directories of this directory. Absolute path strongly recommended, relative path are relative to JQM install directory.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -172,8 +179,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "jobRepoDirectory",
-            label: "Directory containing jars*",
+            label: "Directory containing jars**",
             options: {
+                hint: "The root directory containing all the jobs (payload jars). Absolute path strongly recommended, relative path are relative to JQM install directory.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -200,6 +208,7 @@ export const NodesPage: React.FC = () => {
             name: "rootLogLevel",
             label: "Log level*",
             options: {
+                hint: "Verbosity of the main log file. Valid values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL. See full documentation for the signification of these levels. In case of erroneous value, default value INFO is assumed.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -210,8 +219,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "jmxRegistryPort",
-            label: "Jmx Registry Port*",
+            label: "Jmx Registry Port**",
             options: {
+                hint: "If 0, remote JMX is disabled. Default is 0.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -223,8 +233,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "jmxServerPort",
-            label: "Jmx Server Port*",
+            label: "Jmx Server Port**",
             options: {
+                hint: "If 0, remote JMX is disabled. Default is 0.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -251,6 +262,7 @@ export const NodesPage: React.FC = () => {
             name: "loapApiSimple",
             label: "Simple API",
             options: {
+                hint: "If ticked, the simple web API will start. This API governs script interactions (execution request through wget & co, etc.) and file retrieval (logs, files created by batch jobs executions)",
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -264,6 +276,7 @@ export const NodesPage: React.FC = () => {
             name: "loadApiClient",
             label: "Client API",
             options: {
+                hint: "If ticked, the client web API will start. This API exposes the full JqmClient API - see full documentation.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -277,6 +290,7 @@ export const NodesPage: React.FC = () => {
             name: "loadApiAdmin",
             label: "Admin API",
             options: {
+                hint: "If ticked, the administration web API will start. This API is only used by this web administration console and is an internal JQM API, not a public one. Disabling it disables this web console.",
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -329,7 +343,7 @@ export const NodesPage: React.FC = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
+                    <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
                 </Tooltip>
@@ -348,13 +362,24 @@ export const NodesPage: React.FC = () => {
                 closeDialog={() => setNodeLogs(undefined)}
                 logs={nodeLogs}
             />
+            <HelpDialog
+                isOpen={isHelpModalOpen}
+                onClose={() => setIsHelpModalOpen(false)}
+                title="Nodes documentation"
+                header="Nodes are instances of the JQM engine that actually run batch job instances. Basically, they are Unix init.d entries, Windows services or running containers."
+                descriptionParagraphs={[
+                    "On this page, one may change the characteristics of nodes.",
+                    <>Nodes can only be created through the command line <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>jqm.(sh|ps1) createnode [ nodename ]</Box>. Only nodes switched off for more than 10 minutes can be removed.</>,
+                    <>Changing fields marked with <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>**</Box> (two asterisks) while the node is running requires the node to be restarted for the change to be taken into account. Changes to other fields are automatically applied asynchronously (default is at most after one minute).</>
+                ]}
+            />
             <MUIDataTable
                 title={"Nodes"}
                 data={nodes}
                 columns={columns}
                 options={options}
             />
-        </Container>
+        </Container >
     ) : (
         <Grid container justifyContent="center">
             <CircularProgress />

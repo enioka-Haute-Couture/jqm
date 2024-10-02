@@ -25,6 +25,7 @@ import { Node } from "../Nodes/Node";
 import { Queue } from "../Queues/Queue";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { HelpDialog } from "../HelpDialog";
 
 const MappingsPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -112,6 +113,8 @@ const MappingsPage: React.FC = () => {
         setEnabled(tableMeta.rowData[5]);
         setEditingRowId(tableMeta.rowIndex);
     }, []);
+
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
     const columns = [
         {
@@ -269,7 +272,7 @@ const MappingsPage: React.FC = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
+                    <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
                 </Tooltip>
@@ -297,6 +300,15 @@ const MappingsPage: React.FC = () => {
 
     return mappings && nodes && queues ? (
         <Container maxWidth={false}>
+            <HelpDialog
+                isOpen={isHelpModalOpen}
+                onClose={() => setIsHelpModalOpen(false)}
+                title="Mappings documentation"
+                header="Mappings specify which nodes will poll which queues. They are basically nodes subscribing to queues."
+                descriptionParagraphs={[
+                    "On this page, one may associate nodes with queues. Running nodes will (by default) check every minute if there are changes in their mappings."
+                ]}
+            />
             <MUIDataTable
                 title={"Mappings"}
                 data={mappings}

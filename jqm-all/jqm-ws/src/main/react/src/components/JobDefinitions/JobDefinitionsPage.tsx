@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
-import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import { Typography } from "@mui/material";
@@ -459,11 +458,6 @@ export const JobDefinitionsPage: React.FC = () => {
                         onClick={() => refresh()}
                         size="large">
                         <RefreshIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title={"Help"}>
-                    <IconButton color="default" aria-label={"help"} size="large">
-                        <HelpIcon />
                     </IconButton>
                 </Tooltip>
             </>;
