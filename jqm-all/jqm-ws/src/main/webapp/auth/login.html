@@ -1,41 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JQM administration</title>
+        <link rel="shortcut icon" href="/favicon.png" />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link href="css/login.css" rel="stylesheet" />
+    </head>
 
-<head>
-    <meta charset="utf-8">
-    <title>
-        JQM administration
-    </title>
+    <body>
+        <div class="center">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">JQM administration</span>
+                    <form method="POST">
+                        <div class="input-field">
+                            <input id="username" type="text" name="username" />
+                            <label for="username">Login</label>
+                        </div>
+                        <div class="input-field">
+                            <input
+                                id="password"
+                                type="password"
+                                name="password"
+                            />
+                            <label for="password">Password</label>
+                        </div>
 
-    <link rel="shortcut icon" href="/favicon.png" />
-    <link href="min.css" rel="stylesheet" />
-
-</head>
-
-<body>
-    <div class="marsu center">
-        <div class="title">JQM administration</div>
-        <div class="relative">
-            <div class="">
-                <form method="POST">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Login</td>
-                                <td><input type="text" name="username" /> </td>
-                            </tr>
-                            <tr>
-                                <td>Password</td>
-                                <td><input type="password" name="password" /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <input class="button" type="submit" autofocus value="Log in" />
-                </form>
+                        <input
+                            class="btn"
+                            type="submit"
+                            autofocus
+                            value="Log in"
+                        />
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</body>
-
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+    </body>
 </html>
