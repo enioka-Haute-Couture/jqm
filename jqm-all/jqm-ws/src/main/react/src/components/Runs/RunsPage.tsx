@@ -46,6 +46,8 @@ const RunsPage: React.FC = () => {
         switchJoqQueue,
         fetchLogsStdout,
         fetchLogsStderr,
+        fetchFiles,
+        fetchFileContent
     } = useJobInstanceAPI(Array(5).fill([]));
 
     const { jobDefinitions, fetchJobDefinitions } = useJobDefinitionsAPI();
@@ -389,6 +391,8 @@ const RunsPage: React.FC = () => {
                         tableState.filterList
                     );
                     break;
+                case "propsUpdate":
+                    break;
                 default:
                     console.log("action not handled.", action);
             }
@@ -470,6 +474,8 @@ const RunsPage: React.FC = () => {
                     }
                     fetchLogsStderr={fetchLogsStderr}
                     fetchLogsStdout={fetchLogsStdout}
+                    fetchFiles={fetchFiles}
+                    fetchFileContent={fetchFileContent}
                 />
             )}
             {showLaunchFormDialog && (
