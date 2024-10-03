@@ -20,6 +20,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Link from "@mui/material/Link";
+import fileDownload from "js-file-download";
 import { JobInstance } from "./JobInstance";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 
@@ -153,8 +154,13 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                     <TableCell>
                                                         <Link
                                                             href="#"
-                                                            onClick={(event: any) =>
+                                                            onClick={(event: any) => {
                                                                 event.preventDefault()
+                                                                fetchLogsStdout(
+                                                                    jobInstance.id!
+                                                                ).then((response) =>
+                                                                    fileDownload(response as string, `${jobInstance.id!}.stdout.txt`));
+                                                            }
                                                             }
                                                         >
                                                             download
@@ -181,8 +187,13 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                     <TableCell>
                                                         <Link
                                                             href="#"
-                                                            onClick={(event: any) =>
+                                                            onClick={(event: any) => {
                                                                 event.preventDefault()
+                                                                fetchLogsStderr(
+                                                                    jobInstance.id!
+                                                                ).then((response) =>
+                                                                    fileDownload(response as string, `${jobInstance.id!}.stderr.txt`));
+                                                            }
                                                             }
                                                         >
                                                             download
@@ -376,8 +387,8 @@ export const JobInstanceDetailsDialog: React.FC<{
                         Close
                     </Button>
                 </DialogActions>
-            </Dialog>
-            {logs && (
+            </Dialog >
+            {logs != null && (
                 <Dialog
                     open={true}
                     onClose={() => setLogs(null)}
@@ -385,10 +396,13 @@ export const JobInstanceDetailsDialog: React.FC<{
                     fullWidth
                     maxWidth={"lg"}
                 >
-                    <DialogTitle>Logs job ${jobInstance.id}</DialogTitle>
-                    <DialogContent>{logs}</DialogContent>
+                    <DialogTitle>Logs job {jobInstance.id}</DialogTitle>
+                    <DialogContent>
+                        <Typography sx={{ fontFamily: 'Monospace', fontSize: "small" }}>{logs}</Typography>
+                    </DialogContent>
                 </Dialog>
-            )}
+            )
+            }
         </>
     );
 };
