@@ -111,6 +111,8 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
 
             let request = {
                 ...filterQuery,
+                enqueuedAfter: null,
+                enqueuedBefore: null,
                 firstRow: rowsPerPage * page,
                 pageSize: rowsPerPage,
                 queryLiveInstances: queryLiveInstances,
@@ -306,7 +308,8 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 headers: {
                     Accept: "*/*", // API returns plain text
                 },
-            }).catch(displayError);
+            }, false,
+            ).catch(displayError);
         },
         [displayError]
     );
@@ -317,7 +320,8 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 headers: {
                     Accept: "*/*", // API returns plain text
                 },
-            }).catch(displayError);
+            }, false
+            ).catch(displayError);
         },
         [displayError]
     );
