@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Button,
     Grid,
@@ -22,6 +22,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Link from "@mui/material/Link";
 import fileDownload from "js-file-download";
 import { JobInstance } from "./JobInstance";
+import { JobInstanceFile } from "./JobInstanceFile";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 
 const formatDate = (date?: Date) => {
@@ -37,9 +38,20 @@ export const JobInstanceDetailsDialog: React.FC<{
     jobInstance: JobInstance;
     fetchLogsStdout: (jobId: number) => Promise<String>;
     fetchLogsStderr: (jobId: number) => Promise<String>;
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr }) => {
+    fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
+    fetchFileContent: (fileId: number) => Promise<string>;
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
+    const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
+
+
+    useEffect(() => {
+        // fetch files details
+        fetchFiles(jobInstance.id!).then((files) => {
+            setFiles(files);
+        })
+    }, [fetchFiles, jobInstance.id])
 
     return (
         <>
@@ -248,7 +260,7 @@ export const JobInstanceDetailsDialog: React.FC<{
 
                             <List dense>
                                 {jobInstance.messages.map((message) => (
-                                    <ListItem>
+                                    <ListItem key={message}>
                                         <ListItemText primary={message} />
                                     </ListItem>
                                 ))}
@@ -260,8 +272,33 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         style={{ marginTop: "16px" }}
                                     />
                                     <Typography variant="h6">Files created</Typography>
+                                    <TableContainer component={Paper}>
+                                        <Table size="small">
+                                            <TableBody>
+                                                {files?.map((file) => (
+                                                    <TableRow key={file.id}>
+                                                        <TableCell>Id {file.id}</TableCell>
+                                                        <TableCell>
+                                                            <Link
+                                                                href="#"
+                                                                onClick={(event: any) => {
+                                                                    event.preventDefault()
+                                                                    fetchFileContent(
+                                                                        file.id!
+                                                                    ).then((response) =>
+                                                                        fileDownload(response as string, `${file.fileFamily}.${file.id}.txt`));
+                                                                }
+                                                                }
+                                                            >
+                                                                {file.fileFamily}
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
 
-                                    {/* TODO:  */}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
                                 </>)
                             }
                         </Grid>

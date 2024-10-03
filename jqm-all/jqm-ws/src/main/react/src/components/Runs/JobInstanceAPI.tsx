@@ -326,6 +326,25 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
         [displayError]
     );
 
+    const fetchFiles = useCallback(
+        async (jobId: number) => {
+            return APIService.get(`${API_URL}/${jobId}/files`).catch(displayError);
+        },
+        [displayError]
+    );
+
+    const fetchFileContent = useCallback(
+        async (fileId: number) => {
+            return APIService.get(`${API_URL}/files/${fileId}`, {
+                headers: {
+                    Accept: "*/*", // API returns plain text
+                },
+            }, false,
+            ).catch(displayError);
+        },
+        [displayError]
+    )
+
     return {
         count,
         page,
@@ -345,6 +364,8 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
         switchJoqQueue,
         fetchLogsStdout,
         fetchLogsStderr,
+        fetchFiles,
+        fetchFileContent,
     };
 };
 
