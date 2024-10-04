@@ -3,6 +3,7 @@ import {
     Container,
     Grid,
     IconButton,
+    Stack,
     ToggleButton,
     ToggleButtonGroup,
     Tooltip,
@@ -10,7 +11,7 @@ import {
 } from "@mui/material";
 
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { FilterType, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
+import MUIDataTable, { FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -18,6 +19,8 @@ import StopIcon from "@mui/icons-material/Stop";
 import PauseIcon from "@mui/icons-material/Pause";
 import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { DatePicker } from "@mui/x-date-pickers";
+import { format, isValid, parseISO } from "date-fns";
 import { JobInstanceDetailsDialog } from "./JobInstanceDetailsDialog";
 import { LaunchFormDialog } from "./LaunchFormDialog";
 import useJobInstanceAPI from "./JobInstanceAPI";
@@ -167,9 +170,81 @@ const RunsPage: React.FC = () => {
             name: "enqueueDate",
             label: "Enqueued",
             options: {
-                filter: false,
+                filter: true,
                 sort: true,
-                // TODO: custom filter
+                filterType: "custom" as FilterType,
+                customFilterListOptions: {
+                    render: (v: any) => {
+                        let filterChips = [];
+
+                        if (v[0] && isValid(parseISO(v[0]))) {
+                            filterChips.push(`Created after: ${format(new Date(v[0]), "dd/MM/yyyy")}`);
+                        }
+                        if (v[1] && isValid(parseISO(v[1]))) {
+                            filterChips.push(`Created before: ${format(new Date(v[1]), "dd/MM/yyyy")}`);
+                        }
+                        return filterChips;
+                    },
+                    update: (
+                        filterList: MUIDataTableState["filterList"],
+                        filterPos: number,
+                        index: number,
+                    ) => {
+                        if (filterPos === 0) {
+                            filterList[index] = ['', filterList[index][1]]
+                        }
+                        if (filterPos === 1 || filterPos === -1) {
+                            filterList[index] = [filterList[index][0]]
+                        }
+                        return filterList;
+                    }
+                },
+                filterOptions: {
+                    names: [],
+                    fullWidth: true,
+
+                    display: (filterList: MUIDataTableState["filterList"],
+                        onChange: (val: string | string[], index: number, column: MUIDataTableColumn) => void,
+                        index: number,
+                        column: MUIDataTableColumn,
+                        filterData: MUIDataTableState["filterData"]) => {
+
+                        return <Stack direction="row" spacing={2}>
+                            <DatePicker
+                                sx={{ flexGrow: 1 }}
+                                label="Created after"
+                                format="dd/MM/yyyy"
+                                slotProps={{ field: { clearable: true } }}
+                                value={(filterList[index].length === 0 || !filterList[index][0]) ? null : new Date(filterList[index][0])}
+                                onChange={(date) => {
+                                    if (date && isValid(new Date(date))) {
+                                        filterList[index][0] = new Date(date).toISOString()
+                                        onChange(filterList[index], 4, column);
+                                    } else {
+                                        filterList[index] = ['', filterList[index][1]]
+                                        onChange(filterList[index], 4, column);
+                                    }
+                                }}
+                            />
+                            <DatePicker
+                                sx={{ flexGrow: 1 }}
+                                label="Created before"
+                                format="dd/MM/yyyy"
+                                slotProps={{ field: { clearable: true } }}
+                                value={(filterList[index].length !== 2 || !filterList[index][1]) ? null : new Date(filterList[index][1])}
+                                onChange={(date) => {
+                                    if (date && isValid(new Date(date))) {
+                                        filterList[index][1] = new Date(date).toISOString()
+                                        onChange(filterList[index], 4, column);
+                                    } else {
+                                        filterList[index] = [filterList[index][0]]
+                                        onChange(filterList[index], 4, column);
+                                    }
+                                }}
+                            />
+                        </Stack>
+                    }
+                },
                 customBodyRender: (value: any) => {
                     if (value) {
                         return new Date(value).toUTCString();
@@ -391,10 +466,7 @@ const RunsPage: React.FC = () => {
                         tableState.filterList
                     );
                     break;
-                case "propsUpdate":
-                    break;
                 default:
-                    console.log("action not handled.", action);
             }
         },
         customToolbar: () => {

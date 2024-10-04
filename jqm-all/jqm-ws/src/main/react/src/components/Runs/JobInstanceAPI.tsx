@@ -69,6 +69,10 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
             if (filterList[3]?.length > 0) {
                 filterQuery.statuses = [filterList[3][0]];
             }
+            if (filterList[4]?.length > 0) {
+                filterQuery.enqueuedAfter = new Date(filterList[4][0]);
+                filterQuery.enqueuedBefore = new Date(filterList[4][1]);
+            }
             if (filterList[7]?.length > 0) {
                 filterQuery.user = filterList[7][0];
             }
@@ -111,8 +115,6 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
 
             let request = {
                 ...filterQuery,
-                enqueuedAfter: null,
-                enqueuedBefore: null,
                 firstRow: rowsPerPage * page,
                 pageSize: rowsPerPage,
                 queryLiveInstances: queryLiveInstances,
