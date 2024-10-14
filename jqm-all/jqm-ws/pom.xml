@@ -25,7 +25,6 @@
 
     <profiles>
         <!-- Disable yarn prod build when using dev mode -->
-        <!-- It is enabled inside the exec:exec goal -->
         <profile>
             <id>dev</id>
             <activation>
@@ -61,39 +60,71 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
                 <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <useProvidedScope>true</useProvidedScope>
-                    <useTestScope>true</useTestScope>
-                    <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
+                    <scan>10</scan>
+                    <jettyXmls>${project.basedir}/src/test/resources/jetty.xml</jettyXmls>
                     <httpConnector>
                         <port>8080</port>
                         <name>testConnector</name>
                     </httpConnector>
                     <webApp>
                         <contextPath>/</contextPath>
-                        <overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
                     </webApp>
+                    <jettyProperties>
+                        <!-- used inside jetty.xml to find the test service database location -->
+                        <version>${project.version}</version>
+                    </jettyProperties>
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>org.eclipse.persistence</groupId>
-                        <artifactId>org.eclipse.persistence.moxy</artifactId>
-                        <version>2.7.6</version>
+                        <groupId>org.hsqldb</groupId>
+                        <artifactId>hsqldb</artifactId>
+                        <version>${hsqldb.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>jul-to-slf4j</artifactId>
-                        <version>${slf4j.version}</version>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-jdbc</artifactId>
+                        <version>${pool.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                        <version>${commons.logging.version}</version>
+                        <groupId>org.glassfish.jersey.containers</groupId>
+                        <artifactId>jersey-container-servlet</artifactId>
+                        <version>${jersey.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                        <version>${slf4j.version}</version>
+                        <groupId>org.glassfish.jersey.inject</groupId>
+                        <artifactId>jersey-hk2</artifactId>
+                        <version>${jersey.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>jqm-serializer-jackson</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>com.enioka.jqm</groupId>
+                        <artifactId>jqm-api-client-jdbc</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.enioka.jqm</groupId>
+                        <artifactId>jqm-api-client-jersey</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.enioka.jqm</groupId>
+                        <artifactId>jqm-admin</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.enioka.jqm</groupId>
+                        <artifactId>jqm-xml</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.enioka.jqm</groupId>
+                        <artifactId>jqm-shared</artifactId>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -127,7 +158,7 @@
                         <configuration>
                             <arguments>install</arguments>
                         </configuration>
-                        <phase>generate-resources</phase>
+                        <phase>prepare-package</phase>
                     </execution>
 
                     <execution>
@@ -138,7 +169,7 @@
                         <configuration>
                             <arguments>build</arguments>
                         </configuration>
-                        <phase>generate-resources</phase>
+                        <phase>prepare-package</phase>
                     </execution>
                 </executions>
             </plugin>

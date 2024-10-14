@@ -72,7 +72,7 @@ public final class DbManager
                     }
                     catch (Exception e)
                     {
-                        jqmlogger.error("Unable to connect with the database. Maybe your configuration file is wrong. "
+                        jqmlogger.error("Unable to connect to the database. Maybe your configuration file is wrong. "
                                 + "Please check the password or the url in the $JQM_DIR/conf/resources.xml", e);
                         throw new RuntimeException("Database connection issue", e);
                     }

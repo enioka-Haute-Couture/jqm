@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 	<New id="jqm" class="org.eclipse.jetty.plus.jndi.Resource">
@@ -18,7 +18,7 @@
 
 				<Set name="username">SA</Set>
 				<!--<Set name="password">sa</Set> -->
-				<Set name="url">jdbc:hsqldb:hsql://localhost/jqm</Set>
+				<Set name="url">jdbc:hsqldb:file:../jqm-service/target/jqm-<Property name="version"/>/jqm-<Property name="version"/>/db/jqmdatabase</Set>
 				<Set name="driverClassName">org.hsqldb.jdbcDriver</Set>
 			</New>
 		</Arg>

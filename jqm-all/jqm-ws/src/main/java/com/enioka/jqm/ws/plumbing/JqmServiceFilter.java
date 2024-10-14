@@ -36,6 +36,12 @@ public class JqmServiceFilter implements ContainerRequestFilter
     public void filter(ContainerRequestContext requestContext) throws IOException
     {
         var enabled = false;
+        if (this.context.getInitParameter("startSimple") == null)
+        {
+            log.trace("No init parameters - services are enabled by default");
+            return;
+        }
+
         var clazz = resourceInfo.getResourceClass();
         if (clazz.isAssignableFrom(ServiceSimple.class))
         {

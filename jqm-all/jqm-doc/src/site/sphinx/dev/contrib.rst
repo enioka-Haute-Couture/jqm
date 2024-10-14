@@ -3,7 +3,7 @@ Contributing to JQM
 
 JQM is an Open Source project under the Apache v2 license. We welcome every contribution through GitHub pull requests.
 
-If you wonder if you should modify something, do not hesitate to mail the maintainer at mag@enioka.com with [JQM] inside the subject. 
+If you wonder if you should modify something, do not hesitate to mail the maintainer at mag@enioka.com with [JQM] inside the subject.
 It also works before opening feature requests.
 
 
@@ -15,6 +15,9 @@ JQM dev environment:
 * Sonar (through Maven. No public server provided, rules are :download:`here </files/rules_sonar.csv>`)
 * Git
 
-For the web application, a WebPack build is triggered by Maven. Developpers would simply use the "exec:exec" goal in the WS project to start a dev server with both Java and JS on port 8080.
+For the web application, a WebPack build is triggered by Maven during packaging of artifacts.
+Developpers who want to use a hot reload configuration for the Java web app should use
+the "jetty:run" goal in the WS project to start a dev server on port 8080. It uses by default (inside jetty.xml) a database that
+can be created by running `jqm.sh createnode` inside the service target directory.
 
 Finally, please respect our coding style and conventions: they are described in the :doc:`style` page.
