@@ -19,8 +19,10 @@ import java.security.cert.X509Certificate;
 
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.web.util.WebUtils;
 
 public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
 {
@@ -51,6 +53,28 @@ public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.a
         else
         {
             return super.createToken(request, response);
+        }
+    }
+
+    @Override
+    protected boolean sendChallenge(ServletRequest request, ServletResponse response)
+    {
+        var httpRequest = WebUtils.toHttp(request);
+        var appHeader = httpRequest.getHeader("X-Requested-With");
+
+        if (!"XMLHttpRequest".equals(appHeader))
+        {
+            // If not from an interactive application, return the classic 401/Basic authentication challenge
+            return super.sendChallenge(request, response);
+        }
+        else
+        {
+            // If not, return a stupid challenge to avoid basic auth prompt from the browser
+            var httpResponse = WebUtils.toHttp(response);
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            String authcHeader = "BASICXHR realm=\"" + getApplicationName() + "\"";
+            httpResponse.setHeader(AUTHENTICATE_HEADER, authcHeader);
+            return false;
         }
     }
 }
