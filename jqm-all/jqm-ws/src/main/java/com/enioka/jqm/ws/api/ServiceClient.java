@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
+import com.enioka.jqm.client.shared.JqmClientQuerySubmitCallback;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SelfDestructFileStream;
 import com.enioka.jqm.jdbc.DbConn;
@@ -59,19 +60,23 @@ public class ServiceClient
     private boolean standaloneMode;
     private String localIp;
 
-
-    public ServiceClient() {
+    public ServiceClient()
+    {
         log.info("\tStarting ServiceClient");
 
-        try (DbConn cnx = DbManager.getDb().getConn()) {
-            standaloneMode = Boolean.parseBoolean(
-                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+        try (DbConn cnx = DbManager.getDb().getConn())
+        {
+            standaloneMode = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
         }
 
-        if (standaloneMode) {
-            try {
+        if (standaloneMode)
+        {
+            try
+            {
                 localIp = Inet4Address.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException e)
+            {
                 throw new IllegalStateException(e);
             }
         }
@@ -288,13 +293,16 @@ public class ServiceClient
     public JobInstance getJob(@PathParam("jobId") long jobId)
     {
         JqmClient client;
-        if (standaloneMode && !ipFromId(jobId).equals(localIp)) {
+        if (standaloneMode && !ipFromId(jobId).equals(localIp))
+        {
             // TODO move to a helper
             // Redirect to distant node with Jersey client
             final var p = new Properties();
             p.setProperty("com.enioka.jqm.ws.url", "http://" + ipFromId(jobId) + ":1789/ws/client");
             client = JqmWsClientFactory.getClient(ipFromId(jobId), p, false);
-        } else {
+        }
+        else
+        {
             // Use local node with JDBC client
             client = JqmDbClientFactory.getClient();
         }
@@ -334,41 +342,10 @@ public class ServiceClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Query getJobsQuery(QueryBaseImpl query)
     {
-        Query target = Helpers.getClient().newQuery();
-
-        target.setApplicationName(query.getApplicationName());
-        target.setBeganRunningAfter(query.getBeganRunningAfter());
-        target.setBeganRunningBefore(query.getBeganRunningBefore());
-        target.setEndedAfter(query.getEndedAfter());
-        target.setEndedBefore(query.getBeganRunningBefore());
-        target.setEnqueuedAfter(query.getEndedAfter());
-        target.setEnqueuedBefore(query.getEnqueuedBefore());
-        target.setFirstRow(query.getFirstRow());
-        target.setInstanceApplication(query.getInstanceApplication());
-        target.setInstanceKeyword1(query.getInstanceKeyword1());
-        target.setInstanceKeyword2(query.getInstanceKeyword2());
-        target.setInstanceKeyword3(query.getInstanceKeyword3());
-        target.setInstanceModule(query.getInstanceModule());
-        target.setJobDefApplication(query.getJobDefApplication());
-        target.setJobDefKeyword1(query.getJobDefKeyword1());
-        target.setJobDefKeyword2(query.getJobDefKeyword2());
-        target.setJobDefKeyword3(query.getJobDefKeyword3());
-        target.setJobDefModule(query.getJobDefModule());
-        target.setJobInstanceId(query.getJobInstanceId());
-        target.setNodeName(query.getNodeName());
-        target.setPageSize(query.getPageSize());
-        target.setParentId(query.getParentId());
-        target.setQueryHistoryInstances(query.isQueryHistoryInstances());
-        target.setQueryLiveInstances(query.isQueryLiveInstances());
-        target.setQueueId(query.getQueueId());
-        target.setQueueName(query.getQueueName());
-        // target.setResultSize(resultSize);
-        // target.setResults(results);
-        target.setSessionId(query.getSessionId());
-        target.setUser(query.getUser());
-
-        target.invoke();
-        return target;
+        var client = Helpers.getClient();
+        query.setParentClient((JqmClientQuerySubmitCallback) client);
+        query.invoke();
+        return query;
     }
 
     @Path("ji/{jobId}/messages")

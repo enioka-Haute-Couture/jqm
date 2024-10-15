@@ -180,8 +180,8 @@ public interface JqmClient
 
     /**
      * Signal a job instance which was paused during its run with {@link #pauseRunningJob(long)} that it is allowed to resume. This works
-     * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(long)} was
-     * used.
+     * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(long)}
+     * was used.
      *
      * @param jobId
      * @throws JqmInvalidRequestException

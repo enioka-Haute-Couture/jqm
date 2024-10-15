@@ -84,6 +84,17 @@ public class QueryBaseImpl implements Query
         this.parentClient = client;
     }
 
+    /**
+     * Internal method. Not a public API. Used to change the client used by a query. The parameter type used is not a public interface on
+     * purpose.
+     *
+     * @param parentClient
+     */
+    public void setParentClient(JqmClientQuerySubmitCallback parentClient)
+    {
+        this.parentClient = parentClient;
+    }
+
     // //////////////////////////////////////////
     // Execution
     // //////////////////////////////////////////
