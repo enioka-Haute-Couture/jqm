@@ -77,7 +77,6 @@ const UsersPage: React.FC = () => {
                 id &&
                 login &&
                 locked != null &&
-                expirationDate != null &&
                 userRoles != null
             ) {
                 updateUser({
@@ -186,7 +185,7 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "expirationDate",
-            label: "Expiration date*",
+            label: "Expiration date",
             options: {
                 filter: true,
                 sort: true,
