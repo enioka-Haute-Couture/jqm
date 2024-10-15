@@ -458,6 +458,7 @@ const RunsPage: React.FC = () => {
                 case "sort":
                 case "filterChange":
                 case "changeRowsPerPage":
+                case 'resetFilters':
                     fetchJobInstances(
                         tableState.page,
                         tableState.rowsPerPage,
