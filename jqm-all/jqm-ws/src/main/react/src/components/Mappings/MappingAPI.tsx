@@ -17,7 +17,6 @@ export const useMappingAPI = () => {
     }, [displayError]);
 
     const createMapping = useCallback(
-        // TODO: handle 400 when https://github.com/enioka/jqm/issues/446 is done
         async (newMapping: Mapping) => {
             return APIService.post(API_URL, newMapping)
                 .then(() => {
@@ -39,8 +38,7 @@ export const useMappingAPI = () => {
                 .then(() => {
                     fetchMappings();
                     displaySuccess(
-                        `Successfully deleted mapping${
-                            mappingIds.length > 1 ? "s" : ""
+                        `Successfully deleted mapping${mappingIds.length > 1 ? "s" : ""
                         }`
                     );
                 })
@@ -50,7 +48,6 @@ export const useMappingAPI = () => {
     );
 
     const updateMapping = useCallback(
-        // TODO: handle 400 when https://github.com/enioka/jqm/issues/446 is done
         async (mapping: Mapping) => {
             return APIService.put(`${API_URL}/${mapping.id}`, mapping)
                 .then(() => {
