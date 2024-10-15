@@ -175,8 +175,8 @@ jobs:
                 postgres_tests,
                 jdk_tests,
             ]
-        # trigger job on merge only
-        if: github.event.pull_request.merged == true
+        # trigger job on master branch only
+        if: github.ref == 'refs/heads/master'
         steps:
             - uses: actions/checkout@v4
             - name: Login to Docker Hub
@@ -203,8 +203,8 @@ jobs:
                 postgres_tests,
                 jdk_tests,
             ]
-        # trigger job on merge only
-        if: github.event.pull_request.merged == true
+        # trigger job on master branch only
+        if: github.ref == 'refs/heads/master'
         steps:
             - uses: actions/checkout@v4
             - name: Set up Maven Central Repository
