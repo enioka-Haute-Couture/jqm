@@ -2,6 +2,7 @@ package com.enioka.admin;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 
 import com.enioka.api.admin.GlobalParameterDto;
@@ -654,7 +655,8 @@ public class MetaService
                         }
 
                         // Update main SJ fields (only if needed).
-                        if (update || !sj.getCronExpression().equals(existing.getCronExpression()) || (existing.getQueue() != null && !existing.getQueue().equals(sj.getQueue())))
+                        if (update || !sj.getCronExpression().equals(existing.getCronExpression())
+                                || (existing.getQueue() != null && !existing.getQueue().equals(sj.getQueue())))
                         {
                             cnx.runUpdate("sj_update_all_fields_by_id", sj.getCronExpression(), sj.getQueue(), sj.getPriority(),
                                     sj.getId());
@@ -1102,15 +1104,29 @@ public class MetaService
 
     public static void upsertQueueMapping(DbConn cnx, QueueMappingDto dto)
     {
-        if (dto.getId() != null)
+        try
         {
-            cnx.runUpdate("dp_update_changed_by_id", dto.getEnabled(), dto.getNbThread(), dto.getPollingInterval(), dto.getNodeId(),
-                    dto.getQueueId(), dto.getId(), dto.getEnabled(), dto.getNbThread(), dto.getPollingInterval(), dto.getNodeId(),
-                    dto.getQueueId());
+            if (dto.getId() != null)
+            {
+                cnx.runUpdate("dp_update_changed_by_id", dto.getEnabled(), dto.getNbThread(), dto.getPollingInterval(), dto.getNodeId(),
+                        dto.getQueueId(), dto.getId(), dto.getEnabled(), dto.getNbThread(), dto.getPollingInterval(), dto.getNodeId(),
+                        dto.getQueueId());
+            }
+            else
+            {
+                DeploymentParameter.create(cnx, dto.getNodeId(), dto.getNbThread(), dto.getPollingInterval(), dto.getQueueId());
+            }
         }
-        else
+        catch (DatabaseException e)
         {
-            DeploymentParameter.create(cnx, dto.getNodeId(), dto.getNbThread(), dto.getPollingInterval(), dto.getQueueId());
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+            {
+                throw new JqmAdminApiUserException("Cannot map node and a queue which are already mapped.");
+            }
+            else
+            {
+                throw e;
+            }
         }
     }
 
