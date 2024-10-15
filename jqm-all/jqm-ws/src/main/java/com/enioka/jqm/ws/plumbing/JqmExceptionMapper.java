@@ -15,7 +15,7 @@
  */
 package com.enioka.jqm.ws.plumbing;
 
-import com.enioka.jqm.client.api.JqmInvalidRequestException;
+
 import com.enioka.jqm.ws.api.ErrorDto;
 
 import jakarta.ws.rs.core.Context;
@@ -23,17 +23,15 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.ext.ExceptionMapper;
-import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.ExceptionMapper;;
 
-@Provider
-public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestException>
+public class JqmExceptionMapper<T extends Exception> implements ExceptionMapper<T>
 {
     @Context
     private HttpHeaders headers;
 
     @Override
-    public Response toResponse(JqmInvalidRequestException exception)
+    public Response toResponse(T exception)
     {
         ErrorDto d = new ErrorDto(exception.getMessage(), 10, exception, Status.BAD_REQUEST);
         MediaType type = headers.getMediaType();
