@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CSSObject, styled, Theme, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -29,6 +29,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { Button, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { PermissionAction, PermissionObjectType, useAuth } from "../utils/AuthService";
+import APIService from "../utils/APIService";
 
 const drawerWidth = 240;
 
@@ -126,6 +127,13 @@ export default function MenuWrapper(props: any) {
         setAnchorEl(null);
     };
 
+    const [version, setVersion] = React.useState("");
+    useEffect(() => {
+        APIService.get("/admin/version").then((data) => {
+            setVersion(`v${data.mavenVersion}`);
+        })
+    }, [])
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -144,7 +152,7 @@ export default function MenuWrapper(props: any) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        JQM v3
+                        JQM {version}
                     </Typography>
 
                     <div>

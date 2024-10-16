@@ -13,6 +13,7 @@ import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
+import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -28,6 +29,7 @@ import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.ScheduledJob;
+import com.enioka.jqm.repository.VersionRepository;
 
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
@@ -92,6 +94,18 @@ public class MetaService
         cnx.runUpdate("history_delete_all");
         cnx.runUpdate("jiprm_delete_all");
         cnx.runUpdate("ji_delete_all");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // VERSION
+    //////////////////////////////////////////////////////////////////////////////
+    public static VersionDto getVersion()
+    {
+        String version = VersionRepository.getMavenVersion();
+
+        VersionDto res = new VersionDto();
+        res.setMavenVersion(version);
+        return res;
     }
 
     ///////////////////////////////////////////////////////////////////////////
