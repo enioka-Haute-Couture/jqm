@@ -274,6 +274,7 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             MetaService.deleteQueueMapping(cnx, id);
+            cnx.commit();
         }
     }
 
