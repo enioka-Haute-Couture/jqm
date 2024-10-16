@@ -33,6 +33,7 @@ import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
+import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.client.api.JqmClientException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
@@ -67,6 +68,18 @@ import jakarta.ws.rs.core.StreamingOutput;
 public class ServiceAdmin
 {
     static Logger log = LoggerFactory.getLogger(ServiceAdmin.class);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Version
+    ///////////////////////////////////////////////////////////////////////////
+    @GET
+    @Path("version")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache("public, max-age=60")
+    public VersionDto getVersion()
+    {
+        return MetaService.getVersion();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Nodes
