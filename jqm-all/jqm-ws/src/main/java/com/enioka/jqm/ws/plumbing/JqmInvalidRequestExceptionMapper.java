@@ -27,7 +27,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestException>
+public class JqmInvalidRequestExceptionMapper implements ExceptionMapper<JqmInvalidRequestException>
 {
     @Context
     private HttpHeaders headers;

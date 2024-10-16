@@ -17,7 +17,7 @@ interface JobInstanceFilters {
     parentId?: string;
     queueId?: number;
     sessionId?: string;
-    applicationName?: string;
+    applicationName?: string[];
     statuses: string[];
 }
 
@@ -59,7 +59,7 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 filterQuery.jobInstanceId = filterList[0][0];
             }
             if (filterList[1]?.length > 0) {
-                filterQuery.applicationName = filterList[1][0];
+                filterQuery.applicationName = [filterList[1][0]];
             }
             if (filterList[2]?.length > 0) {
                 filterQuery.queueId = queues!.find(
