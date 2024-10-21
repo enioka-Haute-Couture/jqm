@@ -33,15 +33,13 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
     @Override
     public void init() throws Exception
     {
-        String enableWsApiAuth = this.getContextInitParam("enableWsApiAuth");
         boolean load = true;
-
         try (DbConn cnx = Helpers.getDbSession())
         {
             load = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
         }
 
-        jqmlogger.debug("Shiro filter enabled: " + load + " - " + enableWsApiAuth);
+        jqmlogger.debug("Shiro filter enabled: " + load + " - " + load);
         setEnabled(load);
         super.init();
     }

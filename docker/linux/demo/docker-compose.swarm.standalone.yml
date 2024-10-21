@@ -1,0 +1,12 @@
+services:
+    jqmworker:
+        image: enioka/jqm:${JQM_VERSION:-latest}
+        environment:
+            - JQM_NODE_NAME=_localhost_
+            - JQM_NODE_WS_INTERFACE=_localhost_
+            - JQM_INIT_MODE=STANDALONE
+            - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_DRONEOOOOO
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: vip

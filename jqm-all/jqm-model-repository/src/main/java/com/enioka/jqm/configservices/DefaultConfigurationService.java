@@ -61,14 +61,14 @@ public class DefaultConfigurationService
         }
 
         // Global parameters
-        GlobalParameter.setParameter(cnx, "mavenRepo", "http://repo1.maven.org/maven2/");
-        GlobalParameter.setParameter(cnx, Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS);
-        GlobalParameter.setParameter(cnx, "logFilePerLaunch", "true");
-        GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "60000");
-        GlobalParameter.setParameter(cnx, "disableWsApi", "false");
-        GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
-        GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
-        GlobalParameter.setParameter(cnx, "enableInternalPki", "true");
+        GlobalParameter.setParameterIfNotSet(cnx, "mavenRepo", "http://repo1.maven.org/maven2/");
+        GlobalParameter.setParameterIfNotSet(cnx, Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS);
+        GlobalParameter.setParameterIfNotSet(cnx, "logFilePerLaunch", "true");
+        GlobalParameter.setParameterIfNotSet(cnx, "internalPollingPeriodMs", "60000");
+        GlobalParameter.setParameterIfNotSet(cnx, "disableWsApi", "false");
+        GlobalParameter.setParameterIfNotSet(cnx, "enableWsApiSsl", "false");
+        GlobalParameter.setParameterIfNotSet(cnx, "enableWsApiAuth", "true");
+        GlobalParameter.setParameterIfNotSet(cnx, "enableInternalPki", "true");
 
         // Roles
         RRole adminr = UserManagementRepository.createRoleIfMissing(cnx, "administrator", "all permissions without exception", "*:*");

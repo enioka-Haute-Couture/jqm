@@ -180,4 +180,22 @@ public class GlobalParameter implements Serializable
             create(cnx, key, value);
         }
     }
+
+    /**
+     * Set a parameter in the database if it is not already set. Will never update an existing parameter.
+     *
+     * @param cnx
+     * @param key
+     * @param value
+     * @return true if the parameter was set, false if it was already set.
+     */
+    public static boolean setParameterIfNotSet(DbConn cnx, String key, String value)
+    {
+        if (GlobalParameter.getParameter(cnx, key, null) == null)
+        {
+            GlobalParameter.setParameter(cnx, key, value);
+            return true;
+        }
+        return false;
+    }
 }
