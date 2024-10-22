@@ -12,6 +12,6 @@ public class UrlFactory implements ObjectFactory
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
     {
-        return new URL("http://houba hop");
+        return new URL("http://houba.hop");
     }
 }

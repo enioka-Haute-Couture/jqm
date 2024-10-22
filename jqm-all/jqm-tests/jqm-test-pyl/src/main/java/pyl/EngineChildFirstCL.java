@@ -14,7 +14,7 @@ public class EngineChildFirstCL
         var url = factory.getObjectInstance(null, null, null, prms);
 
         // Normal (parent) implem should return meuh.
-        // Overloaded (child) implem always returns "houba hop"
+        // Overloaded (child) implem always returns "houba.hop"
         if (url.toString().equals("http://meuh"))
         {
             throw new RuntimeException("Value was meuh, meaning parent classloader was used instead of child first");
