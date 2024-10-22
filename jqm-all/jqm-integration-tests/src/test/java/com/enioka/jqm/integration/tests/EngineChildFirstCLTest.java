@@ -1,7 +1,6 @@
 package com.enioka.jqm.integration.tests;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.enioka.jqm.test.helpers.CreationTools;
@@ -24,15 +23,14 @@ public class EngineChildFirstCLTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
      * Test with child first method
      */
     @Test
-    @Ignore // TODO: reenable this with a better test (cannot patch base Java module in java >8)
     public void testChildFirst() throws Exception
     {
         addAndStartEngine();
@@ -43,7 +41,7 @@ public class EngineChildFirstCLTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 }

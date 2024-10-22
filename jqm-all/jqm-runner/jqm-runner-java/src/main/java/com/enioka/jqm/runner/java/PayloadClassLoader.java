@@ -279,7 +279,14 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         if (childFirstClassLoader)
         {
             // Look here first if requested (not the default)
-            c = findClass(name);
+            try
+            {
+                c = findClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                // Do nothing
+            }
             if (c != null)
             {
                 return c;
@@ -296,7 +303,14 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         if (!childFirstClassLoader)
         {
             // Default behaviour : if not found in parent, look here.
-            c = findClass(name);
+            try
+            {
+                c = findClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                // Do nothing
+            }
             if (c != null)
             {
                 return c;
@@ -304,7 +318,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         }
 
         // If here, we have lost
-        return null;
+        throw new ClassNotFoundException(name);
     }
 
     public boolean isChildFirstClassLoader()
