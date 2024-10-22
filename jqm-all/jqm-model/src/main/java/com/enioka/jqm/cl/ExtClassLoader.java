@@ -5,7 +5,6 @@ import java.lang.module.Configuration;
 import java.lang.module.ModuleDescriptor;
 import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -16,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +30,8 @@ public final class ExtClassLoader
     public static ModuleLayer moduleLayerInstance;
     public static ClassLoader classLoaderInstance;
 
-    static {
+    static
+    {
         initInstances();
     }
 
@@ -42,23 +40,6 @@ public final class ExtClassLoader
 
     private static void initInstances()
     {
-        // Java 8?
-        boolean tmpBool = false;
-        Method getPlatformClassLoaderMethod = null;
-        try
-        {
-            getPlatformClassLoaderMethod = ClassLoader.class.getMethod("getPlatformClassLoader");
-        }
-        catch (NoSuchMethodException e)
-        {
-            tmpBool = true;
-        }
-        catch (SecurityException e)
-        {
-            // Ignore.
-        }
-        final boolean java8 = tmpBool;
-
         // Parent for the ext CL?
         final ClassLoader parentCl;
         if (System.getProperty("com.enioka.jqm.cl.allow_system_cl", "false").equals("true"))
@@ -68,14 +49,7 @@ public final class ExtClassLoader
         }
         else
         {
-            try
-            {
-                parentCl = java8 ? null : (ClassLoader) getPlatformClassLoaderMethod.invoke(null);
-            }
-            catch (Exception e)
-            {
-                throw new JqmRuntimeException("Could not get parent classloader", e);
-            }
+            parentCl = ClassLoader.getPlatformClassLoader();
         }
 
         // List all jars inside ext directory
@@ -89,12 +63,16 @@ public final class ExtClassLoader
             final List<File> lJarFiles = getJarsInDirectoryRecursive(extDir);
             final List<URL> lUrls = new ArrayList<>();
             final List<Path> lPaths = new ArrayList<>();
-            for (final File file : lJarFiles) {
-                try {
+            for (final File file : lJarFiles)
+            {
+                try
+                {
                     lUrls.add(file.toURI().toURL());
                     lPaths.add(file.toPath());
                     jqmlogger.trace("\tAdded EXT path {}", file.toURI());
-                } catch (MalformedURLException e) {
+                }
+                catch (MalformedURLException e)
+                {
                     // This should be unreachable because the error was already handled in getJarsInDirectoryRecursive()
                     throw new IllegalStateException(e);
                 }
@@ -102,14 +80,12 @@ public final class ExtClassLoader
 
             // Create classloader
             final ModuleFinder moduleFinder = ModuleFinder.of(lPaths.toArray(new Path[0]));
-            Set<String> moduleNames = moduleFinder.findAll().stream()
-                .map(ModuleReference::descriptor)
-                .map(ModuleDescriptor::name)
-                .collect(Collectors.toUnmodifiableSet());
+            Set<String> moduleNames = moduleFinder.findAll().stream().map(ModuleReference::descriptor).map(ModuleDescriptor::name)
+                    .collect(Collectors.toUnmodifiableSet());
             Configuration cf = ModuleLayer.boot().configuration().resolveAndBind(ModuleFinder.of(), moduleFinder, moduleNames);
             moduleLayerInstance = ModuleLayer.boot().defineModulesWithOneLoader(cf, parentCl);
             classLoaderInstance = moduleLayerInstance.modules().isEmpty()
-                ? AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
+                    ? AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
                     {
                         @Override
                         public URLClassLoader run()
@@ -119,7 +95,7 @@ public final class ExtClassLoader
                             return new URLClassLoader(lUrls.toArray(new URL[0]), parentCl);
                         }
                     })
-                : moduleLayerInstance.modules().iterator().next().getClassLoader();
+                    : moduleLayerInstance.modules().iterator().next().getClassLoader();
         }
         else
         {

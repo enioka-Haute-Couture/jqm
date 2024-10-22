@@ -42,6 +42,11 @@ public interface JobRunnerCallback
      */
     public ClassLoader getExtensionClassloader();
 
+    /**
+     * When running in JPMS mode, this is the module layer containing the extensions.
+     * 
+     * @return
+     */
     public ModuleLayer getExtensionModuleLayer();
 
     /**
