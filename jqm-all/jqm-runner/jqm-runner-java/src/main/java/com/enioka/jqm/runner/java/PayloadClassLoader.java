@@ -90,8 +90,8 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
      *            given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h)
-            throws JobRunnerException
+    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h,
+            ModuleLayer parentModuleLayer) throws JobRunnerException
     {
         // 1 - Create the proxy.
         Object proxy = null;
@@ -117,8 +117,17 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         Class c = null;
         try
         {
-            // using payload CL, i.e. this very object
-            c = loadClass(classQualifiedName);
+            String[] classModuleSegments = classQualifiedName.split("/");
+            if (classModuleSegments.length > 1)
+            {
+                ModuleLayer ml = ModuleManager.createModuleLayerIfNeeded(this, parentModuleLayer, job);
+                c = ml.findLoader(classModuleSegments[0]).loadClass(classModuleSegments[1]);
+            }
+            else
+            {
+                // using payload CL, i.e. this very object
+                c = loadClass(classQualifiedName);
+            }
         }
         catch (Exception e)
         {
@@ -217,68 +226,99 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
 
     private Class<?> loadFromParentCL(String name) throws ClassNotFoundException
     {
+        boolean loadFromParent = true;
         for (Pattern pattern : hiddenJavaClassesPatterns)
         {
             Matcher matcher = pattern.matcher(name);
             if (matcher.matches())
             {
                 jqmlogger.debug("Class " + name + " will not be loaded by parent CL because it matches hiddenJavaClasses parameter");
-                // Invoke findClass in order to find the class.
-                return super.findClass(name);
+                loadFromParent = false;
             }
         }
-        return loadClass(name, false);
+        try
+        {
+            return loadFromParent
+                    ? (this.getParent() != null ? this.getParent().loadClass(name) : ClassLoader.getPlatformClassLoader().loadClass(name))
+                    : null;
+        }
+        catch (ClassNotFoundException e)
+        {
+            return null;
+        }
+    }
+
+    @Override
+    protected Class<?> findClass(String moduleName, String name)
+    {
+        // We must overload this - otherwise default ClassLoader implementation is used and null is always returned when moduleName is
+        // non-null.
+        // We can cheat here, as we know there is always a single CL in the module layer.
+        jqmlogger.trace("FINDING CLASS: {}/{}", moduleName, name);
+        try
+        {
+            Class<?> res = findClass(name);
+            return res != null && res.getModule().getName().equals(moduleName) ? res : null;
+        }
+        catch (ClassNotFoundException e)
+        {
+            return null; // This is the default behavior of the default implementation.
+        }
     }
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
-        Class<?> c = null;
-
-        if (tracing)
+        // Check if class was already loaded
+        var c = findLoadedClass(name);
+        if (c != null)
         {
-            jqmlogger.debug("Loading : " + name);
+            return c;
         }
 
         if (childFirstClassLoader)
         {
-            // Check if class was already loaded
-            c = findLoadedClass(name);
-
-            if (c == null)
+            // Look here first if requested (not the default)
+            try
             {
-                // Try to find class from URLClassLoader
-                try
-                {
-                    c = super.findClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    //
-                }
-                // If nothing was found, try parent class loader
-                if (c == null)
-                {
-                    // jqmlogger.trace("found in parent " + name);
-                    c = loadFromParentCL(name);
-                }
-                else
-                {
-                    // jqmlogger.trace("found in child " + name);
-                }
+                c = findClass(name);
             }
-            else
+            catch (ClassNotFoundException e)
             {
-                // jqmlogger.trace("name already loaded");
+                // Do nothing
+            }
+            if (c != null)
+            {
+                return c;
             }
         }
-        else
+
+        // Default behavior: ask parent
+        c = loadFromParentCL(name);
+        if (c != null)
         {
-            // Default behavior
-            c = loadFromParentCL(name);
+            return c;
         }
 
-        return c;
+        if (!childFirstClassLoader)
+        {
+            // Default behaviour : if not found in parent, look here.
+            try
+            {
+                c = findClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                // Do nothing
+            }
+            if (c != null)
+            {
+                return c;
+            }
+        }
+
+        // If here, we have lost
+        throw new ClassNotFoundException(name);
     }
 
     public boolean isChildFirstClassLoader()
@@ -358,8 +398,8 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         if (!mayBeShared)
         {
             // First: free the hounds, er, the CL leak hunter
-            ClassLoaderLeakCleaner.clean(this);
             ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
+            ClassLoaderLeakCleaner.clean(this);
 
             // Then try to call CL.close()
             Method m = null;

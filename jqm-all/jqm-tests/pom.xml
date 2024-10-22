@@ -24,6 +24,7 @@
         <module>jqm-test-datetimemavennopomlib</module>
         <module>jqm-test-em</module>
         <module>jqm-test-jndijms-amq</module>
+        <module>jqm-test-jpms</module>
         <module>jqm-test-providedapi</module>
         <module>jqm-test-pyl</module>
         <module>jqm-test-pyl-hibapi</module>
