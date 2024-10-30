@@ -418,8 +418,8 @@ export const JobDefinitionsPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -435,6 +435,11 @@ export const JobDefinitionsPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No job definitions found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.jd, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,

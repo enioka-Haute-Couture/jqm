@@ -304,8 +304,8 @@ export const NodesPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -328,6 +328,11 @@ export const NodesPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No nodes found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: "none" as SelectableRows,

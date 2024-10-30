@@ -37,23 +37,23 @@ resourceTemplates["jndiOracle"] = {
         },
         {
             key: "maxActive",
-            value: 100,
+            value: "100",
         },
         {
             key: "minIdle",
-            value: 2,
+            value: "2",
         },
         {
             key: "maxWait",
-            value: 30000,
+            value: "30000",
         },
         {
             key: "initialSize",
-            value: 5,
+            value: "5",
         },
         {
             key: "removeAbandonedTimeout",
-            value: 3600,
+            value: "3600",
         },
         {
             key: "removeAbandoned",
@@ -65,7 +65,7 @@ resourceTemplates["jndiOracle"] = {
         },
         {
             key: "minEvictableIdleTimeMillis",
-            value: 60000,
+            value: "60000",
         },
         {
             key: "jmxEnabled",
@@ -137,23 +137,23 @@ resourceTemplates["jndiPs"] = {
         },
         {
             key: "maxActive",
-            value: 100,
+            value: "100",
         },
         {
             key: "minIdle",
-            value: 2,
+            value: "2",
         },
         {
             key: "maxWait",
-            value: 30000,
+            value: "30000",
         },
         {
             key: "initialSize",
-            value: 5,
+            value: "5",
         },
         {
             key: "removeAbandonedTimeout",
-            value: 3600,
+            value: "3600",
         },
         {
             key: "removeAbandoned",
@@ -165,7 +165,7 @@ resourceTemplates["jndiPs"] = {
         },
         {
             key: "minEvictableIdleTimeMillis",
-            value: 60000,
+            value: "60000",
         },
         {
             key: "jmxEnabled",
@@ -225,23 +225,23 @@ resourceTemplates["jndiMySql"] = {
         },
         {
             key: "maxActive",
-            value: 100,
+            value: "100",
         },
         {
             key: "minIdle",
-            value: 2,
+            value: "2",
         },
         {
             key: "maxWait",
-            value: 30000,
+            value: "30000",
         },
         {
             key: "initialSize",
-            value: 5,
+            value: "5",
         },
         {
             key: "removeAbandonedTimeout",
-            value: 3600,
+            value: "3600",
         },
         {
             key: "removeAbandoned",
@@ -253,7 +253,7 @@ resourceTemplates["jndiMySql"] = {
         },
         {
             key: "minEvictableIdleTimeMillis",
-            value: 60000,
+            value: "60000",
         },
         {
             key: "jmxEnabled",
@@ -329,23 +329,23 @@ resourceTemplates["jndiHsqlDb"] = {
         },
         {
             key: "maxActive",
-            value: 100,
+            value: "100",
         },
         {
             key: "minIdle",
-            value: 2,
+            value: "2",
         },
         {
             key: "maxWait",
-            value: 30000,
+            value: "30000",
         },
         {
             key: "initialSize",
-            value: 5,
+            value: "5",
         },
         {
             key: "removeAbandonedTimeout",
-            value: 3600,
+            value: "3600",
         },
         {
             key: "removeAbandoned",
@@ -357,7 +357,7 @@ resourceTemplates["jndiHsqlDb"] = {
         },
         {
             key: "minEvictableIdleTimeMillis",
-            value: 60000,
+            value: "60000",
         },
         {
             key: "jmxEnabled",
@@ -397,23 +397,23 @@ resourceTemplates["jndiOtherDb"] = {
         },
         {
             key: "maxActive",
-            value: 100,
+            value: "100",
         },
         {
             key: "minIdle",
-            value: 2,
+            value: "2",
         },
         {
             key: "maxWait",
-            value: 30000,
+            value: "30000",
         },
         {
             key: "initialSize",
-            value: 5,
+            value: "5",
         },
         {
             key: "removeAbandonedTimeout",
-            value: 3600,
+            value: "3600",
         },
         {
             key: "removeAbandoned",
@@ -425,7 +425,7 @@ resourceTemplates["jndiOtherDb"] = {
         },
         {
             key: "minEvictableIdleTimeMillis",
-            value: 60000,
+            value: "60000",
         },
         {
             key: "jmxEnabled",
@@ -493,7 +493,7 @@ resourceTemplates["jndiMqQcf"] = {
         },
         {
             key: "TRAN",
-            value: 1,
+            value: "1",
         },
     ],
 };

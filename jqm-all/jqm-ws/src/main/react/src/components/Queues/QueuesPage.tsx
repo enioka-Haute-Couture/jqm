@@ -130,8 +130,8 @@ const QueuesPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -147,6 +147,11 @@ const QueuesPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No queues found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.queue, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,

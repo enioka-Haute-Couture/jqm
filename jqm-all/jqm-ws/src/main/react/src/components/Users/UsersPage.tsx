@@ -222,8 +222,8 @@ const UsersPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -257,6 +257,11 @@ const UsersPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No users found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.user, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
