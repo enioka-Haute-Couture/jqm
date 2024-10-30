@@ -248,14 +248,28 @@ public class MetaService
     {
         if (dto.getId() != null)
         {
-            QueryResult qr = cnx.runUpdate("jndi_update_changed_by_id", dto.getAuth(), dto.getDescription(), dto.getFactory(),
-                    dto.getName(), dto.getSingleton(), dto.getTemplate(), dto.getType(), dto.getId(), dto.getAuth(), dto.getDescription(),
-                    dto.getFactory(), dto.getName(), dto.getSingleton(), dto.getTemplate(), dto.getType());
-            if (qr.nbUpdated != 1)
+            try
             {
-                jqmlogger.debug("No update was done as object either does not exist or no modifications were done");
+                QueryResult qr = cnx.runUpdate("jndi_update_changed_by_id", dto.getAuth(), dto.getDescription(), dto.getFactory(),
+                        dto.getName(), dto.getSingleton(), dto.getTemplate(), dto.getType(), dto.getId(), dto.getAuth(),
+                        dto.getDescription(), dto.getFactory(), dto.getName(), dto.getSingleton(), dto.getTemplate(), dto.getType());
+                if (qr.nbUpdated != 1)
+                {
+                    jqmlogger.debug("No update was done as object either does not exist or no modifications were done");
+                }
             }
+            catch (DatabaseException e)
+            {
 
+                if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+                {
+                    throw new JqmAdminApiUserException("Cannot update resource, JNDI alias already used.");
+                }
+                else
+                {
+                    throw e;
+                }
+            }
             // Sync parameters too
             List<String> existingKeys = cnx.runSelectColumn("jndiprm_select_all_in_jndisrc", 2, String.class, dto.getId());
             for (Map.Entry<String, String> e : dto.getParameters().entrySet())
@@ -428,11 +442,28 @@ public class MetaService
         }
 
         cnx.runUpdate("jdprm_delete_all_for_jd", id);
-        QueryResult qr = cnx.runUpdate("jd_delete_by_id", id);
-        if (qr.nbUpdated != 1)
+
+        try
         {
-            cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            QueryResult qr = cnx.runUpdate("jd_delete_by_id", id);
+            if (qr.nbUpdated != 1)
+            {
+                cnx.setRollbackOnly();
+                throw new JqmAdminApiUserException("no item with ID " + id);
+            }
+
+        }
+        catch (DatabaseException e)
+        {
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+            {
+                throw new JqmAdminApiUserException(
+                        "Cannot delete a job definition with active schedules, remove them first then try again.");
+            }
+            else
+            {
+                throw e;
+            }
         }
     }
 
@@ -1469,7 +1500,7 @@ public class MetaService
         else
         {
             QueryResult r = cnx.runUpdate("user_insert", dto.getEmail(), dto.getExpirationDate(), dto.getFreeText(), null,
-                    dto.getInternal(), false, dto.getLogin(), null);
+                    dto.getInternal(), dto.getLocked(), dto.getLogin(), null);
             Long newId = r.getGeneratedId();
 
             if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
