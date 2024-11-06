@@ -445,6 +445,17 @@ public interface JqmClient
     InputStream getDeliverableContent(long fileId);
 
     /**
+     * Returns the engine log flow of a given node.
+     *
+     * @param nodeName
+     *            name of the node
+     * @param latest
+     *            number of lines to return
+     * @return a stream
+     */
+    InputStream getEngineLog(String nodeName, int latest);
+
+    /**
      * Returns the standard output flow of of an ended job instance <br>
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>

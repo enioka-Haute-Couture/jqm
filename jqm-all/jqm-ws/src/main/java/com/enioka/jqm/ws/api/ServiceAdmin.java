@@ -35,6 +35,7 @@ import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
 import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.client.api.JqmClientException;
+import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
@@ -747,12 +748,8 @@ public class ServiceAdmin
     @GET
     public InputStream SS(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest, @Context HttpServletResponse res)
     {
-        // TODO
-        /*
-         * InputStream fs = ((JdbcClient) JqmClientFactory.getClient()).getEngineLog(nodeName, latest); res.setHeader("Content-Disposition",
-         * "attachment; filename=" + nodeName + ".log"); return fs;
-         */
-
-        return null;
+        InputStream fs = Helpers.getClient().getEngineLog(nodeName, latest);
+        res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
+        return fs;
     }
 }
