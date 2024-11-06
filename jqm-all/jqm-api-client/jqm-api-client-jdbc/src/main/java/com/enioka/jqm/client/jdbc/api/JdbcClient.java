@@ -1014,7 +1014,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
     private String getIntPredicate(String fieldName, Integer filterValue, List<Object> prms)
     {
-        if (filterValue == null) {
+        if (filterValue == null)
+        {
             return "";
         }
         return getLongPredicate(fieldName, filterValue.longValue(), prms);
@@ -1536,6 +1537,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         return getDeliverableContent(deliverable);
     }
 
+    @Override
     public InputStream getEngineLog(String nodeName, int latest)
     {
         URL url = null;
