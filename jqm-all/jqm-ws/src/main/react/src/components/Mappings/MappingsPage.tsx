@@ -19,7 +19,7 @@ import {
     renderInputCell,
 } from "../TableCells";
 import { renderArrayCell } from "../TableCells/renderArrayCell";
-import useNodesApi from "../Nodes/useNodesApi";
+import useNodesApi from "../Nodes/NodesApi";
 import useQueueAPI from "../Queues/QueueAPI";
 import { Node } from "../Nodes/Node";
 import { Queue } from "../Queues/Queue";

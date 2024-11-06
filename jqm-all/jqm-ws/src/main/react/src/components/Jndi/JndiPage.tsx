@@ -7,7 +7,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { EditParametersDialog } from "./EditParametersDialog";
-import useJndiApi from "./useJndiApi";
+import useJndiApi from "./JndiApi";
 import { JndiResource } from "./JndiResource";
 import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
 import {

@@ -5,7 +5,7 @@ import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-dat
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DescriptionIcon from "@mui/icons-material/Description";
-import useNodesApi from "./useNodesApi";
+import useNodesApi from "./NodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
 import {
     renderActionsCell,
