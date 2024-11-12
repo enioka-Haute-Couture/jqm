@@ -9,7 +9,7 @@ Log levels
 +-------+-----------------------------------------------------------------------------------------------------------------------------------+
 | Level | Meaning in JQM                                                                                                                    |
 +=======+===================================================================================================================================+
-| TRACE | Fine grained data only useful for debugging, exposing the innards of the steps of JMQ's state-machine                             |
+| TRACE | Fine grained data only useful for debugging, exposing the innards of the steps of JQM's state-machine                             |
 +-------+-----------------------------------------------------------------------------------------------------------------------------------+
 | DEBUG | For debugging. Gives the succession of the steps of the state-machine, but not what happens inside a step.                        |
 +-------+-----------------------------------------------------------------------------------------------------------------------------------+
@@ -22,7 +22,7 @@ Log levels
 | FATAL | The engine is dead. Immediate attention is required                                                                               |
 +-------+-----------------------------------------------------------------------------------------------------------------------------------+
 
-The default log-level is INFO.
+The default log-level is INFO, which is the recommended level for production.
 
 In case of a classic two-level monitoring system ('something weird' & 'run for your life'), WARN whould be mapped to the first level while ERROR and FATAL should be mapped to the second one.
 
@@ -47,12 +47,12 @@ One file named after the ID of the job instance is created per payload launch. I
 * the engine traces concerning this log (classloader creation, start, stop, ....)
 * the stdout/stderr of the job instance. This means that if payloads use a ConsoleAppender for their logs (as is recommended)
   it will be fully here.
-  
+
 These files are **not purged** automatically. This is the admin's responsability.
 
 Also of note, there are two log levels involved here:
 
-* the engine log level, which will determine the verbosity of the traces concerning the luanch of the job itself.
+* the engine log level, which will determine the verbosity of the traces concerning the launch of the job itself.
 * the payload log level: if the payload uses a logger (log4j, logback, whatever), it has its own log level. This log level
   is not related in any way to the engine log level. (remember: running a payload inside JQM is the same as running it inside
   a standard JVM. The engine has no more influence on the behaviour of the payload than a JVM would have)

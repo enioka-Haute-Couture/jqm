@@ -18,7 +18,7 @@ Multi-layered means that inside modules a structure must be respected for easier
 
 The communication between layers is done through direct manipulation of instances which are created directly (no injection) or through the use of the injection of interfaces at the frontier of extension points.
 
-Great care is taken to expose minimal APIs either to the general public or to other JQM modules.
+Great care is taken to expose only minimal APIs either to the general public or to other JQM modules.
 
 Plugin system
 ******************
@@ -26,7 +26,7 @@ Plugin system
 Principles
 ===============
 
-JQM uses the ServiceLoader API to define its plugins.
+JQM uses the ServiceLoader Java API to define its plugins.
 
 This means that extensions points are defined by:
 
@@ -39,7 +39,7 @@ Other than that, public packages are signaled by a comment inside package-info.j
 
 For JQM, JPMS is a static plugin system and an API surface control system. Nothing more.
 
-Finally, extension points APIs muste be treated as if they were public APIs. This is not the case, but is compulsory for lowering the overall cost of maintenance
+Finally, extension points APIs must be treated as if they were public APIs. This is not the case, but is compulsory for lowering the overall cost of maintenance
 (it is a lot better when plugins do not have to be rewritten every JQM version...)
 
 .. warning:: JQM plugin system is internal. It is not meant for third party plugins. If the JQM maintainers want to break ascending compatibility in the plugin APIs, they can do so without notice.

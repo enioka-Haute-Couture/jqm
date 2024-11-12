@@ -4,28 +4,28 @@ Compatibility matrix
 Java (JRE)
 ************
 
-Supported: 8, 9, 10, 11, 12
+Supported: 12, 18, 21.
 
 Databases
 **************
 
 HSQLDB: version embedded with JQM only.
 
-Oracle: 10gR2, 11gR2, 12cR2
+Oracle: 10gR2, 11gR2, 12cR2, 19c.
 
 DB2: 11.5
 
-MySQL InnoDB only: 5.7, 8.0
+MySQL (InnoDB only): 8.
 
-MariaDB : 10.1, 10.3
+MariaDB : 10.5
 
-PostgreSQL: 9.6, 10
+PostgreSQL: 12, 15.
 
 OS
 *******
 
 Should run under most Java-supporting OSes, but is actively supported under:
 
-* Windows > 2008R2
-* Linux (tested under RHEL 7 or Ubuntu 18)
+* Windows >= 2016
+* Linux (tested under RHEL 8 or Ubuntu 22)
 * AIX 7

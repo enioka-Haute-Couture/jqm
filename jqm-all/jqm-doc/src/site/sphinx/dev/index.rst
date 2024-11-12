@@ -13,6 +13,8 @@ Otherwise, it can be skipped without remorse.
     style
     build
     ../release_notes
+    archi
     classloaders
     tests
     logging
+    env_helpers

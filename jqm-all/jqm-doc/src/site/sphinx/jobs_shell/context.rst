@@ -29,18 +29,18 @@ strongly discouraged - a shell command should be something simple. The administr
 Powershell
 +++++++++++++++++++++++++++++++
 
-Same as default shell, but powershell is always used as the shell. This means powershell core under Linux. 
-Job instances will obvioulsy crash if powershell is not present in the PATH seen by JQM.
+Same as default shell, but powershell is always used as the shell. This means powershell core under Linux.
+Job instances will obviously crash if powershell is not present in the PATH seen by JQM.
 
 Direct executable
 +++++++++++++++++++++++++++++++
 
 In this case, the commmand given must be an executable path (absolute or relative to JQM_HOME) without parameters.
 Parameters should be placed inside the explicit parameter section of the deployment descriptor. The value of parameters
-is added sorted by key. The keys are only used for sorting, and are not present inside the resulting command, so 
+is added sorted by key. The keys are only used for sorting, and are not present inside the resulting command, so
 ``--file FILENAME`` is two parameters.
 
-Note that in this case there is no shell available, and shell usual functions are not available. For example, there 
+Note that in this case there is no shell available, and shell usual functions are not available. For example, there
 is no wildcard expansion, no environment variable is usable in the command or its parameters, internal shell commands
 are not available and the command cannot be a shell pipe or multiple chained commands.
 
@@ -56,7 +56,7 @@ The following variables can be used by the created process (and inside the shell
 
 +----------------------------+------------------------------------------------------------------------------------+
 | Name                       | Description                                                                        |
-+============================+====================================================================================+  
++============================+====================================================================================+
 | JQM_JD_APPLICATION_NAME    | Name of the job definition as defined by thje deployment descriptor                |
 +----------------------------+------------------------------------------------------------------------------------+
 | JQM_JD_KEYWORD_1           | Tag from the deployment descriptor                                                 |

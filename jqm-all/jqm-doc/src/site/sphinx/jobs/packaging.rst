@@ -15,12 +15,12 @@ Should some terms prove to be obscure, please refer to the :doc:`../glossary`.
 Libraries handling
 **************************
 
-JQM itself is hidden from the payloads - payloads cannot see any of its internal classes and resources. So JQM itself does not provide anything to 
+JQM itself is hidden from the payloads - payloads cannot see any of its internal classes and resources. So JQM itself does not provide anything to
 payloads in terms of libraries (with the exception of libraries explicitly added to the ext directory, see below).
 
 But there are two ways, each with two variants, to make sure that required libraries are present at runtime.
 
-.. note:: All the four variants are exclusive. **Only one library source it used at the same time**.
+.. note:: All the four variants are exclusive. **Only one library source is used at the same time**.
 
 Maven POM
 ++++++++++++++++
@@ -35,12 +35,12 @@ your settings.xml. There a few :doc:`/admin/parameters` that can tweak that beha
 
 Conclusion: in that case, no packaging to do.
 
-.. warning:: using this means the pom is fully resolvable from the engine server (repository access, etc). This includes every parent pom used.
+.. warning:: using this means the pom is fully resolvable from the engine server (network access to repositories, etc). This includes every parent pom used.
 
-.. warning:: if you use a non-Maven system such as Gradle to create "uber jars" that include files from jars created with Maven, you may end up with 
+.. warning:: if you use a non-Maven system such as Gradle to create "uber jars" that include files from jars created with Maven, you may end up with
    a pom.xml inside the META-INF even if you are not using Maven! This would result in a Maven library resolution for a non-Maven jar
    and fail. To avoid this, exclude pom.xml files from your uber-ification. With Gradle: ::
-   
+
       jar { from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it)}} { exclude "META-INF/maven/**" }}
 
 
@@ -48,7 +48,7 @@ lib directory
 +++++++++++++++++
 
 If using Maven is not an option (not the build system, no access to a Nexus/Maven central, etc), it is possible to simply put a directory
-named "lib" in the same directory as the jar file. 
+named "lib" in the same directory as the jar file.
 
 POM files are ignored if a lib directory is present. An empty lib directory is valid (allows to ignore a pom).
 
@@ -60,7 +60,7 @@ Shared libraries
 *******************
 
 It is possible to copy jars inside the JQM_ROOT/ext directory. In that case, these resources will be loaded by a
-classloader common to all libraries and will be available to all payloads. 
+classloader common to all libraries and will be available to all payloads.
 
 This should only be used very rarely, and is not to be considered in packaging. This exists mostly for shared JNDI resources
 such as JDBC connection pools. Note that a library in ext has priority over one provided by the payload (through Maven or lib directory).
@@ -70,7 +70,7 @@ such as JDBC connection pools. Note that a library in ext has priority over one 
 
 Pure Maven package
 **************************
-    
+
 JQM also supports fetching your jobs through Maven. Of course, in that case, it means your artifacts must be published
 to a repository accessible to JQM (Maven Central, a  local Nexus...).
 
@@ -79,11 +79,11 @@ To do this, inside your deployment descriptor, use ``<path>groupid:artifactid:ve
 JQM will do a standard Maven3 resolution. That includes using a local cache and the standard refresh policy on SNAPSHOT artifacts.
 See the Maven :doc:`/admin/parameters` to change the standard behaviour.
 
-    
+
 Creating a JobDef
 *********************
 
-Structure 
+Structure
 ++++++++++++++++
 
 .. highlight:: xml
@@ -122,6 +122,7 @@ Jar attributes
 +------------+-------------------------------------------------------------------------------------------------------------+
 | pathType   | The meaning of the "path" attribute. If abse,nt, defaults to FS. Can be FS or MAVEN.                        |
 +------------+-------------------------------------------------------------------------------------------------------------+
+
 .. versionadded:: 1.1.6
 	There used to be a field named "filePath" that was redundant. It is no longer used and should not be specified in new xmls.
 	For existing files, the field is simply ignored so there is no need to modify the files.

@@ -100,7 +100,7 @@ a resource can be sliced and must be shared.
 Discrete resource manager
 +++++++++++++++++++++++++++
 
-A Resource Manager in which the resource is a list of items without order. Each job instance may take 0 to n items. Items are attributed nominaly -
+A Resource Manager in which the resource is a list of items without order. Each job instance may take 0 to n items. Items are attributed nominatively -
 they are named. An environment variable of all attributed items is made available to the job instance for when it runs.
 
 Blocks once the resource is exhausted.

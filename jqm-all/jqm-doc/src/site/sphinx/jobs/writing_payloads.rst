@@ -1,9 +1,9 @@
 Payload basics
 #########################
 
-JQM is a specialized application server dedicated to ease the management of Java batch jobs.
+JQM is a specialized application server dedicated to ease the management of batch jobs.
 Application servers usually have two main aspects: on one hand they bring in frameworks to help writing the business programs,
-on the other they try to ease daily operations. For example, JBoss or Glassfish provide an implementation of the EE6 framework for building
+on the other they try to ease daily operations. For example, JBoss or Glassfish provide an implementation of the EE6+ framework for building
 web applications, and provide many administration utilities to deploy applications, monitor them, load balance them, etc.
 
 JQM's philosophy is that **all existing Java programs should be reusable as is**, and that programmers should be free to use whatever frameworks
@@ -14,7 +14,7 @@ As long as the required libraries are provided, JQM can run :term:`payloads<payl
 **This section aims at giving all the keys to developers in order to create great batch jobs for JQM**. This may seem in contradiction with
 what was just said: why have a "develop for JQM" chapter if JQM runs any Java code?
 
-* First, as in all application server containers, there a a few guidelines to respect, such as packaging rules.
+* First, as in all application server containers, there are a few guidelines to respect, such as packaging rules.
 * Then, as an option, JQM provides a few APIs that can be of help to batch jobs, such as getting the ID of the run or the caller name.
 
 But this document must insist: unless there is a need to use the APIs, there is no need to develop specifically for JQM. **JQM
@@ -116,7 +116,7 @@ Sometimes, a job will need to directly interact with JQM, for operations such as
 * ...
 
 For this, an interface exists called :class:`JobManager` inside jar jqm-api.jar. Using it is trivial:
-just create a field (static or not) inside your job class (whatever type - Main, Runnable or JQM) and the engine
+just create a public field (static or not) inside your job class (whatever type - Main, Runnable or JQM) and the engine
 will **inject an implementation ready for use**.
 
 .. note:: the 'explicit JQM jobs' payload type already has one :class:`JobManager` field named jm defined in the base class JobBase - it would have

@@ -7,43 +7,366 @@ Release notes
 Release goal
 ++++++++++++++++
 
-We are excited to present JQM 3.0.0, the first release in the 3.x line.
-It brings major new functionalities in how to optimize running job instances according to available resources (memory, TCP ports...), going far beyond the "simple" FIFO queueing of previous versions.
-It also deals with the obsolescence of many components: Java 6 & 7 are dropped, new TLS ciphers are supported, IPv6 is now supported, the CLI was rewritten...
+We are excited to present JQM 3.0.0, the first release in the 3.x line, aiming at making the already ten years old JQM ready for the next decade!
+It brings a major overhaul of the JQM internals, aiming at delivering better performances, a more modern and maintenable codebase as well as enabling easier delivery of more features in future releases.
+The most visible change is the new GUI, which was fully rewritten. It is more reactive and user-friendly.
+It also deals with the obsolescence of many components: old Java versions are dropped, new TLS ciphers are supported, IPv6 is now supported, the CLI was rewritten...
 
 Major changes
 ++++++++++++++++++++++++++++
 
-* All libraries have been updated to their latest versions. This is particularly important for anyone exposing JQM web services, as this comes with much increased security.
-* Engine: added Java 11 and 12 support. Please consider using 11 for long term projects as it is a LTS release.
+* CLI: entirely re-written using a more understandable `verb-noun --options` style for commands (and a far more maintainable code behind this).
+* GUI: totally rewritten, with a fresher look and better useability.
+* Engine: the engine was cut into plugins, creating a much more modular codebase.
+* Engine: added Java 11-21 compatibility. Please consider using 21 for long term projects as it is an LTS release.
+* Packaging: docker image now uses Java 21.
 * Web APIs: added IPv6 compatibility and latest TLS versions (on Java versions supporting them).
 * Web APIs: better multiple interface handling.
-* CLI: entirely re-written using a more understandable `verb-noun --options` style for commands (and a far more maintainable code behind this).
 
 Minor changes
 ++++++++++++++++++++++++++++
 
 * Engine: Updated to latest Maven engine, adding latest pom.xml format compatibility.
 * Engine: MySQL >= 8 and MariaDB >= 10.3 do not use a special ID generator anymore, thanks to improvements in InnoDB.
+* Engine: a new "share nothing" mode without a central database was added in preview. Documentation will be added in a later version.
+* Global: all libraries have been updated to their latest versions. This is particularly important for anyone exposing JQM web services, as this comes with much increased security. This includes J2EE to Jakarta migration.
 * Test: client-side certificate authentication is now properly tested.
 * Test: MariaDB, MySQL and PostgreSQL have been added to the already present HSQLDB in the automated test suite run on each commit or PR.
 
 Breaking changes
 +++++++++++++++++++
 
-As the semantic versioning designation entails, this version contains a few breaking changes. However, it should be noted that the code API (the Java interfaces) themselves have no breaking changes from version 2.x, so impact should be minimal - most changes are behind the scenes, and have consequences for the administrators only.
+As the semantic versioning designation entails, this version contains a few breaking changes.
+We tried to limit them, but we allowed breaks where it was necessary to improve the codebase and especially the boudaries between modules.
+The most visible impact is the removal of the initialisation "magic" of JQM clients, which was a hack and the source of many issues while not really needed.
 
 The breaking changes are:
 
-* Java 1.6 and 1.7 are dropped in all JQM components - either for the JQM engine or the provided Java libraries. Note that JQM actively uses the newer Java features: there is no hope to recompile this version with 1.6. 1.6 and 1.7 users should either migrate to 1.8 (or 1.11) or stays with JQM 2.x.
-* Web APIs: SSL and encryptions and broken ciphers have been dropped. Only recent TLS with recent ciphers are now supported.
 * CLI : the internal CLI (the one called with `java -jar jqm.jar options…`) has been fully revamped. All scripts using it should be revised with the new, clearer options. If you use the .sh or .ps1 provided scripts, no changes.
+* Client API: new namespaces for JqmClientFactory. It used to be `com.enioka.jqm.api`, it is now ` `com.enioka.jqm.client.jdbc` or `com.enioka.jqm.client.jersey` depending on the client you wish to use.
+* Client API: change in the construction of Query instances. Used to be `new Query()`or `Query.create()`. Is now only `JqmClient.createQuery()`
+* Client API: change in the execution of a query. Used to be either `Query.submit()` or `JqmClient.getJobs(Query)`. Is now only `Query.invoke()`.
+* Client API: change in the construction of JobRequest instances. Used to be `new JobRequest()` or `JobRequest.create()`. Is now only `JqmClient.createJobRequest()`.
+* Client API: change in the enqueing of a JobRequest. Used to be either `JobRequest.submit()` or `JqmClient.enqueue(JobRequest)`. Is now only `JobRequest.enqueue()`.
+* Engine API: JobManager fields must now be public (as they should always have been - this is an interface between payload and engine, not a private implementation detail)
+* Global: Java 1.6, 1.7, 8, 9 and 10 are dropped in all JQM components - either for the JQM engine or the provided Java libraries. Note that JQM actively uses the newer Java features: there is no hope to recompile this version with 1.6. 1.6 and 1.7 users should either migrate to 11 (or better 21) or stays with JQM 2.x.
+* Global: support for old database versions was dropped, see our new compatibility matrix.
+* Packaging: Windows docker images were dropped for lack of use. Only Linux images remain.
+* Web APIs: SSL and encryptions and broken ciphers have been dropped. Only recent TLS with recent ciphers are now supported.
 
 Deprecated
 +++++++++++++++
 
+* Java 11-16 are deprecated. JQM 4 will only support Java 17+. The best long term choice is to use Java 21, which is an LTS release.
 * The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-client-core" artifact. The redirection will be removed in a future release.
 * JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+
+Changes in management
++++++++++++++++++++++++++++
+
+JQM is still maintained by the IT firm Enioka, but the governance has changed. The historical lead is welcoming the new leads overtaking the project:
+
+* Backend lead: Arnaud Chirat (Enioka Haute Couture)
+* Frontend lead: Paulin de Naurois (Enioka Haute Couture).
+
+Thanks to them for taking the project over.
+
+Also, thanks to all the PR contributors for this release!
+
+2.2.9
+*************
+
+Maintenance release, with a lot of fixes oriented towards Kubernetes (and equivalent container orchestrators) hosting.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Engine: added `deleteStoppedNodes` global parameter, which triggers node deletion from configuration on shutdown. This is used when nodes are transient, like inside an orchestrator. (#435)
+* Build: partial retrofit of GitHub Action automations from 3.0 branch, Travis CI was removed.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: the `System.exit` check is now disabled in Java versions above 17 as Security Managers are now deprecated. (#471)
+* Engine: fixed process not stopping on "engine shutdown" API call due to JMX non-daemon thread.
+* Engine: can now specify the web service listening interface through the command line, overriding the node's "DNS" parameter.
+* Admin GUI: global parameter latest change date no longer change if saving with the same value, preventing some useless engine restarts. (#472)
+* Admin GUI: fixed remove node command (SQL error).
+* Packaging: can now specify initSQL for SQL pool configuration in container deployments. Used in HSQLDB demo swarm configuration to set session timezone.
+* Packaging: Docker images now listen to all network interfaces by default. This fixes the image healthcheck in all deployment configurations.
+* Build: fixed Maven URL in Dockerfile (build only).
+* Build: updated supported Windows images.
+
+2.2.8
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Users of MySQL/MariaDB beware: after the application of this patch JQM will always store times in UTC inside the database, as it was always intended.
+It used to be imposed through a connection property set in resources.xml and not through code.
+If that property was not present before, you will have time zone inconsistencies inside the database after upgrade.
+This will not hamper JQM operations at all, but may produce weird reports in the administration GUI on the day of upgrade.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Admin GUI: can now be deployed in a subdirectory (for example a reverse proxy may expose the GUI on domain.com/jqm instead of simply domain.com)
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: MySQL/MariaDB now enforce UTC in code. Configuration files were updated to remove the previous method. Thanks to Ihor Herasymenko for this PR.
+* Engine: better MySQL/MariaDB connection failure handling. Thanks to Eugene Echipachenko for this PR.
+* Engine: fixed a nasty random database deadlock when using Highlander mode. (#432)
+
+
+2.2.7
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Build: it is now possible to use the JQM web services, including job logs retrieval, inside a Swarm or Kubernetes cluster. A new environment variable must be set (#425)
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Admin GUI: the page selection sliders in "runs" page had a weird interaction with the date criterions of the query (#424)
+* Build: updated Docker base images
+* Client API (JDBC only): when used with the Wildfly/JBoss JDBC pool, the JDBC implementation triggered pool warnings due to statement caching (#403 - new fix, thanks Mr Pool)
+* Engine: the "disable node" function failed since the introduction of resource managers in 2.2.0 (#427)
+* Engine: workaround for MariaDB 10.4 bug MDEV-20695 (#391)
+
+
+2.2.6
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Build: updated docker base images
+* Client API: fixed a concurrency issue when using highlander mode
+* Client API (JDBC only): when used with the Wildfly/JBoss JDBC pool, the JDBC implementation triggered pool warnings due to statement caching (#403 - new fix)
+* Engine: JMX "late jobs count" counter was wrong (#413)
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.2.5.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
+2.2.5
+*************
+
+Maintenance release, with both fixes and small quality of life improvements.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Admin GUI: the logout button now redirects to the login page on all browsers (#398)
+* Admin GUI: the redirection after a valid login could fail (#399)
+* Admin GUI: files created by job instances (deliverables) were not listed in the job instance detail dialog (#402)
+* Admin GUI: added an option to clear job parameters in the new job instance launch dialog (#411)
+* Engine: on Oracle DB, there was a timezone inconsistency (JQM normally only deals with UTC times) (#400)
+* Client API: when used with the Wildfly/JBoss JDBC pool, the JDBC implementation triggered pool warnings due to statement caching (#403)
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.2.4.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
+2.2.4
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* CLI: fixed import of XML files with a lot of job definitions, which opened too many database cursors.
+* CLI: fixed update of JobDef default queue during XML import (was not updated by new value).
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.2.3.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
+2.2.3
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+Due to bug #390, users of the Spring Runner should stop using bean named runtimeParameters and instead use a new bean named runtimeParametersProvider.
+Users who do not use Spring, the runtimeParameters bean and a persistent execution context (all three needed) are not concerned by this.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: fixed injected Spring execution parameters could be shared between instances and never change after the first run (#390)
+* Engine: fixed rare crash on startup when trying to determine database type (#384)
+* Engine: fixed shell runner which did not allow an empty "module name" tag in job instances on some platforms and Java versions (#383)
+* Packaging: added Windows 1909 image
+
+Deprecated
++++++++++++++++
+
+Only last entry is new since 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
+2.2.2
+*************
+
+Release goal
+++++++++++++++++
+
+Maintenance release, mostly consisting in backports from version 3.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes (nor any API changes for that matter).
+
+There is one database modification in this release: a column was added to the History table. Migration is applied
+when running `jqm(.sh|.ps1) createnode`. Note this is the first time the migration mechnanism is used in JQM.
+
+Upgrade procedure for standard installation is therefore:
+
+* Stop all nodes to avoid locks on DB tables (which could prevent schema upgrades)
+* Replace all binaries with new version (keep your resources.xml configuration file!)
+* Run `jqm(.sh|.ps1) createnode` (only once for the whole cluster) - this will not recreate existing nodes, simply upgrade the schema
+* Restart all nodes
+
+For those using the Docker images in a cluster, refer yourself to the Docker-specific documentation.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* All components: Java compatibility from 1.6 to 1.11 included, with automated tests (1.12 and later are not tested on the 2.x branch) (#381).
+* All components: older mysql/mariadb versions do not use stored procedures anymore for sequence emulation and can now run on instances with binary logging enabled (newer versions already use sequences).
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* All components: better version detection for mariadb and mysql.
+* Engine: fixed DB timezone issue which could cause unwanted Jetty restarts.
+* CLI: fixed XML import error on postgresql.
+* Admin API: fixed global cluster parameter update date not being updated.
+* Admin GUI: fixed application name dropdown width in new launch dialog box (#366).
+* Admin GUI: added runAfter to job instance history dialog box (#369).
+* Packaging: sample job definitions can now be run without access to Maven Central at runtime (#347).
+* Packaging: Docker images for Windows 1809, 1903.
+* Packaging: Docker images were updated with latest Java 8 version.
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+
+
+2.2.1
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Client API: fixed connection leak and missing error message when enqueueing a job request on a queue which does not exists (#344)
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
 
 
 2.2.0

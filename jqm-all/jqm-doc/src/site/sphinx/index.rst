@@ -3,7 +3,7 @@
 
 The aptly named Job Queue Manager, or JQM for short, is a queue manager. It has three goals:
 
-* to optimize and streamline the execution of jobs, whatever they may be, by using queues with rich configuration
+* to optimize and streamline the execution of jobs, whatever they may be, on a grid by using queues with rich configuration
 * to make job administration simple
 * to be easy to include or embed in most environments.
 

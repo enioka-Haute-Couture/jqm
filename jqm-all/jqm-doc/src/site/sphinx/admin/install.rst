@@ -30,7 +30,7 @@ The following script (PowerShell 5+) will download and copy the binaries (adapt 
     $JQM_ROOT = "C:\TEMP\jqm"
     $JQM_VERSION = "${project.version}"
     mkdir -Force $JQM_ROOT; cd $JQM_ROOT
-    Invoke-RestMethod https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
+    Invoke-RestMethod https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
     Expand-Archive ./jqm.zip . -Force
     rm jqm.zip; mv jqm*/* .
 
@@ -56,9 +56,9 @@ Prerequisites:
 The following script will download and copy the binaries (adapt the first two lines). Run as jqmadm ::
 
     JQM_ROOT="/opt/jqm"
-    JQM_VERSION="1.2.2"
+    JQM_VERSION="3.0.0"
     cd $JQM_ROOT
-    wget https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.tar.gz
+    wget https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.tar.gz
     tar xvf jqm-*.tar.gz
     rm jqm-*.tar.gz
     mv jqm-*/* .
@@ -130,8 +130,7 @@ The node created in the previous step has serious drawbacks:
 * General low performances and persistence issues inherent to HSQLDB
 
 Just edit JQM_ROOT/conf/resources.xml file to reference your own database.
-It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB, DB2 and MySQL which are the supported databases. (HSQLDB is not supported
-in production environments)
+It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB, DB2 and MySQL which are the supported databases.
 
 .. note:: The database is intended to be shared by all JQM nodes - you should not create a schema/database per node.
 
@@ -166,10 +165,12 @@ Linux / Unix::
 Database support
 ====================
 
+The suported versions are referenced inside the :doc:`compatibility matrix <./matrix>`.
+
 Oracle
 ------------------
 
-Oracle 10gR2 & 11gR2 & 12c are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
+No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
 A typical schema creation would be::
 
@@ -178,12 +179,12 @@ A typical schema creation would be::
     GRANT CONNECT, RESOURCE TO JQM;
     exit;
 
-On 12c the user cannot be named JQM (must be prefixed with C##, unless `alter session set "_ORACLE_SCRIPT"=true;` is run).
+On 12c and later the user cannot be named JQM (must be prefixed with C##, unless `alter session set "_ORACLE_SCRIPT"=true;` is run).
 
 PostgreSQL
 ------------------
 
-PostgreSQL 9 & 10 are supported (tested with PostgreSQL 9.3). It is the recommended open source database to work with JQM.
+It is the recommended open source database to work with JQM.
 No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
 Here's a quickstart to setup a test database. As postgres user::
@@ -200,7 +201,7 @@ Here's a quickstart to setup a test database. As postgres user::
 MySQL
 ------------------
 
-MySQL 5.6+ is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
+MySQL is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
 These commands can be used to setup a database::
 
@@ -213,8 +214,6 @@ These commands can be used to setup a database::
 
 HSQLDB
 ------------------
-
-HSQLDB 2.3.x is supported in test environments only.
 
 No specific HSQLDB configuration is required. Please note that if using a file database, HSQLDB prevents multiple processes from accessing it
 so it will cause issues for creating multi node environments.

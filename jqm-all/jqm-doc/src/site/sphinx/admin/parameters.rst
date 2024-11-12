@@ -115,7 +115,7 @@ Here, nullable means the parameter can be absent from the table. New values are 
 Parameter name is case-sensitive.
 
 .. note:: There must be at least one Maven repository specified.
-	If using Maven central, please specify 'http://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
+	If using Maven central, please specify 'https://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
 	Maven Central is only used if explicitly specified (which is the default).
 
 .. note:: Some parameters about web service or web interface do not require node reboot. However, as they actually change how the
