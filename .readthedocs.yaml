@@ -26,3 +26,7 @@ sphinx:
 formats:
    - pdf
    - epub
+
+python:
+   install:
+     - requirements: jqm-all/jqm-doc/src/site/sphinx/requirements.txt
