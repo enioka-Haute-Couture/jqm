@@ -14,11 +14,4 @@ copyright = '2012-2024, Enioka Haute Couture'
 #release = '1.0'
 hightlight_language = 'java'
 
-
-if on_rtd:
-    html_theme = 'default'
-    html_theme_options = {
-        'navigation_depth': 3,
-    }
-else:
-    html_theme = 'bizstyle'
+html_theme = 'bizstyle'
