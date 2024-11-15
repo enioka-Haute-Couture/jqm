@@ -41,7 +41,7 @@ Also of note that JQM was created with compatibility in mind:
 * under an Apache 2 license, which basically allows you to do anything you want with the product and its code in any situation.
 
 
-Finally, JQM is a free (as beer) and open source product backed by the IT consulting firm [Enioka](http://www.enioka.com) 
+Finally, JQM is a free (as beer) and open source product backed by the IT consulting firm [Enioka Haute Couture](https://haute-couture.enioka.com/en) 
 which first developed it for an international conglomerate. Enquiries about support, development of extensions, 
 integration with other products, consulting and other commercial questions are more than welcome at contact-hc@enioka.com. 
 Community support is of course freely offered on GitHub using the bug-tracker.
