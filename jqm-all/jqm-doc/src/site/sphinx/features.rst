@@ -4,7 +4,7 @@ JQM features
 * The only dedicated job queueing server
 * Open Source under the Apache 2 licence, a business-friendly licence securing your investments in JQM
 * No-cost ready to use solution. Paying support can if needed be purchased from the original authors
-  at contact@enioka.com or at any other firm open to doing maintenance on the tool.
+  at contact-hc@enioka.com or at any other firm open to doing maintenance on the tool.
 * Fully documented
 
 Full command line integration:
