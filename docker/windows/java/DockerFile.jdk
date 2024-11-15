@@ -43,6 +43,6 @@ COPY --from=installer C:/ojdk/ C:/ojdk/
 ENV PATH="C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\ojdk\bin" \
     JAVA_HOME="C:\ojdk"
 
-LABEL maintainer="Enioka" \
-    readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+LABEL maintainer="Enioka Haute Couture" \
+    readme.md="https://github.com/enioka-Haute-Couture/jqm/blob/master/README.md" \
     description="OpenJDK JDK for Windows Nano (the official image is only for long term versions)"

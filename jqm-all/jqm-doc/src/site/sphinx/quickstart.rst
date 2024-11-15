@@ -43,7 +43,7 @@ The following script will download and copy the binaries (adapt the first two li
 	$JQM_ROOT = "C:\TEMP\jqm" ## Change this
 	$JQM_VERSION = "1.3.3"  ## Change this
 	mkdir -Force $JQM_ROOT; cd $JQM_ROOT
-	Invoke-RestMethod https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
+	Invoke-RestMethod https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
 	$shell = new-object -com shell.application
 	$zip = $shell.NameSpace((Resolve-Path .\jqm.zip).Path)
 	foreach($item in $zip.items()) { $shell.Namespace($JQM_ROOT).copyhere($item) }
@@ -83,7 +83,7 @@ Prerequisites:
 
 The following script will download and install the binaries (adapt the first two lines). ::
 
-        wget  https://github.com/enioka/jqm/releases/download/jqm-all-1.3.3/jqm-1.3.3.tar.gz # For 1.3.3 release. Adapt it to the one you want.
+        wget  https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-1.3.3/jqm-1.3.3.tar.gz # For 1.3.3 release. Adapt it to the one you want.
         tar xvf jqm-1.3.3.tar.gz
 
 

@@ -40,6 +40,6 @@ COPY --from=installer C:/mvn/ C:/mvn/
 
 ENV PATH="C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\mvn\bin"
 
-LABEL maintainer="Enioka" \
-    readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+LABEL maintainer="Enioka Haute Couture" \
+    readme.md="https://github.com/enioka-Haute-Couture/jqm/blob/master/README.md" \
     description="Maven packaging"

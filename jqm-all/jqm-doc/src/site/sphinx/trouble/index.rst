@@ -12,4 +12,4 @@
 Bug report
 **************
 
-Please direct all bug reports or feature requests at `GitHub <https://github.com/enioka/jqm/issues>`_.
+Please direct all bug reports or feature requests at `GitHub <https://github.com/enioka-Haute-Couture/jqm/issues>`_.

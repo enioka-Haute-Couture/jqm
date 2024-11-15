@@ -27,8 +27,8 @@ FROM mcr.microsoft.com/windows/nanoserver:${WINDOWS_TAG}
 USER ContainerAdministrator
 COPY --from=installer C:/nexus/ C:/nexus/
 
-LABEL maintainer="Enioka" \
-    readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+LABEL maintainer="Enioka Haute Couture" \
+    readme.md="https://github.com/enioka-Haute-Couture/jqm/blob/master/README.md" \
     description="Unofficial Sonatype Nexus OSS image for Docker for Windows Nano. (official images are for Linux). Sometimes updated. Build helper for enioka projects - please use official images and not this if you need a Nexus."
 
 VOLUME c:/nexus/sonatype-work/
