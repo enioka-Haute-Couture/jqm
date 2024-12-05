@@ -818,6 +818,23 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
+    public InputStream getEngineLog(String nodeName, int latest)
+    {
+        try
+        {
+            return target.path("node/" + nodeName + "/log?latest=" + latest).request().get(InputStream.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
     public InputStream getJobLogStdErr(long jobId)
     {
         try

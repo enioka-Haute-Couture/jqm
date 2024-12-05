@@ -2,7 +2,7 @@ Web Service Client API
 #############################
 
 **Client API** is the name of the API offered to the end users of JQM: it allows to interact with running jobs, offering operations
-such as creating a new execution request, cancelling a request, viewing all currently running jobs, etc. Read :doc:`client API<client>` 
+such as creating a new execution request, cancelling a request, viewing all currently running jobs, etc. Read :doc:`client API<client>`
 before this chapter, as it gives the definition of many terms used here as well as the general way to use clients.
 
 The main client API is the Hibernate Client API, which runs directly against the JQM central database. As JQM is database centric,
@@ -35,7 +35,7 @@ For Maven users::
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-api-client-jersey</artifactId>
 		<version>${jqm.version}</version>
-	</dependency>	
+	</dependency>
 
 and then using the API::
 
@@ -78,7 +78,7 @@ and can be set:
 	p.put("com.enioka.jqm.ws.url", "http://localhost:9999/marsu/ws");
 	JqmClientFactory.setProperties(p);
 * through a system parameter (-Dcom.enioka.jqm.ws.url=http://...)
-	
+
 Interrogating the service directly
 ++++++++++++++++++++++++++++++++++++++++
 
@@ -87,7 +87,7 @@ by interrogating the web service  with the library of your choice (including the
 
 .. highlight:: xml
 
-Should that specific implementation need the interface objects, they are present in the jqm-api-client jar (the pure API jar without any 
+Should that specific implementation need the interface objects, they are present in the jqm-api-client jar (the pure API jar without any
 implementation nor dependencies). ::
 
 	<dependency>
@@ -114,7 +114,7 @@ The only situations when it is recommended to build your own WS client are:
 Server side
 ********************
 
-The web service is not active on any engine by default. To activate it, see the :doc:`administration guide<admin/gui>`.
+The web service is not active on any engine by default. To activate it, see the :doc:`administration guide</admin/gui>`.
 
 It is not necessary to enable the service on all JQM nodes. It is actually recommended to dedicate a node that will not host jobs (or few) to the WS.
 Moreover, it is a standard web application with purely stateless sessions,
@@ -187,7 +187,7 @@ On the full Java client side, these are respectively translated to :class:`JqmIn
 The body of the response contains an XML or JSON item giving details on the error.::
 
     1	404	GET on absent object
-    2	500	
+    2	500
     3	404	DELETE on absent object
     4	400	Update user with absent role
     5	500	Could not create certificate
@@ -202,25 +202,25 @@ Script sample
 ****************
 
 PowerShell script. Logics is the same in any language, script or compiled::
-    
+
     # Note: we use JSON as a demonstration of how to use it over the default XML. Obviously, PowerShell deals with XML very well and does not need this.
-    
+
     # Authentication?
     $cred = Get-Credential root
-    
+
     #################################
     ## Enqueue demonstration
     #################################
-    
+
     $request = @{applicationName="DemoApi"; user=$env:USERNAME} | ConvertTo-Json
     $jobInstance = Invoke-RestMethod http://localhost:62948/ws/client/ji -Method Post -Body $request -Credential $cred -ContentType "application/json" -Headers @{Accept="application/json"}
     $jobInstance.id
-    
-    
+
+
     #################################
     ## Query demonstration
     #################################
-    
+
     $query = @{applicationName="DemoApi"} | ConvertTo-Json
     $res = Invoke-RestMethod http://localhost:62948/ws/client/ji/query -Method Post -Body $query -Credential $cred -ContentType "application/json" -Headers @{Accept="application/json"}
-    $res.instances | Format-Table -AutoSize	
+    $res.instances | Format-Table -AutoSize

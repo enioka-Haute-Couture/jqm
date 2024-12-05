@@ -9,7 +9,7 @@ Formatting
 
 Our code style is c++ inspired, since the maintainers just hate having opening braces on the same line. This is a fully assumed personal bias, so please do not argue with it.
 
-To ease the pain for the users of what we may call the "default Eclipse formatting", an Eclipse formatter is provided :download:`here </files/rules_sonar.csv>`). If you are an Eclipse user, please import it and associate it with the JQM project.
+To ease the pain for the users of what we may call the "default Eclipse formatting", an Eclipse formatter is provided :download:`here </files/rules_sonar.csv>`). If you are an Eclipse or VS code user, please import it and associate it with the JQM project.
 (The Sonar rules we use are also included inside that directory.)
 
 Database

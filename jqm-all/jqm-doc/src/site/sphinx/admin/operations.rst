@@ -6,9 +6,9 @@ Starting
 
 .. note:: there is a safeguard mechanism which prevents two engines (JQM java processes) to run with the same node name.
 	In case of engine crash (kill -9) the engine will ask you to wait (max. 2 minutes) to restart so as to be sure
-	there is no other engine running with the same name. On the other hand, cleanly stopping the engine is totally transparent without ever 
+	there is no other engine running with the same name. On the other hand, cleanly stopping the engine is totally transparent without ever
 	any need to wait.
-	
+
 Windows
 +++++++++
 
@@ -20,7 +20,7 @@ It is also possible to start an engine inside a command prompt. In that case, th
 This is mainly useful for debugging purposes. ::
 
 	java -jar jqm.jar -startnode $env:COMPUTERNAME
-	
+
 (change the node name at will - by default, the computer name is used for the node name).
 
 Unix/Linux
@@ -55,14 +55,14 @@ Unix
 ::
 
 	./jqm.sh stop
-	
-The clean stop sequence is actually triggered by a SIGTERM (normal kill) - the jqm.sh script simply stores the PID at startup and 
+
+The clean stop sequence is actually triggered by a SIGTERM (normal kill) - the jqm.sh script simply stores the PID at startup and
 does a kill to shutdown.
 
 Restarting
 ****************
 
-There should never be any need for restarting an engine, save for the few configuration changes that are 
+There should never be any need for restarting an engine, save for the few configuration changes that are
 listed in :doc:`parameters`.
 
 Windows::
@@ -78,14 +78,14 @@ In both cases, it is strictly equivalent to stopping and then starting again man
 Pausing and resuming
 ***********************
 
-An paused engine runs normally but does not take new job instances anymore. Job instances already running at the time of pause go on normally.
+A paused engine runs normally but does not take new job instances anymore. Job instances already running at the time of pause go on normally.
 
 Pausing and resuming methods are available at two levels:
 
 * per node (pause all queues for an engine)
 * per binding (pause only one queue for an engine)
 
-These methods are available through JMX and though the database (in which case modifications are only applied after at most 
+These methods are available through JMX and though the database (in which case modifications are only applied after at most
 parameter internalPollingPeriodMs). The database method is also exposed by the admin GUI.
 
 Also, a client through the client API can pause all bindings on a designated queue.
@@ -106,4 +106,3 @@ Purges
 The logs of the engine are automatically purged. Job instance logs and created files, however, are not.
 
 The History table should be purged too - see :doc:`history`.
-

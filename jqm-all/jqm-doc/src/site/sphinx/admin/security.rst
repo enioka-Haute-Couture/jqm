@@ -2,7 +2,7 @@ Data security
 ###############
 
 JQM tries to be as simple as possible and to "just work". Therefore, things (like many security mechanisms)
-that require compulsory configuration or which always fail on the first tries are disabled by default. 
+that require compulsory configuration or which always fail on the first tries are disabled by default.
 
 **Therefore, out of the box, JQM is not as secure as it can be** (but still reasonably secure).
 
@@ -19,7 +19,7 @@ Security needs are rated on a three ladder scale: low, medium, high.
 Central Configuration
 ========================
 
-This is the defintion of the JQM network: which JVM runs where, with which parameters. These parameters include the main security options.
+This is the definition of the JQM network: which JVM runs where, with which parameters. These parameters include the main security options.
 Most data in here is easy to guess by simply doing a network traffic analysis (without having to know the actual content of the traffic - just routes will
 tell the structure of the network).
 
@@ -48,7 +48,7 @@ Every node has a configuration file containing the connection information to the
 Job referential
 ========================
 
-The definition of the different batch jobs that are run - basically shell command lines. 
+The definition of the different batch jobs that are run - basically shell command lines.
 
 *Integrity* need: high (as a modification of this data allows for arbitrary command line execution)
 
@@ -76,7 +76,7 @@ Every queued, running or ended job instance has tracking objects inside the cent
 Logs & batch created files
 ==============================
 
-Every job instance creates a log file. It may, depending on the jobs, contain sensitive data. There is however no sensitive data inside 
+Every job instance creates a log file. It may, depending on the jobs, contain sensitive data. There is however no sensitive data inside
 JQM's own logs. Moreover, batch jobs can create file (reports, invoices, ...) that may be critical and are stored alongside logs.
 
 *Integrity* need: depends
@@ -136,7 +136,7 @@ certificate chains are correctly set.
 
 JQM provided its own Private Key Infrastructure (PKI), which allows it to start without need for any certificate configuration.
 Its root certificate is stored inside the central database. The root key is created randomly at first startup.
-It also allows for easy issuing of client certificates for authentication through a web service of the admin API (and the admin GUI). 
+It also allows for easy issuing of client certificates for authentication through a web service of the admin API (and the admin GUI).
 
 However, using the internal PKI is not compulsory. Indeed, it the limitation of not having a revocation mechanism.
 If you don't want to use your own:
@@ -199,7 +199,7 @@ Finally, each node has three parameters allowing to choose which APIs should be 
 
 .. warning:: disabling the simple API means file retrieval won't work.
 
-Database 
+Database
 ========================
 
 Please see your DBA. Once again, the database is the cornerstone of the JQM cluster and its compromission is the compromisson of every server/OS account on which a JQM node runs.

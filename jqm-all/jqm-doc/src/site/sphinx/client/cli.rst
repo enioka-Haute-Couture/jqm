@@ -11,7 +11,7 @@ Engine API
 
 This is a subset of the Client API designed to be usable from payload running inside a JQM engine without any required libraries besides an interface named JobManager.
 
-Its main purpose is to avoid needing the full client library plus Hibernate (a full 20MB of perm gen space, plus a very long initialization time...) just for doing client operations - why not simply use the
+Its main purpose is to avoid needing the full client library just for doing client operations - why not simply use the
 already initialized client API used by the engine itself? As there is a bit of classloading proxying magic involved, the signatures are not strictly the same to the ones of the client API but near enough so as
 not be lost when going from one to the other.
 

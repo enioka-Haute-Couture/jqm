@@ -10,8 +10,8 @@ to any resources that could not be accessed to in any other ways.
 These services are REST-style services. It is deployed along with the client web services and the console (in the same war file).
 In accordance to the most used REST convention, the HTTP verbs are used this way:
 
-+---------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------------+
-| Verb    | Action on container URLs                                                                  | Action on item URLs                                                  |
++---------+------------------------------------------------------------------------------------------+----------------------------------------------------------------+
+| Verb    | Action on container URLs                                                                 | Action on item URLs                                            |
 +========+===========================================================================================+================================================================+
 | GET    | obtain a list of instances                                                                | get the instance                                               |
 +--------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------+

@@ -3,7 +3,7 @@
 
 The aptly named Job Queue Manager, or JQM for short, is a queue manager. It has three goals:
 
-* to optimize and streamline the execution of jobs, whatever they may be, by using queues with rich configuration
+* to optimize and streamline the execution of jobs, whatever they may be, on a grid by using queues with rich configuration
 * to make job administration simple
 * to be easy to include or embed in most environments.
 
@@ -37,7 +37,7 @@ Also of note that JQM was created with compatibility in mind:
 
 Finally, JQM is a free (as beer) and open source product backed by the IT consulting firm [Enioka](http://www.enioka.com)
 which first developed it for an international conglomerate. Enquiries about support, development of extensions,
-integration with other products, consulting and other commercial questions are more than welcome at contact@enioka.com.
+integration with other products, consulting and other commercial questions are more than welcome at contact-hc@enioka.com.
 Community support is of course freely offered on GitHub using the bug-tracker.
 
 

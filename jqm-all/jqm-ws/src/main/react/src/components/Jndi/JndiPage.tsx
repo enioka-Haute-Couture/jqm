@@ -7,7 +7,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { EditParametersDialog } from "./EditParametersDialog";
-import useJndiApi from "./useJndiApi";
+import useJndiApi from "./JndiApi";
 import { JndiResource } from "./JndiResource";
 import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
 import {
@@ -191,7 +191,7 @@ export const JndiPage: React.FC = () => {
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const parameters = tableMeta.rowData[7];
                     const getBadge = (count: number) => (
-                        <Badge badgeContent={count} color="primary">
+                        <Badge badgeContent={count} color="primary" showZero>
                             <SettingsIcon />
                         </Badge>
                     );
@@ -226,8 +226,8 @@ export const JndiPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -243,6 +243,11 @@ export const JndiPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No JNDI resources found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
@@ -269,7 +274,7 @@ export const JndiPage: React.FC = () => {
                             onClose={() => setShowDropDown(false)}
                             onSelectResource={(newResource: JndiResource) => {
                                 delete newResource.uiName;
-                                saveResource(newResource);
+                                saveResource({ ...newResource, name: `${newResource.name}_${new Date().getTime()}` });
                                 setShowDropDown(false);
                             }}
                         />

@@ -16,7 +16,7 @@ The release environment must have:
 * Internet access
 * Login & password to Sonatype OSSRH with permissions on com.enioka.jqm.
 * Login & password to Read the Docs with permissions on com.enioka.jqm.
-* Docker client 18.06+ and access to the multi-arch build environment.
+* Docker client 18.06+ and access to the multi-arch build environment. -- deprecated,  build is migrating to Github action
 
 Update release notes
 +++++++++++++++++++++++++

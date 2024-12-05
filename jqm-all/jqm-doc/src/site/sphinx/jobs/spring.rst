@@ -62,7 +62,7 @@ By having JQM set the context
 ******************************************
 
 In this option, there is only one Spring context for all job definitions using Spring. The jobs themselves (payload code)
-do no Spring context initialization - they just use Spring features (injection...) and do not care where they do come from.
+do no Spring context initialization - they just use Spring features (injection...) and do not care from where they do come from.
 
 This option is the direct equivalent of what happens inside a servlet container (Tomcat...) when using Spring: the context
 is actually initialized by a servlet initialization listener, and the application code just uses Spring, never creating a SpringContext itself.
@@ -152,7 +152,7 @@ The handler will intercept the "job instance is starting" event and initialize i
 * allowCircularReferences: if "true", the context will allow circular references.
 
 
-If no parameters are given, the job class (the first one to run) itself will be added to the Spring context, so if is a @Configuration it will be enabled.
+If no parameters are given, the job class (the first one to run) itself will be added to the Spring context, so if it is a @Configuration it will be enabled.
 
 The handler must be present in the job dependencies. In this case, it is provided with JQM, and the artifact is "com.enioka.jqm:jqm-runner-spring:${jqmversion}"
 

@@ -5,7 +5,7 @@ import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-dat
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DescriptionIcon from "@mui/icons-material/Description";
-import useNodesApi from "./useNodesApi";
+import useNodesApi from "./NodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
 import {
     renderActionsCell,
@@ -304,8 +304,8 @@ export const NodesPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -328,6 +328,11 @@ export const NodesPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No nodes found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: "none" as SelectableRows,

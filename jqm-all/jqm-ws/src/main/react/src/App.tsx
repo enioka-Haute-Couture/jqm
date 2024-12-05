@@ -48,10 +48,10 @@ function App() {
                         <ThemeProvider theme={getMuiTheme()}>
                             <ForceLogin />
                             <SnackbarProvider
-                                maxSnack={3}
+                                maxSnack={4}
                                 anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
+                                    vertical: "bottom",
+                                    horizontal: "left",
                                 }}
                             >
                                 <MenuWrapper>

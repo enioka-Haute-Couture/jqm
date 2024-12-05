@@ -6,7 +6,7 @@ Defining a resource
 
 Resources are defined inside the JQM database, and are therefore accessible from all JQM nodes.
 By 'resource' JNDI means an object that can be created through a (provided)
-`ObjectFactory <http://docs.oracle.com/javase/7/docs/api/javax/naming/spi/ObjectFactory.html>`_. There are multiple factories provided with JQM, concerning databases,
+`ObjectFactory <http://docs.oracle.com/javase/7/docs/api/javax/naming/spi/ObjectFactory.html>`_. There are multiple factories provided with JQM, covering databases,
 files & URLs which are detailed below. Moreover, the :term:`payload` may provide whatever factories it needs, such as a JMS driver (example also below).
 
 The main JNDI directory table is named :class:`JndiObjectResource` and the object parameters belong to the table :class:`JndiObjectResourceParameter`.
@@ -19,7 +19,7 @@ The following elements are needed for every resource, and are defined in the mai
 +================+=========================================================================================+================================================+
 | name           | The JNDI alias - the string used to refer to the resource in the :term:`payload` code   | jdbc/mydatasource                              |
 +----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
-| description    | a short string giving the admin every info he needs                                     | connection to main db                          |
+| description    | a short string giving the admin every info they need                                    | connection to main db                          |
 +----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
 | type           | the class name of the desired resource                                                  | com.ibm.mq.jms.MQQueueConnectionFactory        |
 +----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
@@ -56,7 +56,7 @@ a singleton is impossible - the engine class context has no access to the payloa
 
 By default, the $JQM_ROOT/ext directory contains the following providers, ready to be used as singleton (or not) resources:
 
-* the File provider and URl provider inside a single jar named jqm-provider
+* the File provider and URL provider inside a single jar named jqm-provider
 * the JDBC pool, inside two jars (tomcat-jdbc and tomcat-juli)
 * the HSQLDB driver
 

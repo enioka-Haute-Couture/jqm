@@ -3,15 +3,15 @@ Basics
 
 .. highlight:: java
 
-The client API is defined an a Java interface, and has two implementations. Therefore, to use the client API, 
-one of its two implementations must be imported: either :doc:`the Hibernate JPA 2.0 one<hibernateclient>`
-with jqm-api-client-hibernate.jar or :doc:`the web service client<webservice>` with jqm-api-client-jersey.jar.
+The client API is defined as a Java interface, and has two implementations. Therefore, to use the client API,
+one of its two implementations must be imported: either :doc:`the JDBC one<hibernateclient>`
+with jqm-api-client-jdbc.jar or :doc:`the web service client<webservice>` with jqm-api-client-jersey.jar.
 
 Then it is simply a matter of calling::
 
 	JqmClientFactory.getClient();
 
-The client returned implements an interface named :class:`JqmClient`, which is profusely documented in JavaDoc form, as well as in the 
+The client returned implements an interface named :class:`JqmClient`, which is profusely documented in JavaDoc form, as well as in the
 :doc:`next section<methods>`. Suffice to say that it contains many methods related to:
 
 * queueing new execution requests
@@ -26,7 +26,7 @@ For example, to list all executions known to JQM::
 
 	List<JobInstance> jobs = JqmClientFactory.getClient().getJobs();
 
-Now, each implementation has different needs as far as configuration is concerned. Basically, Hibernate needs to know how to 
+Now, each implementation has different needs as far as configuration is concerned. Basically, thr JDBC one needs to know how to
 connect to the database, and the web service must know the web service server. To allow easy configuration, the following principles apply:
 
 #. Each client provider can have one (always optional) configuration file inside the classpath. It is specific for each provider, see their doc

@@ -33,7 +33,9 @@ import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
+import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.client.api.JqmClientException;
+import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
@@ -67,6 +69,18 @@ import jakarta.ws.rs.core.StreamingOutput;
 public class ServiceAdmin
 {
     static Logger log = LoggerFactory.getLogger(ServiceAdmin.class);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Version
+    ///////////////////////////////////////////////////////////////////////////
+    @GET
+    @Path("version")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache("public, max-age=60")
+    public VersionDto getVersion()
+    {
+        return MetaService.getVersion();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Nodes
@@ -261,6 +275,7 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             MetaService.deleteQueueMapping(cnx, id);
+            cnx.commit();
         }
     }
 
@@ -733,12 +748,8 @@ public class ServiceAdmin
     @GET
     public InputStream SS(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest, @Context HttpServletResponse res)
     {
-        // TODO
-        /*
-         * InputStream fs = ((JdbcClient) JqmClientFactory.getClient()).getEngineLog(nodeName, latest); res.setHeader("Content-Disposition",
-         * "attachment; filename=" + nodeName + ".log"); return fs;
-         */
-
-        return null;
+        InputStream fs = Helpers.getClient().getEngineLog(nodeName, latest);
+        res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
+        return fs;
     }
 }

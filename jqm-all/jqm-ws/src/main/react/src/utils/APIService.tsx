@@ -70,6 +70,11 @@ export default class APIService {
             ...init,
         });
 
+
+        if (res.status === 401) { // Redirect to login user is not authenticated
+            window.location.href = "/auth/login.html";
+        }
+
         if (res.ok) {
             if (res.status === 200 || res.status === 201) {
                 return jsonResponse ? await res.json() : await res.text();

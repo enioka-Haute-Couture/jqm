@@ -13,7 +13,7 @@ Docker on Windows or Linux/Mac
 Prerequisites:
 
 * Docker is configured and can access public images
-* A recent Windows (greater or equal to 1709) or Linux (this includes Macs which run containers inside a hidden Linux VM)
+* A recent Windows (greater or equal to 230H2) or Linux (this includes Macs which run containers inside a hidden Linux VM)
 
 Just run the very classic::
 

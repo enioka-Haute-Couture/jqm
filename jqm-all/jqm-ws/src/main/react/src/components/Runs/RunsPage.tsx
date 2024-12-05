@@ -435,6 +435,11 @@ const RunsPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No runs found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: "none" as SelectableRows,
@@ -458,6 +463,7 @@ const RunsPage: React.FC = () => {
                 case "sort":
                 case "filterChange":
                 case "changeRowsPerPage":
+                case 'resetFilters':
                     fetchJobInstances(
                         tableState.page,
                         tableState.rowsPerPage,

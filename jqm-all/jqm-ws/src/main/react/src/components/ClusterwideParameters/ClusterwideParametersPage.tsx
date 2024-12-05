@@ -102,8 +102,8 @@ const ClusterwideParametersPage: React.FC = () => {
             name: "",
             label: "Actions",
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -119,6 +119,11 @@ const ClusterwideParametersPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
+        textLabels: {
+            body: {
+                noMatch: 'No parameters found',
+            }
+        },
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.prm, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
