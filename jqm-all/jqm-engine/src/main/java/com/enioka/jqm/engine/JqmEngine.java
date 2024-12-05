@@ -251,7 +251,9 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             if (standaloneMode)
             {
                 final var localIp = StandaloneHelpers.getLocalIpAddress();
-                cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idSequenceBaseFromIp(localIp));
+                var idStart = idSequenceBaseFromIp(localIp);
+                jqmlogger.info("Running in standalone (no shared database) mode with local seed {} - starting IDs at {}", localIp);
+                cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idStart);
             }
         }
 
