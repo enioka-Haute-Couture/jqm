@@ -868,6 +868,28 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
         }
     }
 
+    // /////////////////////////////////////////////////////////////////////
+    // File input management
+    // /////////////////////////////////////////////////////////////////////
+
+    @Override
+    public long addJobFile(long jobId, String name, InputStream file)
+    {
+        try
+        {
+            return target.path("ji/" + jobId + "/files/" + name).request().post(Entity.entity(file, MediaType.APPLICATION_OCTET_STREAM),
+                    Long.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////
     // Queue APIs
     ///////////////////////////////////////////////////////////////////////

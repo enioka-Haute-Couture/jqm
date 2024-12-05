@@ -59,7 +59,8 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
     private Map<String, Object> singletons = new HashMap<>();
     private List<ObjectName> jmxNames = new ArrayList<>();
     private Registry r = null;
-    private ClassLoader extResources = ExtClassLoader.instance;
+    private final ClassLoader extResources = ExtClassLoader.classLoaderInstance;
+    private final ModuleLayer extLayer = ExtClassLoader.moduleLayerInstance;
     private String serverName = null;
 
     /**
@@ -113,6 +114,10 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         if (name.equals("cl://ext")) // special case needed for tests, as the ext CL will always be the same (shared between all CLs)
         {
             return this.extResources;
+        }
+        if (name.equals("layer://ext")) // special case neeed for tests, to retrieve the module layer from the job instance
+        {
+            return this.extLayer;
         }
 
         // If in cache...

@@ -29,7 +29,7 @@ class RunningJobInstanceManager
         instancesByTracker.put(reg.rji, reg);
         instancesById.put(reg.ji.getId(), reg);
 
-        (new Thread(reg.rji)).start();
+        (new Thread(new ThreadGroup(reg.ji.getId() + ""), reg.rji)).start();
     }
 
     void signalEndOfRun(RunningJobInstance rji)

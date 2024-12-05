@@ -12,7 +12,7 @@ if errorlevel 1 (
 
 rem set resource file from env variables
 IF DEFINED JQM_POOL_INIT_SQL set JQM_POOL_INIT_SQL=initSQL="%JQM_POOL_INIT_SQL%"
-echo ^<resource name='jdbc/jqm' auth='Container' type='javax.sql.DataSource' factory='org.apache.tomcat.jdbc.pool.DataSourceFactory' testWhileIdle='true' testOnBorrow='false' testOnReturn='true' validationQuery='%JQM_POOL_VALIDATION_QUERY%' %JQM_POOL_INIT_SQL% logValidationErrors='true' validationInterval='1000' timeBetweenEvictionRunsMillis='60000' maxActive='%JQM_POOL_MAX%' minIdle="2" maxIdle="5" maxWait='30000' initialSize='5' removeAbandonedTimeout='3600' removeAbandoned='true' logAbandoned='true' minEvictableIdleTimeMillis='60000' jmxEnabled='true' username='%JQM_POOL_USER%' password='%JQM_POOL_PASSWORD%' driverClassName="%JQM_POOL_DRIVER%"  url='%JQM_POOL_CONNSTR%' connectionProperties='v$session.program=JQM;' singleton='true' /^> > %JQM_ROOT%/conf/resources.xml
+echo ^<resource name='jdbc/jqm' auth='Container' type='javax.sql.DataSource' factory='org.apache.tomcat.jdbc.pool.DataSourceFactory' testWhileIdle='true' testOnBorrow='false' testOnReturn='true' validationQuery='%JQM_POOL_VALIDATION_QUERY%' %JQM_POOL_INIT_SQL% logValidationErrors='true' validationInterval='1000' timeBetweenEvictionRunsMillis='60000' maxActive='%JQM_POOL_MAX%' minIdle="2" maxIdle="5" maxWait='30000' initialSize='5' removeAbandonedTimeout='3600' removeAbandoned='true' logAbandoned='true' minEvictableIdleTimeMillis='60000' jmxEnabled='true' username='%JQM_POOL_USER%' password='%JQM_POOL_PASSWORD%' url='%JQM_POOL_CONNSTR%' connectionProperties='v$session.program=JQM;' singleton='true' /^> > %JQM_ROOT%/conf/resources.xml
 
 rem helper for swarm deployment - use local host name for node name.
 IF "%JQM_NODE_NAME%" == "_localhost_" (

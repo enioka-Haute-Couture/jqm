@@ -90,8 +90,6 @@ create class loader leaks otherwise.
 +================+=========================================+
 | maxActive      | max number of pooled connections        |
 +----------------+-----------------------------------------+
-| driverClassName| class of the db JDBC driver             |
-+----------------+-----------------------------------------+
 | url            | database url (see db documentation)     |
 +----------------+-----------------------------------------+
 | singleton      | always true (since engine provider)     |
