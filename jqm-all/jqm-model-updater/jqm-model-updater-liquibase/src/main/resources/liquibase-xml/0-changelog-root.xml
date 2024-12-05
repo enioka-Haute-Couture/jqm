@@ -9,4 +9,5 @@
     <!-- There are bugs in resource loaders in Liquibase when using includeAll for files inside an
     OSGi bundle, so we use explicit includes -->
     <include file="changelogs/changelog-3.0.0.xml" relativeToChangelogFile="true" />
+    <include file="changelogs/changelog-3.1.0.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>

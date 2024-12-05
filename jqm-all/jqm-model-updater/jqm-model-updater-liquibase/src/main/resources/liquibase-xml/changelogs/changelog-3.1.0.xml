@@ -1,0 +1,39 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="2" author="mag">
+        <!-- New uploaded files -->
+        <createTable tableName="INPUT_FILE">
+            <column name="ID" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="PK_INPUT_FILE" nullable="false" />
+            </column>
+            <column name="FILE_FAMILY" type="VARCHAR(50)" />
+            <column name="PATH" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JOB_INSTANCE" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="ORIGINAL_FILE_NAME" type="VARCHAR(1024)">
+                <constraints nullable="true" />
+            </column>
+            <column name="STORAGE_NODE" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <createIndex tableName="INPUT_FILE" indexName="IDX_FK_INPUT_FILE_1">
+            <column name="JOB_INSTANCE"></column>
+        </createIndex>
+
+        <modifySql dbms="mariadb,mysql">
+            <replace replace="ID BIGINT NOT NULL" with="ID BIGINT NOT NULL AUTO_INCREMENT" />
+        </modifySql>
+    </changeSet>
+
+</databaseChangeLog>
