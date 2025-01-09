@@ -435,7 +435,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                 >
                     <DialogTitle>Logs job {jobInstance.id}</DialogTitle>
                     <DialogContent>
-                        <Typography sx={{ fontFamily: 'Monospace', fontSize: "small" }}>{logs}</Typography>
+                        <Typography sx={{ fontFamily: 'Monospace', fontSize: "small" }} component="pre">{logs}</Typography>
                     </DialogContent>
                 </Dialog>
             )
