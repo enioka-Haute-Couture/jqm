@@ -431,11 +431,11 @@ export const JobInstanceDetailsDialog: React.FC<{
                     onClose={() => setLogs(null)}
                     aria-labelledby="form-dialog-title"
                     fullWidth
-                    maxWidth={"lg"}
+                    maxWidth={"xl"}
                 >
                     <DialogTitle>Logs job {jobInstance.id}</DialogTitle>
                     <DialogContent>
-                        <Typography sx={{ fontFamily: 'Monospace', fontSize: "small" }}>{logs}</Typography>
+                        <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
                     </DialogContent>
                 </Dialog>
             )
