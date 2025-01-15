@@ -279,6 +279,42 @@ const RunsPage: React.FC = () => {
             },
         },
         {
+            name: '',
+            label: 'Duration',
+            options: {
+                filter: false,
+                sort: false,
+                customBodyRender: (_value: any, tableMeta: MUIDataTableMeta) => {
+                    const beganRunningDate = tableMeta.rowData[5];
+                    let duration: number;
+
+                    if (queryLiveInstances) {
+                        if (!beganRunningDate) {
+                            return "";
+                        }
+                        duration = new Date().getTime() - new Date(beganRunningDate).getTime();
+                    } else {
+                        const endDate = tableMeta.rowData[6];
+                        duration = new Date(endDate).getTime() - new Date(beganRunningDate).getTime();
+                    }
+                    duration = duration / 1000;
+
+                    const durationByUnit = Object.entries({
+                        d: Math.floor(duration / 60 / 60 / 24),
+                        h: Math.floor(duration / 60 / 60) % 24,
+                        m: Math.floor(duration / 60) % 60,
+                        s: Math.floor(duration) % 60,
+                    }).filter(keyVal => keyVal[1] !== 0);
+
+                    if (durationByUnit.length === 0) {
+                        return "0s";
+                    }
+
+                    return durationByUnit.map(([unit, value]) => `${value}${unit}`).join(' ');
+                }
+            },
+        },
+        {
             name: "user",
             label: "User",
             options: {
@@ -446,6 +482,7 @@ const RunsPage: React.FC = () => {
         serverSide: true,
         search: false,
         count: count,
+        page: page,
         rowsPerPage: rowsPerPage!,
         sortOrder: sortOrder!,
         customFilterDialogFooter: (
