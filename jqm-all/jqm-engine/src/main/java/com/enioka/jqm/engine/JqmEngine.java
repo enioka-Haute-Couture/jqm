@@ -19,8 +19,6 @@
 package com.enioka.jqm.engine;
 
 import java.lang.management.ManagementFactory;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,7 +46,6 @@ import com.enioka.jqm.engine.api.lifecycle.JqmEngineHandler;
 import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -62,6 +59,7 @@ import com.enioka.jqm.model.State;
 import com.enioka.jqm.repository.VersionRepository;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 import com.enioka.jqm.shared.misc.Closer;
+import com.enioka.jqm.shared.misc.StandaloneHelpers;
 
 import static com.enioka.jqm.shared.misc.StandaloneHelpers.idSequenceBaseFromIp;
 
@@ -249,14 +247,14 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             jqmlogger.info("All required queues are now polled");
 
             // Standalone sequence reinit
-            final var standaloneMode = Boolean.parseBoolean(
-                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
-            if (standaloneMode) {
-                final var localIp = Inet4Address.getLocalHost().getHostAddress();
-                cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idSequenceBaseFromIp(localIp));
+            final var standaloneMode = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+            if (standaloneMode)
+            {
+                final var localIp = StandaloneHelpers.getLocalIpAddress();
+                var idStart = idSequenceBaseFromIp(localIp);
+                jqmlogger.info("Running in standalone (no shared database) mode with local seed {} - starting IDs at {}", localIp);
+                cnx.runRawUpdate("ALTER SEQUENCE JQM_PK RESTART WITH " + idStart);
             }
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
         }
 
         // Internal poller (stop notifications, keep alive)

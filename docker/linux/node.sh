@@ -36,7 +36,6 @@ echo "<resource
     jmxEnabled='true'
     username='${JQM_POOL_USER}'
     password='${JQM_POOL_PASSWORD}'
-    driverClassName='${JQM_POOL_DRIVER}'
     url='${JQM_POOL_CONNSTR}'
     connectionProperties='v\$session.program=JQM;'
     singleton='true'

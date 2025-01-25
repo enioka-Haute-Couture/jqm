@@ -33,7 +33,6 @@ ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_POOL_CONNSTR="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false" \
     JQM_POOL_USER="sa" \
     JQM_POOL_PASSWORD="" \
-    JQM_POOL_DRIVER="org.hsqldb.jdbcDriver" \
     JQM_POOL_VALIDATION_QUERY="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS" \
     JQM_POOL_INIT_SQL=\
     JQM_POOL_MAX=100 \

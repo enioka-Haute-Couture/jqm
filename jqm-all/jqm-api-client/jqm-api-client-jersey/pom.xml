@@ -16,6 +16,16 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-api-client-core</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.enioka.jqm</groupId>
+                    <artifactId>jqm-model-updater-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.enioka.jqm</groupId>
+                    <artifactId>jqm-model-updater-liquibase</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- This implementation, by default, uses Jersey as the JAX-RS implementation. Nothing

@@ -15,9 +15,13 @@
  */
 package com.enioka.jqm.ws.api;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
@@ -30,11 +34,17 @@ import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.JqmClientQuerySubmitCallback;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SelfDestructFileStream;
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.shared.misc.StandaloneHelpers;
 import com.enioka.jqm.ws.plumbing.HttpCache;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -46,6 +56,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.Status;
 
 import static com.enioka.jqm.shared.misc.StandaloneHelpers.ipFromId;
 
@@ -59,10 +70,13 @@ public class ServiceClient
 
     private boolean standaloneMode;
     private String localIp;
+    private Long jqmNodeId = null;
 
-    public ServiceClient()
+    public ServiceClient(@Context ServletContext context)
     {
         log.info("\tStarting ServiceClient");
+
+        jqmNodeId = Long.parseLong(context.getInitParameter("jqmnodeid").toString());
 
         try (DbConn cnx = DbManager.getDb().getConn())
         {
@@ -71,14 +85,7 @@ public class ServiceClient
 
         if (standaloneMode)
         {
-            try
-            {
-                localIp = Inet4Address.getLocalHost().getHostAddress();
-            }
-            catch (UnknownHostException e)
-            {
-                throw new IllegalStateException(e);
-            }
+            localIp = StandaloneHelpers.getLocalIpAddress();
         }
     }
 
@@ -552,6 +559,83 @@ public class ServiceClient
     public JobRequest getEmptyJobRequest()
     {
         return Helpers.getClient().newJobRequest("appName", "rsapi user");
+    }
+
+    @Path("ji/{jobId}/files/{name}")
+    @POST
+    @Consumes("*/*")
+    public long addJobFile(@PathParam("jobId") long jobId, @PathParam("name") String name, InputStream file)
+    {
+        if (jqmNodeId == null)
+        {
+            throw new ErrorDto("can only manage job files when the web app runs on top of JQM", "", 7, Status.BAD_REQUEST);
+        }
+
+        if (standaloneMode && !ipFromId(jobId).equals(localIp))
+        {
+            // Reverse proxy to correct node
+            final var p = new Properties();
+            p.setProperty("com.enioka.jqm.ws.url", "http://" + ipFromId(jobId) + ":1789/ws/client");
+            var client = JqmWsClientFactory.getClient(ipFromId(jobId), p, false);
+            return client.addJobFile(jobId, name, file);
+        }
+
+        // If here, local mode - actually store the file.
+        Node n = null;
+        com.enioka.jqm.model.JobInstance ji = null;
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            try
+            {
+                n = Node.select_single(cnx, "node_select_by_id", jqmNodeId);
+            }
+            catch (NoResultException e)
+            {
+                throw new JqmInvalidRequestException("Node cannot be found - cannot add input files", e);
+            }
+
+            try
+            {
+                ji = com.enioka.jqm.model.JobInstance.select_id(cnx, jobId);
+            }
+            catch (DatabaseException e)
+            {
+                throw new JqmInvalidRequestException("Job instance cannot be found - cannot add input files", e);
+            }
+        }
+        if (ji.getNode() != null)
+        {
+            throw new JqmInvalidRequestException("Job instance is already assigned to a node - cannot add input files");
+        }
+
+        String outputRoot = n.getDlRepo();
+        String relDestPath = ji.getJD().getApplicationName() + "/" + jobId + "/" + name;
+        File dest = new File(outputRoot + "/" + relDestPath);
+        log.info("An input file is added for job ID {}. Stored as {}.", jobId, dest.getAbsolutePath());
+
+        // Store the file
+        if (!dest.getParentFile().isDirectory() && !dest.getParentFile().mkdirs())
+        {
+            throw new JqmClientException("Could not create directory " + dest.getParentFile().getAbsolutePath());
+        }
+        try
+        {
+            Files.copy(file, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException("Could not write file " + dest.getAbsolutePath(), e);
+        }
+
+        // Store the file reference in the DB
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            QueryResult qr = cnx.runUpdate("inputfile_insert", "", dest.getAbsolutePath(), jobId, name, null);
+            cnx.commit();
+
+            // Done
+            return qr.generatedKey;
+        }
     }
 
 }
