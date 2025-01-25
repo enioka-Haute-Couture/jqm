@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.runner.java;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
@@ -29,14 +30,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.runner.java.api.jndi.JavaPayloadClassLoader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>
@@ -264,6 +265,14 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         {
             return null; // This is the default behavior of the default implementation.
         }
+    }
+
+    @Override
+    protected URL findResource(String moduleName, String name) throws IOException
+    {
+        jqmlogger.trace("FINDING RESOURCE: {}/{}", moduleName, name);
+        // We can cheat here, as we know there is always a single CL in the module layer.
+        return findResource(name);
     }
 
     @Override
