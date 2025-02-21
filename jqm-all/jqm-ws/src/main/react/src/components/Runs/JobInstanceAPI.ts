@@ -5,6 +5,7 @@ import { JobLaunchParameters } from "./JobLaunchParameters";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import useQueueAPI from "../Queues/QueueAPI";
+import { useRunsPagination } from "../../utils/RunsPaginationProvider";
 
 const API_URL = "/client/ji";
 
@@ -21,20 +22,24 @@ interface JobInstanceFilters {
     statuses: string[];
 }
 
-export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
+export const useJobInstanceAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
+
+    const {
+        page,
+        rowsPerPage,
+        sortOrder,
+        filterList,
+        queryLiveInstances,
+        setPage,
+        setRowsPerPage,
+        setSortOrder,
+        setFilterList,
+        setQueryLiveInstances,
+    } = useRunsPagination();
 
     const [jobInstances, setJobInstances] = useState<JobInstance[] | null>();
     const [count, setCount] = useState<number>(0);
-    const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-    const [page, setPage] = useState<number>(0);
-    const [sortOrder, setSortOrder] = useState<MUISortOptions>({
-        name: "id",
-        direction: "desc",
-    });
-    const [filterList, setFilterList] = useState<string[][]>(emptyFilterList);
-    const [queryLiveInstances, setQueryLiveInstances] =
-        useState<boolean>(false);
 
     const { queues, fetchQueues } = useQueueAPI();
 
@@ -65,7 +70,7 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 filterQuery.applicationName = [newFilterList[1][0]];
             }
             if (newFilterList[2]?.length > 0) {
-                filterQuery.queueId = queues!.find(
+                filterQuery.queueId = queues?.find(
                     (queue) => queue.name === newFilterList[2][0]
                 )?.id;
             }
@@ -76,14 +81,14 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 filterQuery.enqueuedAfter = new Date(newFilterList[4][0]);
                 filterQuery.enqueuedBefore = new Date(newFilterList[4][1]);
             }
-            if (newFilterList[7]?.length > 0) {
-                filterQuery.user = newFilterList[7][0];
-            }
             if (newFilterList[8]?.length > 0) {
-                filterQuery.parentId = newFilterList[8][0];
+                filterQuery.user = newFilterList[8][0];
             }
-            if (newFilterList[10]?.length > 0) {
-                filterQuery.sessionId = newFilterList[10][0];
+            if (newFilterList[9]?.length > 0) {
+                filterQuery.parentId = newFilterList[9][0];
+            }
+            if (newFilterList[11]?.length > 0) {
+                filterQuery.sessionId = newFilterList[11][0];
             }
 
             var sortColumnName = newSortOrder.name.toUpperCase();
@@ -132,7 +137,16 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 })
                 .catch(displayError);
         },
-        [displayError, queues, queryLiveInstances]
+        [
+            queryLiveInstances,
+            setPage,
+            setRowsPerPage,
+            setSortOrder,
+            setQueryLiveInstances,
+            setFilterList,
+            displayError,
+            queues,
+        ]
     );
 
     const killJob = useCallback(

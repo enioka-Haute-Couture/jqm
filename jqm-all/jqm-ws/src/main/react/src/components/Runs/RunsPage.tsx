@@ -52,7 +52,7 @@ const RunsPage: React.FC = () => {
         fetchLogsStderr,
         fetchFiles,
         fetchFileContent
-    } = useJobInstanceAPI(Array(5).fill([]));
+    } = useJobInstanceAPI();
 
     const { jobDefinitions, fetchJobDefinitions } = useJobDefinitionsAPI();
 
@@ -95,6 +95,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[0],
                 filterType: "textField" as FilterType,
             },
         },
@@ -104,6 +105,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[1],
                 filterType: "textField" as FilterType,
             },
         },
@@ -113,6 +115,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[2],
                 filterOptions: {
                     names: queues?.map((queue) => queue.name),
                 },
@@ -124,6 +127,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[3],
                 filterOptions: {
                     names: [
                         "ATTRIBUTED",
@@ -174,6 +178,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[4],
                 filterType: "custom" as FilterType,
                 customFilterListOptions: {
                     render: (v: any) => {
@@ -322,6 +327,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[8],
                 filterType: "textField" as FilterType,
             },
         },
@@ -331,6 +337,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[9],
                 filterType: "textField" as FilterType,
             },
         },
@@ -349,6 +356,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: false,
+                filterList: filterList[11],
                 filterType: "textField" as FilterType,
             },
         },
