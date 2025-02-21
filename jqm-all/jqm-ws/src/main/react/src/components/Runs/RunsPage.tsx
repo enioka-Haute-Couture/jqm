@@ -28,6 +28,7 @@ import { SwitchJobQueueDialog } from "./SwitchJobQueueDialog";
 import useJobDefinitionsAPI from "../JobDefinitions/JobDefinitionsAPI";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { setPageTitle } from "../../utils/title";
 
 const RunsPage: React.FC = () => {
     const {
@@ -73,6 +74,7 @@ const RunsPage: React.FC = () => {
 
     useEffect(() => {
         refresh();
+        setPageTitle("Runs");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

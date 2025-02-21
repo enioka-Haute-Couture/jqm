@@ -18,6 +18,7 @@ import {
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
+import { setPageTitle } from "../../utils/title";
 
 export const JndiPage: React.FC = () => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -41,6 +42,7 @@ export const JndiPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
             fetchResources();
         }
+        setPageTitle('JNDI ressources');
     }, [fetchResources, canUserAccess]);
 
     const handleOnDelete = useCallback(

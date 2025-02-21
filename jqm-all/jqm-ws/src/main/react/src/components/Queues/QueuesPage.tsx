@@ -16,6 +16,7 @@ import {
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
+import { setPageTitle } from "../../utils/title";
 
 const QueuesPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -33,6 +34,7 @@ const QueuesPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
             fetchQueues();
         }
+        setPageTitle("Queues");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

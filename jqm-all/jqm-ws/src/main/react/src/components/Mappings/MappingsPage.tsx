@@ -26,6 +26,7 @@ import { Queue } from "../Queues/Queue";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
+import { setPageTitle } from "../../utils/title";
 
 const MappingsPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -63,6 +64,7 @@ const MappingsPage: React.FC = () => {
             canUserAccess(PermissionObjectType.node, PermissionAction.read))) {
             refresh();
         }
+        setPageTitle('Mappings');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
