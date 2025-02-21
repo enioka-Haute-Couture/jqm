@@ -1,6 +1,7 @@
 package com.enioka.jqm.runner.shell;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
@@ -13,7 +14,9 @@ import javax.management.ObjectName;
 
 import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.api.JobRunnerException;
+import com.enioka.jqm.cl.ExtClassLoader;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
@@ -21,6 +24,7 @@ import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.runner.shell.api.jmx.ShellJobInstanceTrackerMBean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +39,8 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
     private String login = null, pwd = null, url = null;
     private ObjectName name = null;
     private File tmpDir = null, deliveryDir = null;
+    private String logFilePerLaunch;
+    private File logFileDirectory;
 
     ShellJobInstanceTracker(JobInstance ji, JobRunnerCallback cb, JobManager engineApi)
     {
@@ -50,6 +56,9 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         login = this.cb.getWebApiUser(cnx).getKey();
         pwd = this.cb.getWebApiUser(cnx).getValue();
         url = this.cb.getWebApiLocalUrl(cnx);
+
+        // Global parameter
+        logFilePerLaunch = GlobalParameter.getParameter(cnx, "logFilePerLaunch", "true");
 
         // JMX
         if (cb != null && cb.isJmxEnabled())
@@ -75,6 +84,9 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         {
             throw new JobRunnerException("Could not create delivery directory");
         }
+
+        // Log directory
+        logFileDirectory = new File(ExtClassLoader.getRootDir(), "logs");
     }
 
     @Override
@@ -134,10 +146,20 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
             return State.CRASHED;
         }
 
-        // Wait for end, flushing logs.
+        // Wait for end, flushing logs and write on file if configured.
         try
         {
-            Waiter w = StreamGobbler.plumbProcess(process);
+            Waiter w;
+            if(logFilePerLaunch.equals("true") || logFilePerLaunch.equals("both")) {
+                String fileName = StringUtils.leftPad("" + this.ji.getId(), 10, "0");
+                File stdoutFileLog = new File(logFileDirectory,  fileName + ".stdout.log");
+                FileOutputStream stdoutFileOutputStream = new FileOutputStream(stdoutFileLog);
+                File stderrFileLog = new File(logFileDirectory,  fileName + ".stderr.log");
+                FileOutputStream stderrFileOutputStream = new FileOutputStream(stderrFileLog);
+                w = StreamGobbler.plumbProcess(process, stdoutFileOutputStream, stderrFileOutputStream, logFilePerLaunch.equals("both"));
+            }else{
+                w = StreamGobbler.plumbProcess(process);
+            }
             int res = process.waitFor();
             jqmlogger.debug("Shell payload " + this.ji.getId() + " - the external process has exited with RC " + res);
             w.waitForEnd();
