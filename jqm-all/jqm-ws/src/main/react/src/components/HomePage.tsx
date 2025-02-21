@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Container, Link, Typography } from "@mui/material";
 import APIService from "../utils/APIService";
+import { setPageTitle } from "../utils/title";
 
 const HomePage: React.FC = () => {
     const [documentationLink, setDocumentationLink] = React.useState("http://jqm.readthedocs.org/en/master");
@@ -9,6 +10,7 @@ const HomePage: React.FC = () => {
         APIService.get("/admin/version").then((data) => {
             setDocumentationLink(`http://jqm.readthedocs.org/en/jqm-all-${data.mavenVersion}/`);
         })
+        setPageTitle("Home");
     }, [])
 
     return (

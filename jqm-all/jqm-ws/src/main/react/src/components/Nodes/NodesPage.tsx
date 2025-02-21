@@ -15,6 +15,7 @@ import {
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
+import { setPageTitle } from "../../utils/title";
 
 export const NodesPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -41,6 +42,7 @@ export const NodesPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.node, PermissionAction.read)) {
             fetchNodes();
         }
+        setPageTitle("Nodes");
         // eslint-disable-next-line
     }, []);
 

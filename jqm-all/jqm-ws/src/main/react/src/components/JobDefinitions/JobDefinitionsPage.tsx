@@ -38,6 +38,7 @@ import {
 } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { setPageTitle } from "../../utils/title";
 
 
 export const JobDefinitionsPage: React.FC = () => {
@@ -89,6 +90,7 @@ export const JobDefinitionsPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.queue, PermissionAction.read) && canUserAccess(PermissionObjectType.jd, PermissionAction.read)) {
             refresh();
         }
+        setPageTitle("Job definitions");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -16,6 +16,7 @@ import { renderActionsCell, renderInputCell } from "../TableCells";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { setPageTitle } from "../../utils/title";
 
 const RolesPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -35,6 +36,7 @@ const RolesPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
             fetchRoles();
         }
+        setPageTitle("Roles");
     }, [fetchRoles, canUserAccess]);
 
     const updateRow = useCallback(
