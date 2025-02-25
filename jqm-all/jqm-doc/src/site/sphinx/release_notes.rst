@@ -938,7 +938,7 @@ Upgrade notes
 Many breaking changes in this release in all components. Upgrade of engine, upgrade of all libraries are required plus rebuild of database. *There
 is no compatibiliy whatsoever between version 1.1.4 of the libraries and previous versions of the engine and database.*
 
-Please read the rest of the release notes and check the updated documentation at https://github.com/enioka/jqm/blob/master/doc/index.md
+Please read the rest of the release notes and check the updated documentation at https://github.com/enioka-Haute-Couture/jqm/blob/master/doc/index.md
 
 Major
 ++++++++++++++++++

@@ -11,7 +11,7 @@ It takes standard Java code (which does not need to be specifically tailored for
 
 Basically, it is a very lightweight application server specifically tailored for making it easier to run Java batch jobs.
 
-Full product description and documentation is available at [read the docs](https://jqm.readthedocs.io), code is on [GitHub](https://github.com/enioka/jqm). Maintainer (Enioka company) website (in French) is at http://www.enioka.com.
+Full product description and documentation is available at [read the docs](https://jqm.readthedocs.io), code is on [GitHub](https://github.com/enioka-Haute-Couture/jqm). Maintainer (Enioka Haute Couture company) website is at http://haute-couture.enioka.com/en .
 
 
 ## 2. Tags

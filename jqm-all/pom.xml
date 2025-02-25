@@ -159,9 +159,9 @@
     </modules>
 
     <scm>
-        <developerConnection>scm:git:ssh://git@github.com:enioka/jqm.git</developerConnection>
-        <connection>scm:git:https://github.com/enioka/jqm.git</connection>
-        <url>https://github.com/enioka/jqm/</url>
+        <developerConnection>scm:git:ssh://git@github.com:enioka-Haute-Couture/jqm.git</developerConnection>
+        <connection>scm:git:https://github.com/enioka-Haute-Couture/jqm.git</connection>
+        <url>https://github.com/enioka-Haute-Couture/jqm/</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -459,7 +459,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/enioka/jqm/issues</url>
+        <url>https://github.com/enioka-Haute-Couture/jqm/issues</url>
     </issueManagement>
 
     <ciManagement>
