@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.admin.MetaService;
+import com.enioka.api.admin.ClDto;
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
@@ -419,6 +420,66 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             MetaService.deleteGlobalParameter(cnx, id);
+            cnx.commit();
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    /// ClassLoader
+    /////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("cl")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<ClDto> getClassLoaders()
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            return MetaService.getClassLoaders(cnx);
+        }
+    }
+
+    @GET
+    @Path("cl/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public ClDto getClassLoader(@PathParam("id") long id)
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            return MetaService.getClassLoader(cnx, id);
+        }
+    }
+
+    @PUT
+    @Path("cl/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setClassLoader(@PathParam("id") Long id, ClDto dto)
+    {
+        dto.setId(id);
+        setClassLoader(dto);
+    }
+
+    @POST
+    @Path("cl")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setClassLoader(ClDto dto)
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            MetaService.upsertClassLoader(cnx, dto);
+            cnx.commit();
+        }
+    }
+
+    @DELETE
+    @Path("cl/{id}")
+    public void deleteClassLoader(@PathParam("id") Long id)
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            MetaService.deleteClassLoader(cnx, id);
             cnx.commit();
         }
     }

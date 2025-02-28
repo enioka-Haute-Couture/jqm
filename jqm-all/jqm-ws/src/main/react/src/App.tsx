@@ -23,6 +23,7 @@ import { JobDefinitionsPage } from "./components/JobDefinitions/JobDefinitionsPa
 import { ForceLogin } from "./utils/ForceLogin";
 import { AuthProvider } from "./utils/AuthService";
 import { RunsPaginationProvider } from "./utils/RunsPaginationProvider";
+import ClassLoadersPage from "./components/ClassLoaders/ClassLoadersPage";
 
 
 
@@ -84,6 +85,9 @@ function App() {
                                             </Route>
                                             <Route path="/jndi" exact={true}>
                                                 <JndiPage />
+                                            </Route>
+                                            <Route path="/classloaders" exact={true}>
+                                                <ClassLoadersPage />
                                             </Route>
                                             <Route path="/runs" exact={true}>
                                                 <RunsPage />
