@@ -21,6 +21,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { JobDefinition, JobType } from "./JobDefinition";
 import { SpecificPropertiesForm } from "./EditSpecificPropertiesDialog";
 import { Queue } from "../Queues/Queue";
+import { ClassLoader } from "../ClassLoaders/ClassLoader";
 
 const useStyles = makeStyles((theme: Theme) =>
 ({
@@ -40,7 +41,8 @@ export const CreateJobDefinitionDialog: React.FC<{
     closeDialog: () => void;
     createJobDefinition: (jobDefinition: JobDefinition) => void;
     queues: Queue[];
-}> = ({ closeDialog, createJobDefinition, queues }) => {
+    classLoaders: ClassLoader[]
+}> = ({ closeDialog, createJobDefinition, queues, classLoaders }) => {
     const [queueId, setQueueId] = useState<number>(queues[0].id!);
     const [applicationName, setApplicationName] = useState("");
     const [description, setDescription] = useState("");
@@ -50,6 +52,8 @@ export const CreateJobDefinitionDialog: React.FC<{
     const [javaClassName, setJavaClassName] = useState<string>("");
     const [jarPath, setJarPath] = useState<string>("");
     const [pathType, setPathType] = useState<string>("FS");
+    const [classLoaderId, setClassLoaderId] = useState<number | undefined>()
+
 
     const classes = useStyles();
     return (
@@ -175,6 +179,9 @@ export const CreateJobDefinitionDialog: React.FC<{
                     setJavaClassName={setJavaClassName}
                     pathType={pathType}
                     setPathType={setPathType}
+                    classLoaderId={classLoaderId}
+                    setClassLoaderId={setClassLoaderId}
+                    classLoaders={classLoaders}
                 />
             </DialogContent>
             <DialogActions>
@@ -218,6 +225,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                                 pathType: pathType,
                                 jarPath: jarPath,
                                 javaClassName: javaClassName,
+                                classLoaderId: classLoaderId
                             },
                         });
                         closeDialog();

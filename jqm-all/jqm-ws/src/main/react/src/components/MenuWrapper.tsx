@@ -17,7 +17,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import HomeIcon from "@mui/icons-material/Home";
-import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import PendingIcon from "@mui/icons-material/Pending";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -25,7 +25,8 @@ import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import SecurityIcon from "@mui/icons-material/Security";
 import GroupWorkIcon from "@mui/icons-material/GroupWork";
 import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import UploadIcon from "@mui/icons-material/Upload";
 import { Button, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { PermissionAction, PermissionObjectType, useAuth } from "../utils/AuthService";
@@ -212,7 +213,7 @@ export default function MenuWrapper(props: any) {
                             to="/queues"
                         >
                             <ListItemIcon>
-                                <FormatListBulletedIcon />
+                                <PendingIcon />
                             </ListItemIcon>
                             <ListItemText primary={"Queues"} />
                         </ListItem>
@@ -230,7 +231,8 @@ export default function MenuWrapper(props: any) {
                                 to="/mappings"
                             >
                                 <ListItemIcon>
-                                    <SyncAltIcon />
+                                    <AccountTreeIcon />
+
                                 </ListItemIcon>
                                 <ListItemText primary={"Mappings"} />
                             </ListItem>
@@ -259,6 +261,20 @@ export default function MenuWrapper(props: any) {
                                 <GroupWorkIcon />
                             </ListItemIcon>
                             <ListItemText primary={"Cluster-wide params"} />
+                        </ListItem>
+                    )}
+                    {canUserAccess(PermissionObjectType.cl, PermissionAction.read) && (
+                        <ListItem
+                            button
+                            key={"classLoaders"}
+                            component={NavLink}
+                            to="/classloaders"
+                        >
+                            <ListItemIcon>
+                                <UploadIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Class loaders"} />
+
                         </ListItem>
                     )}
                     {canUserAccess(PermissionObjectType.jd, PermissionAction.read) &&

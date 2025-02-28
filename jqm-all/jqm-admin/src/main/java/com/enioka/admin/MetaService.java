@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import com.enioka.api.admin.ClDto;
+import com.enioka.api.admin.ClHandlerDto;
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
@@ -19,6 +22,8 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JndiObjectResource;
@@ -31,6 +36,7 @@ import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.repository.VersionRepository;
 
+import org.apache.commons.collections4.Get;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.lang.util.ByteSource;
@@ -425,6 +431,106 @@ public class MetaService
         for (JndiObjectResourceDto dto : dtos)
         {
             upsertJndiObjectResource(cnx, dto);
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    /// ClassLoader
+    /////////////////////////////////////////////////////////////////////////
+
+    private static ClDto mapCl(ResultSet rs, int colShift)
+    {
+        try
+        {
+            ClDto res = new ClDto();
+
+            res.setId(rs.getLong(colShift + 1));
+            res.setName(rs.getString(colShift + 2));
+            res.setChildFirst(rs.getBoolean(colShift + 3));
+            res.setHiddenClasses(rs.getString(colShift + 4));
+            res.setTracingEnabled(rs.getBoolean(colShift + 5));
+            res.setPersistent(rs.getBoolean(colShift + 6));
+            res.setAllowedRunners(rs.getString(colShift + 7));
+            return res;
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+    }
+
+    public static List<ClDto> getClassLoaders(DbConn cnx)
+    {
+        List<ClDto> res = new ArrayList<>();
+        try
+        {
+            ResultSet rs = cnx.runSelect("cl_select_all");
+            while (rs.next())
+            {
+                res.add(mapCl(rs, 0));
+            }
+            rs.close();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static ClDto getClassLoader(DbConn cnx, long id)
+    {
+        try (var rs = cnx.runSelect("cl_select_by_id", id))
+        {
+            if (!rs.next())
+            {
+                throw new JqmAdminApiUserException("no result");
+            }
+            return mapCl(rs, 0);
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
+    public static void deleteClassLoader(DbConn cnx, long id)
+    {
+        QueryResult qr = cnx.runUpdate("cl_delete_by_id", id);
+        if (qr.nbUpdated != 1)
+        {
+            cnx.setRollbackOnly();
+            throw new JqmAdminApiUserException("no item with ID " + id);
+        }
+    }
+
+    public static void upsertClassLoader(DbConn cnx, ClDto dto)
+    {
+        try
+        {
+            if (dto.getId() != null)
+            {
+                cnx.runUpdate("cl_update_all_fields_by_id", dto.getName(), dto.isChildFirst(), dto.getHiddenClasses(),
+                        dto.isTracingEnabled(), dto.isPersistent(), dto.getAllowedRunners(), dto.getId());
+            }
+            else
+            {
+                Cl.create(cnx, dto.getName(), dto.isChildFirst(), dto.getHiddenClasses(), dto.isTracingEnabled(), dto.isPersistent(),
+                        dto.getAllowedRunners());
+
+            }
+        }
+        catch (DatabaseException e)
+        {
+
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+            {
+                throw new JqmAdminApiUserException("Name " + dto.getName() + " already used.");
+            }
+            else
+            {
+                throw e;
+            }
         }
     }
 
