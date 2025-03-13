@@ -28,6 +28,7 @@ import { SwitchJobQueueDialog } from "./SwitchJobQueueDialog";
 import useJobDefinitionsAPI from "../JobDefinitions/JobDefinitionsAPI";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { setPageTitle } from "../../utils/title";
 
 const RunsPage: React.FC = () => {
     const {
@@ -51,7 +52,7 @@ const RunsPage: React.FC = () => {
         fetchLogsStderr,
         fetchFiles,
         fetchFileContent
-    } = useJobInstanceAPI(Array(5).fill([]));
+    } = useJobInstanceAPI();
 
     const { jobDefinitions, fetchJobDefinitions } = useJobDefinitionsAPI();
 
@@ -73,6 +74,7 @@ const RunsPage: React.FC = () => {
 
     useEffect(() => {
         refresh();
+        setPageTitle("Runs");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -93,6 +95,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[0],
                 filterType: "textField" as FilterType,
             },
         },
@@ -102,6 +105,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[1],
                 filterType: "textField" as FilterType,
             },
         },
@@ -111,6 +115,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[2],
                 filterOptions: {
                     names: queues?.map((queue) => queue.name),
                 },
@@ -122,6 +127,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[3],
                 filterOptions: {
                     names: [
                         "ATTRIBUTED",
@@ -172,6 +178,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[4],
                 filterType: "custom" as FilterType,
                 customFilterListOptions: {
                     render: (v: any) => {
@@ -279,11 +286,48 @@ const RunsPage: React.FC = () => {
             },
         },
         {
+            name: '',
+            label: 'Duration',
+            options: {
+                filter: false,
+                sort: false,
+                customBodyRender: (_value: any, tableMeta: MUIDataTableMeta) => {
+                    const beganRunningDate = tableMeta.rowData[5];
+                    let duration: number;
+
+                    if (queryLiveInstances) {
+                        if (!beganRunningDate) {
+                            return "";
+                        }
+                        duration = new Date().getTime() - new Date(beganRunningDate).getTime();
+                    } else {
+                        const endDate = tableMeta.rowData[6];
+                        duration = new Date(endDate).getTime() - new Date(beganRunningDate).getTime();
+                    }
+                    duration = duration / 1000;
+
+                    const durationByUnit = Object.entries({
+                        d: Math.floor(duration / 60 / 60 / 24),
+                        h: Math.floor(duration / 60 / 60) % 24,
+                        m: Math.floor(duration / 60) % 60,
+                        s: Math.floor(duration) % 60,
+                    }).filter(keyVal => keyVal[1] !== 0);
+
+                    if (durationByUnit.length === 0) {
+                        return "0s";
+                    }
+
+                    return durationByUnit.map(([unit, value]) => `${value}${unit}`).join(' ');
+                }
+            },
+        },
+        {
             name: "user",
             label: "User",
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[8],
                 filterType: "textField" as FilterType,
             },
         },
@@ -293,6 +337,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                filterList: filterList[9],
                 filterType: "textField" as FilterType,
             },
         },
@@ -311,6 +356,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: false,
+                filterList: filterList[11],
                 filterType: "textField" as FilterType,
             },
         },
@@ -446,6 +492,7 @@ const RunsPage: React.FC = () => {
         serverSide: true,
         search: false,
         count: count,
+        page: page,
         rowsPerPage: rowsPerPage!,
         sortOrder: sortOrder!,
         customFilterDialogFooter: (

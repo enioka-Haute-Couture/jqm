@@ -5,6 +5,7 @@ import { JobLaunchParameters } from "./JobLaunchParameters";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import useQueueAPI from "../Queues/QueueAPI";
+import { useRunsPagination } from "../../utils/RunsPaginationProvider";
 
 const API_URL = "/client/ji";
 
@@ -21,69 +22,76 @@ interface JobInstanceFilters {
     statuses: string[];
 }
 
-export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
+export const useJobInstanceAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
+
+    const {
+        page,
+        rowsPerPage,
+        sortOrder,
+        filterList,
+        queryLiveInstances,
+        setPage,
+        setRowsPerPage,
+        setSortOrder,
+        setFilterList,
+        setQueryLiveInstances,
+    } = useRunsPagination();
 
     const [jobInstances, setJobInstances] = useState<JobInstance[] | null>();
     const [count, setCount] = useState<number>(0);
-    const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-    const [page, setPage] = useState<number>(0);
-    const [sortOrder, setSortOrder] = useState<MUISortOptions>({
-        name: "id",
-        direction: "desc",
-    });
-    const [filterList, setFilterList] = useState<string[][]>(emptyFilterList);
-    const [queryLiveInstances, setQueryLiveInstances] =
-        useState<boolean>(false);
 
     const { queues, fetchQueues } = useQueueAPI();
 
     const fetchJobInstances = useCallback(
         async (
-            page: number,
-            rowsPerPage: number,
-            sortOrder: MUISortOptions,
-            queryLiveInstances: boolean,
-            filterList: string[][]
+            newPage: number,
+            newRowsPerPage: number,
+            newSortOrder: MUISortOptions,
+            newQueryLiveInstances: boolean,
+            newFilterList: string[][]
         ) => {
-            setPage(page);
-            setRowsPerPage(rowsPerPage);
-            setSortOrder(sortOrder);
-            setQueryLiveInstances(queryLiveInstances);
+            if (newQueryLiveInstances !== queryLiveInstances) {
+                setJobInstances(null);
+            }
+            setPage(newPage);
+            setRowsPerPage(newRowsPerPage);
+            setSortOrder(newSortOrder);
+            setQueryLiveInstances(newQueryLiveInstances);
 
             let filterQuery: JobInstanceFilters = { statuses: [] };
 
-            setFilterList(filterList);
+            setFilterList(newFilterList);
 
-            if (filterList[0]?.length > 0) {
-                filterQuery.jobInstanceId = filterList[0][0];
+            if (newFilterList[0]?.length > 0) {
+                filterQuery.jobInstanceId = newFilterList[0][0];
             }
-            if (filterList[1]?.length > 0) {
-                filterQuery.applicationName = [filterList[1][0]];
+            if (newFilterList[1]?.length > 0) {
+                filterQuery.applicationName = [newFilterList[1][0]];
             }
-            if (filterList[2]?.length > 0) {
-                filterQuery.queueId = queues!.find(
-                    (queue) => queue.name === filterList[2][0]
+            if (newFilterList[2]?.length > 0) {
+                filterQuery.queueId = queues?.find(
+                    (queue) => queue.name === newFilterList[2][0]
                 )?.id;
             }
-            if (filterList[3]?.length > 0) {
-                filterQuery.statuses = [filterList[3][0]];
+            if (newFilterList[3]?.length > 0) {
+                filterQuery.statuses = [newFilterList[3][0]];
             }
-            if (filterList[4]?.length > 0) {
-                filterQuery.enqueuedAfter = new Date(filterList[4][0]);
-                filterQuery.enqueuedBefore = new Date(filterList[4][1]);
+            if (newFilterList[4]?.length > 0) {
+                filterQuery.enqueuedAfter = new Date(newFilterList[4][0]);
+                filterQuery.enqueuedBefore = new Date(newFilterList[4][1]);
             }
-            if (filterList[7]?.length > 0) {
-                filterQuery.user = filterList[7][0];
+            if (newFilterList[8]?.length > 0) {
+                filterQuery.user = newFilterList[8][0];
             }
-            if (filterList[8]?.length > 0) {
-                filterQuery.parentId = filterList[8][0];
+            if (newFilterList[9]?.length > 0) {
+                filterQuery.parentId = newFilterList[9][0];
             }
-            if (filterList[10]?.length > 0) {
-                filterQuery.sessionId = filterList[10][0];
+            if (newFilterList[11]?.length > 0) {
+                filterQuery.sessionId = newFilterList[11][0];
             }
 
-            var sortColumnName = sortOrder.name.toUpperCase();
+            var sortColumnName = newSortOrder.name.toUpperCase();
             // For some reason field names and filter names are not the same, so do mapping here
             if (sortColumnName === "STATE") {
                 sortColumnName = "STATUS";
@@ -107,7 +115,7 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 {
                     col: sortColumnName,
                     order:
-                        sortOrder.direction === "asc"
+                        newSortOrder.direction === "asc"
                             ? "ASCENDING"
                             : "DESCENDING",
                 },
@@ -115,10 +123,10 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
 
             let request = {
                 ...filterQuery,
-                firstRow: rowsPerPage * page,
-                pageSize: rowsPerPage,
-                queryLiveInstances: queryLiveInstances,
-                queryHistoryInstances: !queryLiveInstances,
+                firstRow: newRowsPerPage * newPage,
+                pageSize: newRowsPerPage,
+                queryLiveInstances: newQueryLiveInstances,
+                queryHistoryInstances: !newQueryLiveInstances,
                 sortby: sortBy,
             };
 
@@ -129,7 +137,16 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
                 })
                 .catch(displayError);
         },
-        [displayError, queues]
+        [
+            queryLiveInstances,
+            setPage,
+            setRowsPerPage,
+            setSortOrder,
+            setQueryLiveInstances,
+            setFilterList,
+            displayError,
+            queues,
+        ]
     );
 
     const killJob = useCallback(
@@ -306,11 +323,14 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
 
     const fetchLogsStdout = useCallback(
         async (jobId: number) => {
-            return APIService.get(`${API_URL}/${jobId}/stdout`, {
-                headers: {
-                    Accept: "*/*", // API returns plain text
+            return APIService.get(
+                `${API_URL}/${jobId}/stdout`,
+                {
+                    headers: {
+                        Accept: "*/*", // API returns plain text
+                    },
                 },
-            }, false,
+                false
             ).catch(displayError);
         },
         [displayError]
@@ -318,11 +338,14 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
 
     const fetchLogsStderr = useCallback(
         async (jobId: number) => {
-            return APIService.get(`${API_URL}/${jobId}/stderr`, {
-                headers: {
-                    Accept: "*/*", // API returns plain text
+            return APIService.get(
+                `${API_URL}/${jobId}/stderr`,
+                {
+                    headers: {
+                        Accept: "*/*", // API returns plain text
+                    },
                 },
-            }, false
+                false
             ).catch(displayError);
         },
         [displayError]
@@ -330,22 +353,27 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
 
     const fetchFiles = useCallback(
         async (jobId: number) => {
-            return APIService.get(`${API_URL}/${jobId}/files`).catch(displayError);
+            return APIService.get(`${API_URL}/${jobId}/files`).catch(
+                displayError
+            );
         },
         [displayError]
     );
 
     const fetchFileContent = useCallback(
         async (fileId: number) => {
-            return APIService.get(`${API_URL}/files/${fileId}`, {
-                headers: {
-                    Accept: "*/*", // API returns plain text
+            return APIService.get(
+                `${API_URL}/files/${fileId}`,
+                {
+                    headers: {
+                        Accept: "*/*", // API returns plain text
+                    },
                 },
-            }, false,
+                false
             ).catch(displayError);
         },
         [displayError]
-    )
+    );
 
     return {
         count,

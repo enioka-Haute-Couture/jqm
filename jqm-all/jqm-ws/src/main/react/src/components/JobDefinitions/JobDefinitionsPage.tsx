@@ -38,6 +38,8 @@ import {
 } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { setPageTitle } from "../../utils/title";
+import useClassLoaderAPI from "../ClassLoaders/ClassLoaderAPI";
 
 
 export const JobDefinitionsPage: React.FC = () => {
@@ -78,10 +80,13 @@ export const JobDefinitionsPage: React.FC = () => {
 
     const { queues, fetchQueues } = useQueueAPI();
 
+    const { classLoaders, fetchClassLoaders } = useClassLoaderAPI();
+
     const { canUserAccess } = useAuth();
 
     const refresh = () => {
         fetchQueues();
+        fetchClassLoaders();
         fetchJobDefinitions();
     };
 
@@ -89,6 +94,7 @@ export const JobDefinitionsPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.queue, PermissionAction.read) && canUserAccess(PermissionObjectType.jd, PermissionAction.read)) {
             refresh();
         }
+        setPageTitle("Job definitions");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -160,6 +166,8 @@ export const JobDefinitionsPage: React.FC = () => {
                     Path to the jar file: {value.jarPath}
                     <br />
                     Class to launch: {value.javaClassName}
+                    <br />
+                    Class loader: {classLoaders?.find((cl) => cl.id === value.classLoaderId)?.name || 'default'}
                 </>
             );
         } else if (value.jobType === JobType.shell) {
@@ -487,7 +495,7 @@ export const JobDefinitionsPage: React.FC = () => {
         return <AccessForbiddenPage />
     }
 
-    return jobDefinitions && queues ? (
+    return jobDefinitions && queues && classLoaders ? (
         <Container maxWidth={false}>
             <MUIDataTable
                 title={"Job definitions"}
@@ -500,6 +508,7 @@ export const JobDefinitionsPage: React.FC = () => {
                     closeDialog={() => setShowCreateDialog(false)}
                     queues={queues}
                     createJobDefinition={createJobDefinition}
+                    classLoaders={classLoaders}
                 />
             )}
             {editTagsJobDefinitionId !== null && (
@@ -516,6 +525,7 @@ export const JobDefinitionsPage: React.FC = () => {
                     setProperties={(
                         properties: JobDefinitionSpecificProperties
                     ) => setProperties(properties)}
+                    classLoaders={classLoaders}
                 />
             )}
             {editParametersJobDefinitionId != null && (

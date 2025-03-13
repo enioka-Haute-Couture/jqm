@@ -25,6 +25,7 @@ import { renderDateCell } from "../TableCells/renderDateCell";
 import { Role } from "../Roles/Role";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
+import { setPageTitle } from "../../utils/title";
 
 const UsersPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -62,6 +63,7 @@ const UsersPage: React.FC = () => {
             canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
             refresh();
         }
+        setPageTitle("Users");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -25,10 +25,13 @@ function jobDefinitionToPayload(jobDefinition: JobDefinition): any {
         keyword1: jobDefinition.tags.keyword1,
         keyword2: jobDefinition.tags.keyword2,
         keyword3: jobDefinition.tags.keyword3,
-        javaClassName: jobDefinition.properties.javaClassName ? jobDefinition.properties.javaClassName : "com.company.product.ClassName",
+        javaClassName: jobDefinition.properties.javaClassName
+            ? jobDefinition.properties.javaClassName
+            : "com.company.product.ClassName",
         jarPath: jobDefinition.properties.jarPath,
         pathType: jobDefinition.properties.pathType,
-    }
+        classLoaderId: jobDefinition.properties.classLoaderId,
+    };
     delete payload.tags;
     delete payload.properties;
 
@@ -46,33 +49,41 @@ export const useJobDefinitionsAPI = () => {
 
     const fetchJobDefinitions = useCallback(async () => {
         return APIService.get(API_URL)
-            .then((response) => setJobDefinitions(response.map((jobDefinition: any) => {
-                return {
-                    ...jobDefinition,
-                    tags: {
-                        application: jobDefinition.application,
-                        module: jobDefinition.module,
-                        keyword1: jobDefinition.keyword1,
-                        keyword2: jobDefinition.keyword2,
-                        keyword3: jobDefinition.keyword3,
-                    },
-                    jobType: pathTypeToJobType(jobDefinition.pathType),
-                    properties: {
-                        javaClassName: jobDefinition.javaClassName,
-                        jarPath: jobDefinition.jarPath,
-                        jobType: pathTypeToJobType(
-                            jobDefinition.pathType
-                        ),
-                        pathType: jobDefinition.pathType,
-                    },
-                };
-            })))
+            .then((response) =>
+                setJobDefinitions(
+                    response.map((jobDefinition: any) => {
+                        return {
+                            ...jobDefinition,
+                            tags: {
+                                application: jobDefinition.application,
+                                module: jobDefinition.module,
+                                keyword1: jobDefinition.keyword1,
+                                keyword2: jobDefinition.keyword2,
+                                keyword3: jobDefinition.keyword3,
+                            },
+                            jobType: pathTypeToJobType(jobDefinition.pathType),
+                            properties: {
+                                javaClassName: jobDefinition.javaClassName,
+                                jarPath: jobDefinition.jarPath,
+                                jobType: pathTypeToJobType(
+                                    jobDefinition.pathType
+                                ),
+                                pathType: jobDefinition.pathType,
+                                classLoaderId: jobDefinition.classLoaderId,
+                            },
+                        };
+                    })
+                )
+            )
             .catch(displayError);
     }, [displayError]);
 
     const createJobDefinition = useCallback(
         async (newJobDefinition: JobDefinition) => {
-            return APIService.post(API_URL, jobDefinitionToPayload(newJobDefinition))
+            return APIService.post(
+                API_URL,
+                jobDefinitionToPayload(newJobDefinition)
+            )
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess(
@@ -87,12 +98,15 @@ export const useJobDefinitionsAPI = () => {
     const deleteJobDefinitions = useCallback(
         async (jobDefinitionsIds: number[]) => {
             return await Promise.all(
-                jobDefinitionsIds.map((id) => APIService.delete(`${API_URL}/${id}`))
+                jobDefinitionsIds.map((id) =>
+                    APIService.delete(`${API_URL}/${id}`)
+                )
             )
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess(
-                        `Successfully deleted job definition${jobDefinitionsIds.length > 1 ? "s" : ""
+                        `Successfully deleted job definition${
+                            jobDefinitionsIds.length > 1 ? "s" : ""
                         }`
                     );
                 })
@@ -103,7 +117,10 @@ export const useJobDefinitionsAPI = () => {
 
     const updateJobDefinition = useCallback(
         async (jobDefinition: JobDefinition) => {
-            return APIService.put(`${API_URL}/${jobDefinition.id}`, jobDefinitionToPayload(jobDefinition))
+            return APIService.put(
+                `${API_URL}/${jobDefinition.id}`,
+                jobDefinitionToPayload(jobDefinition)
+            )
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess("Successfully saved job definition");

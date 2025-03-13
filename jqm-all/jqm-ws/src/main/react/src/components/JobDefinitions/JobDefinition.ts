@@ -23,6 +23,7 @@ export interface JobDefinitionSpecificProperties {
     jarPath: string;
     jobType?: JobType;
     pathType: string;
+    classLoaderId?: number;
 }
 
 export enum JobType {

@@ -11,6 +11,7 @@ import { renderActionsCell, renderInputCell } from "../TableCells";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
+import { setPageTitle } from "../../utils/title";
 
 const ClusterwideParametersPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -32,6 +33,7 @@ const ClusterwideParametersPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
             fetchParameters();
         }
+        setPageTitle("Cluster-wide parameters");
     }, [fetchParameters, canUserAccess]);
 
     const handleOnDelete = useCallback(
