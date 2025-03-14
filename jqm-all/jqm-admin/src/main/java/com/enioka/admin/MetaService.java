@@ -4,10 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.enioka.api.admin.ClDto;
-import com.enioka.api.admin.ClHandlerDto;
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
@@ -23,7 +21,6 @@ import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.Cl;
-import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JndiObjectResource;
@@ -36,7 +33,6 @@ import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.repository.VersionRepository;
 
-import org.apache.commons.collections4.Get;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.lang.util.ByteSource;
@@ -1587,8 +1583,7 @@ public class MetaService
         if (dto.getId() != null)
         {
             cnx.runUpdate("user_update_changed", dto.getLogin(), dto.getLocked(), dto.getExpirationDate(), dto.getEmail(),
-                    dto.getFreeText(), dto.getId(), dto.getLogin(), dto.getLocked(), dto.getExpirationDate(), dto.getEmail(),
-                    dto.getFreeText());
+                    dto.getFreeText(), dto.getId());
 
             // Password
             if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())

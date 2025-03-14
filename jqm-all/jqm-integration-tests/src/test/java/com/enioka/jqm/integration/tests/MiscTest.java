@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
+import com.enioka.api.admin.RUserDto;
 import jakarta.mail.Folder;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
@@ -342,5 +343,35 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals("hop hop hop", gps.get(0).getValue());
         Assert.assertNotNull("not null", gps.get(0).getLastModified());
         Assert.assertNotEquals(first, gps.get(0).getLastModified());
+    }
+
+
+    @Test
+    public void testUpdateUser() {
+        RUserDto  user = new RUserDto();
+        user.setEmail("john@example.com");
+        user.setLogin("john");
+        user.setNewPassword("john");
+        user.setLocked(false);
+        MetaService.upsertUser(cnx, user);
+
+        RUserDto userSaved = MetaService.getUsers(cnx).get(0);
+
+        Assert.assertEquals("john", userSaved.getLogin());
+        Assert.assertEquals("john@example.com", userSaved.getEmail());
+        Assert.assertNull(userSaved.getExpirationDate());
+        Assert.assertNull(userSaved.getFreeText());
+
+        userSaved.setExpirationDate(Calendar.getInstance());
+        userSaved.setFreeText("free");
+        userSaved.setEmail("newMail@example.com");
+        MetaService.upsertUser(cnx, userSaved);
+
+        RUserDto userUpdated = MetaService.getUsers(cnx).get(0);
+
+        Assert.assertEquals("john", userUpdated.getLogin());
+        Assert.assertEquals("newMail@example.com", userUpdated.getEmail());
+        Assert.assertEquals("free", userUpdated.getFreeText());
+        Assert.assertEquals(userSaved.getExpirationDate(), userUpdated.getExpirationDate());
     }
 }
