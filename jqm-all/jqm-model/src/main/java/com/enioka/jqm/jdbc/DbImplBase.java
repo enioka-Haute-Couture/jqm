@@ -322,7 +322,7 @@ class DbImplBase
         queries.put("user_remove_role", "DELETE FROM __T__RROLE_RUSER WHERE ROLE=? AND ACCOUNT=?");
         queries.put("user_update_enable_by_id", "UPDATE __T__RUSER SET LOCKED=false WHERE ID=?");
         queries.put("user_update_password_by_id", "UPDATE __T__RUSER SET PASSWORD=?, HASHSALT=? WHERE ID=?");
-        queries.put("user_update_changed", "UPDATE __T__RUSER SET LOGIN=?, LOCKED=?, EXPIRATION_DATE=?, LAST_MODIFIED=CURRENT_TIMESTAMP, EMAIL=?, FREETEXT=? WHERE ID=? AND NOT (LOGIN=? AND LOCKED=? AND EXPIRATION_DATE=? AND EMAIL=? AND FREETEXT=? )");
+        queries.put("user_update_changed", "UPDATE __T__RUSER SET LOGIN=?, LOCKED=?, EXPIRATION_DATE=?, LAST_MODIFIED=CURRENT_TIMESTAMP, EMAIL=?, FREETEXT=? WHERE ID=?");
         queries.put("user_select_all_in_role", "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM __T__RUSER u RIGHT JOIN __T__RROLE_RUSER a ON a.USER = u.ID WHERE a.ROLE=?");
         queries.put("user_select_all",         "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM __T__RUSER ");
         queries.put("user_select_by_key",      queries.get("user_select_all") +  " WHERE LOGIN=?");
