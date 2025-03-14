@@ -224,13 +224,13 @@ final class Helpers
      * @param subject
      * @param body
      * @param mailSessionJndiAlias
-     * @throws MessagingException
+     * @throws JqmRuntimeException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     static void sendMessage(String to, String subject, String body, String mailSessionJndiAlias)
     {
         jqmlogger.debug("sending mail to " + to + " - subject is " + subject);
-        ClassLoader extLoader = ExtClassLoader.instance;
+        ClassLoader extLoader = ExtClassLoader.classLoaderInstance;
         extLoader = extLoader == null ? Helpers.class.getClassLoader() : extLoader;
         ClassLoader old = Thread.currentThread().getContextClassLoader();
         Object mailSession = null;

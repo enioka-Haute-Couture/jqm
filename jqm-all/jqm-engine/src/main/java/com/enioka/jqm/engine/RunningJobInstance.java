@@ -410,6 +410,19 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     }
 
     @Override
+    public ModuleLayer getExtensionModuleLayer()
+    {
+        try
+        {
+            return (ModuleLayer) InitialContext.doLookup("layer://ext");
+        }
+        catch (NamingException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public ClassLoader getEngineClassloader()
     {
         return this.getClass().getClassLoader();

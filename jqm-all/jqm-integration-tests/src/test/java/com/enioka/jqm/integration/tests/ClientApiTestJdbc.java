@@ -18,7 +18,9 @@
 
 package com.enioka.jqm.integration.tests;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -28,6 +30,7 @@ import com.enioka.api.admin.JobDefDto;
 import com.enioka.jqm.client.api.JobDef;
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.Query.Sort;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.client.api.Queue;
 import com.enioka.jqm.client.api.QueueStatus;
 import com.enioka.jqm.client.api.State;
@@ -524,6 +527,40 @@ public class ClientApiTestJdbc extends JqmBaseTest
         Assert.assertEquals(State.HOLDED, jqmClient.newQuery().setQueryLiveInstances(true).invoke().get(0).getState());
 
         // Resume at will.
+        jqmClient.resumeQueuedJob(i);
+        TestHelpers.waitFor(1, 10000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+    }
+
+    @Test
+    public void testInputFile()
+    {
+        GlobalParameter.setParameter(cnx, "disableWsApi", "false");
+        GlobalParameter.setParameter(cnx, "wsStandaloneMode", "true");
+        cnx.runUpdate("node_update_all_enable_ws");
+        cnx.commit();
+
+        // Start engine with APIs (file APIs use web services)
+        addAndStartEngine();
+
+        CreationTools.createJobDef(null, true, "pyl.EngineApiExpectInputFile", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        long i = jqmClient.newJobRequest("MarsuApplication", "testuser").startHeld().enqueue();
+        var expectedFile = new File("./target/outputfiles/MarsuApplication/" + i + "/SuperFile");
+        if (expectedFile.exists())
+        {
+            expectedFile.delete();
+        }
+
+        // Add an input file
+        InputStream is = new ByteArrayInputStream(String.valueOf("Hello, World!").getBytes());
+        jqmClient.addJobFile(i, "SuperFile", is);
+
+        // Check file was created
+        expectedFile.canRead();
+
+        // Should run
         jqmClient.resumeQueuedJob(i);
         TestHelpers.waitFor(1, 10000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));

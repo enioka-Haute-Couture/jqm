@@ -55,16 +55,19 @@ import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.Deliverable;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.History;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
 import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.model.State;
+import com.enioka.jqm.shared.misc.StandaloneHelpers;
 
 /**
  * Main JQM client API entry point.
@@ -76,6 +79,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
     private final SimpleHttpClient httpClient;
     private Db db = null;
+    private Boolean standaloneMode = null;
     Properties p;
 
     // /////////////////////////////////////////////////////////////////////
@@ -140,6 +144,15 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         SimpleApiSecurity.dispose();
         this.db = null;
         p = null;
+    }
+
+    private boolean isStandalone(DbConn cnx)
+    {
+        if (standaloneMode == null)
+        {
+            standaloneMode = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+        }
+        return standaloneMode;
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -1618,25 +1631,39 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         String host;
         try (DbConn cnx = getDbSession())
         {
-            try
+            if (isStandalone(cnx))
             {
-                host = cnx.runSelectSingle("history_select_cnx_data_by_id", String.class, launchId);
+                // Use the current node to define the port - in standalone mode by convention all nodes use the same port.
+                var nodes = Node.select(cnx, "node_select_all");
+                if (nodes.size() == 0)
+                {
+                    throw new JqmInvalidRequestException("No node found standalone mode");
+                }
+                var port = nodes.get(0).getPort();
+                host = StandaloneHelpers.ipFromId(launchId) + ":" + port;
             }
-            catch (NoResultException e)
+            else
             {
                 try
                 {
-                    host = cnx.runSelectSingle("ji_select_cnx_data_by_id", String.class, launchId);
+                    host = cnx.runSelectSingle("history_select_cnx_data_by_id", String.class, launchId);
                 }
-                catch (NoResultException r)
+                catch (NoResultException e)
                 {
-                    throw new JqmInvalidRequestException("No ended or running job instance found for this file");
+                    try
+                    {
+                        host = cnx.runSelectSingle("ji_select_cnx_data_by_id", String.class, launchId);
+                    }
+                    catch (NoResultException r)
+                    {
+                        throw new JqmInvalidRequestException("No ended or running job instance found for this file");
+                    }
                 }
-            }
 
-            if (host == null || host.isEmpty() || host.split(":")[0].isEmpty())
-            {
-                throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+                if (host == null || host.isEmpty() || host.split(":")[0].isEmpty())
+                {
+                    throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+                }
             }
 
             return httpClient.getFileProtocol(cnx) + host;
@@ -1669,6 +1696,39 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
 
         return getFile(url.toString());
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // File input management
+    // /////////////////////////////////////////////////////////////////////
+
+    @Override
+    public long addJobFile(long jobId, String name, InputStream file)
+    {
+        try (var cnx = getDbSession())
+        {
+            var host = getHostForLaunch(jobId);
+            URL url = null;
+            try
+            {
+                url = new URL(host + "/ws/client/ji/" + jobId + "/files/" + name);
+                jqmlogger.trace("URL: " + url.toString());
+            }
+            catch (MalformedURLException e)
+            {
+                throw new JqmClientException("URL is not valid " + url, e);
+            }
+
+            var res = httpClient.uploadFile(cnx, file, url.toString());
+            try
+            {
+                return Long.parseLong(res);
+            }
+            catch (NumberFormatException e)
+            {
+                throw new JqmClientException("Could not store file", e);
+            }
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////

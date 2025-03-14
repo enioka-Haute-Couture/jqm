@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -141,6 +142,61 @@ class SimpleHttpClient
         }
         res.nameHint = nameHint;
         return res;
+    }
+
+    public String uploadFile(DbConn cnx, InputStream file, String targetUrl)
+    {
+        // Init the client if needed. (not threadsafe, not an issue as duplicate clients are cheap)
+        var client = this.getHttpClient(cnx);
+
+        // Check the URL
+        URI uri;
+        try
+        {
+            uri = new URI(targetUrl);
+        }
+        catch (URISyntaxException e)
+        {
+            throw new JqmInvalidRequestException("Invalid URL " + targetUrl, e);
+        }
+
+        // Auth stuff
+        var authData = SimpleApiSecurity.getId(cnx);
+        String encodedAuth = null;
+        if (authData != null)
+        {
+            encodedAuth = Base64.getEncoder().encodeToString((authData.usr + ":" + authData.pass).getBytes(StandardCharsets.UTF_8));
+        }
+
+        // Create request
+        var rq = HttpRequest.newBuilder().uri(uri).header("Authorization", "Basic " + encodedAuth)
+                .POST(BodyPublishers.ofInputStream(() -> file)).build();
+
+        // Run
+        HttpResponse<String> rs;
+        try
+        {
+            rs = client.send(rq, BodyHandlers.ofString());
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException("Could not upload file to JQM node at url " + targetUrl, e);
+        }
+        catch (InterruptedException e)
+        {
+            // Clear state
+            Thread.currentThread().interrupt();
+            throw new JqmClientException("File upload interrupted", e);
+        }
+
+        // Manage result.
+        if (rs.statusCode() != 200)
+        {
+            throw new JqmClientException(
+                    "Could not upload file to JQM node. The node may be unreachable. HTTP code was: " + rs.statusCode());
+        }
+
+        return rs.body();
     }
 
     private HttpClient getHttpClient(DbConn cnx)

@@ -482,6 +482,15 @@ public interface JqmClient
     InputStream getJobLogStdErr(long jobId);
 
     // /////////////////////////////////////////////////////////////////////
+    // File input management
+    // /////////////////////////////////////////////////////////////////////
+    /**
+     * Add a file to the job instance. Only job instance that have not started yet are eligible. The file will be copied to the JQM server
+     * and made available to the running job instance through the {@link JobManager} API.
+     */
+    public long addJobFile(long jobId, String name, InputStream file);
+
+    // /////////////////////////////////////////////////////////////////////
     // Queue API
     // /////////////////////////////////////////////////////////////////////
 
