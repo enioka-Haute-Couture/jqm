@@ -1,11 +1,6 @@
 package com.enioka.jqm.runner.shell;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
@@ -19,11 +14,13 @@ import org.slf4j.LoggerFactory;
 class StreamGobbler extends Thread
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(StreamGobbler.class);
+    private static Logger alljobslogger = (Logger) LoggerFactory.getLogger("alljobslogger");
 
     InputStream is;
     OutputStream os;
     Semaphore end = new Semaphore(0);
     String threadName;
+    boolean useCommonLogFile = false;
 
     private StreamGobbler(InputStream is, OutputStream os)
     {
@@ -42,12 +39,23 @@ class StreamGobbler extends Thread
         return res;
     }
 
+    static Waiter plumbProcess(Process p, OutputStream out, OutputStream err, boolean alsoWriteToCommonLog)
+    {
+        Waiter res = new Waiter();
+        res.stdout = new StreamGobbler(p.getInputStream(), out);
+        res.stdout.useCommonLogFile = alsoWriteToCommonLog;
+        res.stderr = new StreamGobbler(p.getErrorStream(), err);
+        res.stderr.useCommonLogFile = alsoWriteToCommonLog;
+        res.stdout.start();
+        res.stderr.start();
+        return res;
+    }
+
     public void run()
     {
         Thread.currentThread().setName(this.threadName);
-        try
+        try(PrintWriter pw = new PrintWriter(this.os))
         {
-            PrintWriter pw = new PrintWriter(this.os);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
 
@@ -55,6 +63,11 @@ class StreamGobbler extends Thread
             while ((line = br.readLine()) != null)
             {
                 pw.println(line);
+
+                if (useCommonLogFile)
+                {
+                    alljobslogger.info(line);
+                }
             }
 
             // Remember to flush before exiting!
