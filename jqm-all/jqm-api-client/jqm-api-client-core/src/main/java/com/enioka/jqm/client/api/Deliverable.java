@@ -39,7 +39,9 @@ public class Deliverable
      * Construction. This will not create a new file on the file system!
      *
      * @param filePath
-     * @param fileName
+     * @param fileFamily
+     * @param id
+     * @param originalName
      */
     public Deliverable(String filePath, String fileFamily, Long id, String originalName)
     {

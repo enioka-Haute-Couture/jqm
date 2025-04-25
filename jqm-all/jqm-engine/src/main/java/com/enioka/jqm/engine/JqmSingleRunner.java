@@ -42,8 +42,6 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
      * Runs an existing JobInstance.
      *
      * @param job
-     * @param logFile
-     *            the file to which output the run log. if null, only stdout will be used.
      * @return the result of the run
      */
     public static JobInstance run(com.enioka.jqm.model.JobInstance job)

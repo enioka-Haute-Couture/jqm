@@ -5,13 +5,14 @@ import java.io.InputStream;
 
 import com.enioka.jqm.client.api.Deliverable;
 import com.enioka.jqm.client.api.JqmClient;
+import com.enioka.jqm.client.api.JqmClientFactory;
 
 /**
  * An asynchronous tester for JQM payloads. It allows to configure and start one or more embedded JQM engines and run payloads against them.
  * It is most suited for integration tests.<br>
  * <br>
  * It starts full JQM nodes running on an in-memory embedded database. They are started with all web API disabled.<br>
- * The user should handle interactions with the nodes through the normal client APIs. See {@link JqmClient} and {@link JqmClientFactory}. As
+ * The user should handle interactions with the nodes through the normal client APIs. See {@link JqmClient}. As
  * the web services are not loaded, the file retrieval methods of these APIs will not work, so the tester provides a
  * {@link #getDeliverableContent(Deliverable)} method to compensate. The tester also provides a few helper methods (accelerators) that
  * encapsulate the client API.<br>
@@ -76,7 +77,7 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * A helper method to create a job definition from a class <strong>which is present inside the current class path</strong>.<br>
      * The job description and name will be the class name (simple name, not the fully qualified name).<br>
      * If you need further customisation, directly create your {@link TestJobDefinition} by calling
-     * {@link #createJobDefinitionFromClassPath(String, String, Class))} instead of using this method.
+     * {@link #createJobDefinitionFromClassPath(Class)} instead of using this method.
      *
      * @param classToRun
      *            a class present inside the class path which should be launched by JQM.
@@ -89,8 +90,6 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * The job description and name will be the class name (simple name, not the fully qualified name).<br>
      * The job definition is only be ready after {@link TestJobDefinition#addJobDefinition()} is called (fluent API).
      *
-     * @param name
-     * @param className
      * @param classToRun
      * @return
      */
@@ -100,7 +99,7 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * A helper method to create a job definition from a class <strong>which is present inside an existing jar file</strong>.<br>
      * The job description and name will be identical<br>
      * If you need further customisation, directly create your {@link TestJobDefinition} and call
-     * {@link #addJobDefinition(TestJobDefinition)} instead of using this method.
+     * {@link TestJobDefinition#addJobDefinition()} instead of using this method.
      *
      * @param name
      *            name of the new job definition (as used in the enqueue methods)
@@ -187,14 +186,12 @@ public interface JqmAsynchronousTester extends AutoCloseable
     /**
      * Removes all job instances from the queues and the history.
      *
-     * @param em
      */
     public void cleanupOperationalDbData();
 
     /**
      * Deletes all job definitions. This calls {@link #cleanupOperationalDbData()}
      *
-     * @param em
      */
     public void cleanupAllJobDefinitions();
 
@@ -204,22 +201,22 @@ public interface JqmAsynchronousTester extends AutoCloseable
     public void resetAllData();
 
     /**
-     * Helper query (directly uses {@link JdbcQuery}). Gives the count of all ended (KO and OK) job instances.
+     * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all ended (KO and OK) job instances.
      */
     public int getHistoryAllCount();
 
     /**
-     * Helper query (directly uses {@link JdbcQuery}). Gives the count of all non-ended (waiting in queue, running...) job instances.
+     * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all non-ended (waiting in queue, running...) job instances.
      */
     public int getQueueAllCount();
 
     /**
-     * Helper query (directly uses {@link JdbcQuery}). Gives the count of all OK-ended job instances.
+     * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all OK-ended job instances.
      */
     public int getOkCount();
 
     /**
-     * Helper query (directly uses {@link JdbcQuery}). Gives the count of all non-OK-ended job instances.
+     * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all non-OK-ended job instances.
      */
     public int getNonOkCount();
 

@@ -558,7 +558,7 @@ public class History implements Serializable
     }
 
     /**
-     * See {@link #getName()}
+     * See {@link #getNodeName()}
      */
     public void setNodeName(final String nodeName)
     {

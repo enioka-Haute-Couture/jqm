@@ -106,7 +106,7 @@ public class Cl implements Serializable
     }
 
     /**
-     * See {@link #isTrace()}
+     * See {@link #isTracingEnabled()}
      *
      * @param trace
      */

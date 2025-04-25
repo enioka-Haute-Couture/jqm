@@ -13,8 +13,8 @@ public class Closer
     /**
      * Close utility method. No exception if it does not work or ig the parameter is null.
      *
-     * @param ps
-     *            closeable object to close.
+     * @param closeable
+     *            object to close.
      */
     public static void closeQuietly(AutoCloseable closeable)
     {

@@ -12,15 +12,10 @@ public interface JqmClientEnqueueCallback
      * parameters) are given inside the job request argument <br>
      * <br>
      *
-     * @param jobRequest
-     *            a property bag for all the parameters that can be specified at enqueue time.
+     * @param runRequest
+     *            a Job execution request.
      * @return the ID of the job instance. Use this ID to track the job instance later on (it is a very common parameter inside the JQM
      *         client API)
-     *
-     * @throws JqmInvalidRequestException
-     *             when input data is invalid.
-     * @throws JqmClientException
-     *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
     public Long enqueue(JobRequestBaseImpl runRequest);
 }
