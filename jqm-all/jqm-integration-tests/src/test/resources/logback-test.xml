@@ -18,6 +18,20 @@
     <logger name="org.apache.aries" level="warn" />
     <logger name="org.apache.shiro" level="info" />
 
+    <!-- All jobs file log appender, simpler than real life, use for log tests -->
+    <appender name="alljobslog" class="ch.qos.logback.core.FileAppender">
+        <file>jobsoutput.log</file>
+        <encoder>
+            <pattern>
+                %message
+            </pattern>
+        </encoder>
+    </appender>
+
+    <logger name="alljobslogger" level="info" additivity="false">
+        <appender-ref ref="alljobslog" />
+    </logger>
+
     <root level="info">
         <appender-ref ref="consoleAppender" />
     </root>

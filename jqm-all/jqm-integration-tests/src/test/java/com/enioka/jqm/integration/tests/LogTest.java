@@ -7,14 +7,13 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,9 +35,13 @@ public class LogTest extends JqmBaseTest {
     }
 
     @Test
-    public void testMultiLog() {
+    public void testLogPerLaunchJavaRunner() throws IOException {
         PrintStream out_ini = System.out;
         PrintStream err_ini = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
 
         GlobalParameter.setParameter(cnx, "logFilePerLaunch", "true");
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
@@ -55,8 +58,77 @@ public class LogTest extends JqmBaseTest {
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
         Assert.assertTrue(f.exists());
 
+        newOut.flush();
+        Assert.assertEquals(0, Files.size(Path.of("jobsoutput.log")));
+
         System.setErr(err_ini);
         System.setOut(out_ini);
+    }
+
+    @Test
+    public void testBothLogJavaRunner() throws IOException {
+
+
+        PrintStream out_ini = System.out;
+        PrintStream err_ini = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
+
+        GlobalParameter.setParameter(cnx, "logFilePerLaunch", "both");
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+            "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        cnx.commit();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, cnx);
+
+        String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
+        File f = new File(FilenameUtils.concat("./target/server/logs", fileName));
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertTrue(f.exists());
+
+        Assert.assertTrue(Files.size(Path.of("jobsoutput.log")) != 0);
+
+        FileUtils.write(new File("jobsoutput.log"), "", Charset.defaultCharset());
+        newOut.flush();
+        System.setErr(err_ini);
+        System.setOut(out_ini);
+    }
+
+    @Test
+    public void testNoLogJavaRunner() throws IOException {
+        PrintStream out_ini = System.out;
+        PrintStream err_ini = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
+
+        GlobalParameter.setParameter(cnx, "logFilePerLaunch", "false");
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+            "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        cnx.commit();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, cnx);
+
+        String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
+        File f = new File(FilenameUtils.concat("./target/server/logs", fileName));
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertFalse(f.exists());
+
+        newOut.flush();
+        Assert.assertEquals(0, Files.size(Path.of("jobsoutput.log")));
+
+        System.setErr(err_ini);
+        System.setOut(out_ini);
+
     }
 
     @Test
@@ -94,9 +166,8 @@ public class LogTest extends JqmBaseTest {
             Assert.assertFalse(fErr.exists());
 
             newOut.flush();
-            String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
-            Assert.assertFalse(outContent.contains("|" + logTextStdout));
-            Assert.assertFalse(outContent.contains("|" + logTextStderr));
+
+            Assert.assertEquals(0, Files.size(Path.of("jobsoutput.log")));
         } finally {
             System.setErr(err_ini);
             System.setOut(out_ini);
@@ -145,9 +216,8 @@ public class LogTest extends JqmBaseTest {
             Assert.assertEquals(logTextStderr, contentErr.trim());
 
             newOut.flush();
-            String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
-            Assert.assertFalse(outContent.contains("|" + logTextStdout));
-            Assert.assertFalse(outContent.contains("|" + logTextStderr));
+
+            Assert.assertEquals(0, Files.size(Path.of("jobsoutput.log")));
         } finally {
             System.setErr(err_ini);
             System.setOut(out_ini);
@@ -195,13 +265,15 @@ public class LogTest extends JqmBaseTest {
             Assert.assertEquals(logTextStderr, contentErr.trim());
 
             newOut.flush();
-            String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
-            Assert.assertTrue(outContent.contains("|" + logTextStdout));
-            Assert.assertTrue(outContent.contains("|" + logTextStderr));
+
+            Assert.assertTrue(Files.size(Path.of("jobsoutput.log")) != 0);
+
+
         } finally {
             System.setErr(err_ini);
             System.setOut(out_ini);
             System.out.write(byteArrayOutputStream.toByteArray());
+            FileUtils.write(new File("jobsoutput.log"), "", Charset.defaultCharset());
         }
     }
 
