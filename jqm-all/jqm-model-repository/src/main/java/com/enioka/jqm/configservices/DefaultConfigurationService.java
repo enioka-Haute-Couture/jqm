@@ -107,12 +107,14 @@ public class DefaultConfigurationService
     /**
      * Creates or updates a node.<br>
      * This method makes the assumption metadata is valid. e.g. there MUST be a single default queue.<br>
-     * Call {@link #updateConfiguration(EntityManager)} before to be sure if necessary.
+     * Call {@link #updateConfiguration(DbConn)} before to be sure if necessary.
      *
      * @param nodeName
      *            name of the node that should be created or updated (if incompletely defined only)
-     * @param em
+     * @param cnx
      *            an EntityManager on which a transaction will be opened.
+     * @param port
+     *            the port of the node
      */
     public static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
     {

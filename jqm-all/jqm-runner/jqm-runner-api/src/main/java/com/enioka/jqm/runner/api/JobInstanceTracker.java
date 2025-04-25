@@ -17,7 +17,7 @@ public interface JobInstanceTracker
      * The runner can load whatever runner-specific configuration needed here. Called just before {@link #run()}, while the JI state is
      * still {@link State#ATTRIBUTED}.<br>
      * Must be thread-safe.
-     * 
+     *
      * @param cnx
      *                a ready to use connection to the main database. Should not be stored as it closed by the engine soon after calling
      *                this method.
@@ -27,7 +27,7 @@ public interface JobInstanceTracker
     /**
      * Called when a job instance should run for real. This method should only return when the job instance run is over.<br>
      * RuntimeException thrown by the payload are expected to bubble up. Exceptions due to the plugin itself should be reported as
-     * {@link JobRunnerException}.<br>
+     * {@link com.enioka.jqm.api.JobRunnerException}.<br>
      * Called within a dedicated thread. - this method should NOT create any thread (the payload itself, outside JQM's responsibility,
      * may)<br>
      * When this method is called, the context class loader is the engine class loader - as a loader is part of the engine.<br>
@@ -35,7 +35,7 @@ public interface JobInstanceTracker
     public State run();
 
     /**
-     * Called after {@link #run(JobInstance, JobRunnerCallback)} has completed. Cleanup work should go here. Not called finalize because
+     * Called after {@link com.enioka.jqm.model.JobInstance } {@link com.enioka.jqm.runner.api.JobRunnerCallback} has completed. Cleanup work should go here. Not called finalize because
      * reserved word.
      */
     public void wrap();

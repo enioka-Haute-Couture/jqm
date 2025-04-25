@@ -25,7 +25,7 @@ public class Schedule implements Serializable
     private Map<String, String> parameters = new HashMap<>();
 
     /**
-     * The schedule ID. This is the same ID returned by {@link JqmClient#enqueue(JobRequest)}.
+     * The schedule ID. This is the same ID returned by {@link JobRequest#enqueue()}.
      */
     public long getId()
     {

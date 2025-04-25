@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.enioka.jqm.cli.bootstrap.CommandLine;
 
 /**
- * Starter class & parameter parsing
+ * Starter class and parameter parsing
  *
  */
 public class Main

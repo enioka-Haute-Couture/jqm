@@ -43,7 +43,7 @@ public interface JobRequest extends Serializable
     public long enqueue();
 
     /**
-     * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself.
      *
      * @param key
@@ -62,7 +62,7 @@ public interface JobRequest extends Serializable
     public JobRequest addParameters(Map<String, String> prms);
 
     /**
-     * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself. If there is no parameter named key, no error is thrown.
      *
      * @param key
@@ -70,7 +70,7 @@ public interface JobRequest extends Serializable
     public void delParameter(String key);
 
     /**
-     * <strong>Compulsory</strong> (unless {@link #setScheduleId(long)} is used)<br>
+     * <strong>Compulsory</strong> (unless {@link #setScheduleId(Long)} (long)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
      *
      * @param applicationName
@@ -134,7 +134,7 @@ public interface JobRequest extends Serializable
     public JobRequest setKeyword3(String keyword3);
 
     /**
-     * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself. This method allows to set them all at once instead of calling {@link #addParameter(String, String)} multiple times.<br>
      * This methods removes all previously set parameters.
      *
@@ -187,7 +187,7 @@ public interface JobRequest extends Serializable
 
     /**
      * <strong>Optional</strong><br>
-     * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
+     * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #setApplicationName(String)} ()} is
      * ignored.
      */
     public JobRequest setScheduleId(Long id);

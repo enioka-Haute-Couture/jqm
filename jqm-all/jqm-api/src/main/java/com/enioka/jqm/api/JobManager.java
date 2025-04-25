@@ -33,12 +33,12 @@ import javax.sql.DataSource;
 public interface JobManager
 {
     /**
-     * The unique ID of the application/Job definition (a <code>JobInstance<code> is one run of a <code>JobDefinition</code>)<br>
+     * The unique ID of the application/Job definition (a <code>JobInstance</code> is one run of a <code>JobDefinition</code>)<br>
      * <br>
      * <strong>This is not the instance ID but the definition ID</strong>. See {@link #jobInstanceID()} for the instance (and not the
      * definition) ID
      *
-     * @return The unique ID of the application/Job definition (a <code>JobInstance<code> is one run of a <code>JobDefinition</code>)
+     * @return The unique ID of the application/Job definition (a <code>JobInstance</code> is one run of a <code>JobDefinition</code>)
      */
     long jobApplicationId();
 
@@ -141,7 +141,7 @@ public interface JobManager
      * Parameters are from the Job Definition (i.e. default parameters) as well as values given at enqueue time. This is the privileged way
      * of giving parameters to a job instance.
      *
-     * @return a <code>Map<String,String></code> of all parameters (random order) with the Map key being the name of the parameter and the
+     * @return a <code>Map</code> of all parameters (random order) with the Map key being the name of the parameter and the
      *         Map value the value of the parameter.
      */
     Map<String, String> parameters();
@@ -247,7 +247,7 @@ public interface JobManager
     File getWorkDir();
 
     /**
-     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed & such. Java makes it
+     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed and such. Java makes it
      * impossible to kill a thread properly, so calling this function is the only way to allow it. <br>
      * Note: this function is also called by the other functions of the API.
      */

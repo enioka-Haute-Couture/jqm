@@ -74,7 +74,7 @@ public class JobDef implements Serializable
     }
 
     /**
-     * See {@link #isCanBeRestarted()}
+     * See {@link #isRestartable()}
      */
     public void setCanBeRestarted(final boolean canBeRestarted)
     {
@@ -210,7 +210,7 @@ public class JobDef implements Serializable
     }
 
     /**
-     * See {@link #getQueue()}
+     * See {@link #getDefaultQueue()} ()}
      */
     public void setQueue(final Queue queue)
     {

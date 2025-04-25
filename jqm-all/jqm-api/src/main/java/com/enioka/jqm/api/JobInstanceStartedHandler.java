@@ -16,14 +16,14 @@ public interface JobInstanceStartedHandler
     /**
      * All filter actions should go here. This runs just before the real job instance launch. This should return fast - no long operation
      * should be done here, even asynchronously. (it is forbidden to create threads or any type of background job in this method).
-     * 
+     *
      * @param toRun
      *            the class which was loaded in order to launch the job. Note that the filter should not instantiate it, it is given as a
      *            reference only.
      * @param handler
      *            the engine API entry point. Gives access to the job instance details.
-     * @param the
-     *            parameters given to configure the filter in the engine configuration. May be empty.
+     * @param handlerParameters
+     *            the parameters given to configure the filter in the engine configuration. May be empty.
      */
     public void run(Class<? extends Object> toRun, JobManager handler, Map<String, String> handlerParameters);
 }
