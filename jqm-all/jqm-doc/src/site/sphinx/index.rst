@@ -42,7 +42,6 @@ Community support is of course freely offered on GitHub using the bug-tracker.
 
 
 .. toctree::
-    :numbered:
     :maxdepth: 3
     :titlesonly:
 
