@@ -7,6 +7,7 @@ module.exports = function (app)
     {
         apiTargetPort = process.env.JQM_CONSOLE_PORT
     }
+    console.log(apiTargetPort);
 
     app.use(
         '/ws',
