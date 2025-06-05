@@ -15,6 +15,8 @@ import MUIDataTable, { FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIData
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
+import WarningIcon from '@mui/icons-material/Warning';
+import TerminalIcon from '@mui/icons-material/Terminal';
 import StopIcon from "@mui/icons-material/Stop";
 import PauseIcon from "@mui/icons-material/Pause";
 import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
@@ -81,11 +83,19 @@ const RunsPage: React.FC = () => {
     const [showDetailsJobInstanceId, setShowDetailsJobInstanceId] = useState<
         string | null
     >(null);
+
+    const [showLogsJobInstanceId, setShowLogsJobInstanceId] = useState<
+        string | null
+    >(null);
     const [showLaunchFormDialog, setShowLaunchFormDialog] =
         useState<boolean>(false);
 
     const [showSwitchJobQueueId, setShowSwitchJobQueueId] = useState<
         number | null
+    >(null);
+
+    const [log, setLog] = useState<
+        string | null
     >(null);
 
     const columns = [
@@ -473,6 +483,48 @@ const RunsPage: React.FC = () => {
                                 <DescriptionIcon />
                             </IconButton>
                         </Tooltip>
+                        <Tooltip
+                            key={"Log stdout"}
+                            title={"Log stdout"}
+                        >
+                            <IconButton
+                                color="default"
+                                aria-label={"Log stdout"}
+                                onClick={() => {
+                                    fetchLogsStdout(
+                                        jobInstanceId!
+                                    ).then((response) => {
+                                        setLog(response);
+                                        setShowDetailsJobInstanceId(
+                                            jobInstanceId
+                                        )
+                                    });
+                                }}
+                                size="large">
+                                <TerminalIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                            key={"Logs stderr"}
+                            title={"Logs stderr"}
+                        >
+                            <IconButton
+                                color="default"
+                                aria-label={"Log stderr"}
+                                onClick={() => {
+                                    fetchLogsStderr(
+                                        jobInstanceId!
+                                    ).then((response) => {
+                                        setLog(response);
+                                        setShowDetailsJobInstanceId(
+                                            jobInstanceId
+                                        )
+                                    });
+                                }}
+                                size="large">
+                                <WarningIcon />
+                            </IconButton>
+                        </Tooltip>
                     </>;
                 },
             },
@@ -597,10 +649,12 @@ const RunsPage: React.FC = () => {
                             (ji) => ji.id === Number(showDetailsJobInstanceId)
                         )!
                     }
+
                     fetchLogsStderr={fetchLogsStderr}
                     fetchLogsStdout={fetchLogsStdout}
                     fetchFiles={fetchFiles}
                     fetchFileContent={fetchFileContent}
+                    logsContent={log}
                 />
             )}
             {showLaunchFormDialog && (

@@ -34,17 +34,19 @@ const formatDate = (date?: Date) => {
 };
 
 export const JobInstanceDetailsDialog: React.FC<{
+
     closeDialog: () => void;
     jobInstance: JobInstance;
     fetchLogsStdout: (jobId: number) => Promise<String>;
     fetchLogsStderr: (jobId: number) => Promise<String>;
     fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
     fetchFileContent: (fileId: number) => Promise<string>;
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent }) => {
+    logsContent: string | null;
+
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, logsContent }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
-
 
     useEffect(() => {
         // fetch files details
@@ -52,6 +54,13 @@ export const JobInstanceDetailsDialog: React.FC<{
             setFiles(files);
         })
     }, [fetchFiles, jobInstance.id])
+
+    useEffect(() => {
+        // get the logs
+        if (logsContent !== null) {
+            setLogs(logsContent)
+        }
+    }, [logsContent])
 
     return (
         <>
