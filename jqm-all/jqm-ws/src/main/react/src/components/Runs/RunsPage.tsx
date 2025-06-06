@@ -32,11 +32,11 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
 
-export const STD = {
-    STDERR: 'stderr',
-    STDOUT: 'stdout',
-    NONE: 'none'
-};
+export type STD =
+    "STDERR" |
+    "STDOUT" |
+    "NONE"
+    ;
 
 const RunsPage: React.FC = () => {
     const {
@@ -81,7 +81,7 @@ const RunsPage: React.FC = () => {
     }
 
 
-    const [stdType, setStdType] = useState<string | null>(null);
+    const [stdType, setStdType] = useState<STD>("NONE");
 
 
 
@@ -466,7 +466,7 @@ const RunsPage: React.FC = () => {
                                                 setShowSwitchJobQueueId(
                                                     jobInstanceId
                                                 );
-                                                setStdType(STD.NONE);
+                                                setStdType("NONE");
                                             }}
                                             size="large">
                                             <FlipCameraAndroidIcon />
@@ -508,7 +508,7 @@ const RunsPage: React.FC = () => {
                                         jobInstanceId
                                     )
                                         ;
-                                    setStdType(STD.STDOUT);
+                                    setStdType("STDOUT");
                                 }}
                                 size="large">
                                 <TerminalIcon />
@@ -529,7 +529,7 @@ const RunsPage: React.FC = () => {
                                     setShowDetailsJobInstanceId(
                                         jobInstanceId
                                     );
-                                    setStdType(STD.STDERR);
+                                    setStdType("STDERR");
                                 }}
                                 size="large">
                                 <WarningIcon />
@@ -655,7 +655,7 @@ const RunsPage: React.FC = () => {
                 <JobInstanceDetailsDialog
                     closeDialog={() => {
                         setShowDetailsJobInstanceId(null);
-                        setStdType(null);
+                        setStdType("NONE");
                     }}
                     jobInstance={
                         jobInstances.find(

@@ -44,17 +44,12 @@ export const JobInstanceDetailsDialog: React.FC<{
     fetchLogsStderr: (jobId: number) => Promise<String>;
     fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
     fetchFileContent: (fileId: number) => Promise<string>;
-    stdTypeRequest: string | null;
+    stdTypeRequest: STD;
 
 }> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, stdTypeRequest }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
-    const Std = {
-        STDERR: 'stderr',
-        STDOUT: 'stdout',
-        NONE: 'none'
-    };
     const [stdType, setStdType] = useState<string | null>(null);
     // for autoscroll const bottomOfPanelRef = useRef<HTMLDivElement>(null);
 
@@ -68,23 +63,20 @@ export const JobInstanceDetailsDialog: React.FC<{
     useEffect(() => {
         // get the logs
         switch (stdTypeRequest) {
-            case STD.STDOUT:
-                fetchLogsStdout(
-                    jobInstance.id!
-                ).then((response) => {
-                    setLogs(response);
-                    setStdType(stdTypeRequest);
-                }
-                );
+            case "STDOUT":
+                fetchLogsStdout(jobInstance.id!)
+                    .then((response) => {
+                        setLogs(response);
+                        setStdType(stdTypeRequest);
+                    });
                 break;
-            case STD.STDERR:
+            case "STDERR":
                 fetchLogsStderr(
                     jobInstance.id!
                 ).then((response) => {
                     setLogs(response);
                     setStdType(stdTypeRequest);
-                }
-                );
+                });
                 break;
             default:
             // pass
@@ -104,7 +96,7 @@ export const JobInstanceDetailsDialog: React.FC<{
         if ((jobInstance.state === "RUNNING" || jobInstance.state === "SUBMITTED") && logs !== null) {
             let timer = setInterval(() => {
                 switch (stdType) {
-                    case STD.STDOUT:
+                    case "STDOUT":
                         fetchLogsStdout(
                             jobInstance.id!
                         ).then((response) => {
@@ -112,7 +104,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                         }
                         );
                         break;
-                    case STD.STDERR:
+                    case "STDERR":
                         fetchLogsStderr(
                             jobInstance.id!
                         ).then((response) => {
@@ -239,7 +231,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 ).then((response) =>
                                                                     setLogs(response)
                                                                 );
-                                                                setStdType(STD.STDOUT);
+                                                                setStdType("STDOUT");
                                                                 console.log(stdType);
                                                             }}
                                                         >
@@ -274,7 +266,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 ).then((response) =>
                                                                     setLogs(response)
                                                                 );
-                                                                setStdType(STD.STDERR);
+                                                                setStdType("STDERR");
                                                             }}
                                                         >
                                                             view
@@ -513,7 +505,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                 <Dialog
                     open={true}
                     onClose={() => {
-                        setStdType(Std.NONE);
+                        setStdType("NONE");
                         setLogs(null);
 
                     }}
