@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Button,
     Grid,
@@ -21,9 +21,12 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Link from "@mui/material/Link";
 import fileDownload from "js-file-download";
+import { STD } from "./RunsPage";
 import { JobInstance } from "./JobInstance";
 import { JobInstanceFile } from "./JobInstanceFile";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import RunsPage from "./RunsPage";
+
 
 const formatDate = (date?: Date) => {
     if (date) {
@@ -41,12 +44,19 @@ export const JobInstanceDetailsDialog: React.FC<{
     fetchLogsStderr: (jobId: number) => Promise<String>;
     fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
     fetchFileContent: (fileId: number) => Promise<string>;
-    logsContent: string | null;
+    stdTypes: string | null;
 
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, logsContent }) => {
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, stdTypes }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
+    const Std = {
+        STDERR: 'stderr',
+        STDOUT: 'stdout',
+        NONE: 'none'
+    };
+    const [stdType, setStdType] = useState<string | null>(null);
+    const bottomOfPanelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // fetch files details
@@ -57,10 +67,76 @@ export const JobInstanceDetailsDialog: React.FC<{
 
     useEffect(() => {
         // get the logs
-        if (logsContent !== null) {
-            setLogs(logsContent)
+        switch (stdTypes) {
+            case STD.STDOUT:
+                fetchLogsStdout(
+                    jobInstance.id!
+                ).then((response) => {
+                    setLogs(response)
+                    setStdType(stdTypes)
+                }
+                );
+                break;
+            case STD.STDERR:
+                fetchLogsStderr(
+                    jobInstance.id!
+                ).then((response) => {
+                    setLogs(response)
+                    setStdType(stdTypes)
+                }
+                );
+                break;
+            default:
+            // pass
         }
-    }, [logsContent])
+    }, [stdTypes])
+
+    /* for autoscroll
+    useEffect(() => {
+        if (bottomOfPanelRef.current) {
+            console.log(bottomOfPanelRef.current)
+            bottomOfPanelRef.current.scrollIntoView();
+        }
+    });*/
+
+    useEffect(() => {
+        // update logs for running jobs
+        if ((jobInstance.state === "RUNNING" || jobInstance.state === "SUBMITTED") && logs !== null) {
+            let timer = setInterval(() => {
+
+                switch (stdTypes) {
+                    case STD.STDOUT:
+                        fetchLogsStdout(
+                            jobInstance.id!
+                        ).then((response) => {
+                            setLogs(response)
+                        }
+                        );
+                        break;
+                    case STD.STDERR:
+                        fetchLogsStderr(
+                            jobInstance.id!
+                        ).then((response) => {
+                            setLogs(response)
+
+                        }
+                        );
+                        break;
+                    default:
+                    // pass
+                }
+            }, 2000);
+            return () => {
+                if (timer !== null) clearInterval(timer);
+            }
+
+
+        }
+    }, [logs]
+    );
+
+
+
 
     return (
         <>
@@ -167,6 +243,8 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 ).then((response) =>
                                                                     setLogs(response)
                                                                 );
+                                                                setStdType(STD.STDOUT);
+                                                                console.log(stdType);
                                                             }}
                                                         >
                                                             view
@@ -200,6 +278,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 ).then((response) =>
                                                                     setLogs(response)
                                                                 );
+                                                                setStdType(STD.STDERR);
                                                             }}
                                                         >
                                                             view
@@ -437,7 +516,11 @@ export const JobInstanceDetailsDialog: React.FC<{
             {logs != null && (
                 <Dialog
                     open={true}
-                    onClose={() => setLogs(null)}
+                    onClose={() => {
+                        setLogs(null);
+                        //stdType = Std.NONE;
+                    }}
+
                     aria-labelledby="form-dialog-title"
                     fullWidth
                     maxWidth={"xl"}
@@ -445,6 +528,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                     <DialogTitle>Logs job {jobInstance.id}</DialogTitle>
                     <DialogContent>
                         <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
+                        {/* for autoscroll <div ref={(bottomOfPanelRef)}></div>*/}
                     </DialogContent>
                 </Dialog>
             )

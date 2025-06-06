@@ -32,6 +32,12 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
 
+export const STD = {
+    STDERR: 'stderr',
+    STDOUT: 'stdout',
+    NONE: 'none'
+};
+
 const RunsPage: React.FC = () => {
     const {
         count,
@@ -73,6 +79,11 @@ const RunsPage: React.FC = () => {
             fetchQueues();
         }
     }
+
+
+    const [stdType, setStdType] = useState<string | null>(null);
+
+
 
     useEffect(() => {
         refresh();
@@ -459,6 +470,7 @@ const RunsPage: React.FC = () => {
                                                 setShowSwitchJobQueueId(
                                                     jobInstanceId
                                                 );
+                                                setStdType(STD.NONE);
                                             }}
                                             size="large">
                                             <FlipCameraAndroidIcon />
@@ -478,6 +490,7 @@ const RunsPage: React.FC = () => {
                                     setShowDetailsJobInstanceId(
                                         jobInstanceId
                                     );
+                                    setLog(null);
                                 }}
                                 size="large">
                                 <DescriptionIcon />
@@ -491,35 +504,37 @@ const RunsPage: React.FC = () => {
                                 color="default"
                                 aria-label={"Log stdout"}
                                 onClick={() => {
+                                    /*
                                     fetchLogsStdout(
                                         jobInstanceId!
                                     ).then((response) => {
-                                        setLog(response);
-                                        setShowDetailsJobInstanceId(
-                                            jobInstanceId
-                                        )
-                                    });
+                                        setLog(response);*/
+                                    setShowDetailsJobInstanceId(
+                                        jobInstanceId
+                                    )
+                                        ;
+                                    setStdType(STD.STDOUT);
                                 }}
                                 size="large">
                                 <TerminalIcon />
                             </IconButton>
                         </Tooltip>
                         <Tooltip
-                            key={"Logs stderr"}
-                            title={"Logs stderr"}
+                            key={"Log stderr"}
+                            title={"Log stderr"}
                         >
                             <IconButton
                                 color="default"
                                 aria-label={"Log stderr"}
                                 onClick={() => {
-                                    fetchLogsStderr(
+                                    /*fetchLogsStderr(
                                         jobInstanceId!
                                     ).then((response) => {
-                                        setLog(response);
-                                        setShowDetailsJobInstanceId(
-                                            jobInstanceId
-                                        )
-                                    });
+                                        setLog(response);*/
+                                    setShowDetailsJobInstanceId(
+                                        jobInstanceId
+                                    );
+                                    setStdType(STD.STDERR);
                                 }}
                                 size="large">
                                 <WarningIcon />
@@ -643,7 +658,10 @@ const RunsPage: React.FC = () => {
             />
             {showDetailsJobInstanceId !== null && (
                 <JobInstanceDetailsDialog
-                    closeDialog={() => setShowDetailsJobInstanceId(null)}
+                    closeDialog={() => {
+                        setShowDetailsJobInstanceId(null);
+                        setStdType(null);
+                    }}
                     jobInstance={
                         jobInstances.find(
                             (ji) => ji.id === Number(showDetailsJobInstanceId)
@@ -654,9 +672,10 @@ const RunsPage: React.FC = () => {
                     fetchLogsStdout={fetchLogsStdout}
                     fetchFiles={fetchFiles}
                     fetchFileContent={fetchFileContent}
-                    logsContent={log}
+                    stdTypes={stdType}
                 />
-            )}
+            )
+            }
             {showLaunchFormDialog && (
                 <LaunchFormDialog
                     closeDialog={() => setShowLaunchFormDialog(false)}
@@ -679,5 +698,6 @@ const RunsPage: React.FC = () => {
         </Grid>
     );
 };
+
 
 export default RunsPage;
