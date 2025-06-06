@@ -44,9 +44,9 @@ export const JobInstanceDetailsDialog: React.FC<{
     fetchLogsStderr: (jobId: number) => Promise<String>;
     fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
     fetchFileContent: (fileId: number) => Promise<string>;
-    stdTypes: string | null;
+    stdTypeRequest: string | null;
 
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, stdTypes }) => {
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, stdTypeRequest }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
@@ -56,7 +56,7 @@ export const JobInstanceDetailsDialog: React.FC<{
         NONE: 'none'
     };
     const [stdType, setStdType] = useState<string | null>(null);
-    const bottomOfPanelRef = useRef<HTMLDivElement>(null);
+    // for autoscroll const bottomOfPanelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // fetch files details
@@ -67,13 +67,13 @@ export const JobInstanceDetailsDialog: React.FC<{
 
     useEffect(() => {
         // get the logs
-        switch (stdTypes) {
+        switch (stdTypeRequest) {
             case STD.STDOUT:
                 fetchLogsStdout(
                     jobInstance.id!
                 ).then((response) => {
-                    setLogs(response)
-                    setStdType(stdTypes)
+                    setLogs(response);
+                    setStdType(stdTypeRequest);
                 }
                 );
                 break;
@@ -81,15 +81,15 @@ export const JobInstanceDetailsDialog: React.FC<{
                 fetchLogsStderr(
                     jobInstance.id!
                 ).then((response) => {
-                    setLogs(response)
-                    setStdType(stdTypes)
+                    setLogs(response);
+                    setStdType(stdTypeRequest);
                 }
                 );
                 break;
             default:
             // pass
         }
-    }, [stdTypes])
+    }, [stdTypeRequest])
 
     /* for autoscroll
     useEffect(() => {
@@ -103,13 +103,12 @@ export const JobInstanceDetailsDialog: React.FC<{
         // update logs for running jobs
         if ((jobInstance.state === "RUNNING" || jobInstance.state === "SUBMITTED") && logs !== null) {
             let timer = setInterval(() => {
-
-                switch (stdTypes) {
+                switch (stdType) {
                     case STD.STDOUT:
                         fetchLogsStdout(
                             jobInstance.id!
                         ).then((response) => {
-                            setLogs(response)
+                            setLogs(response);
                         }
                         );
                         break;
@@ -117,20 +116,17 @@ export const JobInstanceDetailsDialog: React.FC<{
                         fetchLogsStderr(
                             jobInstance.id!
                         ).then((response) => {
-                            setLogs(response)
-
+                            setLogs(response);
                         }
                         );
                         break;
                     default:
                     // pass
                 }
-            }, 2000);
+            }, 2000);// timer between 2 refresh in ms
             return () => {
                 if (timer !== null) clearInterval(timer);
             }
-
-
         }
     }, [logs]
     );
@@ -517,8 +513,9 @@ export const JobInstanceDetailsDialog: React.FC<{
                 <Dialog
                     open={true}
                     onClose={() => {
+                        setStdType(Std.NONE);
                         setLogs(null);
-                        //stdType = Std.NONE;
+
                     }}
 
                     aria-labelledby="form-dialog-title"

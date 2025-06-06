@@ -105,10 +105,6 @@ const RunsPage: React.FC = () => {
         number | null
     >(null);
 
-    const [log, setLog] = useState<
-        string | null
-    >(null);
-
     const columns = [
         {
             name: "id",
@@ -490,7 +486,6 @@ const RunsPage: React.FC = () => {
                                     setShowDetailsJobInstanceId(
                                         jobInstanceId
                                     );
-                                    setLog(null);
                                 }}
                                 size="large">
                                 <DescriptionIcon />
@@ -672,7 +667,7 @@ const RunsPage: React.FC = () => {
                     fetchLogsStdout={fetchLogsStdout}
                     fetchFiles={fetchFiles}
                     fetchFileContent={fetchFileContent}
-                    stdTypes={stdType}
+                    stdTypeRequest={stdType}
                 />
             )
             }
