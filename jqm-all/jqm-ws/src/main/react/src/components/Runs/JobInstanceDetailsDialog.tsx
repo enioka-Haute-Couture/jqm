@@ -79,6 +79,36 @@ export const JobInstanceDetailsDialog: React.FC<{
         }
     }, [fetchLogsStderr,fetchLogsStdout, displayedLogType, jobInstance.id])
 
+    useEffect(() => {
+        // update logs for running jobs
+        if ((jobInstance.state === "RUNNING" || jobInstance.state === "SUBMITTED") && logs !== null) {
+            let timer = setInterval(() => {
+                switch (logType) {
+                    case "STDOUT":
+                        fetchLogsStdout(
+                            jobInstance.id!
+                        ).then((response) => {
+                            setLogs(response);
+                        }
+                        );
+                        break;
+                    case "STDERR":
+                        fetchLogsStderr(
+                            jobInstance.id!
+                        ).then((response) => {
+                            setLogs(response);
+                        }
+                        );
+                        break;
+                    default:
+                }
+            }, 2000);
+            return () => {
+                if (timer !== null) clearInterval(timer);
+            }
+        }
+    }, [fetchLogsStderr,fetchLogsStdout, logs, jobInstance.id, jobInstance.state, logType]);
+
     return (
         <>
             <Dialog
