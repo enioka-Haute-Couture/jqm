@@ -56,7 +56,7 @@ public class DefaultConfigurationService
                 q = Queue.select(cnx, "q_select_all").get(0);
                 cnx.runUpdate("q_update_default_none");
                 cnx.runUpdate("q_update_default_by_id", q.getId());
-                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were multiple default queues");
+                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were no default queues");
             }
         }
 
