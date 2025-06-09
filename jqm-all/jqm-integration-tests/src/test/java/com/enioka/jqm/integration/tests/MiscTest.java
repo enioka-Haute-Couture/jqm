@@ -25,8 +25,10 @@ import jakarta.mail.Folder;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 
+import com.enioka.admin.JqmAdminApiUserException;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JndiObjectResourceDto;
+import com.enioka.api.admin.QueueDto;
 import com.enioka.jqm.engine.api.exceptions.JqmInitErrorTooSoon;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef.PathType;
@@ -345,10 +347,10 @@ public class MiscTest extends JqmBaseTest
         Assert.assertNotEquals(first, gps.get(0).getLastModified());
     }
 
-
     @Test
-    public void testUpdateUser() {
-        RUserDto  user = new RUserDto();
+    public void testUpdateUser()
+    {
+        RUserDto user = new RUserDto();
         user.setEmail("john@example.com");
         user.setLogin("john");
         user.setNewPassword("john");
@@ -373,5 +375,29 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals("newMail@example.com", userUpdated.getEmail());
         Assert.assertEquals("free", userUpdated.getFreeText());
         Assert.assertEquals(userSaved.getExpirationDate(), userUpdated.getExpirationDate());
+    }
+
+    /**
+     * Test multiple default queues cannot be created
+     */
+    @Test
+    public void testMultipleDefaultQueues()
+    {
+        QueueDto q1 = new QueueDto();
+        q1.setName("AnotherDefaultQueue");
+        q1.setDescription("default");
+        q1.setDefaultQueue(true);
+
+        Assert.assertTrue(q1.isDefaultQueue());
+        try
+        {
+            MetaService.upsertQueue(cnx, q1);
+            Assert.fail();
+        }
+        catch (JqmAdminApiUserException e)
+        {
+            Assert.assertEquals("there is already a default queue", e.getMessage());
+        }
+
     }
 }
