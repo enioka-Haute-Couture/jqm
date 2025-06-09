@@ -497,7 +497,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                     fullWidth
                     maxWidth={"xl"}
                 >
-                    <DialogTitle>Logs job {jobInstance.id}</DialogTitle>
+                    <DialogTitle>Job {jobInstance.id}: {logType.toLowerCase()} </DialogTitle>
                     <DialogContent>
                         <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
                     </DialogContent>

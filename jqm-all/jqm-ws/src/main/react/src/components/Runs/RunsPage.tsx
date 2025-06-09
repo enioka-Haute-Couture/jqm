@@ -384,18 +384,16 @@ const RunsPage: React.FC = () => {
                     return <>
                         {!queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) && (
                             <Tooltip key={"Relaunch"} title={"Relaunch"}>
-                                <>
-                                    <IconButton
-                                        color="default"
-                                        aria-label={"Relaunch"}
-                                        onClick={() => {
-                                            relaunchJob(jobInstanceId);
-                                        }}
-                                        disabled={status === "CANCELLED"}
-                                        size="large">
-                                        <RefreshIcon />
-                                    </IconButton>
-                                </>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"Relaunch"}
+                                    onClick={() => {
+                                        relaunchJob(jobInstanceId);
+                                    }}
+                                    disabled={status === "CANCELLED"}
+                                    size="small">
+                                    <RefreshIcon />
+                                </IconButton>
                             </Tooltip>
                         )}
                         {queryLiveInstances && (
@@ -404,7 +402,6 @@ const RunsPage: React.FC = () => {
                                     (
                                         <>
                                             <Tooltip key={"Kill"} title={"Kill"}>
-                                                <>
                                                     <IconButton
                                                         color="default"
                                                         aria-label={"Kill"}
@@ -412,10 +409,9 @@ const RunsPage: React.FC = () => {
                                                             killJob(jobInstanceId);
                                                         }}
                                                         disabled={status === "HOLDED"}
-                                                        size="large">
+                                                        size="small">
                                                         <StopIcon />
                                                     </IconButton>
-                                                </>
                                             </Tooltip>
                                             {status === "HOLDED" ? (
                                                 <Tooltip
@@ -428,7 +424,7 @@ const RunsPage: React.FC = () => {
                                                         onClick={() => {
                                                             resumeJob(jobInstanceId);
                                                         }}
-                                                        size="large">
+                                                        size="small">
                                                         <PlayArrowIcon />
                                                     </IconButton>
                                                 </Tooltip>
@@ -440,7 +436,7 @@ const RunsPage: React.FC = () => {
                                                         onClick={() => {
                                                             pauseJob(jobInstanceId);
                                                         }}
-                                                        size="large">
+                                                        size="small">
                                                         <PauseIcon />
                                                     </IconButton>
                                                 </Tooltip>
@@ -462,7 +458,7 @@ const RunsPage: React.FC = () => {
                                                 );
                                                 setLogType("NONE");
                                             }}
-                                            size="large">
+                                            size="small">
                                             <FlipCameraAndroidIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -482,7 +478,7 @@ const RunsPage: React.FC = () => {
                                     );
                                     setLogType("NONE");
                                 }}
-                                size="large">
+                                size="small">
                                 <DescriptionIcon />
                             </IconButton>
                         </Tooltip>
