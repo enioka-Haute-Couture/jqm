@@ -126,11 +126,24 @@ public class MetaService
 
     public static void upsertGlobalParameter(DbConn cnx, GlobalParameterDto dto)
     {
-        if (dto == null || dto.getKey() == null || dto.getKey().isEmpty() || dto.getValue() == null || dto.getValue().isEmpty())
+        if (dto == null || dto.getKey() == null || dto.getKey().isEmpty() || dto.getValue() == null)
         {
             throw new IllegalArgumentException("invalid dto object");
         }
-        GlobalParameter.setParameter(cnx, dto.getKey(), dto.getValue());
+
+        if (dto.getId() != null)
+        {
+            QueryResult qr = cnx.runUpdate("globalprm_update_key_value_by_id", dto.getKey(), dto.getValue(), dto.getId());
+            if (qr.nbUpdated == 0)
+            {
+                cnx.setRollbackOnly();
+                throw new NoResultException("no item with ID " + dto.getId());
+            }
+        }
+        else
+        {
+            GlobalParameter.setParameter(cnx, dto.getKey(), dto.getValue());
+        }
     }
 
     private static GlobalParameterDto mapGlobalParameter(ResultSet rs) throws SQLException
