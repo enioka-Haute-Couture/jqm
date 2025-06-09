@@ -144,8 +144,9 @@ final class Helpers
         }
         if (defaultQueues.size() > 1)
         {
-            throw new JqmInitError(
-                    "There is more than one default queue. Correct this (for example with CLI option -u, or with the web admin)");
+            cnx.runUpdate("q_update_default_none");
+            cnx.runUpdate("q_update_default_by_id", defaultQueues.get(0).getId());
+            jqmlogger.warn("There is more than one default queue. " + defaultQueues.get(0).getName() + " is the default queue.");
         }
 
         // Deployment parameters
