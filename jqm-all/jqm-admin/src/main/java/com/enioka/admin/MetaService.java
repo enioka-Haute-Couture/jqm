@@ -1142,6 +1142,17 @@ public class MetaService
         {
             throw new DatabaseException(e);
         }
+        catch (DatabaseException e)
+        {
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+            {
+                throw new JqmAdminApiUserException("Name " + dto.getName() + " already used.");
+            }
+            else
+            {
+                throw e;
+            }
+        }
     }
 
     public static void syncQueues(DbConn cnx, List<QueueDto> dtos)
