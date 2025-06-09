@@ -21,6 +21,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Link from "@mui/material/Link";
 import fileDownload from "js-file-download";
+import { LOG_TYPE } from "./RunsPage";
 import { JobInstance } from "./JobInstance";
 import { JobInstanceFile } from "./JobInstanceFile";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
@@ -34,17 +35,20 @@ const formatDate = (date?: Date) => {
 };
 
 export const JobInstanceDetailsDialog: React.FC<{
+
     closeDialog: () => void;
     jobInstance: JobInstance;
     fetchLogsStdout: (jobId: number) => Promise<String>;
     fetchLogsStderr: (jobId: number) => Promise<String>;
     fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
     fetchFileContent: (fileId: number) => Promise<string>;
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent }) => {
+    displayedLogType: LOG_TYPE;
+
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
-
+    const [logType, setLogType] = useState<LOG_TYPE>(displayedLogType);
 
     useEffect(() => {
         // fetch files details
@@ -52,6 +56,28 @@ export const JobInstanceDetailsDialog: React.FC<{
             setFiles(files);
         })
     }, [fetchFiles, jobInstance.id])
+
+    useEffect(() => {
+        // get the logs
+        switch (displayedLogType) {
+            case "STDOUT":
+                fetchLogsStdout(jobInstance.id!)
+                    .then((response) => {
+                        setLogs(response);
+                        setLogType(displayedLogType);
+                    });
+                break;
+            case "STDERR":
+                fetchLogsStderr(
+                    jobInstance.id!
+                ).then((response) => {
+                    setLogs(response);
+                    setLogType(displayedLogType);
+                });
+                break;
+            default:
+        }
+    }, [fetchLogsStderr,fetchLogsStdout, displayedLogType, jobInstance.id])
 
     return (
         <>
@@ -155,8 +181,10 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 event.preventDefault();
                                                                 fetchLogsStdout(
                                                                     jobInstance.id!
-                                                                ).then((response) =>
-                                                                    setLogs(response)
+                                                                ).then((response) => {
+                                                                    setLogs(response);
+                                                                    setLogType("STDOUT");
+                                                                }
                                                                 );
                                                             }}
                                                         >
@@ -188,9 +216,12 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 event.preventDefault();
                                                                 fetchLogsStderr(
                                                                     jobInstance.id!
-                                                                ).then((response) =>
+                                                                ).then((response) => {
                                                                     setLogs(response)
+                                                                    setLogType("STDERR");
+                                                                }
                                                                 );
+
                                                             }}
                                                         >
                                                             view
@@ -428,7 +459,10 @@ export const JobInstanceDetailsDialog: React.FC<{
             {logs != null && (
                 <Dialog
                     open={true}
-                    onClose={() => setLogs(null)}
+                    onClose={() => {
+                        setLogs(null);
+                        setLogType("NONE");
+                    }}
                     aria-labelledby="form-dialog-title"
                     fullWidth
                     maxWidth={"xl"}

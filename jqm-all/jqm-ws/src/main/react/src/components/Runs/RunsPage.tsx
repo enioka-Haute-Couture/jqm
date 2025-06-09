@@ -15,6 +15,8 @@ import MUIDataTable, { FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIData
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
+import WarningIcon from '@mui/icons-material/Warning';
+import TerminalIcon from '@mui/icons-material/Terminal';
 import StopIcon from "@mui/icons-material/Stop";
 import PauseIcon from "@mui/icons-material/Pause";
 import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
@@ -29,6 +31,12 @@ import useJobDefinitionsAPI from "../JobDefinitions/JobDefinitionsAPI";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
+
+export type LOG_TYPE =
+    "STDERR" |
+    "STDOUT" |
+    "NONE"
+    ;
 
 const RunsPage: React.FC = () => {
     const {
@@ -72,6 +80,8 @@ const RunsPage: React.FC = () => {
         }
     }
 
+    const [displayedLogType, setLogType] = useState<LOG_TYPE>("NONE");
+
     useEffect(() => {
         refresh();
         setPageTitle("Runs");
@@ -81,6 +91,7 @@ const RunsPage: React.FC = () => {
     const [showDetailsJobInstanceId, setShowDetailsJobInstanceId] = useState<
         string | null
     >(null);
+
     const [showLaunchFormDialog, setShowLaunchFormDialog] =
         useState<boolean>(false);
 
@@ -449,6 +460,7 @@ const RunsPage: React.FC = () => {
                                                 setShowSwitchJobQueueId(
                                                     jobInstanceId
                                                 );
+                                                setLogType("NONE");
                                             }}
                                             size="large">
                                             <FlipCameraAndroidIcon />
@@ -468,9 +480,44 @@ const RunsPage: React.FC = () => {
                                     setShowDetailsJobInstanceId(
                                         jobInstanceId
                                     );
+                                    setLogType("NONE");
                                 }}
                                 size="large">
                                 <DescriptionIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                            key={"Log stdout"}
+                            title={"Log stdout"}
+                        >
+                            <IconButton
+                                color="default"
+                                aria-label={"Log stdout"}
+                                onClick={() => {
+                                    setShowDetailsJobInstanceId(
+                                        jobInstanceId
+                                    );
+                                    setLogType("STDOUT");
+                                }}
+                                size="small">
+                                <TerminalIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                            key={"Log stderr"}
+                            title={"Log stderr"}
+                        >
+                            <IconButton
+                                color="default"
+                                aria-label={"Log stderr"}
+                                onClick={() => {
+                                    setShowDetailsJobInstanceId(
+                                        jobInstanceId
+                                    );
+                                    setLogType("STDERR");
+                                }}
+                                size="small">
+                                <WarningIcon />
                             </IconButton>
                         </Tooltip>
                     </>;
@@ -591,18 +638,24 @@ const RunsPage: React.FC = () => {
             />
             {showDetailsJobInstanceId !== null && (
                 <JobInstanceDetailsDialog
-                    closeDialog={() => setShowDetailsJobInstanceId(null)}
+                    closeDialog={() => {
+                        setShowDetailsJobInstanceId(null);
+                        setLogType("NONE");
+                    }}
                     jobInstance={
                         jobInstances.find(
                             (ji) => ji.id === Number(showDetailsJobInstanceId)
                         )!
                     }
+
                     fetchLogsStderr={fetchLogsStderr}
                     fetchLogsStdout={fetchLogsStdout}
                     fetchFiles={fetchFiles}
                     fetchFileContent={fetchFileContent}
+                    displayedLogType={displayedLogType}
                 />
-            )}
+            )
+            }
             {showLaunchFormDialog && (
                 <LaunchFormDialog
                     closeDialog={() => setShowLaunchFormDialog(false)}
@@ -625,5 +678,6 @@ const RunsPage: React.FC = () => {
         </Grid>
     );
 };
+
 
 export default RunsPage;
