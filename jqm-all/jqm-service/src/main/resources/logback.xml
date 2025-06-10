@@ -26,6 +26,23 @@
         </encoder>
     </appender>
 
+    <!-- All jobs file log appender -->
+    <appender name="alljobslog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/jobsoutput.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/jobsoutput.log/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>5</maxHistory>
+            <totalSizeCap>10MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>
+                %message
+            </pattern>
+        </encoder>
+    </appender>
+
+
     <logger name="hsqldb" level="warn" />
     <logger name="com.enioka.jqm" level="info" />
     <logger name="org.apache.commons.beanutils" level="info" />
@@ -33,6 +50,11 @@
     <logger name="org.apache.felix" level="info" />
     <logger name="org.apache.aries" level="warn" />
     <logger name="org.apache.shiro" level="info" />
+
+    <logger name="alljobslogger" level="info" additivity="false">
+        <appender-ref ref="alljobslog" />
+    </logger>
+
 
     <root level="info">
         <appender-ref ref="consoleAppender" />

@@ -7,17 +7,17 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 /**
@@ -36,9 +36,13 @@ public class LogTest extends JqmBaseTest {
     }
 
     @Test
-    public void testMultiLog() {
+    public void testLogPerLaunchJavaRunner() throws IOException {
         PrintStream out_ini = System.out;
         PrintStream err_ini = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
 
         GlobalParameter.setParameter(cnx, "logFilePerLaunch", "true");
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
@@ -49,14 +53,89 @@ public class LogTest extends JqmBaseTest {
         TestHelpers.waitFor(1, 20000, cnx);
 
         String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
-        File f = new File(FilenameUtils.concat("./target/server/logs", fileName));
+        String filePath = FilenameUtils.concat("./target/server/logs", fileName);
+        File f = new File(filePath);
 
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
         Assert.assertTrue(f.exists());
 
+        newOut.flush();
+
+        // check that the alljobslogger do not log into logfile
+        Assert.assertFalse(Files.readString(Path.of(filePath), StandardCharsets.UTF_8).contains("alljobslogger"));
+
         System.setErr(err_ini);
         System.setOut(out_ini);
+    }
+
+    // @Test
+    // logback from test/resources is not use when launching test from jqm-all (CI breaks)
+    public void testBothLogJavaRunner() throws IOException {
+
+
+        PrintStream out_ini = System.out;
+        PrintStream err_ini = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
+
+        GlobalParameter.setParameter(cnx, "logFilePerLaunch", "both");
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+            "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        cnx.commit();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, cnx);
+
+        String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
+        String filePath = FilenameUtils.concat("./target/server/logs", fileName);
+        File f = new File(filePath);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertTrue(f.exists());
+
+        newOut.flush();
+
+        // check that the alljobslogger log into logfile. In real life, the logger write into another file (see logback configuration)
+        Assert.assertTrue(Files.readString(Path.of(filePath), StandardCharsets.UTF_8).contains("alljobslogger"));
+
+        System.setErr(err_ini);
+        System.setOut(out_ini);
+    }
+
+    @Test
+    public void testNoLogJavaRunner() {
+        PrintStream out_ini = System.out;
+        PrintStream err_ini = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
+
+        GlobalParameter.setParameter(cnx, "logFilePerLaunch", "false");
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+            "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        cnx.commit();
+        long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, cnx);
+
+        String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
+        String filePath = FilenameUtils.concat("./target/server/logs", fileName);
+        File f = new File(filePath);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertFalse(f.exists());
+
+        newOut.flush();
+
+        System.setErr(err_ini);
+        System.setOut(out_ini);
+
     }
 
     @Test
@@ -94,6 +173,7 @@ public class LogTest extends JqmBaseTest {
             Assert.assertFalse(fErr.exists());
 
             newOut.flush();
+
             String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
             Assert.assertFalse(outContent.contains("|" + logTextStdout));
             Assert.assertFalse(outContent.contains("|" + logTextStderr));
@@ -145,6 +225,7 @@ public class LogTest extends JqmBaseTest {
             Assert.assertEquals(logTextStderr, contentErr.trim());
 
             newOut.flush();
+
             String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
             Assert.assertFalse(outContent.contains("|" + logTextStdout));
             Assert.assertFalse(outContent.contains("|" + logTextStderr));
@@ -155,7 +236,8 @@ public class LogTest extends JqmBaseTest {
         }
     }
 
-    @Test
+    //@Test
+    // logback from test/resources is not use when launching test from jqm-all (CI breaks)
     public void testMultiLogForShellJob() throws Exception {
         PrintStream out_ini = System.out;
         PrintStream err_ini = System.err;
@@ -195,9 +277,11 @@ public class LogTest extends JqmBaseTest {
             Assert.assertEquals(logTextStderr, contentErr.trim());
 
             newOut.flush();
+
             String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
             Assert.assertTrue(outContent.contains("|" + logTextStdout));
             Assert.assertTrue(outContent.contains("|" + logTextStderr));
+
         } finally {
             System.setErr(err_ini);
             System.setOut(out_ini);
