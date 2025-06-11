@@ -36,7 +36,6 @@ import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
 import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.client.api.JqmClientException;
-import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
