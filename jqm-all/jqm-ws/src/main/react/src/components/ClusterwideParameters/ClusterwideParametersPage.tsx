@@ -132,8 +132,8 @@ const ClusterwideParametersPage: React.FC = () => {
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.prm, PermissionAction.create) &&
+                <>
                     <Tooltip title={"Add line"}>
-                        <>
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -141,13 +141,16 @@ const ClusterwideParametersPage: React.FC = () => {
                                 size="large">
                                 <AddCircleIcon />
                             </IconButton>
+                            </Tooltip>
+
+                    <Tooltip title={"Add line dialog"}>
                             <CreateParameterDialog
                                 showDialog={showDialog}
                                 closeDialog={() => setShowDialog(false)}
                                 createParameter={createParameter}
                             />
-                        </>
                     </Tooltip>
+                    </>
                 }
                 <Tooltip title={"Refresh"}>
                     <IconButton
