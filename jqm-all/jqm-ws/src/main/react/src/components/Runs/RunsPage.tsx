@@ -588,19 +588,17 @@ const RunsPage: React.FC = () => {
                 </ToggleButtonGroup>
                 {canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) &&
                     <Tooltip title={"New launch form"}>
-                        <>
-                            <IconButton
-                                color="default"
-                                aria-label={"New launch form"}
-                                onClick={() =>
-                                    fetchJobDefinitions().then(() =>
-                                        setShowLaunchFormDialog(true)
-                                    )
-                                }
-                                size="large">
-                                <AddCircleIcon />
-                            </IconButton>
-                        </>
+                        <IconButton
+                            color="default"
+                            aria-label={"New launch form"}
+                            onClick={() =>
+                                fetchJobDefinitions().then(() =>
+                                    setShowLaunchFormDialog(true)
+                                )
+                            }
+                            size="large">
+                            <AddCircleIcon />
+                        </IconButton>
                     </Tooltip>
                 }
                 <Tooltip title={"Refresh"}>
