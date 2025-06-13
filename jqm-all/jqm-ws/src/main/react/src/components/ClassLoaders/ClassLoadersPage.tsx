@@ -212,8 +212,9 @@ const ClassLoadersPage: React.FC = () => {
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.cl, PermissionAction.create) &&
+                <>
                     <Tooltip title={"Add line"}>
-                        <>
+
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -221,13 +222,15 @@ const ClassLoadersPage: React.FC = () => {
                                 size="large">
                                 <AddCircleIcon />
                             </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"add line Dialog"}>
                             <CreateClassLoaderDialog
                                 showDialog={showDialog}
                                 closeDialog={() => setShowDialog(false)}
                                 createClassLoader={createClassLoader}
                             />
-                        </>
-                    </Tooltip>}
+                    </Tooltip>
+                </>}
                 <Tooltip title={"Refresh"}>
                     <IconButton
                         color="default"

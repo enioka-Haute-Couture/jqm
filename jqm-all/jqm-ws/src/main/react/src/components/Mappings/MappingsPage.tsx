@@ -249,8 +249,8 @@ const MappingsPage: React.FC = () => {
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.qmapping, PermissionAction.create) &&
-                    <Tooltip title={"Add line"}>
-                        <>
+                    <>
+                        <Tooltip title={"Add line"}>
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -258,17 +258,16 @@ const MappingsPage: React.FC = () => {
                                 size="large">
                                 <AddCircleIcon />
                             </IconButton>
-                            {showDialog && (
-                                <CreateMappingDialog
-                                    closeDialog={() => setShowDialog(false)}
-                                    createMapping={createMapping}
-                                    nodes={nodes!!}
-                                    queues={queues!!}
-                                />
-                            )}
-                        </>
-                    </Tooltip>
-                }
+                        </Tooltip>
+                        {showDialog && (
+                            <CreateMappingDialog
+                                closeDialog={() => setShowDialog(false)}
+                                createMapping={createMapping}
+                                nodes={nodes!!}
+                                queues={queues!!}
+                            />
+                        )}
+                    </>}
                 <Tooltip title={"Refresh"}>
                     <IconButton
                         color="default"
