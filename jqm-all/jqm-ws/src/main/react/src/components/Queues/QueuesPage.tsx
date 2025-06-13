@@ -160,8 +160,8 @@ const QueuesPage: React.FC = () => {
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.queue, PermissionAction.create) &&
-                    <Tooltip title={"Add line"}>
-                        <>
+                    <>
+                        <Tooltip title={"Add line"}>
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -169,14 +169,16 @@ const QueuesPage: React.FC = () => {
                                 size="large">
                                 <AddCircleIcon />
                             </IconButton>
-                            <CreateQueueDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createQueue={createQueue}
-                                canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
-                            />
-                        </>
-                    </Tooltip>}
+                        </Tooltip>
+                        <Tooltip title={"Add line Dialog"}>
+                                <CreateQueueDialog
+                                    showDialog={showDialog}
+                                    closeDialog={() => setShowDialog(false)}
+                                    createQueue={createQueue}
+                                    canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
+                                />
+                        </Tooltip>
+                    </>}
                 <Tooltip title={"Refresh"}>
                     <IconButton
                         color="default"
