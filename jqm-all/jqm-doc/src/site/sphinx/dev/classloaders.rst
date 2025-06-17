@@ -29,22 +29,22 @@ For payloads:
 | Bootstrap class loader (JVM provided)                                                                                                   |
 +-----------------------------------------------------------------------------------------------------------------------------------------+
 
-		
+
 The general idea is:
 
 * The engine uses the classic JVM-provided AppClassLoader for everything concerning its internal business
-* Every payload launch has its own classloader, **totally independent from the engine classloader**. 
+* Every payload launch has its own classloader, **totally independent from the engine classloader**.
   This classloader is garbage collected at the end of the run.
-* JNDI resources in singleton mode (see :doc:`../jobs/resources`) must be kept cached by the engine, so they cannot be loaded through 
+* JNDI resources in singleton mode (see :doc:`../jobs/resources`) must be kept cached by the engine, so they cannot be loaded through
   the transient payload classloader itself. Also, the loaded resources must be understandable by the payloads - and therefore there must be a
-  shared classloader here. The JNDI classloader is therefore the parent of the payload classloaders. The JNDI classloader itself has no parent (save 
-  obviously the bootstrap CL), so the payloads won't be polluted by anything foreign.  
+  shared classloader here. The JNDI classloader is therefore the parent of the payload classloaders. The JNDI classloader itself has no parent (save
+  obviously the bootstrap CL), so the payloads won't be polluted by anything foreign.
 
 Advantages:
 
 * The engine is totally transparent to payloads, as the engine libraries are inside a classloader which is not accessible to payloads.
 * It allows to have multiple incompatible versions of the same library running simultaneously in different payloads.
-* It still allows for the exposition to the payload of an API implemented inside the engine through the use of a proxy class, a 
+* It still allows for the exposition to the payload of an API implemented inside the engine through the use of a proxy class, a
   pattern designed explicitly for that use case.
 * Easily allows for hot swap of libs and payloads.
 * Avoids having to administer complex classloader hierarchies and keeps payloads independent from one another.
@@ -57,7 +57,7 @@ Cons:
   to be garbage collected. This a huge memory leak (usually called a classloader leak). The best known example: registering a JDBC driver
   inside the static bootstrap-loaded DriverManager. This keeps a reference to the payload-context driver inside the bootstrap-context, and prevents
   collection. This special case is the reason why singleton mode should always be used for JDBC resources.
-* There is a bug inside the Sun JVM 6: even if garbage collected, a classloader will leave behind an open file descriptor. This will effectively 
+* There is a bug inside the Sun JVM 6: even if garbage collected, a classloader will leave behind an open file descriptor. This will effectively
   prevent hot swap of libs on Windows.
 
 To alleviate some of the conses, JQM also provides options to share class loaders between different job instances and reuse them between runs,
@@ -70,3 +70,5 @@ to deal with libraries - they are either in libs or in ext, and it just works. T
 so no specific development is required.
 
 The result is also robust, as payloads have virtually no access to the engine and can't set it off tracks.
+
+.. note:: JQM also has an optional JPMS mode that slightly changes the class loading behaviour, please look at :doc:`../jobs/jpms` for more information.
