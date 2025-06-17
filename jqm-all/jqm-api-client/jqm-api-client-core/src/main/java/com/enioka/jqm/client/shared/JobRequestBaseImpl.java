@@ -36,7 +36,7 @@ import com.enioka.jqm.client.api.State;
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  *
  * Job execution request. It contains the job application name (the only mandatory piece of data needed to enqueue a request), as well as
- * non-mandatory data. It is consumed by {@link JqmClient#enqueue(JobRequest)}
+ * non-mandatory data. It is consumed by {@link JobRequest#enqueue()}
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -82,7 +82,7 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself.
      *
      * @param key
@@ -123,7 +123,7 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself. If there is no parameter named key, no error is thrown.
      *
      * @param key
@@ -134,7 +134,7 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * <strong>Compulsory</strong> (unless {@link JobRequest#setScheduleId(long)} is used)<br>
+     * <strong>Compulsory</strong> (unless {@link com.enioka.jqm.client.api.JobRequest#setScheduleId(Long)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
      */
     public String getApplicationName()
@@ -143,7 +143,7 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * <strong>Compulsory</strong> (unless {@link JobRequest#setScheduleId(long)} is used)<br>
+     * <strong>Compulsory</strong> (unless {@link com.enioka.jqm.client.api.JobRequest#setScheduleId(Long)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
      *
      * @param applicationName

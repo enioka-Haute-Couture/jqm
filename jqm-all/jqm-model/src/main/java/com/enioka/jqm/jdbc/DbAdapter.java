@@ -78,7 +78,6 @@ public abstract class DbAdapter
      *                an open and ready to use connection to the database. Please return it without any open statement/result set.
      * @param q
      *                the query which will be run. Can be modified by this method.
-     * @return a generated ID or null;
      */
     public void beforeUpdate(Connection cnx, QueryPreparation q)
     {

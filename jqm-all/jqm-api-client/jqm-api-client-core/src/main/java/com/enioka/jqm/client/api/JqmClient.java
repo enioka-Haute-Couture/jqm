@@ -62,8 +62,8 @@ public interface JqmClient
 
     /**
      * Entry point of the enqueue API. Creates a new empty JobRequest object, ready to run on this client. The returned JobRequest can
-     * either be enqued by calling {@link JobRequest#enqueue()} or by giving it to {@link JqmClient#enqueue(JobRequest)} in any client
-     * instance.
+     * either be enqued by calling {@link com.enioka.jqm.client.api.JobRequest#enqueue()} or by giving it to enqueue(JobRequest) in any
+     * client instance.
      *
      * @return a new empty JobRequest
      */
@@ -486,7 +486,7 @@ public interface JqmClient
     // /////////////////////////////////////////////////////////////////////
     /**
      * Add a file to the job instance. Only job instance that have not started yet are eligible. The file will be copied to the JQM server
-     * and made available to the running job instance through the {@link JobManager} API.
+     * and made available to the running job instance inside the outputfile directory of the instance.
      */
     public long addJobFile(long jobId, String name, InputStream file);
 
@@ -562,7 +562,7 @@ public interface JqmClient
 
     /**
      * Lists all the available {@link JobDef} objects for a given application, i.e. the different payloads that can be launched by JQM. The
-     * "application" is the optional tag that can be given inside the <code> &ltapplication&gt</code> tag of the JobDef XML file.<br>
+     * "application" is the optional tag that can be given inside the <code> &lt;application&gt;</code> tag of the JobDef XML file.<br>
      * If application is null, this method is equivalent to {@link #getJobDefinitions()}.
      *
      * @return a list of JobDef

@@ -64,7 +64,7 @@ public class XmlConfigurationParser
      *
      * @param path
      * @param cnx
-     * @throws JqmEngineException
+     * @throws JqmXmlException
      */
     public static void parse(String path, DbConn cnx) throws JqmXmlException
     {

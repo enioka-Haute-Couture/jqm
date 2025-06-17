@@ -25,6 +25,7 @@ package com.enioka.jqm.test.api;
  *     JobInstance res = JqmAsynchronousTesterJse.create("com.enioka.jqm.test.Payload1").run();
  *     Assert.assertEquals(State.ENDED, res.getState());
  * }
+ * }
  * </pre>
  */
 public interface JqmSynchronousTester extends AutoCloseable

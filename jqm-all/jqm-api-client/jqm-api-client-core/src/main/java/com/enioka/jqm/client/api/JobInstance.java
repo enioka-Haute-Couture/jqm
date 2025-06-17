@@ -339,7 +339,7 @@ public class JobInstance
     }
 
     /**
-     * The time at which the execution request was given to {@link JqmClient#enqueue(JobRequest)}.
+     * The time at which the execution request was given to {@link JobRequest#enqueue()}.
      */
     public Calendar getEnqueueDate()
     {

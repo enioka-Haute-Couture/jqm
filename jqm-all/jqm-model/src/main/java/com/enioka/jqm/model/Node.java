@@ -214,7 +214,7 @@ public class Node implements Serializable
     }
 
     /**
-     * The port on which to start the JMX remote registry. No remote JMX item is started if this field or jmxserverport is < 1
+     * The port on which to start the JMX remote registry. No remote JMX item is started if this field or jmxserverport is &lt; 1
      */
     public Integer getJmxRegistryPort()
     {
@@ -230,7 +230,7 @@ public class Node implements Serializable
     }
 
     /**
-     * The port on which to start the JMX remote server. No remote JMX item is started if this field or jmxregistryport is < 1
+     * The port on which to start the JMX remote server. No remote JMX item is started if this field or jmxregistryport is &lt; 1
      */
     public Integer getJmxServerPort()
     {

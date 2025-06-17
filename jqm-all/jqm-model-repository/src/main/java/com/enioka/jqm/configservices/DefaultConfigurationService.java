@@ -56,7 +56,7 @@ public class DefaultConfigurationService
                 q = Queue.select(cnx, "q_select_all").get(0);
                 cnx.runUpdate("q_update_default_none");
                 cnx.runUpdate("q_update_default_by_id", q.getId());
-                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were multiple default queues");
+                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were no default queues");
             }
         }
 
@@ -107,12 +107,14 @@ public class DefaultConfigurationService
     /**
      * Creates or updates a node.<br>
      * This method makes the assumption metadata is valid. e.g. there MUST be a single default queue.<br>
-     * Call {@link #updateConfiguration(EntityManager)} before to be sure if necessary.
+     * Call {@link #updateConfiguration(DbConn)} before to be sure if necessary.
      *
      * @param nodeName
      *            name of the node that should be created or updated (if incompletely defined only)
-     * @param em
+     * @param cnx
      *            an EntityManager on which a transaction will be opened.
+     * @param port
+     *            the port of the node
      */
     public static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
     {

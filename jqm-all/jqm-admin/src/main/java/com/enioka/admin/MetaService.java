@@ -4,10 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.enioka.api.admin.ClDto;
-import com.enioka.api.admin.ClHandlerDto;
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
@@ -23,7 +21,6 @@ import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.Cl;
-import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JndiObjectResource;
@@ -36,7 +33,6 @@ import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.repository.VersionRepository;
 
-import org.apache.commons.collections4.Get;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.lang.util.ByteSource;
@@ -130,11 +126,24 @@ public class MetaService
 
     public static void upsertGlobalParameter(DbConn cnx, GlobalParameterDto dto)
     {
-        if (dto == null || dto.getKey() == null || dto.getKey().isEmpty() || dto.getValue() == null || dto.getValue().isEmpty())
+        if (dto == null || dto.getKey() == null || dto.getKey().isEmpty() || dto.getValue() == null)
         {
             throw new IllegalArgumentException("invalid dto object");
         }
-        GlobalParameter.setParameter(cnx, dto.getKey(), dto.getValue());
+
+        if (dto.getId() != null)
+        {
+            QueryResult qr = cnx.runUpdate("globalprm_update_key_value_by_id", dto.getKey(), dto.getValue(), dto.getId());
+            if (qr.nbUpdated == 0)
+            {
+                cnx.setRollbackOnly();
+                throw new NoResultException("no item with ID " + dto.getId());
+            }
+        }
+        else
+        {
+            GlobalParameter.setParameter(cnx, dto.getKey(), dto.getValue());
+        }
     }
 
     private static GlobalParameterDto mapGlobalParameter(ResultSet rs) throws SQLException
@@ -1120,14 +1129,42 @@ public class MetaService
 
     public static void upsertQueue(DbConn cnx, QueueDto dto)
     {
-        if (dto.getId() != null)
+        try
         {
-            cnx.runUpdate("q_update_changed_by_id", dto.isDefaultQueue(), dto.getDescription(), dto.getName(), dto.getId(),
-                    dto.isDefaultQueue(), dto.getDescription(), dto.getName());
+            if (dto.isDefaultQueue())
+            {
+                ResultSet rs = null;
+                rs = cnx.runSelect("q_select_default");
+                if (rs.next())
+                {
+                    throw new JqmAdminApiUserException("there is already a default queue");
+                }
+            }
+
+            if (dto.getId() != null)
+            {
+                cnx.runUpdate("q_update_changed_by_id", dto.isDefaultQueue(), dto.getDescription(), dto.getName(), dto.getId(),
+                        dto.isDefaultQueue(), dto.getDescription(), dto.getName());
+            }
+            else
+            {
+                Queue.create(cnx, dto.getName(), dto.getDescription(), dto.isDefaultQueue());
+            }
         }
-        else
+        catch (SQLException e)
         {
-            Queue.create(cnx, dto.getName(), dto.getDescription(), dto.isDefaultQueue());
+            throw new DatabaseException(e);
+        }
+        catch (DatabaseException e)
+        {
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+            {
+                throw new JqmAdminApiUserException("Name " + dto.getName() + " already used.");
+            }
+            else
+            {
+                throw e;
+            }
         }
     }
 
@@ -1587,8 +1624,7 @@ public class MetaService
         if (dto.getId() != null)
         {
             cnx.runUpdate("user_update_changed", dto.getLogin(), dto.getLocked(), dto.getExpirationDate(), dto.getEmail(),
-                    dto.getFreeText(), dto.getId(), dto.getLogin(), dto.getLocked(), dto.getExpirationDate(), dto.getEmail(),
-                    dto.getFreeText());
+                    dto.getFreeText(), dto.getId());
 
             // Password
             if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())

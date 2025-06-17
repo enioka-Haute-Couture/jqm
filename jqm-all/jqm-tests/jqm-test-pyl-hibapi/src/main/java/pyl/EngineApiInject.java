@@ -27,7 +27,7 @@ import java.util.Map;
 import com.enioka.jqm.api.JobManager;
 
 /**
- * Tests API injection & all engine API methods inside a main method WITH THE FULL API present.
+ * Tests API injection and all engine API methods inside a main method WITH THE FULL API present.
  */
 public class EngineApiInject
 {

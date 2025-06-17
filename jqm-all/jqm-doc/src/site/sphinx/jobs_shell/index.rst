@@ -2,11 +2,11 @@ Shell Payload development
 ##########################
 
 .. toctree::
-	:numbered:
-	:titlesonly:
-	:maxdepth: 2
+    :numbered:
+    :titlesonly:
+    :maxdepth: 2
 
-	basics
+    basics
     context
     api
     logging

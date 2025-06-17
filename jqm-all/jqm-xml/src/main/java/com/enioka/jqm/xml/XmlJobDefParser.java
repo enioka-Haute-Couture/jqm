@@ -62,7 +62,7 @@ public class XmlJobDefParser
      *            full or relative path to the deployment descriptor to read.
      * @param cnx
      *            a database connection to use with no active transaction.
-     * @throws JqmEngineException
+     * @throws JqmXmlException
      */
     public static void parse(String path, DbConn cnx) throws JqmXmlException
     {
@@ -78,7 +78,7 @@ public class XmlJobDefParser
      *            a database connection to use with no active transaction.
      * @param overrideJarBasePath
      *            ignore the base path of the jar in the deployment descriptor and use this one. It must be relative to to repository root.
-     * @throws JqmEngineException
+     * @throws JqmXmlException
      */
     public static void parse(String path, DbConn cnx, String overrideJarBasePath) throws JqmXmlException
     {

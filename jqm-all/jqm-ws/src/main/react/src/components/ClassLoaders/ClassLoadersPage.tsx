@@ -79,7 +79,10 @@ const ClassLoadersPage: React.FC = () => {
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
     const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setEditingRowId(tableMeta.rowIndex);
+        setChildFirst(tableMeta.rowData[2]);
         setHiddenClasses(tableMeta.rowData[3]);
+        setTracingEnabled(tableMeta.rowData[4]);
+        setPersistent(tableMeta.rowData[5]);
         setAllowedRunners(tableMeta.rowData[6]);
     }, []);
 
@@ -268,7 +271,7 @@ const ClassLoadersPage: React.FC = () => {
             {editHiddenClassesClId !== null && (
                 <EditHiddenClassesDialog
                     closeDialog={() => setEditHiddenClassesClId(null)}
-                    hiddenClasses={hiddenClasses !== "" ? hiddenClasses.split(',') : []}
+                    hiddenClasses={hiddenClasses ? hiddenClasses.split(',') : []}
                     setHiddenClasses={(hiddenClasses: string[]) =>
                         setHiddenClasses(hiddenClasses.join(','))
                     }
@@ -277,7 +280,7 @@ const ClassLoadersPage: React.FC = () => {
             {editAllowedRunnersClId !== null && (
                 <EditAllowedRunnersDialog
                     closeDialog={() => setEditAllowedRunnersClId(null)}
-                    allowedRunners={allowedRunners !== "" ? allowedRunners.split(',') : []}
+                    allowedRunners={allowedRunners ? allowedRunners.split(',') : []}
                     setAllowedRunners={(allowedRunners: string[]) =>
                         setAllowedRunners(allowedRunners.join(','))
                     }

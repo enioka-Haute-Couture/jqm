@@ -5,7 +5,7 @@ import com.enioka.jqm.model.Node;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * A set of callbacks for creating hooks on a JQM engine life cycle. Used by {@link JqmEngineFactory}.<br>
+ * A set of callbacks for creating hooks on a JQM engine life cycle. Used by EngineCallback.<br>
  * TODO: remove this, too many lifecycle hooks triggered from inside the engine that do not belong there.
  */
 public interface JqmEngineHandler
