@@ -25,7 +25,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class ErrorHandler implements ExceptionMapper<ErrorDto>
+public class ErrorHandlerStructured implements ExceptionMapper<ErrorDto>
 {
     @Context
     private HttpHeaders headers;
