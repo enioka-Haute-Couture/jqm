@@ -38,11 +38,11 @@ Current job metadata
 For the description of these items, please see the job instance description. Please note that these are methods, not fields - this is
 only because Java does not allow to specify fields inside an interface.
 
-.. method:: JobManager.parentId() -> int
+.. method:: JobManager.parentId() -> long
 
-.. method:: JobManager.jobApplicationId() -> int
+.. method:: JobManager.jobApplicationId() -> long
 
-.. method:: JobManager.jobInstanceID() -> int
+.. method:: JobManager.jobInstanceID() -> long
 
 .. method:: JobManager.canBeRestarted() -> boolean
 
@@ -67,7 +67,7 @@ only because Java does not allow to specify fields inside an interface.
 Enqueue & retrieve jobs
 ************************
 
-.. method:: JobManager.enqueue(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters) -> int
+.. method:: JobManager.enqueue(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters) -> long
 
     Enqueues a new execution request. This is asynchronous - it returns as soon as the request was posted.
 
@@ -75,11 +75,11 @@ Enqueue & retrieve jobs
     This is a little ugly but necessary due to the underlying class loader proxying magic.
 
 
-.. method:: JobManager.enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters) -> int
+.. method:: JobManager.enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters) -> long
 
     Calls :meth:`enqueue` and waits for the end of the execution.
 
-.. method:: JobManager.waitChild(int jobInstanceId) -> void
+.. method:: JobManager.waitChild(long jobInstanceId) -> void
 .. method:: JobManager.waitChildren() -> void
 
 .. method:: JobManager.hasEnded(int jobInstanceId) -> Boolean
