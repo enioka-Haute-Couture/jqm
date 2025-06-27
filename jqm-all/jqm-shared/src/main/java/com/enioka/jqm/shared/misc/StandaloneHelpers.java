@@ -1,19 +1,17 @@
 package com.enioka.jqm.shared.misc;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 /**
  * Various helper functions for the Standalone mode
  */
 public class StandaloneHelpers
 {
-
     /**
      * Extracts the IP address corresponding to an ID.
      * <p>
@@ -27,8 +25,7 @@ public class StandaloneHelpers
     public static String ipFromId(long id)
     {
         final var base = id / 1_000_000;
-        return "" + base / 1000L / 1000L / 1000 % 1000L + '.' + base / 1000L / 1000L % 1000L + '.' + base / 1000L % 1000L + '.'
-                + base % 1000L;
+        return String.format("%d.%d.%d.%d", (base >> 24 & 0xff), (base >> 16 & 0xff), (base >> 8 & 0xff), (base & 0xff));
     }
 
     /**
@@ -41,19 +38,39 @@ public class StandaloneHelpers
      *            The IP address
      * @return The first value of the corresponding sequence
      */
-    public static long idSequenceBaseFromIp(String ip)
+    public static long idSequenceBaseFromIp(InetAddress ip)
     {
-        return Long.parseLong(Arrays.stream(ip.split("\\.")).map(stringValue -> String.format("%03d", Integer.parseInt(stringValue)))
-                .collect(Collectors.joining())) * 1_000_000L;
+        var ipAsInteger = 0L;
+        for (var b : ip.getAddress())
+        {
+            ipAsInteger = (ipAsInteger << 8) + (b & 0xFF);
+        }
+
+        return ipAsInteger * 1_000_000L;
     }
 
-    public static String getLocalIpAddress()
+    public static long idSequenceBaseFromIp(String ip)
+    {
+        try
+        {
+            return idSequenceBaseFromIp(InetAddress.getByName(ip));
+        }
+        catch (UnknownHostException e)
+        {
+            // This should never happen as the IP is supposed to be valid
+            throw new RuntimeException("Unable to parse IP address: " + ip, e);
+        }
+    }
+
+    public static InetAddress getLocalIpAddress()
     {
         try
         {
             for (var netInterface : Collections.list(NetworkInterface.getNetworkInterfaces()))
             {
-                if (netInterface.isPointToPoint() || !netInterface.isUp())
+                if (netInterface.isPointToPoint() || !netInterface.isUp() || netInterface.isVirtual()
+                        || netInterface.getName().startsWith("docker") || netInterface.getName().startsWith("veth")
+                        || netInterface.getName().startsWith("br-"))
                 {
                     continue;
                 }
@@ -65,16 +82,23 @@ public class StandaloneHelpers
                         {
                             continue;
                         }
-                        return addr.getHostAddress();
+                        return addr;
                     }
                 }
             }
 
-            return Inet4Address.getLocalHost().getHostAddress();
+            return Inet4Address.getLocalHost();
         }
         catch (SocketException | UnknownHostException e)
         {
-            return "127.0.0.1";
+            try
+            {
+                return Inet4Address.getByName("127.0.0.1");
+            }
+            catch (UnknownHostException e1)
+            {
+                throw new RuntimeException("Unable to get loopback address", e1);
+            }
         }
     }
 }
