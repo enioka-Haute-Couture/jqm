@@ -75,9 +75,25 @@ Note that the following configuration assumes that you want to share the Spring 
 which is not the JQM default. If this does not suit your needs, change the execution context ``<persistent>true</persistent>`` to
 false and the default JQM behaviour of having one different class loader per launch will be reinstated.
 
+First of all, some dependencies are needed
+
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-handler-spring</artifactId>
+            <version>${jqm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-api</artifactId>
+            <version>${jqm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+
 The payload can be defined like this::
 
-    package com.compagny.project;
+    package com.company.project;
 
     @Component
     public class MyJobClass implements Runnable

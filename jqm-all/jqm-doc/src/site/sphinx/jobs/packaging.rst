@@ -239,7 +239,7 @@ Importing
 
 The XML can be imported through the command line. ::
 
-	java -jar jqm.jar -importjobdef /path/to/xml.file
+	java -jar jqm.jar Import-JobDef /path/to/xml.file
 
 Please note that if your JQM deployment has multiple engines, it is not necessary to import the file on each node - only once is enough
 (all nodes share the same configuration). However, the jar file must obviously still be present on the nodes that will run it.
