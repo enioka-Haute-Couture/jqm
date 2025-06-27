@@ -17,40 +17,37 @@ The JqmClient interface
 New execution requests
 ++++++++++++++++++++++++++++++++++++++
 
-    .. method:: JqmClient.enqueue(JobRequest executionRequest) -> integer
+    .. method:: JqmClient.enqueue(String applicationName, String userName) -> long
 
         The core method of the Job Queue Manager: it enqueues a new job execution request, as described in the object parameter.
         It returns the ID of the request. This ID will be kept throughout the life cycle of the request until it becomes the ID
         of the history item after the execution ends. This ID is reused in many other methods of the API.
 
-        It consumes a :class:`JobRequest` item, which is a "form" object in which all ncessary parameters can be specified.
+        It consumes a applicationName, aka the name of the job to launch and the an Username, aka the user at the origin of the enqueue request (can be null or empty)
 
-    .. method:: JqmClient.enqueue(String applicationName, String user) -> integer
 
-        A simplified version of the method above.
-
-    .. method:: JqmClient.enqueueFromHistory(Integer jobIdToCopy) -> integer
+    .. method:: JqmClient.enqueueFromHistory(long jobIdToCopy) -> long
 
         This method copies an ended request. (this creates a new request - it has no impact whatsoever on the copied request)
 
 Job request deleting
 ++++++++++++++++++++++++++++++++++++++
 
-    .. method:: JqmClient.cancelJob(Integer id) -> void
+    .. method:: JqmClient.cancelJob(long id) -> void
 
         When called on a waiting execution request, removes it from the queue and moves it to history with CANCELLED status.
         This is the standard way of cancelling a request.
 
         *Synchronous method*
 
-    .. method:: JqmClient.deleteJob(int id) -> void
+    .. method:: JqmClient.deleteJob(long id) -> void
 
         This method should not usually be called. It completely removes a job execution request from the database.
         Please use cancelJob instead.
 
         *Synchronous method*
 
-    .. method:: JqmClient.killJob(int id) -> void
+    .. method:: JqmClient.killJob(long id) -> void
 
         Attempts to kill a running job instance. As Java thread are quite hard to kill, this may well have no effect.
 
@@ -59,16 +56,16 @@ Job request deleting
 Pausing and restarting jobs
 ++++++++++++++++++++++++++++++++++++++
 
-    .. method:: JqmClient.pauseQueuedJob(int id) -> void
+    .. method:: JqmClient.pauseQueuedJob(long id) -> void
 
         When called on a job execution request it is ignored by engines and status forever in queue.
 
-    .. method:: JqmClient.resumeJob(int id) -> void
+    .. method:: JqmClient.resumeJob(long id) -> void
 
         Will re insert a paused execution request into the queue. The place inside the queue may change from what it
         used to be before the pause.
 
-    .. method:: JqmClient.restartCrachedJob(int id) -> int
+    .. method:: JqmClient.restartCrashedJob(long id) -> long
 
         Will create an execution request from a crashed history element and *remove all traces of the failed execution**.
 
@@ -78,7 +75,7 @@ Queries on Job instances
 The API offers many methods to query either ended jobs or waiting/running ones. When there is a choice, please use
 the method which is the mst specific to your needs, as it may have optimizations not present in the more general ones.
 
-    .. method:: JqmClient.getJob(int id) -> JobInstance
+    .. method:: JqmClient.getJob(long id) -> JobInstance
 
         Returns either a running or an ended job instance.
 
@@ -94,25 +91,22 @@ the method which is the mst specific to your needs, as it may have optimizations
 
         Lists all waiting or running job instances which have the given "username" tag.
 
-    .. method:: JqmClient.getJobs(Query q) -> List<JobInstance>
-
-        please see :doc:`query`.
 
 Quick access helpers
 ++++++++++++++++++++++++++++++++++++++
 
-    .. method:: JqmClient.getJobMessages(int id) -> List<String>
+    .. method:: JqmClient.getJobMessages(long id) -> List<String>
 
         Retrieves all the messages created by a job instance (ended or not)
 
-    .. method:: JqmClient.getJobProgress(int id) -> int
+    .. method:: JqmClient.getJobProgress(long id) -> int
 
         Get the progress indication that may have been given by a job instance (running or done).
 
 Files & logs retrieval
 ++++++++++++++++++++++++++++++++++++++
 
-    .. method:: JqmClient.getJobDeliverables(int id) -> List<Deliverable>
+    .. method:: JqmClient.getJobDeliverables(long id) -> List<Deliverable>
 
         Return all metadata concerning the (potential) files created by the job instance: Excel files, PDFs, ...
         These are the files explicitly referenced by the job instance through the :meth:`JobManager.addDeliverable` method.
@@ -125,15 +119,15 @@ Files & logs retrieval
 
         **The responsibility to close the stream lies on the API user**
 
-    .. method:: JqmClient.getDeliverableContent(int deliverableId) -> InputStream
+    .. method:: JqmClient.getDeliverableContent(long deliverableId) -> InputStream
 
         Same a above.
 
-    .. method:: JqmClient.getJobDeliverablesContent(int jobId) -> List<InputStream>
+    .. method:: JqmClient.getJobDeliverablesContent(long jobId) -> List<InputStream>
 
         Helper method. A loop on :meth:`getDeliverableContent` for all files created by a single job instance.
 
-    .. method:: JqmClient.getJobLogStdOut(int jobId) -> InputStream
+    .. method:: JqmClient.getJobLogStdOut(long jobId) -> InputStream
 
         Returns the standard output flow of of an ended job instance.
 
@@ -141,7 +135,7 @@ Files & logs retrieval
 
         **The responsibility to close the returned stream lies on the API user**
 
-    .. method:: JqmClient.getJobLogStdErr(int jobId) -> InputStream
+    .. method:: JqmClient.getJobLogStdErr(long jobId) -> InputStream
 
         Same as :meth:`getJobLogStdOut` but for standard error flow.
 
@@ -166,7 +160,7 @@ JobRequest
 .. class:: JobRequest
 
     Job execution request. It contains all the data needed to enqueue a request (the application name), as well as non-mandatory data.
-    It is consumed by :meth:`JqmClient.enqueue`.
+    Job can be submit to the JQM cluster by calling :meth:`JobRequest.enqueue`.
 
     **Basically, this is the form one has to fill in order to submit an execution request.**
 
