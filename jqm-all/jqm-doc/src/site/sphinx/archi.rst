@@ -70,7 +70,7 @@ queue will end on that one). All further new nodes will have one association cre
 With this way to associate queue to nodes, it is very easy to specialise nodes and usages. It is for example possible to have one node polling a queue
 very fast, while another polls it more slowly. More interestingly, it makes it easy to adapt to the size of the underlying servers:
 one engine may be able to run 10 jobs for a queue in parallel while another, on a more powerful server, may run 50 for the same queue.
-It also makes it possible to specialise servers: some will poll a set of queues, others will poll a completly different set of queues.
+It also makes it possible to specialise servers: some will poll a set of queues, others will poll a completely different set of queues.
 
 
 A :term:`Job Definition` has a default queue: all job requests pertaining to a job definition are created (unless otherwise specified) inside this queue.
