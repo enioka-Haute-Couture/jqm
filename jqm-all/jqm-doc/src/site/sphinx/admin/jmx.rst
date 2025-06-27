@@ -8,7 +8,7 @@ JQM fully embraces JMX as its main way of being monitored.
 Monitoring JQM through JMX
 ****************************
 
-JQM exposes threee different level of details through JMX: the engine, the pollers inside the engine, and the job instances currently running
+JQM exposes three different level of details through JMX: the engine, the pollers inside the engine, and the job instances currently running
 inside the pollers.
 
 The first level will most often be enough: it has checks for seeing if the engine process is alive and if the pollers are polling. Basically, the two
@@ -64,10 +64,6 @@ Beans detail
 
 		The total number of job instances that were run on this node since the last history purge. (long)
 
-	.. method:: getJobsFinishedPerSecondLastMinute
-
-		On all queues, the number of job requests that ended last minute. (float)
-
 	.. method:: getCurrentlyRunningJobCount
 
 		The number of currently running job instances on all queues (long)
@@ -93,11 +89,14 @@ Beans detail
 
 		Stops the engine, exactly as if stopping the service (see stop procedure for details).
 
+    .. method:: refreshConfiguration
+
+        Forces a full refresh of base configuration (HTTP port, log level, ...). Usually configuration is updated automatically every
 
 
-.. class:: PollingMBean
+.. class:: QueuePollerMBean
 
-	This bean tracks a local poller. A poller is basicaly a thread that polls a :term:`queue` inside the database at a given interval (defined in a :class:`DeploymentParameter`).
+	This bean tracks a local poller. A poller is basically a thread that polls a :term:`queue` inside the database at a given interval (defined in a :class:`DeploymentParameter`).
 
 	.. method:: getCurrentActiveThreadCount
 
@@ -135,11 +134,13 @@ Beans detail
 
 		True if running count equals max job number. (the max count number can be retrieved through :meth:`getMaxConcurrentJobInstanceCount`)
 
+	.. method:: getLateJobs
 
+        The count of running jobs that have run for more than their maxTimeRunning time.
 
-.. class:: LoaderMBean
+.. class:: JavaJobInstanceTrackerMBean
 
-	This bean tracks a running job, allowing to query its properties and (try to) stop it. It is created just before the start of the :term:`payload` and destroyed when it ends.
+	This bean tracks a running java job, allowing to query its properties and (try to) stop it. It is created just before the start of the :term:`payload` and destroyed when it ends.
 
 	.. method:: kill()
 
@@ -185,3 +186,47 @@ Beans detail
 
 		Time elapsed between startup and current time. (int)
 
+
+.. class:: JavaJobInstanceTrackerMBean
+
+	This bean tracks a running shell job, allowing to query its properties and (try to) stop it. It is created just before the start of the :term:`payload` and destroyed when it ends.
+
+	.. method:: kill()
+
+		Tries to kill the job. As Java is not very good at killing threads, it will often fail to achieve anything. See :ref:`the job documentation<culling>` for more details.
+
+	.. method:: getApplicationName();
+
+		The name of the job. (String)
+
+	.. method:: getEnqueueDate();
+
+		Start time (Calendar)
+
+	.. method:: getKeyword1();
+
+		A fully customizable and optional tag to help sorting job requests. (String)
+
+	.. method:: getKeyword2();
+
+		A fully customizable and optional tag to help sorting job requests. (String)
+
+	.. method:: getKeyword3();
+
+		A fully customizable and optional tag to help sorting job requests. (String)
+
+	.. method:: getModule();
+
+		A fully customizable and optional tag to help sorting job requests. (String)
+
+	.. method:: getUser();
+
+		A fully customizable and optional tag to help sorting job requests. (String)
+
+	.. method:: getSessionId();
+
+		A fully customizable and optional tag to help sorting job requests. (int)
+
+	.. method:: getId();
+
+		The unique ID attributed by JQM to the execution request. (int)

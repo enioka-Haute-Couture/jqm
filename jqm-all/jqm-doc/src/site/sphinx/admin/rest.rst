@@ -4,7 +4,7 @@ Administration web services
 .. warning:: The admin REST web service is a **private** JQM API. It should never be accessed directly. Either use the web administration console or the future
 	CLI. The service is only described here for reference and as a private specification.
 
-The web console is actually only an HTML5 client built on top of some generic administration web services - it has no priviledged access
+The web console is actually only an HTML5 client built on top of some generic administration web services - it has no privileged access
 to any resources that could not be accessed to in any other ways.
 
 These services are REST-style services. It is deployed along with the client web services and the console (in the same war file).

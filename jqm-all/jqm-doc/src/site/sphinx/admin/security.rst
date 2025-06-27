@@ -25,7 +25,7 @@ tell the structure of the network).
 
 *Integrity* need: high (as security mechanisms can be disabled here)
 
-*Confidentiality* need: low (as data is public anyway. Exception: if the internal PKI isued, the root certificate is here. But this certificate actually protects... the central configuration so its not a real issue)
+*Confidentiality* need: low (as data is public anyway. Exception: if the internal PKI issued, the root certificate is here. But this certificate actually protects... the central configuration so its not a real issue)
 
 *Stored in*: central database
 

@@ -4,7 +4,7 @@ Parameters
 Engine parameters
 *****************
 
-These parameters gouvern the behaviour of the JQM engines.
+These parameters govern the behaviour of the JQM engines.
 
 There are three sets of engine parameters:
 
@@ -81,7 +81,7 @@ have to be altered directly inside the database with your tool of choice or thro
 | defaultConnection       | the JNDI alias returned by the engine API getDefaultConnection method.                              | jdbc/jqm      | No      | No           |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | logFilePerLaunch        | if 'true', one log file will be created per launch. If 'false', job stdout/stderr is lost.          | true          | Yes     | No           |
-|                         | if 'both', one log file will be created per launch PLUS one common file concatening all these files |               |         |              |
+|                         | if 'both', one log file will be created per launch PLUS one common file concatenating all these files |               |         |              |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | internalPollingPeriodMs | Period in ms for checking stop orders. Also period at which the "I'm a alive" signal is sent.       | 60000         | Yes     | No           |
 |                         | Also used for checking and applying  parameter modifications (new queues, global prm changes...)    |               |         |              |
