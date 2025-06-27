@@ -41,7 +41,7 @@ Prerequisites:
 The following script will download and copy the binaries (adapt the first two lines). ::
 
 	$JQM_ROOT = "C:\TEMP\jqm" ## Change this
-	$JQM_VERSION = "1.3.3"  ## Change this
+	$JQM_VERSION = "${project.version}"  ## Change this
 	mkdir -Force $JQM_ROOT; cd $JQM_ROOT
 	Invoke-RestMethod https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
 	$shell = new-object -com shell.application
