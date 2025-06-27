@@ -24,7 +24,7 @@ Log levels
 
 The default log-level is INFO, which is the recommended level for production.
 
-In case of a classic two-level monitoring system ('something weird' & 'run for your life'), WARN whould be mapped to the first level while ERROR and FATAL should be mapped to the second one.
+In case of a classic two-level monitoring system ('something weird' & 'run for your life'), WARN would be mapped to the first level while ERROR and FATAL should be mapped to the second one.
 
 
 Engine log
@@ -48,7 +48,7 @@ One file named after the ID of the job instance is created per payload launch. I
 * the stdout/stderr of the job instance. This means that if payloads use a ConsoleAppender for their logs (as is recommended)
   it will be fully here.
 
-These files are **not purged** automatically. This is the admin's responsability.
+These files are **not purged** automatically. This is the admin's responsibility.
 
 Also of note, there are two log levels involved here:
 

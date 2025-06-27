@@ -19,7 +19,7 @@ The regular installation is as a service. Just do, inside a PowerShell prompt wi
 It is also possible to start an engine inside a command prompt. In that case, the engine stops when the prompt is closed.
 This is mainly useful for debugging purposes. ::
 
-	java -jar jqm.jar -startnode $env:COMPUTERNAME
+	java -jar jqm.jar Start-Node -n node-name  $env:COMPUTERNAME
 
 (change the node name at will - by default, the computer name is used for the node name).
 

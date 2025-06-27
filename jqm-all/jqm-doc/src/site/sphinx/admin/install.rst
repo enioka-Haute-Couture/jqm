@@ -165,7 +165,7 @@ Linux / Unix::
 Database support
 ====================
 
-The suported versions are referenced inside the :doc:`compatibility matrix <./matrix>`.
+The supported versions are referenced inside the :doc:`compatibility matrix <./matrix>`.
 
 Oracle
 ------------------
