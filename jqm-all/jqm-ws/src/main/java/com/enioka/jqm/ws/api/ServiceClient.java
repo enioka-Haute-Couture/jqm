@@ -85,7 +85,7 @@ public class ServiceClient
 
         if (standaloneMode)
         {
-            localIp = StandaloneHelpers.getLocalIpAddress();
+            localIp = StandaloneHelpers.getLocalIpAddress().getHostAddress();
         }
     }
 
