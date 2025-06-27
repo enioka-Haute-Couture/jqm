@@ -68,6 +68,10 @@ export default class APIService {
         var res = await fetch(API_URL + url, {
             credentials: "same-origin",
             ...init,
+            headers: {
+                ...init.headers,
+                "X-Requested-With": "XMLHttpRequest", // Indicate that this is an AJAX request
+            },
         });
 
 
