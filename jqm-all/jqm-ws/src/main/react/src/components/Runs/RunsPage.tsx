@@ -648,6 +648,7 @@ const RunsPage: React.FC = () => {
                     fetchFiles={fetchFiles}
                     fetchFileContent={fetchFileContent}
                     displayedLogType={displayedLogType}
+                    relaunchJob={relaunchJob}
                 />
             )
             }

@@ -43,8 +43,8 @@ export const JobInstanceDetailsDialog: React.FC<{
     fetchFiles: (jobId: number) => Promise<JobInstanceFile[]>;
     fetchFileContent: (fileId: number) => Promise<string>;
     displayedLogType: LOG_TYPE;
-
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType }) => {
+    relaunchJob: (jobId: number) => void;
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType, relaunchJob }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
@@ -77,7 +77,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                 break;
             default:
         }
-    }, [fetchLogsStderr,fetchLogsStdout, displayedLogType, jobInstance.id])
+    }, [fetchLogsStderr, fetchLogsStdout, displayedLogType, jobInstance.id])
 
     useEffect(() => {
         // update logs for running jobs
@@ -107,7 +107,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                 if (timer !== null) clearInterval(timer);
             }
         }
-    }, [fetchLogsStderr,fetchLogsStdout, logs, jobInstance.id, jobInstance.state, logType]);
+    }, [fetchLogsStderr, fetchLogsStdout, logs, jobInstance.id, jobInstance.state, logType]);
 
     return (
         <>
@@ -476,6 +476,18 @@ export const JobInstanceDetailsDialog: React.FC<{
                     </Grid>
                 </DialogContent>
                 <DialogActions>
+                    {canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) &&
+                        <Button
+                            size="small"
+                            onClick={() => {
+                                relaunchJob(jobInstance.id!);
+                                closeDialog();
+                            }}
+                            style={{ margin: "8px" }}
+                        >
+                            Relaunch
+                        </Button>
+                    }
                     <Button
                         variant="contained"
                         size="small"
