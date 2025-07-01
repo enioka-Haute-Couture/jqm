@@ -20,7 +20,7 @@
         "@types/react-router-dom": "^5.1.5",
         "cron-validate": "^1.4.3",
         "date-fns": "^4.1.0",
-        "http-proxy-middleware": "^3.0.0",
+        "http-proxy-middleware": "^3.0.5",
         "js-file-download": "^0.4.12",
         "mui-datatables": "^4.3.0",
         "notistack": "^3.0.1",
