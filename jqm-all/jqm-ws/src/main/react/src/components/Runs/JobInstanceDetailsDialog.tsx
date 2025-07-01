@@ -513,6 +513,62 @@ export const JobInstanceDetailsDialog: React.FC<{
                     <DialogContent>
                         <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
                     </DialogContent>
+                    <DialogActions>
+                        <Button
+                            size="small"
+                            style={{ margin: "8px" }}
+                            onClick={() => {
+                                if (logs) {
+                                    fileDownload(logs.toString(), `${jobInstance.id!}.${logType.toLowerCase()}.txt`);
+                                }
+                            }}
+                        >
+                            Download
+                        </Button>
+                        <Button
+                            size="small"
+                            style={{ margin: "8px" }}
+                            onClick={() => {
+                                if (logs) {
+                                    const blob = new Blob([logs.toString()], { type: 'text/plain' });
+                                    const url = URL.createObjectURL(blob);
+                                    const newTab = window.open(url, '_blank');
+
+                                    // Clean up the blob URL after the tab is opened
+                                    if (newTab) {
+                                        newTab.addEventListener('beforeunload', () => {
+                                            URL.revokeObjectURL(url);
+                                        });
+                                    }
+                                }
+                            }}
+                        >
+                            See Raw
+                        </Button>
+                        <Button
+                            size="small"
+                            style={{ margin: "8px" }}
+                            onClick={() => {
+                                if (logs) {
+                                    navigator.clipboard.writeText(logs.toString());
+                                }
+                            }}
+                        >
+                            Copy
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => {
+                                setLogs(null);
+                                setLogType("NONE");
+                            }}
+                            style={{ margin: "8px" }}
+                        >
+                            Close
+                        </Button>
+                    </DialogActions>
                 </Dialog>
             )
             }
