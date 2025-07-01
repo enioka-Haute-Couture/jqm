@@ -1,19 +1,15 @@
-import React, { ReactNode, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
+    Autocomplete,
     Button,
     FormControl,
     FormControlLabel,
     FormHelperText,
     FormLabel,
     IconButton,
-    Input,
-    InputLabel,
-    MenuItem,
     Paper,
     Radio,
     RadioGroup,
-    Select,
-    SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
@@ -60,6 +56,11 @@ export const LaunchFormDialog: React.FC<{
     const [key, setKey] = useState<string>("");
     const [value, setValue] = useState<string>("");
 
+    const sortedJobDefinitions = useMemo(() =>
+        jobDefinitions?.sort((a, b) => a.applicationName.localeCompare(b.applicationName)) || [],
+        [jobDefinitions]
+    );
+
     const classes = useStyles();
     return (
         <Dialog
@@ -71,36 +72,30 @@ export const LaunchFormDialog: React.FC<{
         >
             <DialogTitle>New launch</DialogTitle>
             <DialogContent>
-                <FormControl fullWidth className={classes.Select}>
-                    <InputLabel id="application-name-select-label">
-                        Application name*
-                    </InputLabel>
-                    <Select
-                        labelId="application-name-select-label"
-                        fullWidth
-                        value={applicationName}
-                        onChange={
-                            (event: SelectChangeEvent<string>, child: ReactNode) => {
-                                const jobDefinition = jobDefinitions.find(
-                                    (jd) =>
-                                        jd.applicationName ===
-                                        (event.target.value as string)
-                                )!;
-                                setApplicationName(jobDefinition.applicationName);
-                                setParameters(jobDefinition.parameters);
-                            }}
-                        input={<Input />}
-                    >
-                        {jobDefinitions?.map((jobDefinition: JobDefinition) => (
-                            <MenuItem
-                                key={jobDefinition.applicationName}
-                                value={jobDefinition.applicationName}
-                            >
-                                {jobDefinition.applicationName}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                <Autocomplete
+                    fullWidth
+                    className={classes.Select}
+                    options={sortedJobDefinitions}
+                    getOptionLabel={(option) => option.applicationName}
+                    value={sortedJobDefinitions.find(jd => jd.applicationName === applicationName) || null}
+                    onChange={(event, newValue) => {
+                        if (newValue) {
+                            setApplicationName(newValue.applicationName);
+                            setParameters(newValue.parameters);
+                        } else {
+                            setApplicationName("");
+                            setParameters([]);
+                        }
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Application name*"
+                            variant="standard"
+                        />
+                    )}
+                    noOptionsText="No job definitions found"
+                />
                 {/* // Name of the batch process to launch. */}
                 <TextField
                     className={classes.TextField}
