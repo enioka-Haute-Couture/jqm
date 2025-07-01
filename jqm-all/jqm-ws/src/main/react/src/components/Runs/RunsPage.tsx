@@ -19,6 +19,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import StopIcon from "@mui/icons-material/Stop";
 import PauseIcon from "@mui/icons-material/Pause";
+import ReplayIcon from "@mui/icons-material/Replay";
 import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -392,7 +393,7 @@ const RunsPage: React.FC = () => {
                                     }}
                                     disabled={status === "CANCELLED"}
                                     size="small">
-                                    <RefreshIcon />
+                                    <ReplayIcon />
                                 </IconButton>
                             </Tooltip>
                         )}
@@ -402,16 +403,16 @@ const RunsPage: React.FC = () => {
                                     (
                                         <>
                                             <Tooltip key={"Kill"} title={"Kill"}>
-                                                    <IconButton
-                                                        color="default"
-                                                        aria-label={"Kill"}
-                                                        onClick={() => {
-                                                            killJob(jobInstanceId);
-                                                        }}
-                                                        disabled={status === "HOLDED"}
-                                                        size="small">
-                                                        <StopIcon />
-                                                    </IconButton>
+                                                <IconButton
+                                                    color="default"
+                                                    aria-label={"Kill"}
+                                                    onClick={() => {
+                                                        killJob(jobInstanceId);
+                                                    }}
+                                                    disabled={status === "HOLDED"}
+                                                    size="small">
+                                                    <StopIcon />
+                                                </IconButton>
                                             </Tooltip>
                                             {status === "HOLDED" ? (
                                                 <Tooltip
