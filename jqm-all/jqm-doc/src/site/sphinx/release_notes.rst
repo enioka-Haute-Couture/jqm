@@ -1,6 +1,44 @@
 Release notes
 ######################
 
+3.1.0
+*************
+
+Maintenance release, with a few new features and many fixes after the v3 release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Engine: fixed double logging with logFilePerLaunch=both
+* Engine: reduced standalone mode IDs size that were too long for the UI
+* GUI: added Class Loaders page
+* GUI: improved runs page
+    * Added a "run time" column
+    * Improved job logs display (shortcut, auto-refresh, fixed lines display)
+    * In launch form the job definitions are sorted and can be filtered
+* GUI: save table state in the runs page when switching between pages
+* Web APIs: fixed renaming of a cluster-wide parameter
+* Engine & web APIs: fixed configuration trap when two default queues are set
+* Documentation: updated some out-of-date parts.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Global: fixed Javadoc
+* Global: migrated to Vite
+* Documentation: fixed readthedocs warnings
+* GUI: login page redirection when trying to access a page without being logged in
+* GUI: added favicon
+* GUI: added page titles
+* Web APIs: a user created without an expiration date can now have one later
+
 3.0.0
 *************
 
