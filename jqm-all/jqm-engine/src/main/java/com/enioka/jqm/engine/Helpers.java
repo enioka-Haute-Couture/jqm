@@ -84,8 +84,8 @@ final class Helpers
     }
 
     /**
-     * For internal test use only <br/>
-     * <bold>WARNING</bold> This will invalidate all open DB sessions!
+     * For internal test use only <br>
+     * <b>WARNING</b> This will invalidate all open DB sessions!
      */
     static void resetDb()
     {

@@ -52,10 +52,13 @@ public abstract class ResourceManagerBase
      * <li>released if the engine decides to run the job instance, but the Resource Manager wishes to release the resource at once because
      * they are only useful during polling, with no need to withold them during the job instance run.
      * {@link #commitResourceBooking(JobInstance, DbConn)}</li>
-     * <ul>
+     * </ul>
      *
      * @param ji
-     * @return
+     *            the job instance to book resources for
+     * @param cnx
+     *            database connection
+     * @return booking status indicating success or failure
      */
     abstract BookingStatus bookResource(JobInstance ji, DbConn cnx);
 
@@ -133,8 +136,8 @@ public abstract class ResourceManagerBase
     }
 
     /**
-     * Apply precedence rules for parameter value resolution: JI parameter using RM key > JI parameter using generic RM name without key >
-     * JD > RM > defaults
+     * Apply precedence rules for parameter value resolution: JI parameter using RM key &gt; JI parameter using generic RM name without key
+     * &gt; JD &gt; RM &gt; defaults
      *
      * @param key
      *            the end of the parameter key. getParameterRoot()[.key] is automatically prefixed.
@@ -142,7 +145,7 @@ public abstract class ResourceManagerBase
      *            the analysed job instance
      * @param pop
      *            if true, parameter will be removed from the JI prm list
-     * @return
+     * @return the resolved parameter value
      */
     protected String getStringParameter(String key, JobInstance ji, boolean pop)
     {

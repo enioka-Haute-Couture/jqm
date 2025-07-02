@@ -141,7 +141,7 @@ public final class ExtClassLoader
      * A helper to retrieve the installation path of JQM. Usually determined by running jar, but can change by property during tests and
      * non-standard deployments.
      *
-     * @return
+     * @return the root directory path of the JQM installation
      */
     public static String getRootDir()
     {

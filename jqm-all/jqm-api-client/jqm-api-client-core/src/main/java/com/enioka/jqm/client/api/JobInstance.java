@@ -112,7 +112,7 @@ public class JobInstance
     }
 
     /**
-     * Status of the job. Usual cycle: SUBMITTED -> ATTRIBUTED -> RUNNING, -> DONE or CRASHED.
+     * Status of the job. Usual cycle: SUBMITTED → ATTRIBUTED → RUNNING, → DONE or CRASHED.
      */
     public State getState()
     {

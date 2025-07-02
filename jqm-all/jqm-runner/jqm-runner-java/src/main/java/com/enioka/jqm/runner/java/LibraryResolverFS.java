@@ -68,11 +68,9 @@ class LibraryResolverFS
     /**
      *
      * @param n
-     *                the JQM Node that holds the binaries (local node)
+     *            the JQM Node that holds the binaries (local node)
      * @param jd
-     *                the JobDefinition that should be resolved
-     * @param cnx
-     *                a DbConn that will be used only if not in cache, to fetch the Maven repository list from the database.
+     *            the JobDefinition that should be resolved
      * @throws JqmPayloadException
      */
     synchronized URL[] getLibraries(Node n, JobDef jd) throws JqmPayloadException
@@ -182,7 +180,9 @@ class LibraryResolverFS
                             throw new JqmPayloadException("Could not extract libraries from jar");
                         }
 
-                        try (InputStream is = zf.getInputStream(ze); FileOutputStream os = new FileOutputStream(FilenameUtils.concat(libDirExtracted.getAbsolutePath(), FilenameUtils.getName(ze.getName()))))
+                        try (InputStream is = zf.getInputStream(ze);
+                                FileOutputStream os = new FileOutputStream(
+                                        FilenameUtils.concat(libDirExtracted.getAbsolutePath(), FilenameUtils.getName(ze.getName()))))
                         {
                             IOUtils.copy(is, os);
                         }

@@ -9,7 +9,7 @@ import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.shared.IDbClientFactory;
 
 /**
- * The entry point to create a {@link JqmClient} that will be able to interact with JQM.<br/>
+ * The entry point to create a {@link JqmClient} that will be able to interact with JQM.<br>
  * {@link JqmClient}s should never be created outside of this factory.<br>
  * The factory also holds the client cache - clients are cached to avoid creating useless objects and connections. (it is possible to create
  * a non-cached client but this is not the default)

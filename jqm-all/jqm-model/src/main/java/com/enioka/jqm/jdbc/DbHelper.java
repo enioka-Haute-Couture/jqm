@@ -58,7 +58,7 @@ public class DbHelper
     /**
      * Close utility method.
      *
-     * @param ps
+     * @param st
      *            statement to close.
      */
     static void closeQuietly(Statement st)

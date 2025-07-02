@@ -40,7 +40,7 @@ public class ClassloaderManager
     private Map<String, PayloadClassLoader> sharedJarClassLoader = new HashMap<>();
 
     /**
-     * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}). Key is Cl object ID.
+     * The CLs corresponding to specific keys (specified inside {@link JobDef#getClassLoader()}). Key is Cl object ID.
      */
     private Map<Long, PayloadClassLoader> persistentClassLoaders = new HashMap<Long, PayloadClassLoader>();
 

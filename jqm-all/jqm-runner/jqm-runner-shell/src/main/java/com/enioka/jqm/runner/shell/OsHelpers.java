@@ -74,9 +74,13 @@ final class OsHelpers
      * When using /bin/sh -c "..." there is a single argument to the process. This method builds it.<br>
      * Note we encourange users through the GUI to only specify the whole shell command in a single field. Only XML imports may result in
      * multiple arguments.
-     * 
+     *
      * @param resultList
-     * @param ji
+     *            the list to add parameters to
+     * @param commandLine
+     *            the command line string
+     * @param prms
+     *            the parameters map
      */
     private static void addAllParametersAsSingleString(List<String> resultList, String commandLine, Map<String, String> prms)
     {
@@ -104,9 +108,12 @@ final class OsHelpers
 
     /**
      * The most common case: start a process, no need for a shell.
-     * 
-     * @param ji
-     * @return
+     *
+     * @param processPath
+     *            the path to the process executable
+     * @param prms
+     *            the parameters map with keys as indices and values as parameter strings
+     * @return a list of strings representing the command and its arguments
      */
     private static List<String> getSimpleProcess(String processPath, Map<String, String> prms)
     {

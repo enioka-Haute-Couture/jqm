@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is a workaround for the deprecation of security managers in Java 17.<br>
- * It registers the security manager only if Java<17. Obviously this also removes the functionality in Java>=17. We should follow the JDK
- * ticket https://bugs.openjdk.java.net/browse/JDK-8199704 for an API allowing us to prevent System.exit in Java 17+.
+ * It registers the security manager only if Java &lt; 17. Obviously this also removes the functionality in Java &gt;= 17. We should follow
+ * the JDK ticket https://bugs.openjdk.java.net/browse/JDK-8199704 for an API allowing us to prevent System.exit in Java 17+.
  */
 class SecurityManagerPayloadLoader
 {

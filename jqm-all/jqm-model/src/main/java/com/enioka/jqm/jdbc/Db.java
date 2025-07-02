@@ -42,6 +42,7 @@ public class Db
      * Main constructor. Properties may be null. Properties are not documented on purpose, as this is a private JQM API.
      *
      * @param properties
+     *            configuration properties for database connection
      */
     public Db(Properties properties)
     {
@@ -140,6 +141,8 @@ public class Db
 
     /**
      * The raw Datasource object. This should not be used except when needing to interact with the database before it is fully initialized.
+     *
+     * @return the underlying DataSource object
      */
     public DataSource getDataSource()
     {
@@ -148,6 +151,9 @@ public class Db
 
     /**
      * Main database initialization. To be called only when _ds is a valid DataSource.
+     *
+     * @param p
+     *            configuration properties for database adapter
      */
     private void initAdapter(Properties p)
     {
@@ -264,6 +270,9 @@ public class Db
     /**
      * Creates the adapter for the target database. The list of available adapters comes either from the ServiceLoader service registry or
      * from a property.
+     *
+     * @param p
+     *            configuration properties for database selection
      */
     private void selectAdapter(Properties p)
     {
