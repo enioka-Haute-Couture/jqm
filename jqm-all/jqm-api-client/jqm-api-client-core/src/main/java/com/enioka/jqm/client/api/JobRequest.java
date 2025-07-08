@@ -43,8 +43,8 @@ public interface JobRequest extends Serializable
     public long enqueue();
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself.
      *
      * @param key
      *            max length is 50
@@ -62,8 +62,8 @@ public interface JobRequest extends Serializable
     public JobRequest addParameters(Map<String, String> prms);
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself. If there is no parameter named key, no error is thrown.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself. If there is no parameter named key, no error is thrown.
      *
      * @param key
      */
@@ -87,6 +87,17 @@ public interface JobRequest extends Serializable
      *            max length is 100
      */
     public JobRequest setSessionID(String sessionID);
+
+    /**
+     * <strong>Optional</strong><br>
+     * It is possible to monitor a job instance threw Swkywalking API, If the plugin is active we propage the context of the trace thanks to
+     * this field.<br>
+     * Default is null.
+     *
+     * @param ContextCarrier
+     *            max length is 100
+     */
+    public JobRequest setContextCarrier(String contextCarrier);
 
     /**
      * <strong>Optional</strong><br>
@@ -134,8 +145,8 @@ public interface JobRequest extends Serializable
     public JobRequest setKeyword3(String keyword3);
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself. This method allows to set them all at once instead of calling {@link #addParameter(String, String)} multiple times.<br>
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself. This method allows to set them all at once instead of calling {@link #addParameter(String, String)} multiple times.<br>
      * This methods removes all previously set parameters.
      *
      * @param parameters
@@ -187,8 +198,8 @@ public interface JobRequest extends Serializable
 
     /**
      * <strong>Optional</strong><br>
-     * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #setApplicationName(String)} ()} is
-     * ignored.
+     * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #setApplicationName(String)}
+     * ()} is ignored.
      */
     public JobRequest setScheduleId(Long id);
 
