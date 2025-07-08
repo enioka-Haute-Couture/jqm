@@ -43,7 +43,7 @@ public class QueryBaseImpl implements Query
     protected Long jobInstanceId;
     protected Long parentId;
     protected List<String> applicationName = new ArrayList<>();
-    protected String user, sessionId;
+    protected String user, sessionId, contextCarrier;
     protected String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     protected String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
     protected String queueName, nodeName;
@@ -252,6 +252,18 @@ public class QueryBaseImpl implements Query
     public Query setSessionId(String sessionId)
     {
         this.sessionId = sessionId;
+        return this;
+    }
+
+    public String getContextCarrier()
+    {
+        return contextCarrier;
+    }
+
+    @Override
+    public Query setContextCarrier(String contextCarrier)
+    {
+        this.contextCarrier = contextCarrier;
         return this;
     }
 

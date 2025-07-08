@@ -46,6 +46,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     private String applicationName;
     private String sessionID;
+    private String contextCarrier;
     private String application;
     private String user;
     private String module;
@@ -82,8 +83,8 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself.
      *
      * @param key
      *            max length is 50
@@ -123,8 +124,8 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself. If there is no parameter named key, no error is thrown.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself. If there is no parameter named key, no error is thrown.
      *
      * @param key
      */
@@ -180,6 +181,30 @@ public class JobRequestBaseImpl implements JobRequest
     public JobRequest setSessionID(String sessionID)
     {
         this.sessionID = sessionID;
+        return this;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * It is possible to monitor a job instance with Skywalking, We can give context to add information to the trace.<br>
+     * Default is null.
+     */
+    public String getContextCarrier()
+    {
+        return contextCarrier;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * It is possible to monitor a job instance with Skywalking, We can give context to add information to the trace.<br>
+     * Default is null.
+     *
+     * @param contextCarrier
+     *            max length is 100
+     */
+    public JobRequest setContextCarrier(String contextCarrier)
+    {
+        this.contextCarrier = contextCarrier;
         return this;
     }
 

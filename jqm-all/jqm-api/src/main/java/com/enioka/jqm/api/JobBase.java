@@ -96,6 +96,11 @@ public class JobBase
         return jm.sessionID();
     }
 
+    public String getContextCarrier()
+    {
+        return jm.contextCarrier();
+    }
+
     public String getApplication()
     {
         return jm.application();

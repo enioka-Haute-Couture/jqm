@@ -308,6 +308,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
         jd.setModule(h.getModule());
         jd.setParentID(h.getParent());
         jd.setSessionID(h.getSessionID());
+        jd.setContextCarrier(h.getContextCarrier());
         jd.setUser(h.getUser());
 
         for (Map.Entry<String, String> p : h.getParameters().entrySet())

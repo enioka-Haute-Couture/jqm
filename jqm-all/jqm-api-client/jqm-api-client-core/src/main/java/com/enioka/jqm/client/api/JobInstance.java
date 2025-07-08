@@ -43,6 +43,7 @@ public class JobInstance
     private Long parent;
     private String user;
     private String sessionID;
+    private String contextCarrier;
     private State state;
     private Long position;
     private Integer priority;
@@ -109,6 +110,19 @@ public class JobInstance
     public void setSessionID(String sessionID)
     {
         this.sessionID = sessionID;
+    }
+
+    /**
+     * The Skywalking context that was given at enqueue time. Optional.
+     */
+    public String getContextCarrier()
+    {
+        return contextCarrier;
+    }
+
+    public void setContextCarrier(String contextCarrier)
+    {
+        this.contextCarrier = contextCarrier;
     }
 
     /**
