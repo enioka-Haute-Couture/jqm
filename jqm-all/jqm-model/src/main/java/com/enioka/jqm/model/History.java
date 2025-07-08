@@ -575,7 +575,7 @@ public class History implements Serializable
 
     /**
      * @param return_code
-     *                        the return_code to set
+     *            the return_code to set
      */
     public void setReturnCode(Integer return_code)
     {
@@ -607,8 +607,8 @@ public class History implements Serializable
                     ji.getEmail(), endDate, ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(),
                     ji.getKeyword1(), ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(),
                     jd.getKeyword3(), jd.getModule(), n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(),
-                    finalState.toString(), ji.getUserName(), ji.getJdId(), ji.getNode().getId(), ji.getQueue(), ji.isFromSchedule(),
-                    ji.getPriority(), ji.getNotBefore());
+                    ji.getContextCarrier(), finalState.toString(), ji.getUserName(), ji.getJdId(), ji.getNode().getId(), ji.getQueue(),
+                    ji.isFromSchedule(), ji.getPriority(), ji.getNotBefore());
         }
     }
 

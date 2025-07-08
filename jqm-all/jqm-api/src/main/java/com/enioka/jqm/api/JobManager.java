@@ -77,6 +77,13 @@ public interface JobManager
     /**
      * Optional arbitrary user classification
      *
+     * @return the sessionID that was given at enqueue time, null if none.
+     */
+    String contextCarrier();
+
+    /**
+     * Optional arbitrary user classification
+     *
      * @return the application name that was given at enqueue time, null if none.
      */
     String application();
@@ -128,7 +135,7 @@ public interface JobManager
      *
      * @return the third keyword that was given inside the job definition, null if none.
      */
-	String definitionKeyword3();
+    String definitionKeyword3();
 
     /**
      * Optional arbitrary user classification
@@ -141,8 +148,8 @@ public interface JobManager
      * Parameters are from the Job Definition (i.e. default parameters) as well as values given at enqueue time. This is the privileged way
      * of giving parameters to a job instance.
      *
-     * @return a <code>Map</code> of all parameters (random order) with the Map key being the name of the parameter and the
-     *         Map value the value of the parameter.
+     * @return a <code>Map</code> of all parameters (random order) with the Map key being the name of the parameter and the Map value the
+     *         value of the parameter.
      */
     Map<String, String> parameters();
 
@@ -152,8 +159,7 @@ public interface JobManager
     String defaultConnect();
 
     /*
-     * *************************************************************************************
-     * METHODS
+     * ************************************************************************************* METHODS
      */
 
     /**
@@ -166,6 +172,8 @@ public interface JobManager
      * @param mail
      *            Give an e-mail address to send a mail at the end of run. Leave null if no mail is needed.
      * @param sessionId
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param contextCarrier
      *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
      * @param application
      *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
@@ -182,8 +190,8 @@ public interface JobManager
      * @return the ID of the new request
      * @see #enqueueSync sync enqueue for a synchronous variant
      */
-    long enqueue(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1,
-                 String keyword2, String keyword3, Map<String, String> parameters);
+    long enqueue(String applicationName, String user, String mail, String sessionId, String contextCarrier, String application,
+            String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
 
     /**
      * Enqueues a new execution request and waits for the execution to end.
@@ -191,8 +199,8 @@ public interface JobManager
      * @return the ID of the new request
      * @see #enqueue the synchronous variant for the description of parameters
      */
-    long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
-                     String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
+    long enqueueSync(String applicationName, String user, String mail, String sessionId, String contextCarrier, String application,
+            String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
 
     /**
      * Messages are strings that can be retrieved during run by other applications, so that interactive human users may have a measure of
@@ -247,8 +255,8 @@ public interface JobManager
     File getWorkDir();
 
     /**
-     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed and such. Java makes it
-     * impossible to kill a thread properly, so calling this function is the only way to allow it. <br>
+     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed and such. Java makes
+     * it impossible to kill a thread properly, so calling this function is the only way to allow it. <br>
      * Note: this function is also called by the other functions of the API.
      */
     void yield();
@@ -271,7 +279,8 @@ public interface JobManager
     void waitChildren();
 
     /**
-     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure) <br>
+     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure)
+     * <br>
      * Also see {@link #hasSucceeded} and {@link #hasFailed}: these methods also allow to check for end with the added value of getting the
      * status.
      *

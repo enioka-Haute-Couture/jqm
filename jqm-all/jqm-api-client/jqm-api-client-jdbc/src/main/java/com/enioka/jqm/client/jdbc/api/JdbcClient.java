@@ -329,8 +329,9 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         {
             Long id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
-                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
-                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), priority, Instruction.RUN, prms);
+                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getContextCarrier(), runRequest.getUser(),
+                    runRequest.getEmail(), jobDef.isHighlander(), sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(),
+                    priority, Instruction.RUN, prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();
@@ -449,7 +450,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jd.setModule(rs.getString(7));
             jd.setParentID(rs.getLong(8));
             jd.setSessionID(rs.getString(9));
-            jd.setUser(rs.getString(10));
+            jd.setContextCarrier(rs.getString(10));
+            jd.setUser(rs.getString(11));
 
             for (Map.Entry<String, String> p : prms.entrySet())
             {
@@ -693,9 +695,10 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jr.setModule(rs.getString(7));
             jr.setParentID(rs.getLong(8));
             jr.setSessionID(rs.getString(9));
-            jr.setUser(rs.getString(10));
+            jr.setContextCarrier(rs.getString(10));
+            jr.setUser(rs.getString(11));
 
-            State s = State.valueOf(rs.getString(11));
+            State s = State.valueOf(rs.getString(12));
             if (!s.equals(State.CRASHED))
             {
                 throw new JqmClientException("You cannot restart a job that has not crashed");
@@ -1123,6 +1126,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 wh += getStringPredicate("ji.KEYWORD3", query.getInstanceKeyword3(), prms);
                 wh += getStringPredicate("ji.USERNAME", query.getUser(), prms);
                 wh += getStringPredicate("ji.SESSION_KEY", query.getSessionId(), prms);
+                wh += getStringPredicate("CONTEXT_CARRIER", query.getContextCarrier(), prms);
                 wh += getStatusPredicate("ji.STATUS", query.getStatus(), prms);
 
                 wh += getStringPredicate("jd.JD_KEY", query.getApplicationName(), prms);
@@ -1148,7 +1152,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
                         + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
-                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE, ji.PRIORITY, ji.DATE_NOT_BEFORE "
+                        + "ji.SESSION_KEY AS SESSION_KEY, ji.CONTEXT_CARRIER AS CONTEXT_CARRIER, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE, ji.PRIORITY, ji.DATE_NOT_BEFORE "
                         + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ";
 
                 if (wh.length() > 3)
@@ -1180,6 +1184,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 wh += getStringPredicate("INSTANCE_KEYWORD3", query.getInstanceKeyword3(), prms);
                 wh += getStringPredicate("USERNAME", query.getUser(), prms);
                 wh += getStringPredicate("SESSION_KEY", query.getSessionId(), prms);
+                wh += getStringPredicate("CONTEXT_CARRIER", query.getContextCarrier(), prms);
                 wh += getStatusPredicate("STATUS", query.getStatus(), prms);
 
                 wh += getStringPredicate("JD_KEY", query.getApplicationName(), prms);
@@ -1205,7 +1210,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, PRIORITY AS PRIORITY, DATE_NOT_BEFORE FROM __T__HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, CONTEXT_CARRIER, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, PRIORITY AS PRIORITY, DATE_NOT_BEFORE FROM __T__HISTORY ";
 
                 if (wh.length() > 3)
                 {
@@ -1363,19 +1368,20 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         res.setProgress(rs.getInt(21));
         res.setQueueName(rs.getString(22));
         res.setSessionID(rs.getString(24));
-        res.setState(com.enioka.jqm.client.api.State.valueOf(rs.getString(25)));
-        res.setUser(rs.getString(26));
+        res.setContextCarrier(rs.getString(25));
+        res.setState(com.enioka.jqm.client.api.State.valueOf(rs.getString(26)));
+        res.setUser(rs.getString(27));
 
         com.enioka.jqm.client.api.Queue q = new com.enioka.jqm.client.api.Queue();
-        q.setId(rs.getLong(29));
+        q.setId(rs.getLong(30));
         q.setName(rs.getString(22));
         res.setQueue(q);
 
-        res.setPosition(rs.getLong(30));
-        res.setFromSchedule(rs.getBoolean(31));
-        res.setPriority(rs.getInt(32) > 0 ? rs.getInt(32) : null);
+        res.setPosition(rs.getLong(31));
+        res.setFromSchedule(rs.getBoolean(32));
+        res.setPriority(rs.getInt(33) > 0 ? rs.getInt(33) : null);
 
-        res.setRunAfter(cnx.getCal(rs, 33));
+        res.setRunAfter(cnx.getCal(rs, 34));
 
         return res;
     }

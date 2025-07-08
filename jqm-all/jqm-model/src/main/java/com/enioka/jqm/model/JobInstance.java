@@ -64,6 +64,7 @@ public class JobInstance implements Serializable
 
     private String userName;
     private String sessionID;
+    private String contextCarrier;
     private String instanceApplication;
     private String instanceModule;
     private String instanceKeyword1;
@@ -81,9 +82,9 @@ public class JobInstance implements Serializable
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
      *
      * @param key
-     *                  name of the parameter to add
+     *            name of the parameter to add
      * @param value
-     *                  value of the parameter to create
+     *            value of the parameter to create
      * @return the newly created parameter
      */
     public RuntimeParameter addParameter(String key, String value)
@@ -117,6 +118,14 @@ public class JobInstance implements Serializable
     public String getSessionID()
     {
         return sessionID;
+    }
+
+    /**
+     * An optional classification tag which can be specified inside the execution request (default is NULL).
+     */
+    public String getContextCarrier()
+    {
+        return contextCarrier;
     }
 
     /**
@@ -175,6 +184,14 @@ public class JobInstance implements Serializable
     public void setSessionID(final String sessionID)
     {
         this.sessionID = sessionID;
+    }
+
+    /**
+     * See {@link #getContextCarrier()}
+     */
+    public void setContextCarrier(final String contextCarrier)
+    {
+        this.contextCarrier = contextCarrier;
     }
 
     /**
@@ -508,20 +525,21 @@ public class JobInstance implements Serializable
                 tmp.parentId = rs.getLong(12);
                 tmp.progress = rs.getInt(13);
                 tmp.sessionID = rs.getString(14);
-                tmp.state = State.valueOf(rs.getString(15));
-                tmp.userName = rs.getString(16);
-                tmp.jd_id = rs.getLong(17);
-                tmp.node_id = rs.getLong(18);
-                tmp.queue_id = rs.getLong(19);
-                tmp.highlander = rs.getBoolean(20);
-                tmp.fromSchedule = rs.getBoolean(21);
-                tmp.priority = rs.getInt(22);
-                tmp.instruction = Instruction.valueOf(rs.getString(23));
-                tmp.notBefore = cnx.getCal(rs, 24);
+                tmp.contextCarrier = rs.getString(15);
+                tmp.state = State.valueOf(rs.getString(16));
+                tmp.userName = rs.getString(17);
+                tmp.jd_id = rs.getLong(18);
+                tmp.node_id = rs.getLong(19);
+                tmp.queue_id = rs.getLong(20);
+                tmp.highlander = rs.getBoolean(21);
+                tmp.fromSchedule = rs.getBoolean(22);
+                tmp.priority = rs.getInt(23);
+                tmp.instruction = Instruction.valueOf(rs.getString(24));
+                tmp.notBefore = cnx.getCal(rs, 25);
 
-                tmp.q = Queue.map(rs, 24);
-                tmp.jd = JobDef.map(rs, 28);
-                tmp.n = Node.map(cnx, rs, 47);
+                tmp.q = Queue.map(rs, 25);
+                tmp.jd = JobDef.map(rs, 29);
+                tmp.n = Node.map(cnx, rs, 48);
 
                 res.add(tmp);
             }
@@ -558,11 +576,11 @@ public class JobInstance implements Serializable
     }
 
     public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
-                               String keyword1, String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander,
-                               boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
+            String keyword1, String keyword2, String keyword3, String sessionId, String contextCarrier, String userName, String email,
+            boolean highlander, boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction);
+                contextCarrier, status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction);
 
         long newId = qr.getGeneratedId();
 
