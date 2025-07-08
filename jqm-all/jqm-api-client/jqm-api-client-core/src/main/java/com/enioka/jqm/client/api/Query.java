@@ -171,8 +171,7 @@ public interface Query
     // //////////////////////////////////////////
 
     /**
-     * To QueryInterface a specific job instance. This ID is returned, for example, by the {@link JobRequest#enqueue()} method.
-     * <br>
+     * To QueryInterface a specific job instance. This ID is returned, for example, by the {@link JobRequest#enqueue()} method. <br>
      * It is pretty useless to give any other QueryInterface parameters if you know the ID. Also note that there is a shortcut method named
      * {@link JqmClient#getJob(long)} to make a QueryInterface by ID.
      *
@@ -223,6 +222,14 @@ public interface Query
      * @param sessionId
      */
     public Query setSessionId(String sessionId);
+
+    /**
+     * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
+     * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
+     *
+     * @param sessionId
+     */
+    public Query setContextCarrier(String setContextCarrier);
 
     /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
@@ -342,16 +349,16 @@ public interface Query
     public Query setEnqueuedAfter(Calendar enqueuedAfter);
 
     /**
-     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an {@code <=}
-     * comparison.
+     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an
+     * {@code <=} comparison.
      *
      * @param beganRunningBefore
      */
     public Query setBeganRunningBefore(Calendar beganRunningBefore);
 
     /**
-     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an {@code >=}
-     * comparison.
+     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an
+     * {@code >=} comparison.
      *
      * @param beganRunningAfter
      */
@@ -380,12 +387,14 @@ public interface Query
     public Query addStatusFilter(State status);
 
     /**
-     * For querying jobs on a given queue. The list of queues can be retrieved through {@link com.enioka.jqm.client.api.JqmClient#getQueues()}.
+     * For querying jobs on a given queue. The list of queues can be retrieved through
+     * {@link com.enioka.jqm.client.api.JqmClient#getQueues()}.
      */
     public Query setQueueName(String queueName);
 
     /**
-     * For querying jobs on a given queue. The list of queues can be retrieved through {@link com.enioka.jqm.client.api.JqmClient#getQueues()}.<br>
+     * For querying jobs on a given queue. The list of queues can be retrieved through
+     * {@link com.enioka.jqm.client.api.JqmClient#getQueues()}.<br>
      * Ignored if setQueueName is used.
      */
     public Query setQueueId(Long queueId);
