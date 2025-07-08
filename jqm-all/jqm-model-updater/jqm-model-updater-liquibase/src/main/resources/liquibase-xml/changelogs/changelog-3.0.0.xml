@@ -360,6 +360,9 @@
             </column>
             <column name="SESSION_KEY" type="VARCHAR(255)">
                 <constraints nullable="true" />
+                        </column>
+            <column name="CONTEXT_CARRIER" type="VARCHAR(255)">
+                <constraints nullable="true" />
             </column>
             <column name="USERNAME" type="VARCHAR(255)">
                 <constraints nullable="true" />
@@ -480,6 +483,9 @@
                 <constraints nullable="true" />
             </column>
             <column name="SESSION_KEY" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="CONTEXT_CARRIER" type="VARCHAR(255)">
                 <constraints nullable="true" />
             </column>
             <column name="USERNAME" type="VARCHAR(255)">
