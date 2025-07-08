@@ -39,8 +39,8 @@ public class StressGeo implements Runnable
         }
 
         jm.sendMsg("launching first job");
-        jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, p);
+        jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, null, p);
         jm.sendMsg("launching second job");
-        jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, p);
+        jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, null, p);
     }
 }

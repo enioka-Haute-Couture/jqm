@@ -1,5 +1,6 @@
 import { MUISortOptions } from "mui-datatables";
 import { useCallback, useState } from "react";
+import ClientMonitor from "skywalking-client-js";
 import { JobInstance } from "./JobInstance";
 import { JobLaunchParameters } from "./JobLaunchParameters";
 import APIService from "../../utils/APIService";
@@ -296,6 +297,13 @@ export const useJobInstanceAPI = () => {
 
     const launchJob = useCallback(
         async (jobLauchParameters: JobLaunchParameters) => {
+            ClientMonitor.register({
+            collector: `${window.location.origin}/api/sw`,
+            service: 'Plugin_JQM',
+            pagePath: '/client/ji',
+            serviceVersion: 'v1.0.0',
+            traceTimeInterval: 3000,
+            });
             return APIService.post(API_URL, jobLauchParameters)
                 .then(() => {
                     fetchJobInstances(
