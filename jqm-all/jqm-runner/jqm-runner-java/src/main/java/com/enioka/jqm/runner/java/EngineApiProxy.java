@@ -74,6 +74,10 @@ public class EngineApiProxy implements InvocationHandler
             {
                 return this.api.sessionID();
             }
+            else if ("contextCarrier".equals(methodName))
+            {
+                return this.api.contextCarrier();
+            }
             else if ("application".equals(methodName))
             {
                 return this.api.application();
@@ -146,15 +150,17 @@ public class EngineApiProxy implements InvocationHandler
             this.api.sendProgress((Integer) args[0]);
             return null;
         }
-        else if ("enqueue".equals(methodName) && classes.length == 10 && classes[0] == String.class)
+        else if ("enqueue".equals(methodName) && classes.length == 11 && classes[0] == String.class)
         {
             return this.api.enqueue((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4],
-                    (String) args[5], (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
+                    (String) args[5], (String) args[6], (String) args[7], (String) args[8], (String) args[9],
+                    (Map<String, String>) args[10]);
         }
-        else if ("enqueueSync".equals(methodName) && classes.length == 10 && classes[0] == String.class)
+        else if ("enqueueSync".equals(methodName) && classes.length == 11 && classes[0] == String.class)
         {
             return this.api.enqueueSync((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4],
-                    (String) args[5], (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
+                    (String) args[5], (String) args[6], (String) args[7], (String) args[8], (String) args[9],
+                    (Map<String, String>) args[10]);
         }
         else if ("addDeliverable".equals(methodName) && classes.length == 2 && classes[0] == String.class && classes[1] == String.class)
         {

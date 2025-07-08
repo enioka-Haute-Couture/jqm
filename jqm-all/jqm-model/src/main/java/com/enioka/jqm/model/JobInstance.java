@@ -64,6 +64,7 @@ public class JobInstance implements Serializable
 
     private String userName;
     private String sessionID;
+    private String contextCarrier;
     private String instanceApplication;
     private String instanceModule;
     private String instanceKeyword1;
@@ -117,6 +118,14 @@ public class JobInstance implements Serializable
     public String getSessionID()
     {
         return sessionID;
+    }
+
+    /**
+     * An optional classification tag which can be specified inside the execution request (default is NULL).
+     */
+    public String getContextCarrier()
+    {
+        return contextCarrier;
     }
 
     /**
@@ -175,6 +184,14 @@ public class JobInstance implements Serializable
     public void setSessionID(final String sessionID)
     {
         this.sessionID = sessionID;
+    }
+
+    /**
+     * See {@link #getContextCarrier()}
+     */
+    public void setContextCarrier(final String contextCarrier)
+    {
+        this.contextCarrier = contextCarrier;
     }
 
     /**
@@ -490,33 +507,34 @@ public class JobInstance implements Serializable
 
         tmp.id = rs.getLong(1);
 
-        tmp.attributionDate = cnx.getCal(rs, 2);
-        tmp.creationDate = cnx.getCal(rs, 3);
-        tmp.email = rs.getString(4);
-        tmp.executionDate = cnx.getCal(rs, 5);
-        tmp.instanceApplication = rs.getString(6);
-        tmp.instanceKeyword1 = rs.getString(7);
-        tmp.instanceKeyword2 = rs.getString(8);
-        tmp.instanceKeyword3 = rs.getString(9);
-        tmp.instanceModule = rs.getString(10);
-        tmp.internalPosition = rs.getDouble(11);
-        tmp.parentId = rs.getLong(12);
-        tmp.progress = rs.getInt(13);
-        tmp.sessionID = rs.getString(14);
-        tmp.state = State.valueOf(rs.getString(15));
-        tmp.userName = rs.getString(16);
-        tmp.jd_id = rs.getLong(17);
-        tmp.node_id = rs.getLong(18);
-        tmp.queue_id = rs.getLong(19);
-        tmp.highlander = rs.getBoolean(20);
-        tmp.fromSchedule = rs.getBoolean(21);
-        tmp.priority = rs.getInt(22);
-        tmp.instruction = Instruction.valueOf(rs.getString(23));
-        tmp.notBefore = cnx.getCal(rs, 24);
+                tmp.attributionDate = cnx.getCal(rs, 2);
+                tmp.creationDate = cnx.getCal(rs, 3);
+                tmp.email = rs.getString(4);
+                tmp.executionDate = cnx.getCal(rs, 5);
+                tmp.instanceApplication = rs.getString(6);
+                tmp.instanceKeyword1 = rs.getString(7);
+                tmp.instanceKeyword2 = rs.getString(8);
+                tmp.instanceKeyword3 = rs.getString(9);
+                tmp.instanceModule = rs.getString(10);
+                tmp.internalPosition = rs.getDouble(11);
+                tmp.parentId = rs.getLong(12);
+                tmp.progress = rs.getInt(13);
+                tmp.sessionID = rs.getString(14);
+                tmp.contextCarrier = rs.getString(15);
+                tmp.state = State.valueOf(rs.getString(16));
+                tmp.userName = rs.getString(17);
+                tmp.jd_id = rs.getLong(18);
+                tmp.node_id = rs.getLong(19);
+                tmp.queue_id = rs.getLong(20);
+                tmp.highlander = rs.getBoolean(21);
+                tmp.fromSchedule = rs.getBoolean(22);
+                tmp.priority = rs.getInt(23);
+                tmp.instruction = Instruction.valueOf(rs.getString(24));
+                tmp.notBefore = cnx.getCal(rs, 25);
 
-        tmp.q = Queue.map(rs, 24);
-        tmp.jd = JobDef.map(rs, 28);
-        tmp.n = Node.map(cnx, rs, 47);
+                tmp.q = Queue.map(rs, 25);
+                tmp.jd = JobDef.map(rs, 29);
+                tmp.n = Node.map(cnx, rs, 48);
 
         return tmp;
     }
@@ -582,11 +600,11 @@ public class JobInstance implements Serializable
     }
 
     public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
-            String keyword1, String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander,
-            boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
+            String keyword1, String keyword2, String keyword3, String sessionId, String contextCarrier, String userName, String email,
+            boolean highlander, boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction);
+                contextCarrier, status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction);
 
         long newId = qr.getGeneratedId();
 
