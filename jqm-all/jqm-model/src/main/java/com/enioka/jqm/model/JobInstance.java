@@ -525,22 +525,21 @@ public class JobInstance implements Serializable
                 tmp.parentId = rs.getLong(12);
                 tmp.progress = rs.getInt(13);
                 tmp.sessionID = rs.getString(14);
-                tmp.contextCarrier = rs.getString(15);
-                tmp.state = State.valueOf(rs.getString(16));
-                tmp.userName = rs.getString(17);
-                tmp.jd_id = rs.getLong(18);
-                tmp.node_id = rs.getLong(19);
-                tmp.queue_id = rs.getLong(20);
-                tmp.highlander = rs.getBoolean(21);
-                tmp.fromSchedule = rs.getBoolean(22);
-                tmp.priority = rs.getInt(23);
-                tmp.instruction = Instruction.valueOf(rs.getString(24));
-                tmp.notBefore = cnx.getCal(rs, 25);
+                tmp.state = State.valueOf(rs.getString(15));
+                tmp.userName = rs.getString(16);
+                tmp.jd_id = rs.getLong(17);
+                tmp.node_id = rs.getLong(18);
+                tmp.queue_id = rs.getLong(19);
+                tmp.highlander = rs.getBoolean(20);
+                tmp.fromSchedule = rs.getBoolean(21);
+                tmp.priority = rs.getInt(22);
+                tmp.instruction = Instruction.valueOf(rs.getString(23));
+                tmp.notBefore = cnx.getCal(rs, 24);
 
-                tmp.q = Queue.map(rs, 25);
-                tmp.jd = JobDef.map(rs, 29);
-                tmp.n = Node.map(cnx, rs, 48);
-
+                tmp.q = Queue.map(rs, 24);
+                tmp.jd = JobDef.map(rs, 28);
+                tmp.n = Node.map(cnx, rs, 47);
+                tmp.contextCarrier = rs.getString(64);
                 res.add(tmp);
             }
         }
@@ -580,7 +579,7 @@ public class JobInstance implements Serializable
             boolean highlander, boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                contextCarrier, status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction);
+                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction, contextCarrier);
 
         long newId = qr.getGeneratedId();
 
