@@ -255,18 +255,6 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
-    public String getContextCarrier()
-    {
-        return contextCarrier;
-    }
-
-    @Override
-    public Query setContextCarrier(String contextCarrier)
-    {
-        this.contextCarrier = contextCarrier;
-        return this;
-    }
-
     public String getJobDefKeyword1()
     {
         return jobDefKeyword1;

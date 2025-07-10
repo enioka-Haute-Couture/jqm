@@ -224,14 +224,6 @@ public interface Query
     public Query setSessionId(String sessionId);
 
     /**
-     * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
-     * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     *
-     * @param sessionId
-     */
-    public Query setContextCarrier(String setContextCarrier);
-
-    /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
      * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
      *
