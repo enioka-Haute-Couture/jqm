@@ -450,8 +450,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jd.setModule(rs.getString(7));
             jd.setParentID(rs.getLong(8));
             jd.setSessionID(rs.getString(9));
-            jd.setContextCarrier(rs.getString(10));
-            jd.setUser(rs.getString(11));
+            jd.setUser(rs.getString(10));
 
             for (Map.Entry<String, String> p : prms.entrySet())
             {
@@ -695,10 +694,9 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jr.setModule(rs.getString(7));
             jr.setParentID(rs.getLong(8));
             jr.setSessionID(rs.getString(9));
-            jr.setContextCarrier(rs.getString(10));
-            jr.setUser(rs.getString(11));
+            jr.setUser(rs.getString(10));
 
-            State s = State.valueOf(rs.getString(12));
+            State s = State.valueOf(rs.getString(11));
             if (!s.equals(State.CRASHED))
             {
                 throw new JqmClientException("You cannot restart a job that has not crashed");
