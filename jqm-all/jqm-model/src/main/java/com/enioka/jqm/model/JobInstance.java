@@ -64,7 +64,7 @@ public class JobInstance implements Serializable
 
     private String userName;
     private String sessionID;
-    private String contextCarrier;
+    private String traceId;
     private String instanceApplication;
     private String instanceModule;
     private String instanceKeyword1;
@@ -123,9 +123,9 @@ public class JobInstance implements Serializable
     /**
      * An optional classification tag which can be specified inside the execution request (default is NULL).
      */
-    public String getContextCarrier()
+    public String getTraceId()
     {
-        return contextCarrier;
+        return traceId;
     }
 
     /**
@@ -187,11 +187,11 @@ public class JobInstance implements Serializable
     }
 
     /**
-     * See {@link #getContextCarrier()}
+     * See {@link #getTraceId()}
      */
-    public void setContextCarrier(final String contextCarrier)
+    public void setTraceId(final String traceId)
     {
-        this.contextCarrier = contextCarrier;
+        this.traceId = traceId;
     }
 
     /**
@@ -539,7 +539,7 @@ public class JobInstance implements Serializable
                 tmp.q = Queue.map(rs, 24);
                 tmp.jd = JobDef.map(rs, 28);
                 tmp.n = Node.map(cnx, rs, 47);
-                tmp.contextCarrier = rs.getString(64);
+                tmp.traceId = rs.getString(64);
                 res.add(tmp);
             }
         }
@@ -575,11 +575,11 @@ public class JobInstance implements Serializable
     }
 
     public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
-            String keyword1, String keyword2, String keyword3, String sessionId, String contextCarrier, String userName, String email,
+            String keyword1, String keyword2, String keyword3, String sessionId, String traceId, String userName, String email,
             boolean highlander, boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction, contextCarrier);
+                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction, traceId);
 
         long newId = qr.getGeneratedId();
 

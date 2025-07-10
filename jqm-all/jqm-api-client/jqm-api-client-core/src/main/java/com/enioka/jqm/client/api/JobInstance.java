@@ -43,7 +43,7 @@ public class JobInstance
     private Long parent;
     private String user;
     private String sessionID;
-    private String contextCarrier;
+    private String traceId;
     private State state;
     private Long position;
     private Integer priority;
@@ -115,14 +115,14 @@ public class JobInstance
     /**
      * The Skywalking context that was given at enqueue time. Optional.
      */
-    public String getContextCarrier()
+    public String getTraceId()
     {
-        return contextCarrier;
+        return traceId;
     }
 
-    public void setContextCarrier(String contextCarrier)
+    public void setTraceId(String traceId)
     {
-        this.contextCarrier = contextCarrier;
+        this.traceId = traceId;
     }
 
     /**

@@ -329,7 +329,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         {
             Long id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
-                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getContextCarrier(), runRequest.getUser(),
+                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getTraceId(), runRequest.getUser(),
                     runRequest.getEmail(), jobDef.isHighlander(), sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(),
                     priority, Instruction.RUN, prms);
 
@@ -1364,7 +1364,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         res.setProgress(rs.getInt(21));
         res.setQueueName(rs.getString(22));
         res.setSessionID(rs.getString(24));
-        res.setContextCarrier(rs.getString(25));
+        res.setTraceId(rs.getString(25));
         res.setState(com.enioka.jqm.client.api.State.valueOf(rs.getString(26)));
         res.setUser(rs.getString(27));
 

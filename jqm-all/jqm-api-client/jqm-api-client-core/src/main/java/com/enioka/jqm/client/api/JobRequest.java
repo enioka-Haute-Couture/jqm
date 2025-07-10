@@ -94,10 +94,10 @@ public interface JobRequest extends Serializable
      * this field.<br>
      * Default is null.
      *
-     * @param ContextCarrier
+     * @param TraceId
      *            max length is 100
      */
-    public JobRequest setContextCarrier(String contextCarrier);
+    public JobRequest setTraceId(String traceId);
 
     /**
      * <strong>Optional</strong><br>
