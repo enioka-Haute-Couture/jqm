@@ -88,7 +88,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public long enqueue(String applicationName, String user, String mail, String sessionId, String traceId, String application,
+    public long enqueue(String applicationName, String user, String mail, String sessionId, String application,
             String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         JobRequest jr = getJqmClient().newJobRequest(applicationName, user);
@@ -96,7 +96,7 @@ class JobInstanceEngineApi implements JobManager
         jr.setUser(user == null ? ji.getUserName() : user);
         jr.setEmail(mail);
         jr.setSessionID(sessionId == null ? this.ji.getSessionID() : sessionId);
-        jr.setTraceId(traceId == null ? this.ji.getTraceId() : sessionId);
+        jr.setTraceId(this.ji.getTraceId());
         jr.setApplication(application == null ? this.ji.getJD().getApplication() : application);
         jr.setModule(module == null ? this.ji.getJD().getModule() : module);
         jr.setKeyword1(keyword1);
@@ -112,10 +112,10 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public long enqueueSync(String applicationName, String user, String mail, String sessionId, String traceId, String application,
+    public long enqueueSync(String applicationName, String user, String mail, String sessionId, String application,
             String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        long i = enqueue(applicationName, user, mail, sessionId, traceId, application, module, keyword1, keyword2, keyword3,
+        long i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3,
                 parameters);
         waitChild(i);
         return i;

@@ -100,7 +100,7 @@ public class Job2 implements Runnable
         JobManager jm = jmp.getObject();
         System.out.println("Job instance ID is " + jm.jobInstanceID());
         long instanceId = jm.jobInstanceID();
-        jm.enqueueSync("Job1", jm.userName(), null, null, null, null, jm.module(), null, null, null, jm.parameters());
+        jm.enqueueSync("Job1", jm.userName(), null, null, null, jm.module(), null, null, null, jm.parameters());
 
         if (instanceId != jmp.getObject().jobInstanceID())
         {

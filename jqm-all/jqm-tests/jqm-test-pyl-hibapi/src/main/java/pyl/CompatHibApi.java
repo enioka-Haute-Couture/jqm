@@ -53,7 +53,7 @@ public class CompatHibApi implements Runnable
             log.info("Queuing again - with parameter and through the JM API");
             Map<String, String> prms = new HashMap<>();
             prms.put("stop", "1");
-            jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, null, prms);
+            jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, prms);
         }
         else
         {

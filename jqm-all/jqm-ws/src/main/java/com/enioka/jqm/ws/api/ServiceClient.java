@@ -118,7 +118,7 @@ public class ServiceClient
         target.setRunAfter(jd.getRunAfter());
         target.setScheduleId(jd.getScheduleId());
         target.setSessionID(jd.getSessionID());
-        target.setContextCarrier(ContextHeader);
+        target.setTraceId(ContextHeader);
         if (jd.getStartState() == State.HOLDED)
         {
             target.startHeld();
@@ -134,7 +134,7 @@ public class ServiceClient
         ji.setParameters(jd.getParameters());
         ji.setParent(jd.getParentID());
         ji.setSessionID(jd.getSessionID());
-        ji.setContextCarrier(ContextHeader);
+        ji.setTraceId(ContextHeader);
         ji.setState(State.SUBMITTED);
         ji.setUser(jd.getUser());
         ji.setPosition(Long.MAX_VALUE);

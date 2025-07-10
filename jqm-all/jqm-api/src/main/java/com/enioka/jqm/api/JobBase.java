@@ -62,17 +62,17 @@ public class JobBase
         jm.sendProgress(progress);
     }
 
-    public Long enQueue(String applicationName, String user, String mail, String sessionID, String traceId, String application,
+    public Long enQueue(String applicationName, String user, String mail, String sessionID, String application,
             String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        return jm.enqueue(applicationName, user, mail, sessionID, traceId, application, module, keyword1, keyword2, keyword3,
+        return jm.enqueue(applicationName, user, mail, sessionID, application, module, keyword1, keyword2, keyword3,
                 parameters);
     }
 
-    public Long enQueueSynchronously(String applicationName, String user, String mail, String sessionID, String traceId,
+    public Long enQueueSynchronously(String applicationName, String user, String mail, String sessionID,
             String application, String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        return jm.enqueueSync(applicationName, user, mail, sessionID, traceId, application, module, keyword1, keyword2, keyword3,
+        return jm.enqueueSync(applicationName, user, mail, sessionID, application, module, keyword1, keyword2, keyword3,
                 parameters);
     }
 

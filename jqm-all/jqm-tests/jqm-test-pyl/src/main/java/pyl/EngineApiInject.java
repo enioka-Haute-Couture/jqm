@@ -99,13 +99,13 @@ public class EngineApiInject
             Map<String, String> prms = new HashMap<>();
             prms.put("rr", "2nd run");
             System.out.println("creating a new async job instance request");
-            long i = jm.enqueue(jm.applicationName(), null, null, null, null, jm.application(), jm.module(), null, null, null, prms);
+            long i = jm.enqueue(jm.applicationName(), null, null, null, jm.application(), jm.module(), null, null, null, prms);
             System.out.println("New request is number " + i);
 
             jm.sendProgress(66);
             prms.put("rrr", "3rd run");
             System.out.println("creating a new sync job instance request");
-            jm.enqueueSync(jm.applicationName(), null, null, null, null, jm.application(), jm.module(), null, null, null, prms);
+            jm.enqueueSync(jm.applicationName(), null, null, null, jm.application(), jm.module(), null, null, null, prms);
             System.out.println("New request is number " + i + " and should be done now");
             jm.sendProgress(100);
         }
