@@ -79,7 +79,7 @@ public interface JobManager
      *
      * @return the sessionID that was given at enqueue time, null if none.
      */
-    String contextCarrier();
+    String traceId();
 
     /**
      * Optional arbitrary user classification
@@ -173,7 +173,7 @@ public interface JobManager
      *            Give an e-mail address to send a mail at the end of run. Leave null if no mail is needed.
      * @param sessionId
      *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
-     * @param contextCarrier
+     * @param traceId
      *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
      * @param application
      *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
@@ -190,7 +190,7 @@ public interface JobManager
      * @return the ID of the new request
      * @see #enqueueSync sync enqueue for a synchronous variant
      */
-    long enqueue(String applicationName, String user, String mail, String sessionId, String contextCarrier, String application,
+    long enqueue(String applicationName, String user, String mail, String sessionId, String traceId, String application,
             String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
 
     /**
@@ -199,7 +199,7 @@ public interface JobManager
      * @return the ID of the new request
      * @see #enqueue the synchronous variant for the description of parameters
      */
-    long enqueueSync(String applicationName, String user, String mail, String sessionId, String contextCarrier, String application,
+    long enqueueSync(String applicationName, String user, String mail, String sessionId, String traceId, String application,
             String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
 
     /**

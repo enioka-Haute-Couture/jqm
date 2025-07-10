@@ -381,7 +381,7 @@
                 <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
                     foreignKeyName="FK_JOB_INSTANCE_3" />
             </column>
-            <column name="CONTEXT_CARRIER" type="VARCHAR(255)">
+            <column name="TRACE_ID" type="VARCHAR(255)">
                 <constraints nullable="true" />
             </column>
         </createTable>

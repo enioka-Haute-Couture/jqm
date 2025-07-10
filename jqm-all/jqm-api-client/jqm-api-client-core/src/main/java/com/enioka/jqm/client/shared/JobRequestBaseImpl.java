@@ -46,7 +46,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     private String applicationName;
     private String sessionID;
-    private String contextCarrier;
+    private String traceId;
     private String application;
     private String user;
     private String module;
@@ -189,9 +189,9 @@ public class JobRequestBaseImpl implements JobRequest
      * It is possible to monitor a job instance with Skywalking, We can give context to add information to the trace.<br>
      * Default is null.
      */
-    public String getContextCarrier()
+    public String getTraceId()
     {
-        return contextCarrier;
+        return traceId;
     }
 
     /**
@@ -199,12 +199,12 @@ public class JobRequestBaseImpl implements JobRequest
      * It is possible to monitor a job instance with Skywalking, We can give context to add information to the trace.<br>
      * Default is null.
      *
-     * @param contextCarrier
+     * @param traceId
      *            max length is 100
      */
-    public JobRequest setContextCarrier(String contextCarrier)
+    public JobRequest setTraceId(String traceId)
     {
-        this.contextCarrier = contextCarrier;
+        this.traceId = traceId;
         return this;
     }
 

@@ -74,9 +74,9 @@ public class EngineApiProxy implements InvocationHandler
             {
                 return this.api.sessionID();
             }
-            else if ("contextCarrier".equals(methodName))
+            else if ("traceId".equals(methodName))
             {
-                return this.api.contextCarrier();
+                return this.api.traceId();
             }
             else if ("application".equals(methodName))
             {
