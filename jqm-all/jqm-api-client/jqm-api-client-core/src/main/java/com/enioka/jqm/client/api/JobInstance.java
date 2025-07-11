@@ -115,7 +115,6 @@ public class JobInstance
     /**
      * The trace ID that was given at enqueue time. Optional.
      */
-
     public void setTraceId(String traceId)
     {
         this.traceId = traceId;
