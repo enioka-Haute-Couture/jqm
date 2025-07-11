@@ -50,13 +50,22 @@ else
         JAVA="/usr/java6_64/jre/bin/java"
     fi
 fi
+
+# Java agent use to monitor jobs
+agent=$(find . -name 'skywalking-agent.jar')
+if [[ -n "$agent" ]]; then
+    AGENT="-javaagent:$agent"
+else
+    AGENT=""
+fi
+
 $JAVA -version > /dev/null 2>&1
 if [ $? -ne 0 ]
 then
     echo "No java found. Please define JAVA_HOME or put java inside PATH"
     exit 1
 fi
-JAVA="$JAVA $JAVA_OPTS "
+JAVA="$JAVA $JAVA_OPTS $JAVA_AGENT"
 
 OOM=${JAVA_OOM_ACTION:-""}
 if [ "x${OOM}" = "x" ]
@@ -126,7 +135,7 @@ jqm_start() {
     # We can go on...
     if [ "$1" = "console" ]
     then
-        $JAVA "$OOM" -jar $JQM_JAR Start-Node -n $JQM_NODE
+        $JAVA "$OOM"  -jar $JQM_JAR Start-Node -n $JQM_NODE
     else
         remove_npipes
         mkfifo $STDOUT_NPIPE
@@ -208,6 +217,7 @@ jqm_createnode() {
 }
 
 jqm_enqueue() {
+    -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
     $JAVA -jar $JQM_JAR New-Ji -a $1
 }
 
