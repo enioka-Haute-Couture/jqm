@@ -532,6 +532,7 @@ public class JobInstance implements Serializable
                 tmp.jd = JobDef.map(rs, 28);
                 tmp.n = Node.map(cnx, rs, 47);
                 tmp.traceId = rs.getString(64);
+
                 res.add(tmp);
             }
         }
@@ -566,9 +567,9 @@ public class JobInstance implements Serializable
         }
     }
 
-    public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
-            String keyword1, String keyword2, String keyword3, String sessionId, String traceId, String userName, String email,
-            boolean highlander, boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
+   public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
+                               String keyword1, String keyword2, String keyword3, String sessionId,  String traceId, String userName, String email, boolean highlander,
+                               boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
                 status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction, traceId);

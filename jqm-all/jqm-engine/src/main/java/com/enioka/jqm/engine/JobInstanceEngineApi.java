@@ -88,8 +88,8 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public long enqueue(String applicationName, String user, String mail, String sessionId, String application,
-            String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+    public long enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
+                        String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         JobRequest jr = getJqmClient().newJobRequest(applicationName, user);
         jr.setApplicationName(applicationName);

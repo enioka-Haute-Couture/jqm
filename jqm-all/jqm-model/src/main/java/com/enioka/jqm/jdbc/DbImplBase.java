@@ -194,17 +194,16 @@ class DbImplBase
         queries.put("ji_select_count_by_jd", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE JOBDEF=?");
         queries.put("ji_select_count_by_node", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE NODE=?");
         queries.put("ji_select_count_by_queue", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE QUEUE=?");
-        queries.put("ji_select_all",
-                "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
-                        + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, ji.INSTRUCTION, ji.DATE_NOT_BEFORE, "
-                        + "q.ID AS Q_ID, q.DEFAULT_QUEUE, q.DESCRIPTION AS Q_DESCRIPTION, q.NAME AS Q_NAME, "
-                        + "jd.ID AS JD_ID, jd.APPLICATION AS JD_APPLICATION, jd.JD_KEY, jd.CL, "
-                        + "jd.DESCRIPTION AS JD_DESCRITPION, jd.ENABLED AS JD_ENABLED, jd.EXTERNAL, jd.HIGHLANDER AS JD_HIGHLANDER, "
-                        + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1 AS JD_KW1, jd.KEYWORD2 AS JD_KW2, jd.KEYWORD3 AS JD_KW3, jd.ALERT_AFTER_SECONDS, "
-                        + "jd.MODULE AS JD_MODULE, jd.PATH_TYPE, jd.QUEUE AS JD_QUEUE, jd.PRIORITY AS JD_PRIORITY,"
-                        + "n.ID AS N_ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED AS N_ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
-                        + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE, ji.TRACE_ID "
-                        + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ");
+        queries.put("ji_select_all", "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
+                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, ji.INSTRUCTION, ji.DATE_NOT_BEFORE, "
+                + "q.ID AS Q_ID, q.DEFAULT_QUEUE, q.DESCRIPTION AS Q_DESCRIPTION, q.NAME AS Q_NAME, "
+                + "jd.ID AS JD_ID, jd.APPLICATION AS JD_APPLICATION, jd.JD_KEY, jd.CL, "
+                + "jd.DESCRIPTION AS JD_DESCRITPION, jd.ENABLED AS JD_ENABLED, jd.EXTERNAL, jd.HIGHLANDER AS JD_HIGHLANDER, "
+                + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1 AS JD_KW1, jd.KEYWORD2 AS JD_KW2, jd.KEYWORD3 AS JD_KW3, jd.ALERT_AFTER_SECONDS, "
+                + "jd.MODULE AS JD_MODULE, jd.PATH_TYPE, jd.QUEUE AS JD_QUEUE, jd.PRIORITY AS JD_PRIORITY,"
+                + "n.ID AS N_ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED AS N_ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
+                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE, ji.TRACE_ID "
+                + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ");
         queries.put("ji_select_by_id", queries.get("ji_select_all") + " WHERE ji.ID=?");
         queries.put("ji_select_by_queue", queries.get("ji_select_all") + " WHERE ji.QUEUE=? ORDER BY INTERNAL_POSITION");
         queries.put("ji_select_by_node", queries.get("ji_select_all") + " WHERE ji.NODE=?");
