@@ -360,7 +360,7 @@
             </column>
             <column name="SESSION_KEY" type="VARCHAR(255)">
                 <constraints nullable="true" />
-                        </column>
+            </column>
             <column name="USERNAME" type="VARCHAR(255)">
                 <constraints nullable="true" />
             </column>
