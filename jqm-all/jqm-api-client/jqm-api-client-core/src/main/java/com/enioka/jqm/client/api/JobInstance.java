@@ -113,12 +113,8 @@ public class JobInstance
     }
 
     /**
-     * The Skywalking context that was given at enqueue time. Optional.
+     * The trace ID that was given at enqueue time. Optional.
      */
-    public String getTraceId()
-    {
-        return traceId;
-    }
 
     public void setTraceId(String traceId)
     {

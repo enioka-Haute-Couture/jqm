@@ -377,12 +377,6 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public String traceId()
-    {
-        return this.ji.getTraceId();
-    }
-
-    @Override
     public String application()
     {
         return this.ji.getJD().getApplication();

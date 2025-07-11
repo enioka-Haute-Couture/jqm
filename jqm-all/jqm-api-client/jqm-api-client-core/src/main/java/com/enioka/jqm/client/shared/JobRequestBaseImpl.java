@@ -186,7 +186,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * <strong>Optional</strong><br>
-     * It is possible to monitor a job instance with Skywalking, We can give context to add information to the trace.<br>
+     * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
      * Default is null.
      */
     public String getTraceId()
@@ -196,7 +196,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * <strong>Optional</strong><br>
-     * It is possible to monitor a job instance with Skywalking, We can give context to add information to the trace.<br>
+     * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
      * Default is null.
      *
      * @param traceId
