@@ -126,7 +126,7 @@ jqm_start() {
     # We can go on...
     if [ "$1" = "console" ]
     then
-        $JAVA "$OOM" -javaagent:$HOME/java-test/apache-skywalking-java-agent-9.4.0/skywalking-agent/skywalking-agent.jar  -jar $JQM_JAR Start-Node -n $JQM_NODE
+        $JAVA "$OOM" -jar $JQM_JAR Start-Node -n $JQM_NODE
     else
         remove_npipes
         mkfifo $STDOUT_NPIPE
@@ -135,7 +135,7 @@ jqm_start() {
         log_rotate <$STDERR_NPIPE $JQM_LOG_ERR_FILE &
         exec 1> $STDOUT_NPIPE
         exec 2> $STDERR_NPIPE
-        nohup $JAVA "$OOM" -javaagent:$HOME/java-test/apache-skywalking-java-agent-9.4.0/skywalking-agent/skywalking-agent.jar -jar $JQM_JAR Start-Node -n $JQM_NODE &
+        nohup $JAVA "$OOM" -jar $JQM_JAR Start-Node -n $JQM_NODE &
         JQM_PID=$!
         echo $JQM_PID > ${JQM_PID_FILE}
         echo "JQM Started with pid ${JQM_PID}"
@@ -208,7 +208,6 @@ jqm_createnode() {
 }
 
 jqm_enqueue() {
-    -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
     $JAVA -jar $JQM_JAR New-Ji -a $1
 }
 

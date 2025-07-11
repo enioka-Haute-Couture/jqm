@@ -13,17 +13,6 @@ export default defineConfig({
                 changeOrigin: true,
                 ws: true,
             },
-            "/api/perfData": {
-                target: "http://127.0.0.1:12800",
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api\/perfData/, "/browser/perfData"),
-            },
-
-            "/api/sw": {
-                target: "http://127.0.0.1:12800",
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api\/sw/, ""),
-            },
         },
     },
     build: {

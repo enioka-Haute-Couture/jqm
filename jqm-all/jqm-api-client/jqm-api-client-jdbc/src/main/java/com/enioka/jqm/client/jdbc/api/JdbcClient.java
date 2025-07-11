@@ -1377,6 +1377,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         res.setPriority(rs.getInt(32) > 0 ? rs.getInt(32) : null);
 
         res.setRunAfter(cnx.getCal(rs, 33));
+
         return res;
     }
 

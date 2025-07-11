@@ -49,7 +49,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -100,7 +99,7 @@ public class ServiceClient
     @Path("ji")
     @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public JobInstance enqueueObject(JobRequestBaseImpl jd, @HeaderParam("sw8") String ContextHeader)
+    public JobInstance enqueueObject(JobRequestBaseImpl jd)
     {
         JobRequest target = Helpers.getClient().newJobRequest(jd.getApplicationName(), jd.getUser());
 
@@ -118,7 +117,6 @@ public class ServiceClient
         target.setRunAfter(jd.getRunAfter());
         target.setScheduleId(jd.getScheduleId());
         target.setSessionID(jd.getSessionID());
-        target.setTraceId(ContextHeader);
         if (jd.getStartState() == State.HOLDED)
         {
             target.startHeld();
@@ -134,7 +132,6 @@ public class ServiceClient
         ji.setParameters(jd.getParameters());
         ji.setParent(jd.getParentID());
         ji.setSessionID(jd.getSessionID());
-        ji.setTraceId(ContextHeader);
         ji.setState(State.SUBMITTED);
         ji.setUser(jd.getUser());
         ji.setPosition(Long.MAX_VALUE);
@@ -154,7 +151,6 @@ public class ServiceClient
     @POST
     public Long enqueueFromHistory(@PathParam("id") long jobIdToCopy)
     {
-
         return Helpers.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
