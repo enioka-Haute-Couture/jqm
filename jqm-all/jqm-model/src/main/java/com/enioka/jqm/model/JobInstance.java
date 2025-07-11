@@ -82,9 +82,9 @@ public class JobInstance implements Serializable
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
      *
      * @param key
-     *            name of the parameter to add
+     *                  name of the parameter to add
      * @param value
-     *            value of the parameter to create
+     *                  value of the parameter to create
      * @return the newly created parameter
      */
     public RuntimeParameter addParameter(String key, String value)

@@ -112,11 +112,10 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public long enqueueSync(String applicationName, String user, String mail, String sessionId, String application,
-            String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+    public long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
+                            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        long i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3,
-                parameters);
+        long i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
         waitChild(i);
         return i;
     }

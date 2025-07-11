@@ -83,8 +83,8 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
-     * itself.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * job itself.
      *
      * @param key
      *            max length is 50
@@ -124,8 +124,8 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
-     * itself. If there is no parameter named key, no error is thrown.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+     * job itself. If there is no parameter named key, no error is thrown.
      *
      * @param key
      */
