@@ -1364,21 +1364,19 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         res.setProgress(rs.getInt(21));
         res.setQueueName(rs.getString(22));
         res.setSessionID(rs.getString(24));
-        res.setTraceId(rs.getString(25));
-        res.setState(com.enioka.jqm.client.api.State.valueOf(rs.getString(26)));
-        res.setUser(rs.getString(27));
+        res.setState(com.enioka.jqm.client.api.State.valueOf(rs.getString(25)));
+        res.setUser(rs.getString(26));
 
         com.enioka.jqm.client.api.Queue q = new com.enioka.jqm.client.api.Queue();
-        q.setId(rs.getLong(30));
+        q.setId(rs.getLong(29));
         q.setName(rs.getString(22));
         res.setQueue(q);
 
-        res.setPosition(rs.getLong(31));
-        res.setFromSchedule(rs.getBoolean(32));
-        res.setPriority(rs.getInt(33) > 0 ? rs.getInt(33) : null);
+        res.setPosition(rs.getLong(30));
+        res.setFromSchedule(rs.getBoolean(31));
+        res.setPriority(rs.getInt(32) > 0 ? rs.getInt(32) : null);
 
-        res.setRunAfter(cnx.getCal(rs, 34));
-
+        res.setRunAfter(cnx.getCal(rs, 33));
         return res;
     }
 
