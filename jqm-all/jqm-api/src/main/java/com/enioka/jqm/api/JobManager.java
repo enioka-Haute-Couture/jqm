@@ -77,13 +77,6 @@ public interface JobManager
     /**
      * Optional arbitrary user classification
      *
-     * @return the sessionID that was given at enqueue time, null if none.
-     */
-    String traceId();
-
-    /**
-     * Optional arbitrary user classification
-     *
      * @return the application name that was given at enqueue time, null if none.
      */
     String application();

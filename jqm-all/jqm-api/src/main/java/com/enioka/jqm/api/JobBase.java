@@ -98,11 +98,6 @@ public class JobBase
         return jm.sessionID();
     }
 
-    public String getTraceId()
-    {
-        return jm.traceId();
-    }
-
     public String getApplication()
     {
         return jm.application();

@@ -90,8 +90,7 @@ public interface JobRequest extends Serializable
 
     /**
      * <strong>Optional</strong><br>
-     * It is possible to monitor a job instance threw Swkywalking API, If the plugin is active we propage the context of the trace thanks to
-     * this field.<br>
+     * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
      * Default is null.
      *
      * @param TraceId

@@ -187,14 +187,6 @@ public class JobInstance implements Serializable
     }
 
     /**
-     * See {@link #getTraceId()}
-     */
-    public void setTraceId(final String traceId)
-    {
-        this.traceId = traceId;
-    }
-
-    /**
      * The {@link Queue} on which is the {@link JobInstance} should wait. Cannot be changed once the status is ATTRIBUTED (i.e. wait is
      * over).
      */
