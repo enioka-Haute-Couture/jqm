@@ -243,4 +243,22 @@ public class BasicTest
             Assert.assertEquals(1, res.size());
         }
     }
+
+    @Test
+    public void testTraceId()
+    {
+    try (DbConn cnx = db.getConn())
+        {
+            long qId = Queue.create(cnx, "q1", "q1 description", true);
+            long jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
+                    false, null, PathType.FS);
+
+            JobInstance.enqueue(cnx,com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, "myTraceId", null, null, false, false, null, 1, Instruction.RUN, new HashMap<>());
+            JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null, null, null, false, false, null, 1, Instruction.RUN, new HashMap<>());
+            List<JobInstance> jobs = JobInstance.select(cnx, "ji_select_all");
+
+            Assert.assertEquals(jobs.get(0).getTraceId(), "myTraceId");
+            Assert.assertEquals(jobs.get(1).getTraceId(), null);
+        }
+    }
 }
