@@ -381,9 +381,6 @@
                 <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
                     foreignKeyName="FK_JOB_INSTANCE_3" />
             </column>
-            <column name="TRACE_ID" type="VARCHAR(255)">
-                <constraints nullable="true" />
-            </column>
         </createTable>
         <createIndex tableName="JOB_INSTANCE" indexName="IDX_FK_JOB_INSTANCE_1">
             <column name="JOBDEF"></column>
