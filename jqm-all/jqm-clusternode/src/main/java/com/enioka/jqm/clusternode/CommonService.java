@@ -21,10 +21,11 @@ final class CommonService
                 return;
             }
             RollingFileAppender r = (RollingFileAppender) a;
+            r.stop();
             r.setFile("./logs/jqm-" + name + ".log");
             r.start();
         }
-        catch (Error e)
+        catch (Exception e)
         {
             jqmlogger.warn("Log file could not be set", e);
         }

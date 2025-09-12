@@ -200,7 +200,7 @@ public class ServiceSimple
             latest = 10000;
         }
 
-        File f = new File(FilenameUtils.concat("./logs/", "jqm-" + n.getId() + ".log"));
+        File f = new File(FilenameUtils.concat("./logs/", "jqm-" + n.getName() + ".log"));
         try (ReversedLinesFileReader r = new ReversedLinesFileReader(f, Charset.defaultCharset()))
         {
             StringBuilder sb = new StringBuilder(latest);
