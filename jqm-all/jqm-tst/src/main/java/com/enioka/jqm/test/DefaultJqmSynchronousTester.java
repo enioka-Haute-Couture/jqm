@@ -133,7 +133,7 @@ public class DefaultJqmSynchronousTester implements JqmSynchronousTester
                 false, null, PathType.MEMORY);
 
         ji = com.enioka.jqm.model.JobInstance.enqueue(cnx, State.SUBMITTED, q, jd, null, null, null, null, null, null, null, null, null,
-                false, false, null, 0, Instruction.RUN, null);
+                null, false, false, null, 0, Instruction.RUN, null);
         cnx.runUpdate("ji_update_status_by_id", node.getId(), ji);
 
         cnx.commit();

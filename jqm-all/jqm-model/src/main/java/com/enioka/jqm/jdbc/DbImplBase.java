@@ -169,8 +169,8 @@ class DbImplBase
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO __T__JOB_INSTANCE (ID, DATE_ENQUEUE, EMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION_KEY, "
-                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE, DATE_NOT_BEFORE, PRIORITY, INSTRUCTION) "
-                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE, DATE_NOT_BEFORE, PRIORITY, INSTRUCTION, TRACE_ID) "
+                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM __T__JOB_INSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM __T__JOB_INSTANCE WHERE ID = ?");
         queries.put("ji_delete_waiting_in_queue_id", "DELETE FROM __T__JOB_INSTANCE WHERE QUEUE = ? AND STATUS IN ('HOLDED', 'SUBMITTED', 'SCHEDULED')");
@@ -202,7 +202,7 @@ class DbImplBase
                 + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1 AS JD_KW1, jd.KEYWORD2 AS JD_KW2, jd.KEYWORD3 AS JD_KW3, jd.ALERT_AFTER_SECONDS, "
                 + "jd.MODULE AS JD_MODULE, jd.PATH_TYPE, jd.QUEUE AS JD_QUEUE, jd.PRIORITY AS JD_PRIORITY,"
                 + "n.ID AS N_ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED AS N_ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
-                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE "
+                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE, ji.TRACE_ID "
                 + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ");
         queries.put("ji_select_by_id", queries.get("ji_select_all") + " WHERE ji.ID=?");
         queries.put("ji_select_by_queue", queries.get("ji_select_all") + " WHERE ji.QUEUE=? ORDER BY INTERNAL_POSITION");
