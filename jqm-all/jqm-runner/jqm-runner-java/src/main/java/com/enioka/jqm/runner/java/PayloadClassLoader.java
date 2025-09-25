@@ -278,56 +278,59 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
-        // Check if class was already loaded
-        var c = findLoadedClass(name);
-        if (c != null)
+        synchronized (getClassLoadingLock(name))
         {
-            return c;
-        }
-
-        if (childFirstClassLoader)
-        {
-            // Look here first if requested (not the default)
-            try
-            {
-                c = findClass(name);
-            }
-            catch (ClassNotFoundException e)
-            {
-                // Do nothing
-            }
+            // Check if class was already loaded
+            var c = findLoadedClass(name);
             if (c != null)
             {
                 return c;
             }
-        }
 
-        // Default behavior: ask parent
-        c = loadFromParentCL(name);
-        if (c != null)
-        {
-            return c;
-        }
+            if (childFirstClassLoader)
+            {
+                // Look here first if requested (not the default)
+                try
+                {
+                    c = findClass(name);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // Do nothing
+                }
+                if (c != null)
+                {
+                    return c;
+                }
+            }
 
-        if (!childFirstClassLoader)
-        {
-            // Default behaviour : if not found in parent, look here.
-            try
-            {
-                c = findClass(name);
-            }
-            catch (ClassNotFoundException e)
-            {
-                // Do nothing
-            }
+            // Default behavior: ask parent
+            c = loadFromParentCL(name);
             if (c != null)
             {
                 return c;
             }
-        }
 
-        // If here, we have lost
-        throw new ClassNotFoundException(name);
+            if (!childFirstClassLoader)
+            {
+                // Default behaviour : if not found in parent, look here.
+                try
+                {
+                    c = findClass(name);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // Do nothing
+                }
+                if (c != null)
+                {
+                    return c;
+                }
+            }
+
+            // If here, we have lost
+            throw new ClassNotFoundException(name);
+        }
     }
 
     public boolean isChildFirstClassLoader()
