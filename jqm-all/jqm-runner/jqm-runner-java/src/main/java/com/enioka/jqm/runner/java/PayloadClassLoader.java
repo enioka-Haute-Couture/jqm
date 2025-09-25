@@ -94,47 +94,52 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
     public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h,
             ModuleLayer parentModuleLayer) throws JobRunnerException
     {
-        // 1 - Create the proxy.
         Object proxy = null;
         Class injInt;
-        try
-        {
-            injInt = this.loadClass("com.enioka.jqm.api.JobManager");
-            proxy = Proxy.newProxyInstance(this, new Class[] { injInt }, h);
-        }
-        catch (Exception e)
-        {
-            throw new JobRunnerException("could not create proxy API object", e);
-        }
-
-        // 2 - Meta data used by runners
-        Map<String, String> metaprms = new HashMap<>();
-        metaprms.put("mayBeShared", "" + this.mayBeShared);
-
-        // 3 - Load the target class inside the context class loader
-        String classQualifiedName = job.getJD().getJavaClassName();
-        jqmlogger.debug("Will now load class: " + classQualifiedName);
-
         Class c = null;
-        try
+        Map<String, String> metaprms = null;
+
+        synchronized (this) // Prevent LinkageError when multiple instances using the same CL are run concurrently
         {
-            String[] classModuleSegments = classQualifiedName.split("/");
-            if (classModuleSegments.length > 1)
+            // 1 - Create the proxy.
+            try
             {
-                ModuleLayer ml = ModuleManager.createModuleLayerIfNeeded(this, parentModuleLayer, job);
-                c = ml.findLoader(classModuleSegments[0]).loadClass(classModuleSegments[1]);
+                injInt = this.loadClass("com.enioka.jqm.api.JobManager");
+                proxy = Proxy.newProxyInstance(this, new Class[] { injInt }, h);
             }
-            else
+            catch (Exception e)
             {
-                // using payload CL, i.e. this very object
-                c = loadClass(classQualifiedName);
+                throw new JobRunnerException("could not create proxy API object", e);
             }
+
+            // 2 - Meta data used by runners
+            metaprms = new HashMap<>();
+            metaprms.put("mayBeShared", "" + this.mayBeShared);
+
+            // 3 - Load the target class inside the context class loader
+            String classQualifiedName = job.getJD().getJavaClassName();
+            jqmlogger.debug("Will now load class: " + classQualifiedName);
+
+            try
+            {
+                String[] classModuleSegments = classQualifiedName.split("/");
+                if (classModuleSegments.length > 1)
+                {
+                    ModuleLayer ml = ModuleManager.createModuleLayerIfNeeded(this, parentModuleLayer, job);
+                    c = ml.findLoader(classModuleSegments[0]).loadClass(classModuleSegments[1]);
+                }
+                else
+                {
+                    // using payload CL, i.e. this very object
+                    c = loadClass(classQualifiedName);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new JobRunnerException("could not load class " + classQualifiedName, e);
+            }
+            jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
         }
-        catch (Exception e)
-        {
-            throw new JobRunnerException("could not load class " + classQualifiedName, e);
-        }
-        jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
 
         // 4 - Determine which job runner should take the job and launch!
         List<JavaJobRunner> allAvailableRunners = clm.getAllJavaJobRunners();
@@ -168,7 +173,10 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         {
             boolean canRun = false;
 
-            canRun = runner.canRun(c);
+            synchronized (this) // Prevent LinkageError when multiple instances using the same CL are run concurrently
+            {
+                canRun = runner.canRun(c);
+            }
 
             if (canRun)
             {
