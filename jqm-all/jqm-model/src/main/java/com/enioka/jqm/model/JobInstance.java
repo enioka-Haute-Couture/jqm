@@ -81,9 +81,9 @@ public class JobInstance implements Serializable
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
      *
      * @param key
-     *                  name of the parameter to add
+     *            name of the parameter to add
      * @param value
-     *                  value of the parameter to create
+     *            value of the parameter to create
      * @return the newly created parameter
      */
     public RuntimeParameter addParameter(String key, String value)
@@ -484,6 +484,43 @@ public class JobInstance implements Serializable
         return envVarCache == null ? new HashMap<>() : envVarCache;
     }
 
+    private static JobInstance mapJobInstance(ResultSet rs, DbConn cnx) throws SQLException
+    {
+        JobInstance tmp = new JobInstance();
+
+        tmp.id = rs.getLong(1);
+
+        tmp.attributionDate = cnx.getCal(rs, 2);
+        tmp.creationDate = cnx.getCal(rs, 3);
+        tmp.email = rs.getString(4);
+        tmp.executionDate = cnx.getCal(rs, 5);
+        tmp.instanceApplication = rs.getString(6);
+        tmp.instanceKeyword1 = rs.getString(7);
+        tmp.instanceKeyword2 = rs.getString(8);
+        tmp.instanceKeyword3 = rs.getString(9);
+        tmp.instanceModule = rs.getString(10);
+        tmp.internalPosition = rs.getDouble(11);
+        tmp.parentId = rs.getLong(12);
+        tmp.progress = rs.getInt(13);
+        tmp.sessionID = rs.getString(14);
+        tmp.state = State.valueOf(rs.getString(15));
+        tmp.userName = rs.getString(16);
+        tmp.jd_id = rs.getLong(17);
+        tmp.node_id = rs.getLong(18);
+        tmp.queue_id = rs.getLong(19);
+        tmp.highlander = rs.getBoolean(20);
+        tmp.fromSchedule = rs.getBoolean(21);
+        tmp.priority = rs.getInt(22);
+        tmp.instruction = Instruction.valueOf(rs.getString(23));
+        tmp.notBefore = cnx.getCal(rs, 24);
+
+        tmp.q = Queue.map(rs, 24);
+        tmp.jd = JobDef.map(rs, 28);
+        tmp.n = Node.map(cnx, rs, 47);
+
+        return tmp;
+    }
+
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobInstance> res = new ArrayList<>();
@@ -491,45 +528,32 @@ public class JobInstance implements Serializable
         {
             while (rs.next())
             {
-                JobInstance tmp = new JobInstance();
-
-                tmp.id = rs.getLong(1);
-
-                tmp.attributionDate = cnx.getCal(rs, 2);
-                tmp.creationDate = cnx.getCal(rs, 3);
-                tmp.email = rs.getString(4);
-                tmp.executionDate = cnx.getCal(rs, 5);
-                tmp.instanceApplication = rs.getString(6);
-                tmp.instanceKeyword1 = rs.getString(7);
-                tmp.instanceKeyword2 = rs.getString(8);
-                tmp.instanceKeyword3 = rs.getString(9);
-                tmp.instanceModule = rs.getString(10);
-                tmp.internalPosition = rs.getDouble(11);
-                tmp.parentId = rs.getLong(12);
-                tmp.progress = rs.getInt(13);
-                tmp.sessionID = rs.getString(14);
-                tmp.state = State.valueOf(rs.getString(15));
-                tmp.userName = rs.getString(16);
-                tmp.jd_id = rs.getLong(17);
-                tmp.node_id = rs.getLong(18);
-                tmp.queue_id = rs.getLong(19);
-                tmp.highlander = rs.getBoolean(20);
-                tmp.fromSchedule = rs.getBoolean(21);
-                tmp.priority = rs.getInt(22);
-                tmp.instruction = Instruction.valueOf(rs.getString(23));
-                tmp.notBefore = cnx.getCal(rs, 24);
-
-                tmp.q = Queue.map(rs, 24);
-                tmp.jd = JobDef.map(rs, 28);
-                tmp.n = Node.map(cnx, rs, 47);
-
-                res.add(tmp);
+                res.add(mapJobInstance(rs, cnx));
             }
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
         }
+        return res;
+    }
+
+    public static List<JobInstance> getJobInstances(ResultSet rs, DbConn cnx)
+    {
+        List<JobInstance> res = new ArrayList<>();
+
+        try
+        {
+            while (rs.next())
+            {
+                res.add(mapJobInstance(rs, cnx));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+
         return res;
     }
 
@@ -558,8 +582,8 @@ public class JobInstance implements Serializable
     }
 
     public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
-                               String keyword1, String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander,
-                               boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
+            String keyword1, String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander,
+            boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
                 status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction);
