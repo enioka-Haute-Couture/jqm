@@ -19,8 +19,11 @@
 package com.enioka.jqm.engine;
 
 import java.lang.management.ManagementFactory;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -524,23 +527,60 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      */
     private void purgeDeadJobInstances(DbConn cnx, Node node)
     {
-        for (JobInstance ji : JobInstance.select(cnx, "ji_select_by_node", node.getId()))
-        {
-            try
-            {
-                cnx.runSelectSingle("history_select_state_by_id", String.class, ji.getId());
-            }
-            catch (NoResultException e)
-            {
-                History.create(cnx, ji, State.CRASHED, Calendar.getInstance());
-                Message.create(cnx,
-                        "Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash",
-                        ji.getId());
-            }
+        int batchSize = 10000;
+        List<JobInstance> jobInstances;
+        int totalPurged = 0;
 
-            cnx.runUpdate("ji_delete_by_id", ji.getId());
-        }
-        cnx.commit();
+        jqmlogger.info("Purging dead job instances for node {}", node.getName());
+
+        do
+        {
+            List<Object> params = new ArrayList<>();
+            params.add((int) node.getId());
+
+            String paginatedSql = cnx.paginateQueryByKey("ji_select_by_node", 0, batchSize, params);
+
+            try (ResultSet rs = cnx.runRawSelect(paginatedSql, params.toArray()))
+            {
+                jobInstances = JobInstance.getJobInstances(rs, cnx);
+
+                for (JobInstance ji : jobInstances)
+                {
+                    try
+                    {
+                        cnx.runSelectSingle("history_select_state_by_id", String.class, ji.getId());
+                    }
+                    catch (NoResultException e)
+                    {
+                        try
+                        {
+                            History.create(cnx, ji, State.CRASHED, Calendar.getInstance());
+                            Message.create(cnx,
+                                    "Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash",
+                                    ji.getId());
+                        }
+                        catch (Exception ex)
+                        {
+                            jqmlogger.error("Failed to create history for job instance {}", ji.getId(), ex);
+                        }
+                    }
+
+                    cnx.runUpdate("ji_delete_by_id", ji.getId());
+                }
+
+                cnx.commit();
+                totalPurged += jobInstances.size();
+
+                jqmlogger.info("Purged {} job instances for node {} (total: {})", jobInstances.size(), node.getName(), totalPurged);
+            }
+            catch (SQLException e)
+            {
+                jqmlogger.error("Error while purging dead job instances for node " + node.getName(), e);
+                break;
+            }
+        } while (!jobInstances.isEmpty());
+
+        jqmlogger.info("Completed purging {} total job instances for node {}", totalPurged, node.getName());
     }
 
     /**
