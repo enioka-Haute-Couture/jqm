@@ -136,8 +136,17 @@ export const useJobInstanceAPI = () => {
                 sortby: sortBy,
             };
 
+            const queryDate = new Date().getTime();
             return APIService.post(`${API_URL}/query/`, request)
                 .then((response) => {
+                    if (newQueryLiveInstances) {
+                        // For live instances end date is not set, so set it to the query date to compute duration
+                        response["instances"]?.forEach((instance: any) => {
+                            if (instance.beganRunningDate) {
+                                instance.endDate = queryDate;
+                            }
+                        });
+                    }
                     setJobInstances(response["instances"]);
                     setCount(response["resultSize"]);
                 })

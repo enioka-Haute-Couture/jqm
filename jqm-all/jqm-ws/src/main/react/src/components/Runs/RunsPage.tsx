@@ -291,7 +291,7 @@ const RunsPage: React.FC = () => {
                 filter: false,
                 sort: true,
                 customBodyRender: (value: any) => {
-                    if (value) {
+                    if (!queryLiveInstances && value) {
                         return new Date(value).toLocaleString();
                     }
                 },
@@ -307,16 +307,16 @@ const RunsPage: React.FC = () => {
                     const beganRunningDate = tableMeta.rowData[5];
                     let duration: number;
 
-                    if (queryLiveInstances) {
-                        if (!beganRunningDate) {
-                            return "";
-                        }
-                        duration = new Date().getTime() - new Date(beganRunningDate).getTime();
+                    if (queryLiveInstances && !beganRunningDate) {
+                        return "";
                     } else {
                         const endDate = tableMeta.rowData[6];
                         duration = new Date(endDate).getTime() - new Date(beganRunningDate).getTime();
                     }
                     duration = duration / 1000;
+                    if (duration < 0) {
+                        duration = 0;
+                    }
 
                     const durationByUnit = Object.entries({
                         d: Math.floor(duration / 60 / 60 / 24),
