@@ -63,7 +63,10 @@ export const useJobInstanceAPI = () => {
 
             setFilterList(newFilterList);
 
-            if (newFilterList[0]?.length > 0) {
+            if (
+                newFilterList[0]?.length > 0 &&
+                !isNaN(parseInt(newFilterList[0][0]))
+            ) {
                 filterQuery.jobInstanceId = newFilterList[0][0];
             }
             if (newFilterList[1]?.length > 0) {
@@ -84,7 +87,10 @@ export const useJobInstanceAPI = () => {
             if (newFilterList[8]?.length > 0) {
                 filterQuery.user = newFilterList[8][0];
             }
-            if (newFilterList[9]?.length > 0) {
+            if (
+                newFilterList[9]?.length > 0 &&
+                !isNaN(parseInt(newFilterList[9][0]))
+            ) {
                 filterQuery.parentId = newFilterList[9][0];
             }
             if (newFilterList[11]?.length > 0) {
