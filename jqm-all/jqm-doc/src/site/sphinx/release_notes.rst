@@ -1,6 +1,32 @@
 Release notes
 ######################
 
+3.1.1
+*************
+
+Maintenance release, fixing two important bugs and adding a few UI improvements.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Engine : made the loadClass method thread-safe again, fixing crashes of threads trying to do a concurrent load of the same class
+* Engine : fixed OOM in internal poller when too many job instance awaiting for PostgreSQL
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* GUI : in runs page prevent error when trying to filter ids with non-numeric values
+* GUI : in runs page display dates in local timezone
+* GUI : in runs page fix duration display for live jobs
+* GUI : in runs page do not show logs related buttons when they are not done at job level
+
 3.1.0
 *************
 
