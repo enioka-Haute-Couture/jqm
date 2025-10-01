@@ -6,6 +6,7 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import useQueueAPI from "../Queues/QueueAPI";
 import { useRunsPagination } from "../../utils/RunsPaginationProvider";
+import useParametersApi from "../ClusterwideParameters/ParametersApi";
 
 const API_URL = "/client/ji";
 
@@ -42,6 +43,8 @@ export const useJobInstanceAPI = () => {
     const [count, setCount] = useState<number>(0);
 
     const { queues, fetchQueues } = useQueueAPI();
+
+    const { parameters, fetchParameters } = useParametersApi();
 
     const fetchJobInstances = useCallback(
         async (
@@ -411,6 +414,8 @@ export const useJobInstanceAPI = () => {
         fetchLogsStderr,
         fetchFiles,
         fetchFileContent,
+        parameters,
+        fetchParameters,
     };
 };
 
