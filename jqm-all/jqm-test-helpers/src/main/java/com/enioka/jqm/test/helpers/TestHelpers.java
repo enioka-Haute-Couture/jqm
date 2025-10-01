@@ -270,8 +270,8 @@ public class TestHelpers
         return getOkCount(cnx) == theoreticalOkCount;
     }
 
-    public static int getDefaultQueueId(DbConn cnx)
+    public static long getDefaultQueueId(DbConn cnx)
     {
-        return cnx.runSelectSingle("q_select_default", Integer.class);
+        return cnx.runSelectSingle("q_select_default", Long.class);
     }
 }
