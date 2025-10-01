@@ -266,7 +266,7 @@ const RunsPage: React.FC = () => {
                 },
                 customBodyRender: (value: any) => {
                     if (value) {
-                        return new Date(value).toUTCString();
+                        return new Date(value).toLocaleString();
                     }
                 },
             },
@@ -279,7 +279,7 @@ const RunsPage: React.FC = () => {
                 sort: true,
                 customBodyRender: (value: any) => {
                     if (value) {
-                        return new Date(value).toUTCString();
+                        return new Date(value).toLocaleString();
                     }
                 },
             },
@@ -292,7 +292,7 @@ const RunsPage: React.FC = () => {
                 sort: true,
                 customBodyRender: (value: any) => {
                     if (value) {
-                        return new Date(value).toUTCString();
+                        return new Date(value).toLocaleString();
                     }
                 },
             },
