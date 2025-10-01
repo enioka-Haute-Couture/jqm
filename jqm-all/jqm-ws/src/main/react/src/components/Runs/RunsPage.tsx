@@ -60,12 +60,22 @@ const RunsPage: React.FC = () => {
         fetchLogsStdout,
         fetchLogsStderr,
         fetchFiles,
-        fetchFileContent
+        fetchFileContent,
+        parameters,
+        fetchParameters,
     } = useJobInstanceAPI();
 
     const { jobDefinitions, fetchJobDefinitions } = useJobDefinitionsAPI();
 
     const { canUserAccess } = useAuth();
+
+    const canSeeIndividualLogs = () => {
+        const logFilePerLaunch = parameters?.find(p => p.key === 'logFilePerLaunch')?.value;
+        if (logFilePerLaunch !== undefined && logFilePerLaunch === "false") {
+            return false;
+        }
+        return true; // true or both
+    }
 
     const refresh = () => {
         if (canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
@@ -78,6 +88,7 @@ const RunsPage: React.FC = () => {
                 filterList!
             );
             fetchQueues();
+            fetchParameters();
         }
     }
 
@@ -483,40 +494,42 @@ const RunsPage: React.FC = () => {
                                 <DescriptionIcon />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip
-                            key={"Log stdout"}
-                            title={"Log stdout"}
-                        >
-                            <IconButton
-                                color="default"
-                                aria-label={"Log stdout"}
-                                onClick={() => {
-                                    setShowDetailsJobInstanceId(
-                                        jobInstanceId
-                                    );
-                                    setLogType("STDOUT");
-                                }}
-                                size="small">
-                                <TerminalIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                            key={"Log stderr"}
-                            title={"Log stderr"}
-                        >
-                            <IconButton
-                                color="default"
-                                aria-label={"Log stderr"}
-                                onClick={() => {
-                                    setShowDetailsJobInstanceId(
-                                        jobInstanceId
-                                    );
-                                    setLogType("STDERR");
-                                }}
-                                size="small">
-                                <WarningIcon />
-                            </IconButton>
-                        </Tooltip>
+                        {canSeeIndividualLogs() && <>
+                            <Tooltip
+                                key={"Log stdout"}
+                                title={"Log stdout"}
+                            >
+                                <IconButton
+                                    color="default"
+                                    aria-label={"Log stdout"}
+                                    onClick={() => {
+                                        setShowDetailsJobInstanceId(
+                                            jobInstanceId
+                                        );
+                                        setLogType("STDOUT");
+                                    }}
+                                    size="small">
+                                    <TerminalIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip
+                                key={"Log stderr"}
+                                title={"Log stderr"}
+                            >
+                                <IconButton
+                                    color="default"
+                                    aria-label={"Log stderr"}
+                                    onClick={() => {
+                                        setShowDetailsJobInstanceId(
+                                            jobInstanceId
+                                        );
+                                        setLogType("STDERR");
+                                    }}
+                                    size="small">
+                                    <WarningIcon />
+                                </IconButton>
+                            </Tooltip></>
+                        }
                     </>;
                 },
             },
@@ -623,7 +636,7 @@ const RunsPage: React.FC = () => {
         return <AccessForbiddenPage />
     }
 
-    return jobInstances && queues ? (
+    return jobInstances && queues && parameters ? (
         <Container maxWidth={false}>
             <MUIDataTable
                 title={"Runs"}
@@ -649,6 +662,7 @@ const RunsPage: React.FC = () => {
                     fetchFileContent={fetchFileContent}
                     displayedLogType={displayedLogType}
                     relaunchJob={relaunchJob}
+                    canSeeIndividualLogs={canSeeIndividualLogs()}
                 />
             )
             }

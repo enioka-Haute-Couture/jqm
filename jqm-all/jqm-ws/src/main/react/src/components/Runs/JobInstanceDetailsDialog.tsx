@@ -44,7 +44,8 @@ export const JobInstanceDetailsDialog: React.FC<{
     fetchFileContent: (fileId: number) => Promise<string>;
     displayedLogType: LOG_TYPE;
     relaunchJob: (jobId: number) => void;
-}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType, relaunchJob }) => {
+    canSeeIndividualLogs: boolean;
+}> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType, relaunchJob, canSeeIndividualLogs }) => {
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
@@ -192,7 +193,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            {canUserAccess(PermissionObjectType.logs, PermissionAction.read) &&
+                            {canSeeIndividualLogs && canUserAccess(PermissionObjectType.logs, PermissionAction.read) &&
                                 (<>
                                     <Divider
                                         variant="middle"
