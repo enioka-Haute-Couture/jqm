@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.enioka.jqm</groupId>
         <artifactId>jqm-dbadapter</artifactId>
-        <version>3.1.1-SNAPSHOT</version>
+        <version>3.1.1</version>
     </parent>
     <artifactId>jqm-dbadapter-db2</artifactId>
     <packaging>jar</packaging>

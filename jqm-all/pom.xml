@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.enioka.jqm</groupId>
     <artifactId>jqm-all</artifactId>
-    <version>3.1.1-SNAPSHOT</version>
+    <version>3.1.1</version>
     <packaging>pom</packaging>
 
     <name>jqm-all</name>
@@ -160,7 +160,7 @@
         <developerConnection>scm:git:ssh://git@github.com:enioka-Haute-Couture/jqm.git</developerConnection>
         <connection>scm:git:https://github.com/enioka-Haute-Couture/jqm.git</connection>
         <url>https://github.com/enioka-Haute-Couture/jqm/</url>
-        <tag>HEAD</tag>
+        <tag>jqm-all-3.1.1</tag>
     </scm>
 
     <profiles>
