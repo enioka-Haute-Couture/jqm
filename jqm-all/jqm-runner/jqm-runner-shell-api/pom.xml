@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.enioka.jqm</groupId>
         <artifactId>jqm-runner</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>jqm-runner-shell-api</artifactId>
 

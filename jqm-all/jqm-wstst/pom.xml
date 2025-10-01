@@ -6,7 +6,7 @@
     <parent>
         <artifactId>jqm-all</artifactId>
         <groupId>com.enioka.jqm</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>jqm-wstst</artifactId>

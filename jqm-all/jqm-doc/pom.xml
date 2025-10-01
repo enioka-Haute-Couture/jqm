@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-all</artifactId>
-		<version>3.1.1</version>
+		<version>3.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>jqm-doc</artifactId>
 	<packaging>pom</packaging>
