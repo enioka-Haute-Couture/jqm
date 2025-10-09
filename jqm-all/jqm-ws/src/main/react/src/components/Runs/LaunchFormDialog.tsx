@@ -47,6 +47,7 @@ export const LaunchFormDialog: React.FC<{
     jobDefinitions: JobDefinition[];
 }> = ({ closeDialog, launchJob, jobDefinitions }) => {
     const [applicationName, setApplicationName] = useState<string>("");
+    const [application, setApplication] = useState<string>("");
     const [parameters, setParameters] = useState<JobInstanceParameters[]>([]);
     const [priority, setPriority] = useState<string>("");
     const [sessionId, setSessionId] = useState<string>("");
@@ -82,9 +83,11 @@ export const LaunchFormDialog: React.FC<{
                         if (newValue) {
                             setApplicationName(newValue.applicationName);
                             setParameters(newValue.parameters);
+                            setApplication(newValue.tags.application ?? "")
                         } else {
                             setApplicationName("");
                             setParameters([]);
+                            setApplication("")
                         }
                     }}
                     renderInput={(params) => (
@@ -260,6 +263,7 @@ export const LaunchFormDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={() => {
                         let launchJobParameters: JobLaunchParameters = {
+                            application: application,
                             applicationName: applicationName,
                             module: "JQM web UI",
                             parameters: parameters,
