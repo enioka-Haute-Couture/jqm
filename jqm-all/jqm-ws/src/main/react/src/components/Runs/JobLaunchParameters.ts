@@ -8,4 +8,5 @@ export interface JobLaunchParameters {
     sessionID: string;
     startState: string;
     user: string;
+    application: string;
 }
