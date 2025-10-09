@@ -19,10 +19,10 @@ const useNodesApi = () => {
             .then((nodes) => setNodes(nodes))
             .catch(displayError);
     }, [displayError]);
-
-    const updateNodes = useCallback(
-        async (nodes: Node[]) => {
-            return APIService.put(API_URL, nodes)
+    
+    const updateNode = useCallback(
+        (node: Node) => {
+            return APIService.post(API_URL, node)
                 .then(() => {
                     fetchNodes();
                     displaySuccess("Successfully updated node");
@@ -30,11 +30,6 @@ const useNodesApi = () => {
                 .catch(displayError);
         },
         [fetchNodes, displaySuccess, displayError]
-    );
-
-    const updateNode = useCallback(
-        (node: Node) => updateNodes([node]),
-        [updateNodes]
     );
 
     const fetchNodeLogs = useCallback(
