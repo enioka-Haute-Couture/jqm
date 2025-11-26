@@ -29,27 +29,21 @@ The XML is in the form::
 				<name>XmlQueue</name>
 				<description>Queue to test the xml import</description>
 				<timeToLive>10</timeToLive>
-				<jobs>
-					<applicationName>Fibo</applicationName>
-					<applicationName>Geo</applicationName>
-				</jobs>
 			</queue>
 			<queue>
 				<name>XmlQueue2</name>
 				<description>Queue 2 to test the xml import</description>
 				<timeToLive>42</timeToLive>
-				<jobs>
-					<applicationName>DateTime</applicationName>
-				</jobs>
 			</queue>
 		</queues>
 	</jqm>
 
 
-The XML does more than simply specify a queue: it also specify which job definitions should use the queue by default.
 The XML can be created manually or exported from a JQM node. (See the :doc:`CLI reference<cli>` for import and export commands)
 
 The timeToLive parameter is deprecated and not used any more.
+
+To assign a default queue to a job definition you can set its ``queue`` attribute. (See the :doc:`JobDef packaging reference<../jobs/packaging>`).
 
 Defining pollers
 ********************
