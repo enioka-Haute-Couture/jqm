@@ -42,8 +42,11 @@ const getMuiTheme = () =>
     });
 
 function App() {
+    // Support deployment behind reverse proxy with a path prefix
+    const basename = (import.meta as any).env.VITE_BASE_PATH || "/";
+
     return (
-        <Router>
+        <Router basename={basename}>
             <AuthProvider>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <StyledEngineProvider injectFirst>

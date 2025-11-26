@@ -31,3 +31,9 @@ If the web console port is different from `59977`, **set the environment variabl
 ## Troubleshooting
 
 * If you get a white screen check the API calls being made ; 504 HTTP errors indicate the proxy is not properly configured ([see API proxy configuration](#api-proxy-configuration))
+
+## Reverse Proxy Deployment
+
+The Web UI can be deployed behind a reverse proxy with a path prefix.
+
+**Set the environment variable `VITE_BASE_PATH`** to the wanted path with a leading slash but no trailing slash. (e.g. `export VITE_BASE_PATH=/marsu/pi/lami`)
