@@ -46,6 +46,7 @@ export const JobInstanceDetailsDialog: React.FC<{
     relaunchJob: (jobId: number) => void;
     canSeeIndividualLogs: boolean;
 }> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType, relaunchJob, canSeeIndividualLogs }) => {
+    const [showParameters, setShowParameters] = useState<boolean>(false);
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
@@ -175,7 +176,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {jobInstance.parameters.map(
+                                        {jobInstance.parameters.slice(0,10).map(
                                             (parameter) => (
                                                 <TableRow key={parameter.key}>
                                                     <TableCell
@@ -192,6 +193,19 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         )}
                                     </TableBody>
                                 </Table>
+                                {jobInstance.parameters.length > 10 && (
+                                    <Button
+                                        size="small"
+                                        onClick={() => {
+                                            setShowParameters(true);
+                                        }}
+                                        style={{ margin: "8px" }}
+                                    >
+                                        See all
+                                    </Button>
+                                )
+                                }
+
                             </TableContainer>
                             {canSeeIndividualLogs && canUserAccess(PermissionObjectType.logs, PermissionAction.read) &&
                                 (<>
@@ -499,6 +513,52 @@ export const JobInstanceDetailsDialog: React.FC<{
                     </Button>
                 </DialogActions>
             </Dialog >
+            {showParameters && (
+                <Dialog
+                open={true}
+                onClose={() => setShowParameters(false)}
+                aria-labelledby="form-dialog-title"
+                fullWidth>
+                    <DialogTitle> Parameters</DialogTitle>
+                    <DialogContent>
+                        <Table size="small" aria-label="Parameters">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Key</TableCell>
+                                    <TableCell>Value</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {jobInstance.parameters.map(
+                                    (parameter) => (
+                                        <TableRow key={parameter.key}>
+                                            <TableCell
+                                                component="th"
+                                                scope="row"
+                                            >
+                                                {parameter.key}
+                                            </TableCell>
+                                            <TableCell>
+                                                {parameter.value}
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                )}
+                            </TableBody>
+                        </Table>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => setShowParameters(false)}
+                            style={{ margin: "8px" }}
+                        >
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
             {logs != null && (
                 <Dialog
                     open={true}
