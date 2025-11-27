@@ -24,6 +24,7 @@ import { ForceLogin } from "./utils/ForceLogin";
 import { AuthProvider } from "./utils/AuthService";
 import { RunsPaginationProvider } from "./utils/RunsPaginationProvider";
 import ClassLoadersPage from "./components/ClassLoaders/ClassLoadersPage";
+import { LoginModal } from "./components/LoginModal";
 
 
 
@@ -52,6 +53,7 @@ function App() {
                     <StyledEngineProvider injectFirst>
                         <ThemeProvider theme={getMuiTheme()}>
                             <ForceLogin />
+                            <LoginModal />
                             <SnackbarProvider
                                 maxSnack={4}
                                 anchorOrigin={{
