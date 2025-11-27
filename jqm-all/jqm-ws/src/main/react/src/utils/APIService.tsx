@@ -1,6 +1,8 @@
 const API_URL = "/ws";
 
 export default class APIService {
+    static isSessionExpired = false;
+
     static headers() {
         return {
             Accept: "application/json",
@@ -75,8 +77,15 @@ export default class APIService {
         });
 
 
-        if (res.status === 401) { // Redirect to login user is not authenticated
-            window.location.href = "/auth/login.html";
+        if (res.status === 401) {
+            if (!this.isSessionExpired) {
+                this.isSessionExpired = true;
+                // Dispatch session expired event
+                const event = new CustomEvent('auth:session-expired');
+                window.dispatchEvent(event);
+            }
+
+            return new Promise(() => { }); // Never resolves, user will have to do action again after re-login
         }
 
         if (res.ok) {
