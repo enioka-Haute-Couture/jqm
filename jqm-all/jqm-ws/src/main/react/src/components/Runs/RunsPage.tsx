@@ -318,7 +318,7 @@ const RunsPage: React.FC = () => {
                     const beganRunningDate = tableMeta.rowData[5];
                     let duration: number;
 
-                    if (queryLiveInstances && !beganRunningDate) {
+                    if (!beganRunningDate) {
                         return "";
                     } else {
                         const endDate = tableMeta.rowData[6];
