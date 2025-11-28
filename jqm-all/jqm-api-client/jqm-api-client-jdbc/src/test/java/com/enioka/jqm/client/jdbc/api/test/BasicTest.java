@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import com.enioka.jqm.client.api.JqmInvalidRequestException;
 import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.client.api.Query.Sort;
 import com.enioka.jqm.client.shared.IDbClientFactory;
@@ -243,4 +244,12 @@ public class BasicTest
             Assert.assertEquals(1, res.size());
         }
     }
+
+    @Test
+    public void testGetJobOnInexistantJob()
+    {
+        Assert.assertThrows(JqmInvalidRequestException.class, () -> JqmClientFactory.getClient().getJob(123456789L));
+
+    }
+
 }

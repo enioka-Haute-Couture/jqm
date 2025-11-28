@@ -1383,60 +1383,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     @Override
     public com.enioka.jqm.client.api.JobInstance getJob(long idJob)
     {
-        // TODO: direct queries following previous logic, but after we have common table structures.
-        return this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke().get(0);
+        List<com.enioka.jqm.client.api.JobInstance> jobList = this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke();
 
-        // DbConn cnx = null;
-        // try
-        // {
-        // // Three steps: first, query History as:
-        // // * this is supposed to be the most frequent query.
-        // // * we try to avoid hitting the queues if possible
-        // // Second, query live queues
-        // // Third, query history again (because a JI may have ended between the first two queries, so we may miss a JI)
-        // // Outside this case, this third query will be very rare, as the method is always called with an ID that cannot be
-        // // guessed as its only parameter, so the existence of the JI is nearly always a given.
-        // cnx = getDbSession();
-        // History h = em.find(History.class, idJob);
-        // com.enioka.jqm.api.JobInstance res = null;
-        // if (h != null)
-        // {
-        // res = getJob(h, em);
-        // }
-        // else
-        // {
-        // JobInstance ji = em.find(JobInstance.class, idJob);
-        // if (ji != null)
-        // {
-        // res = getJob(ji, em);
-        // }
-        // else
-        // {
-        // h = em.find(History.class, idJob);
-        // if (h != null)
-        // {
-        // res = getJob(h, em);
-        // }
-        // else
-        // {
-        // throw new JqmInvalidRequestException("No job instance of ID " + idJob);
-        // }
-        // }
-        // }
-        // return res;
-        // }
-        // catch (JqmInvalidRequestException e)
-        // {
-        // throw e;
-        // }
-        // catch (Exception e)
-        // {
-        // throw new JqmClientException("an error occured during query execution", e);
-        // }
-        // finally
-        // {
-        // closeQuietly(em);
-        // }
+        if (jobList.isEmpty()){
+            throw new JqmInvalidRequestException("No job with id " + idJob + " found :");
+        }
+        return jobList.get(0);
+
     }
 
     @Override
