@@ -18,10 +18,13 @@
 
 package com.enioka.jqm.integration.tests;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -364,4 +367,41 @@ public class MultiNodeTest extends JqmBaseTest
 
         jqmlogger.info("" + (Calendar.getInstance().getTimeInMillis() - c.getTimeInMillis()) / 1000);
     }
+
+    @Test
+    public void testCreateNodeWithMultipleRepo()
+    {
+        long qId = Queue.create(cnx, "testqueue", "super test queue", false);
+
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "test.jar", qId, 42, "appliname",
+            null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        Node n0 = Node.create(cnx, "n0", 0, "./target/outputfiles/", "./../jqm-tests/jqm-test-pyl/src" + File.pathSeparator +"./../jqm-tests/jqm-test-pyl/target", "./target/tmp", "localhost", "INFO");
+
+        DeploymentParameter.create(cnx, n0.getId(), 5, 1, qId);
+
+        TestHelpers.setNodesLogLevel("DEBUG", cnx);
+
+        cnx.commit();
+
+        jqmClient.newJobRequest("appliname", "user").enqueue();
+
+        this.addAndStartEngine("n0");
+
+        TestHelpers.waitFor(1, 120000, cnx);
+
+        long msgs = cnx.runSelectSingle("message_select_count_all", Long.class);
+        Assert.assertEquals(1, msgs);
+
+    }
+
+    @Test(expected = DatabaseException.class)
+    public void testCreateNodeWithTooLongRepo()
+    {
+        char[] repeatedChars = new char[1025];
+        Arrays.fill(repeatedChars, 'z');
+        String repoPath = new String(repeatedChars);
+        Node n0 = Node.create(cnx, "n0", 0, "./target/outputfiles/", repoPath, "./target/tmp", "localhost", "INFO");
+    }
+
 }

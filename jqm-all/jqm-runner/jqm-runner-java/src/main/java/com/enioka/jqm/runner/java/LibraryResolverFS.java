@@ -21,10 +21,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -97,7 +94,15 @@ class LibraryResolverFS
 
         // Is cache stale?
         Date lastLoaded = libs.loadTime;
-        File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), jd.getJarPath()));
+        File jarFile = new File(FilenameUtils.concat(new File(node.getRepos().get(0)).getAbsolutePath(), jd.getJarPath()));
+        if (!jarFile.exists())
+        {
+            Iterator<String> it = node.getRepos().iterator();
+            while (it.hasNext() && !jarFile.exists())
+            {
+                jarFile = new File(FilenameUtils.concat(new File(it.next()).getAbsolutePath(), jd.getJarPath()));
+            }
+        }
         File jarDir = jarFile.getParentFile();
         File libDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "lib"));
 
@@ -116,7 +121,15 @@ class LibraryResolverFS
     {
         jqmlogger.debug("Resolving classpath for job definition " + jd.getApplicationName());
 
-        File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), jd.getJarPath()));
+        File jarFile = new File(FilenameUtils.concat(new File(node.getRepos().get(0)).getAbsolutePath(), jd.getJarPath()));
+        if (!jarFile.exists())
+        {
+            Iterator<String> it = node.getRepos().iterator();
+            while (it.hasNext() && !jarFile.exists())
+            {
+                jarFile = new File(FilenameUtils.concat(new File(it.next()).getAbsolutePath(), jd.getJarPath()));
+            }
+        }
         File jarDir = jarFile.getParentFile();
         File libDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "lib"));
         File libDirExtracted = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "libFromJar"));
