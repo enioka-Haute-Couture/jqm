@@ -146,7 +146,7 @@ jobs:
               uses: docker/login-action@v3
               with:
                   registry: container-registry.oracle.com
-                  password: ${{ secrets.DOCKER_ORACLE_REPO_PASSWORD }}
+                  password: ${{ secrets.DOCKER_ORACLE_REPO_TOKEN }}
                   username: ${{ secrets.DOCKER_ORACLE_REPO_USERNAME }}
             - run: docker run --detach --rm -p 1521:1521 --name oracle -e "DB_SID=JQM" container-registry.oracle.com/database/enterprise:12.2.0.1;
             - run: while true; do if docker ps | grep "oracle" | grep -q "(healthy)" ; then break; fi; done
