@@ -11,6 +11,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -28,7 +29,15 @@ public final class ModuleManager
         var loadedModuleNames = new HashSet<String>();
 
         // Test if the target is a module (just for information sake)
-        File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepo()).getAbsolutePath(), ji.getJD().getJarPath()));
+        File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepos().get(0)).getAbsolutePath(), ji.getJD().getJarPath()));
+        if (!jarFile.exists())
+        {
+            Iterator<String> it = ji.getNode().getRepos().iterator();
+            while (it.hasNext() && !jarFile.exists())
+            {
+                jarFile = new File(FilenameUtils.concat(new File(it.next()).getAbsolutePath(), ji.getJD().getJarPath()));
+            }
+        }
         ModuleFinder finder = ModuleFinder.of(jarFile.toPath());
         if (finder.findAll().isEmpty())
         {

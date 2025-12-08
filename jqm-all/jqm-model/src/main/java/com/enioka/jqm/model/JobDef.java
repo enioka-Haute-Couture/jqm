@@ -301,7 +301,7 @@ public class JobDef implements Serializable
     }
 
     /**
-     * The path of the jar file containing the payload to run. The path must be relative to the job repository root ({@link Node#getRepo()}
+     * The path of the jar file containing the payload to run. The path must be relative to the one of the job repository roots ({@link Node#getRepos()}
      * ).<br>
      * Max length is 1024.
      */

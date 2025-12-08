@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -81,8 +82,15 @@ public class ClassloaderManager
         JobDef jd = ji.getJD();
 
         // Extract the jar actual path
-        File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepo()).getAbsolutePath(), jd.getJarPath()));
-
+        File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepos().get(0)).getAbsolutePath(), jd.getJarPath()));
+        if (!jarFile.exists())
+        {
+            Iterator<String> it = ji.getNode().getRepos().iterator();
+            while (it.hasNext() && !jarFile.exists())
+            {
+                jarFile = new File(FilenameUtils.concat(new File(it.next()).getAbsolutePath(), jd.getJarPath()));
+            }
+        }
         // The parent class loader is normally the CL with EXT on its CL. But if no lib load, user current one (happens for external
         // payloads)
         ClassLoader parent = getParentClassLoader(ji, cb);

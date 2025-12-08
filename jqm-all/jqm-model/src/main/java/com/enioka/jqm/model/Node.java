@@ -18,10 +18,12 @@
 
 package com.enioka.jqm.model;
 
+import java.io.File;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -150,24 +152,24 @@ public class Node implements Serializable
     }
 
     /**
-     * Directory holding the payload repository, i.e. all the jars that can be run by JQM.
+     * Directories holding the payload repository, i.e. all the jars that JQM can run.
      *
      * @return the repo
      */
-    public String getRepo()
+    public List<String> getRepos()
     {
-        return repo;
+        return Arrays.asList(repo.split(File.pathSeparator));
     }
 
     /**
-     * See {@link #getRepo()}
+     * See {@link #getRepos()}
      *
-     * @param repo
-     *            the repo to set
+     * @param repos
+     *            the repos to set
      */
-    public void setRepo(final String repo)
+    public void setRepos(final List<String> repos)
     {
-        this.repo = repo;
+        this.repo = String.join(File.pathSeparator, repos);
     }
 
     /**

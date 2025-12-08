@@ -130,7 +130,7 @@ final class Helpers
         }
         Node nn = nodes.get(0);
 
-        if (!StringUtils.hasText(nn.getDlRepo()) || !StringUtils.hasText(nn.getRepo()) || !StringUtils.hasText(nn.getTmpDirectory()))
+        if (!StringUtils.hasText(nn.getDlRepo()) || !StringUtils.hasText(nn.getRepos().get(0)) || !StringUtils.hasText(nn.getTmpDirectory()))
         {
             throw new JqmInitError(
                     "The node does not have all its paths specified. Check node configuration (or recreate it with the CLI).");
@@ -188,7 +188,7 @@ final class Helpers
             jqmlogger.info("Node parameters are as follow:");
             jqmlogger.info("\tfile produced storage directory: " + n.getDlRepo());
             jqmlogger.info("\tHTTP listening interface: " + n.getDns());
-            jqmlogger.info("\tlooks for payloads inside: " + n.getRepo());
+            jqmlogger.info("\tlooks for payloads inside: " + (n.getRepos().size() == 1 ? n.getRepos().get(0) : n.getRepos().toString()));
             jqmlogger.info("\tlog level: " + n.getRootLogLevel());
             jqmlogger.info("\ttemp files will be created inside: " + n.getTmpDirectory());
             jqmlogger.info("\tJMX registry port: " + n.getJmxRegistryPort());
