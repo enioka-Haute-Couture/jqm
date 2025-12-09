@@ -1,16 +1,15 @@
 package com.enioka.jqm.integration.tests;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
+import com.enioka.jqm.client.api.*;
+import com.enioka.jqm.test.helpers.CreationTools;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.client.api.JqmClient;
-import com.enioka.jqm.client.api.JqmClientException;
-import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.api.JqmWsClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.repository.UserManagementRepository;
@@ -90,5 +89,18 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
             Assert.assertNotNull(e.getCause());
             Assert.assertTrue(e.getMessage() + " - " + e.getCause().getMessage(), e.getCause() instanceof NotAuthorizedException);
         }
+    }
+
+    @Test
+    public void testGetJobsWithQuery(){
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42, "jqm-test-em",
+            null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        Long i = jqmClient.enqueue("jqm-test-em", "test");
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 5000, cnx);
+
+        Query query = jqmClient.newQuery();
+        List<JobInstance> res = query.invoke();
+        Assert.assertNotNull(res);
     }
 }
