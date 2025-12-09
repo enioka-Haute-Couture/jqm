@@ -183,7 +183,7 @@ export const NodesPage: React.FC = () => {
             name: "jobRepoDirectory",
             label: "Directory containing jars**",
             options: {
-                hint: "The root directory containing all the jobs (payload jars). Absolute path strongly recommended, relative path are relative to JQM install directory.",
+                hint: "The root directory or directories containing all the jobs (payload jars). Absolute path strongly recommended, relative path are relative to JQM install directory. If multiple directories, split with either ':' on UNIX or ';' on Windows",
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
