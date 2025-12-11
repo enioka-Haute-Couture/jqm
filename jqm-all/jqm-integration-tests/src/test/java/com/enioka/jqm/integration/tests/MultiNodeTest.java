@@ -20,8 +20,12 @@ package com.enioka.jqm.integration.tests;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.JobDefDto;
+import com.enioka.jqm.client.api.JobDef;
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -363,5 +367,78 @@ public class MultiNodeTest extends JqmBaseTest
         }
 
         jqmlogger.info("" + (Calendar.getInstance().getTimeInMillis() - c.getTimeInMillis()) / 1000);
+    }
+
+    @Test
+    public void testSimpleScheduleTwoNodes() throws InterruptedException {
+        addAndStartEngine("localhost");
+        addAndStartEngine("localhost4");
+
+        long id = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+            TestHelpers.qVip, 42, "JediApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        long scheduleId = jqmClient.newJobRequest("JediApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
+            .enqueue();
+
+        JobDef jd_client = jqmClient.getJobDefinition("JediApplication");
+        Assert.assertEquals(id, jd_client.getId());
+        Assert.assertEquals(1, jd_client.getSchedules().size());
+        Assert.assertEquals(scheduleId, jd_client.getSchedules().get(0).getId());
+        Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
+
+
+
+        TestHelpers.waitFor(2, 1500000, cnx);
+
+        List<JobInstance> jobInstanceList = jqmClient.newQuery().invoke();
+
+        Assert.assertEquals(2, jobInstanceList.size());
+        Calendar firstExecutionDate = jobInstanceList.get(0).getBeganRunningDate();
+        firstExecutionDate.add(Calendar.SECOND, 45);
+        Assert.assertTrue(firstExecutionDate.before(jobInstanceList.get(1).getBeganRunningDate()));
+
+        JobDefDto jd = MetaService.getJobDef(cnx, id);
+        Assert.assertEquals(1, jd.getSchedules().size());
+
+        jqmClient.removeRecurrence(scheduleId);
+
+        jd = MetaService.getJobDef(cnx, id);
+        Assert.assertEquals(0, jd.getSchedules().size());
+
+        Assert.assertTrue(jqmClient.newQuery().invoke().get(0).isFromSchedule());
+    }
+    @Test
+    public void testSimpleScheduleTwoNodesV2() throws InterruptedException {
+        addAndStartEngine("localhost");
+        addAndStartEngine("localhost4");
+
+        long id = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+            TestHelpers.qVip, 42, "JediApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        long scheduleId = jqmClient.newJobRequest("JediApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
+            .enqueue();
+
+        JobDef jd_client = jqmClient.getJobDefinition("JediApplication");
+        Assert.assertEquals(id, jd_client.getId());
+        Assert.assertEquals(1, jd_client.getSchedules().size());
+        Assert.assertEquals(scheduleId, jd_client.getSchedules().get(0).getId());
+        Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
+
+        // Wait for 10 seconds
+
+        TestHelpers.waitFor(1, 150000, cnx);
+
+        Thread.sleep(5000);
+        Assert.assertEquals(1, jqmClient.newQuery().invoke().size());
+
+        JobDefDto jd = MetaService.getJobDef(cnx, id);
+        Assert.assertEquals(1, jd.getSchedules().size());
+
+        jqmClient.removeRecurrence(scheduleId);
+
+        jd = MetaService.getJobDef(cnx, id);
+        Assert.assertEquals(0, jd.getSchedules().size());
+
+        Assert.assertTrue(jqmClient.newQuery().invoke().get(0).isFromSchedule());
     }
 }
