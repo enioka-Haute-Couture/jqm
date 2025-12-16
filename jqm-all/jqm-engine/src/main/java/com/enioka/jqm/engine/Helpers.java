@@ -161,7 +161,7 @@ final class Helpers
         List<RRole> roles = RRole.select(cnx, "role_select_by_key", "administrator");
         if (roles.size() != 1)
         {
-            throw new JqmInitError("The 'administrator' role does not exist. It is needed for the APIs. Run CLI option -u to create it.");
+            throw new JqmInitError("The 'administrator' role does not exist. It is needed for the APIs.");
         }
 
         // Mail session

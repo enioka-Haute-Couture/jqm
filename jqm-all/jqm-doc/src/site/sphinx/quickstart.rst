@@ -83,13 +83,13 @@ Prerequisites:
 
 The following script will download and install the binaries (adapt the first two lines). ::
 
-        wget  https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-1.3.3/jqm-1.3.3.tar.gz # For 1.3.3 release. Adapt it to the one you want.
-        tar xvf jqm-1.3.3.tar.gz
+        wget  https://github.com/enioka-Haute-Couture/jqm/releases/download/jqm-all-3.2/jqm-3.2.tar.gz # For 3.2 release. Adapt it to the one you want.
+        tar xvf jqm-3.2.tar.gz
 
 
 The following script will create a database and reference the test jobs (i.e. :term:`payloads<payload>`) inside a test database::
 
-        cd jqm-1.3.3
+        cd jqm-3.2
         ./jqm.sh createnode
         ./jqm.sh allxml  # This will import all the test job definitions
 
