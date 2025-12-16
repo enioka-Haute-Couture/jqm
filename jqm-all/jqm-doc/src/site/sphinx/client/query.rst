@@ -8,22 +8,22 @@ using a fluent style.
 Basics, running & filtering
 *****************************
 
-To create a :class:`Query`, simply do *Query.create()*. This will create a query without any predicates - if run, it will return
+To create a :class:`Query`, simply do *JqmClient.newQuery()*. This will create a query without any predicates - if run (using *.invoke()*), it will return
 the whole execution history.
 
 To add predicates, use the different :class:`Query` methods. For example, this will return every past instance for the :term:`job definition` named JD::
 
-	JqmClientFactory.getClient().createQuery().setApplicationName("JD");
+	jqmClient.newQuery().setApplicationName("JD");
 
 To create predicates with wildcards, simply use "%" (the percent sign) as the wildcard. This will return at least the results of the previous
 example and potentially more::
 
-	JqmClientFactory.getClient().createQuery().setApplicationName("J%");
+	jqmClient.newQuery().setApplicationName("J%");
 
 To run a query, simply call invoke() on it. This is equivalent to calling *JqmClientFactory.getClient().getJobs(Query q)*. Running the previous example
 would be::
 
-	List<JobInstance> results = JqmClientFactory.getClient().createQuery().setApplicationName("J%").invoke();
+	List<JobInstance> results = jqmClient.newQuery().setApplicationName("J%").invoke();
 
 Querying live data
 ********************

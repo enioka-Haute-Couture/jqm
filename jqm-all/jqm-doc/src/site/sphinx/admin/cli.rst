@@ -16,7 +16,7 @@ The CLI has commands to:
 * enable or disable web APIs, using TLS or not
 * update the database
 
-To get all details, use `java -jar jqm.jar --help`.
+To get all details, use ``java -jar jqm.jar -h`` (or ``--help``).
 
 The most useful options are exposed in a more user friendly way with the
 script jqm.sh (or jqm.ps1 under Windows).
