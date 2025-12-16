@@ -10,7 +10,9 @@ import java.util.Properties;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.xml.crypto.Data;
 
+import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -162,9 +164,18 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             endOfRun();
             return;
         }
+        catch (DatabaseUnreachableException e){
+            jqmlogger.error("connection to database lost - loader " + this.ji.getId() + " will be restarted later");
+            jqmlogger.trace("connection error was:", e);
+            this.engine.loaderRestartNeeded(this);
+            if (this.engine.getHandler() != null)
+            {
+                this.engine.getHandler().onJobInstanceDone(this.ji);
+            }
+            return;
+        }
         catch (RuntimeException e)
         {
-            firstBlockDbFailureAnalysis(e);
             return;
         }
 
@@ -293,51 +304,17 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             cnx.runUpdate("ji_delete_by_id", this.ji.getId());
             cnx.commit();
         }
-        catch (RuntimeException e)
-        {
-            endBlockDbFailureAnalysis(e);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // DB failure analysis
-    ///////////////////////////////////////////////////////////////////////////
-
-    private void firstBlockDbFailureAnalysis(Exception e)
-    {
-        if (Helpers.testDbFailure(e))
-        {
-            jqmlogger.error("connection to database lost - loader " + this.ji.getId() + " will be restarted later");
-            jqmlogger.trace("connection error was:", e);
-            this.engine.loaderRestartNeeded(this);
-            if (this.engine.getHandler() != null)
-            {
-                this.engine.getHandler().onJobInstanceDone(this.ji);
-            }
-            return;
-        }
-        else
-        {
-            jqmlogger.error("a database related operation has failed and cannot be recovered", e);
-            resultStatus = State.CRASHED;
-            endOfRun();
-            return;
-        }
-    }
-
-    private void endBlockDbFailureAnalysis(RuntimeException e)
-    {
-        if (Helpers.testDbFailure(e))
+        catch (DatabaseUnreachableException e)
         {
             jqmlogger.error("connection to database lost - loader " + this.ji.getId() + " will need delayed finalization");
             jqmlogger.trace("connection error was:", e.getCause());
             this.engine.loaderFinalizationNeeded(this);
         }
-        else
-        {
+        catch (RuntimeException e) {
             jqmlogger.error("a database related operation has failed and cannot be recovered", e);
             throw e;
         }
+
     }
 
     ///////////////////////////////////////////////////////////////////////////
