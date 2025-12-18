@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -16,11 +16,11 @@ export const DisplayLogsDialog: React.FC<{
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth
-            maxWidth="lg"
+            maxWidth="xl"
         >
             <DialogTitle>Latest logs for node {logs?.nodeName}</DialogTitle>
             <DialogContent>
-                <p>{logs?.data}</p>
+                <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs?.data}</Typography>
             </DialogContent>
             <DialogActions>
                 <Button
