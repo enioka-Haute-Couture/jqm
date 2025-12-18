@@ -809,7 +809,7 @@ public class ServiceAdmin
     public InputStream SS(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest, @Context HttpServletResponse res)
     {
         InputStream fs = Helpers.getClient().getEngineLog(nodeName, latest);
-        res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
+        res.setHeader("Content-Disposition", "attachment; filename=jqm.log");
         return fs;
     }
 }

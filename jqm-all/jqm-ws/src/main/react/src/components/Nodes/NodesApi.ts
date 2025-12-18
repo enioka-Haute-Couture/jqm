@@ -3,7 +3,7 @@ import { Node } from "./Node";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 
-const API_URL = "/admin/node"
+const API_URL = "/admin/node";
 
 const useNodesApi = () => {
     const { displayError, displaySuccess } = useNotificationService();
@@ -43,10 +43,9 @@ const useNodesApi = () => {
                 },
                 false
             )
-                .then((response) => response.text())
-                .then((textData) =>
-                    setNodeLogs({ nodeName: nodeName, data: textData })
-                )
+                .then((response) => {
+                    setNodeLogs({ nodeName: nodeName, data: response });
+                })
                 .catch(displayError);
         },
         [displayError]
