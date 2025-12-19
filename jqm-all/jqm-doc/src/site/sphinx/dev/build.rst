@@ -70,7 +70,7 @@ This will checkout the release tag, build it, and upload to Maven Central Reposi
 Maven Central Repository validation
 ************************************
 
-Go to https://central.sonatype.com/ and unstage (which means: close, then release the staged repository) the release.
+Go to https://central.sonatype.com/ and publish the release.
 
 Git push
 +++++++++++++
@@ -101,4 +101,17 @@ Create a release inside GitHub and upload the zip and tar.gz produced by the jqm
 Docker Hub upload
 ++++++++++++++++++++
 
-TODO:
+For linux amd64 architecture, build the Docker image for the new release ::
+
+    docker build --platform linux/amd64 --rm --pull --provenance=false --sbom=false -t enioka/jqm:3.2.0 -f ./linux/Dockerfile ../
+
+Push the image to Docker Hub ::
+
+    docker push enioka/jqm:3.2.0
+
+Then tag the image as latest and 3 and push again ::
+
+    docker tag enioka/jqm:3.2.0 enioka/jqm:latest
+    docker tag enioka/jqm:3.2.0 enioka/jqm:3
+    docker push enioka/jqm:latest
+    docker push enioka/jqm:3
