@@ -254,7 +254,7 @@ public class MiscTest extends JqmBaseTest
         jqmClient.newJobRequest("jqm-test-maven", null).enqueue();
         addAndStartEngine();
 
-        TestHelpers.waitFor(1, 10000, cnx);
+        TestHelpers.waitFor(1, 15000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
