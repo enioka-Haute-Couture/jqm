@@ -335,6 +335,9 @@
                     <!-- Use custom release profile -->
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
+
+                    <!-- Goals to execute during release:perform -->
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
 

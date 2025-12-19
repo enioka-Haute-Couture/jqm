@@ -14,7 +14,7 @@ The release environment must have:
 * Access to a Sonar server with a correctly configured Maven settings.xml
 * The Selenium setup (see :doc:`tests`) - this has been deprecated. It may come back later.
 * Internet access
-* Login & password to Sonatype OSSRH with permissions on com.enioka.jqm.
+* Login & password to Maven Central Repository (https://central.sonatype.com/) with permissions on com.enioka.jqm.
 * Login & password to Read the Docs with permissions on com.enioka.jqm.
 * Docker client 18.06+ and access to the multi-arch build environment. -- deprecated,  build is migrating to Github action
 
@@ -35,7 +35,7 @@ There is no distinction between tests & integration tests in JQM so this will ru
 
 	mvn clean install
 
-Sonar snapshot
+Sonar snapshot (deprecated)
 ++++++++++++++++++
 
 This will create a new Sonar analysis.
@@ -53,21 +53,24 @@ The release plug-in is (inside the pom.xml) parametrized to use a local git repo
 During that step, all packages are bumped in version number, even if they were not modified. ::
 
 	mvn release:prepare -Darguments='-DskipTests'
-	mvn package
 
-Then the test package must be test-deployed in a two-node configuration.
+This creates a Git tag with the release version and updates the POMs to the next development version.
+
+Then the test package must be test-deployed in a two-node configuration. To build the release version for testing::
+
+	mvn package -Prelease -DskipTests scm:checkout -Drevision=<tag-name>
 
 Release
 +++++++++++++
 
-This will upload the packages to the OSSRH staging repository.::
+This will checkout the release tag, build it, and upload to Maven Central Repository. ::
 
-	mvn release:perform -Darguments='-DskipTests'
+     mvn release:perform -Darguments='-Dgpg.keyname=<keyname> -Prelease -DskipTests'
 
-OSSRH validation
-********************
+Maven Central Repository validation
+************************************
 
-Go to https://oss.sonatype.org/ and unstage (which means: close, then release the staged repository) the release. This will in time allow synchronization with Maven Central.
+Go to https://central.sonatype.com/ and unstage (which means: close, then release the staged repository) the release.
 
 Git push
 +++++++++++++
@@ -91,22 +94,11 @@ Go to jqm.rtfd.org and change the default branch to the newly created tag.
 GitHub upload
 ++++++++++++++++
 
-Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-engine project. Add a link to the release notes inside.
+Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-service project. Add a link to the release notes inside.
 
 .. note:: only do this **after** the documentation is up on ReadTheDocs. Creating a release sends a mail to followers, so any link to the doc would be dead otherwise.
 
 Docker Hub upload
 ++++++++++++++++++++
 
-This updates the following tags:
-
-* release tag
-* major tag
-* latest is updated to this release
-* nightly is updated to the next upcoming version.
-
-For maintenance releases of past majors, care must be taken to change the updated tags.
-
-Changing version, run `$jqmVer="2.1.0"; $majorVer=$jqmVer.Split('.')[0]; $newTag="jqm-all-$jqmVer"; ./Update-AllBranches.ps1 -Push -Branches @{$jqmVer = $newTag; $majorVer = $newTag; "latest" = $newTag; "nightly" = "master"}`
-
-You also may rebuild older branches - this updates OS and middlewares.
+TODO:
