@@ -536,7 +536,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         do
         {
             List<Object> params = new ArrayList<>();
-            params.add((int) node.getId());
+            params.add(node.getId());
 
             String paginatedSql = cnx.paginateQueryByKey("ji_select_by_node", 0, batchSize, params);
 
