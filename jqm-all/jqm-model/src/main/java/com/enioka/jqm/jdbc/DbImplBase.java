@@ -343,6 +343,9 @@ class DbImplBase
         queries.put("globalprm_select_count_modified_jetty", "SELECT COUNT(1) FROM __T__GLOBAL_PARAMETER WHERE LAST_MODIFIED > ? AND KEYNAME IN('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', 'pfxPassword', 'enableWsApiAuth')");
 
         // WITNESS
+        queries.put("get_timezone_psql", "SHOW TIMEZONE;");
+        queries.put("get_witness_timestamp", "select latest_contact from witness limit 1;");
+
         queries.put("w_insert", "INSERT INTO __T__WITNESS(ID, KEYNAME, NODE, LATEST_CONTACT) VALUES(JQM_PK.nextval, 'SCHEDULER', ?, CURRENT_TIMESTAMP)");
         queries.put("w_update_take", "UPDATE __T__WITNESS SET NODE=?, LATEST_CONTACT=CURRENT_TIMESTAMP WHERE KEYNAME='SCHEDULER' AND (LATEST_CONTACT IS NULL OR NODE IS NULL OR NODE=? OR (NODE<>? AND LATEST_CONTACT < (CURRENT_TIMESTAMP - ? SECOND)))");
 
