@@ -1,6 +1,38 @@
 Release notes
 ######################
 
+3.2.0
+*************
+
+Maintenance release, with a few new features and many fixes after the v3.1 release.
+
+Ugrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* GUI: support for deployment behind a reverse proxy with path prefix configuration (#642)
+* GUI: improved auto re-login when user session expires instead of redirecting to login page (#563)
+* Web APIs: getJob(long) now throws JqmInvalidRequestException when querying a non-existing job
+* Web APIs: force XML format in query invoke (#616)
+* GUI: fix node log view (#567)
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: improved test stability (ShellRunnerTest, testMavenArtifact, testDbFailureUnderLoad, testStartupCleanupRunning, testStartupCleanupAttr)
+* GUI: update only the edited node instead of all nodes on admin node page (#635)
+* GUI: in job run details, show only 10 first parameters with dialog for additional parameters (#641)
+* GUI: set application field when enqueuing job from run pages (#613)
+* GUI: fix duration display for cancelled jobs in frontend Runs page (#637)
+* Documentation: add missing job definition attributes
+* Documentation: update readTheDocs and helpers to reflect current behavior
+
 3.1.1
 *************
 
