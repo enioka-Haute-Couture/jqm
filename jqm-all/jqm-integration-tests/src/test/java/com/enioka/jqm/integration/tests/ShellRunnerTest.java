@@ -140,6 +140,13 @@ public class ShellRunnerTest extends JqmBaseTest
     @Test
     public void testKill()
     {
+        if (onMacOS())
+        {
+            // macOS doesn't have pstree by default, so the kill functionality does not work
+            org.junit.Assume.assumeTrue("Kill test not supported on macOS without pstree", false);
+            return;
+        }
+
         if (onWindows())
         {
             // We explicitely start a sub shell here so as to have a process tree powershell-> powershell.

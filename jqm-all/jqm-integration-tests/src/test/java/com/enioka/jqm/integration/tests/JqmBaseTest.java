@@ -193,6 +193,11 @@ public class JqmBaseTest
         return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
+    protected boolean onMacOS()
+    {
+        return System.getProperty("os.name").toLowerCase().contains("mac");
+    }
+
     protected JqmEngineOperations addAndStartEngine()
     {
         return addAndStartEngine("localhost");
