@@ -48,14 +48,26 @@ class CronScheduler implements Runnable, TaskCollector
             return;
         }
 
-        try
-        {
-            cnx.runUpdate("w_insert", this.node.getId());
-            cnx.commit();
-            jqmlogger.debug("This node is the first scheduling node to start inside the cluster");
+        try {
+            String timezone = cnx.runSelectSingle("get_timezone_psql", String.class);
+            jqmlogger.info("Timezone is {}", timezone);
+            String date = cnx.runSelectSingle("get_witness_timestamp", String.class);
+            jqmlogger.info("Witness timestamp is {}", date);
         }
         catch (DatabaseException ex)
         {
+            jqmlogger.info("Error while accessing database for timezone and witness timestamp");
+        }
+        try {
+
+            jqmlogger.info("Inserting into witness : {}", this.node.getId());
+            cnx.runUpdate("w_insert", this.node.getId());
+            cnx.commit();
+            jqmlogger.info("This node is the first scheduling node to start inside the cluster");
+        }
+        catch (DatabaseException ex)
+        {
+            jqmlogger.info("Could not insert into witness, another node is probably already the master scheduler.");
             // Ignore it (UK error). It means the line already exists inside the database.
         }
         cnx.close();
@@ -85,6 +97,7 @@ class CronScheduler implements Runnable, TaskCollector
             try (DbConn cnx = Helpers.getNewDbSession())
             {
                 // Try to take the lead.
+                jqmlogger.info("Trying to take the lead in the scheduler cluster. Node id : {}, ", this.node.getId());
                 qr = cnx.runUpdate("w_update_take", this.node.getId(), this.node.getId(), this.node.getId(),
                         (int) (schedulerKeepAlive * 1.2 / 1000));
                 cnx.commit();
@@ -168,11 +181,12 @@ class CronScheduler implements Runnable, TaskCollector
     public TaskTable getTasks()
     {
         TaskTable res = new TaskTable();
-
+        jqmlogger.info("Trying to get all cron tasks");
         try (DbConn cnx = Helpers.getNewDbSession())
         {
             for (ScheduledJob sj : ScheduledJob.select(cnx, "sj_select_all"))
             {
+                jqmlogger.info("New cron expression : {} from the scheduled job : {}", sj.getCronExpression(), sj);
                 res.add(new SchedulingPattern(sj.getCronExpression()), new JqmTask(sj));
             }
 
