@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Properties;
 
 import com.enioka.api.admin.RUserDto;
+import com.icegreen.greenmail.junit4.GreenMailRule;
+import com.icegreen.greenmail.util.ServerSetup;
 import jakarta.mail.Folder;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
@@ -38,15 +40,20 @@ import com.enioka.jqm.xml.XmlJobDefParser;
 
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class MiscTest extends JqmBaseTest
 {
+    @Rule
+    public final GreenMailRule greenMail = new GreenMailRule(new ServerSetup[] {
+        new ServerSetup(10025, null, ServerSetup.PROTOCOL_SMTP),
+        new ServerSetup(10143, null, ServerSetup.PROTOCOL_IMAP)
+    });
     @Test
     public void testEmail() throws Exception
     {
-        // Do not run in Eclipse, as it does not support the SMTP Maven plugin.
-        Assume.assumeTrue(!System.getProperty("java.class.path").contains("eclipse"));
+        greenMail.setUser("test@jqm.com", "testlogin", "testpassword");
 
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
@@ -65,8 +72,9 @@ public class MiscTest extends JqmBaseTest
         {
             Session session = Session.getInstance(props, null);
             Store store = session.getStore();
-            store.connect("localhost", 10143, "testlogin", "testpassword");
+            store.connect("localhost", greenMail.getImap().getPort(), "testlogin", "testpassword");
             Folder inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_ONLY);
             nbMail = inbox.getMessageCount();
         }
         catch (Exception mex)
