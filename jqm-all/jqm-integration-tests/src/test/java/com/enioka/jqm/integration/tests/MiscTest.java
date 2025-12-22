@@ -257,6 +257,7 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.waitFor(1, 15000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+
     }
 
     @Test
