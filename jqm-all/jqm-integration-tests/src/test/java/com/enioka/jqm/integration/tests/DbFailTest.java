@@ -79,11 +79,13 @@ public class DbFailTest extends JqmBaseTest
     {
         JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
         this.sleep(2);
-
+        jqmlogger.info("About to simulate failure");
         this.simulateDbFailure(5);
+        jqmlogger.info("Simulation done");
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
-
+        jqmlogger.info("done waiting");
         Assert.assertEquals(0, TestHelpers.getOkCount(this.getNewDbSession()));
+        jqmlogger.info("assertion one done");
         Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
     }
 
