@@ -1,5 +1,7 @@
 package com.enioka.jqm.jdbc;
 
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -12,6 +14,7 @@ import java.util.Properties;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * The interface to implement to create a new database adapter. Adapters contain all the database-specific stuff for running JQM on a
@@ -162,5 +165,31 @@ public abstract class DbAdapter
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId());
+    }
+
+    /**
+     * Trigger a connection close from the DB.
+     * Used in tests to simulate a DB failure.
+     *
+     * @param cnx
+     *                an open ready to use connection to the database.
+     */
+    public void simulateDisconnection(Connection cnx) {
+
+    }
+    /**
+     * Test the exception to determine whether the database is offline.
+     * Errors are specific to each type of database
+     *
+     * @param e exception to test
+     * @return true if the database is closed
+     */
+    public boolean testDbUnreachable(Exception e)
+    {
+        Throwable cause = e.getCause();
+        return (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+            || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
+            || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+            || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."));
     }
 }

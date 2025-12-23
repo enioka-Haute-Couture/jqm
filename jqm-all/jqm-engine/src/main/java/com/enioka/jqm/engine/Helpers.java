@@ -286,16 +286,4 @@ final class Helpers
             jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
         }
     }
-
-    static boolean testDbFailure(Exception e)
-    {
-        Throwable cause = e.getCause();
-        return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-                || (cause != null && cause.getMessage().equals("This connection has been closed"))
-                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
-                || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
-    }
 }

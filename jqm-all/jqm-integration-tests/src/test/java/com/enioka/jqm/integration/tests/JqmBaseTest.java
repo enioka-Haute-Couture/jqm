@@ -54,8 +54,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 import static com.enioka.jqm.shared.misc.StandaloneHelpers.idSequenceBaseFromIp;
 
-public class JqmBaseTest
-{
+public class JqmBaseTest {
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
 
     protected static Db db;
@@ -71,17 +70,14 @@ public class JqmBaseTest
     @Rule
     public TestName testName = new TestName();
 
-    static
-    {
+    static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
     }
 
     @BeforeClass
-    public static void beforeClass()
-    {
-        if (s == null)
-        {
+    public static void beforeClass() {
+        if (s == null) {
             s = new DebugHsqlDbServer();
             s.start();
 
@@ -91,24 +87,21 @@ public class JqmBaseTest
     }
 
     @Before
-    public void beforeEachTest() throws NamingException, SQLException
-    {
+    public void beforeEachTest() throws NamingException, SQLException {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
         JqmDbClientFactory.reset();
         jqmClient = JqmDbClientFactory.getClient();
 
-        if (db == null)
-        {
+        if (db == null) {
             // In all cases load the datasource. (the helper itself will load the property file if any).
             Properties p = new Properties();
             p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
             p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
             db = DbManager.getDb(p);
             var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
-            try (var cnx = db.getDataSource().getConnection())
-            {
+            try (var cnx = db.getDataSource().getConnection()) {
                 dbSchemaManager.updateSchema(cnx);
             }
         }
@@ -123,28 +116,22 @@ public class JqmBaseTest
     }
 
     @After
-    public void afterEachTest()
-    {
+    public void afterEachTest() {
         jqmlogger.debug("*** Cleaning after test " + testName.getMethodName());
-        for (String k : engines.keySet())
-        {
+        for (String k : engines.keySet()) {
             JqmEngineOperations e = engines.get(k);
             e.stop();
         }
         engines.clear();
-        for (DbConn cnx : cnxs)
-        {
+        for (DbConn cnx : cnxs) {
             cnx.close();
         }
         cnxs.clear();
 
         // Reset the caches - no side effect between tests?
-        try
-        {
+        try {
             InitialContext.doLookup("internal://reset");
-        }
-        catch (NamingException e)
-        {
+        } catch (NamingException e) {
             // jqmlogger.warn("Could not purge test JNDI context", e);
         }
 
@@ -157,49 +144,40 @@ public class JqmBaseTest
         System.gc();
     }
 
-    protected void AssumeWindows()
-    {
+    protected void AssumeWindows() {
         Assume.assumeTrue(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    protected void AssumeNotWindows()
-    {
+    protected void AssumeNotWindows() {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    protected void AssumeHsqldb()
-    {
+    protected void AssumeHsqldb() {
         Assume.assumeTrue(s.isHsqldb());
     }
 
-    protected void assumeJavaVersionStrictlyGreaterThan(double version)
-    {
+    protected void assumeJavaVersionStrictlyGreaterThan(double version) {
         Assume.assumeTrue(getJavaVersion() > version);
     }
 
-    protected void assumeJavaVersionStrictlyLowerThan(double version)
-    {
+    protected void assumeJavaVersionStrictlyLowerThan(double version) {
         Assume.assumeTrue(getJavaVersion() < version);
     }
 
-    protected double getJavaVersion()
-    {
+    protected double getJavaVersion() {
         String ver = System.getProperty("java.version");
         return Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
     }
 
-    protected boolean onWindows()
-    {
+    protected boolean onWindows() {
         return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
-    protected JqmEngineOperations addAndStartEngine()
-    {
+    protected JqmEngineOperations addAndStartEngine() {
         return addAndStartEngine("localhost");
     }
 
-    protected JqmEngineOperations addAndStartEngine(String nodeName)
-    {
+    protected JqmEngineOperations addAndStartEngine(String nodeName) {
         beforeStartEngine(nodeName);
 
         var engine = ServiceLoaderHelper.getService(ServiceLoader.load(JqmEngineOperations.class));
@@ -210,72 +188,57 @@ public class JqmBaseTest
         return engine;
     }
 
-    protected void beforeStartEngine(String nodeName)
-    {
+    protected void beforeStartEngine(String nodeName) {
         // For overrides.
     }
 
-    protected void afterStartEngine(String nodeName)
-    {
+    protected void afterStartEngine(String nodeName) {
         // For overrides.
     }
 
-    protected void stopAndRemoveEngine(String nodeName)
-    {
+    protected void stopAndRemoveEngine(String nodeName) {
         JqmEngineOperations e = engines.get(nodeName);
         e.stop();
         engines.remove(nodeName);
     }
 
-    protected DbConn getNewDbSession()
-    {
+    protected DbConn getNewDbSession() {
         DbConn cnx = db.getConn();
         cnxs.add(cnx);
         return cnx;
     }
 
-    protected void sleep(int s)
-    {
+    protected void sleep(int s) {
         sleepms(1000 * s);
     }
 
-    protected static void sleepms(int ms)
-    {
-        try
-        {
+    protected static void sleepms(int ms) {
+        try {
             Thread.sleep(ms);
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             // not an issue in tests
         }
     }
 
-    protected void simulateDbFailure()
-    {
-        if (db.getProduct().contains("hsql"))
-        {
-            jqmlogger.info("DB is going down");
-            s.close();
-            jqmlogger.info("DB is now fully down");
-            this.sleep(1);
-            jqmlogger.info("Restarting DB");
-            s.start();
+    protected void simulateDbFailure(int waitTimeBeforeRestart) {
+        try {
+            jqmlogger.info("Send suicide query");
+            cnx.simulateDisconnection();
+            this.sleep(waitTimeBeforeRestart);
+//            Helpers.closeQuietly(cnx);
         }
-        else if (db.getProduct().contains("postgresql"))
-        {
-            try
-            {
-                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
-                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
-            }
-            catch (Exception e)
-            {
-                // Do nothing - the query is a suicide so it cannot work fully.
-            }
-            cnx.close();
-            cnx = getNewDbSession();
+        catch(Exception e) {
+            // Nothing to do. Some SGBDR will throw exception because the killing connection was killed.
         }
+    }
+
+    protected boolean waitForPollersArePolling(){
+        int remainingAttempt = 10;
+        while (!this.engines.get("localhost").areAllPollersPolling() && remainingAttempt > 0){
+            remainingAttempt --;
+            jqmlogger.debug("waitFormPollersArePolling countdown : " + remainingAttempt);
+        }
+        return this.engines.get("localhost").areAllPollersPolling();
     }
 
     protected void displayAllHistoryTable()
@@ -313,5 +276,23 @@ public class JqmBaseTest
     public void testContainerStarts()
     {
         Assert.assertTrue(true);
+    }
+
+    protected void assumeNotDb2()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
+        }
+    }
+
+    protected void assumeNotOracle()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
+        }
     }
 }
