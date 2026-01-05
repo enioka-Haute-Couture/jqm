@@ -1,12 +1,10 @@
 package com.enioka.jqm.jdbc.impl.pg;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Properties;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import org.kohsuke.MetaInfServices;
 
 import com.enioka.jqm.jdbc.DbAdapter;
@@ -68,5 +66,20 @@ public class DbImplPg extends DbAdapter
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
+    }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+
+        try (Statement s = cnx.createStatement())
+        {
+            s.execute("SELECT pg_cancel_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid()"); // Tue les autres
+            s.execute("SELECT pg_terminate_backend(pg_backend_pid())");
+        }
+        catch (SQLException e)
+        {
+            // it is expected that this catch an exception.
+        }
     }
 }
