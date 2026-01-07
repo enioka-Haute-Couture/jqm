@@ -212,11 +212,11 @@ jobs:
               with:
                   java-version: 21
                   distribution: "zulu"
-                  server-id: sonatype-nexus-snapshots
-                  server-username: OSSRH_USERNAME
-                  server-password: OSSRH_PASSWORD
+                  server-id: central
+                  server-username: MAVEN_CENTRAL_USERNAME
+                  server-password: MAVEN_CENTRAL_PASSWORD
             - name: Publish package
               run: mvn deploy
               env:
-                  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-                  OSSRH_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+                  OSSRH_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+                  OSSRH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
