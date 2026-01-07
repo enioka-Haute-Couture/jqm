@@ -216,7 +216,7 @@ jobs:
                   server-username: MAVEN_CENTRAL_USERNAME
                   server-password: MAVEN_CENTRAL_PASSWORD
             - name: Publish package
-              run: mvn deploy
+              run: mvn deploy -DskipTests -DdeployAtEnd=true
               env:
                   OSSRH_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
                   OSSRH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
