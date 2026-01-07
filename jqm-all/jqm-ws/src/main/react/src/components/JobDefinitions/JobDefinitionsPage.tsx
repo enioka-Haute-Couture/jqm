@@ -96,7 +96,7 @@ export const JobDefinitionsPage: React.FC = () => {
         }
         setPageTitle("Job definitions");
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {

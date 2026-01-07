@@ -78,27 +78,29 @@ const RunsPage: React.FC = () => {
     }
 
     const refresh = () => {
-        if (canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
-            canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
-            fetchJobInstances(
-                page,
-                rowsPerPage,
-                sortOrder!,
-                queryLiveInstances,
-                filterList!
-            );
-            fetchQueues();
-            fetchParameters();
-        }
+
+        fetchJobInstances(
+            page,
+            rowsPerPage,
+            sortOrder!,
+            queryLiveInstances,
+            filterList!
+        );
+        fetchQueues();
+        fetchParameters();
+
     }
 
     const [displayedLogType, setLogType] = useState<LOG_TYPE>("NONE");
 
     useEffect(() => {
-        refresh();
+        if (canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
+            canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
+            refresh();
+        }
         setPageTitle("Runs");
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [canUserAccess]);
 
     const [showDetailsJobInstanceId, setShowDetailsJobInstanceId] = useState<
         string | null

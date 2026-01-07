@@ -65,7 +65,7 @@ const UsersPage: React.FC = () => {
         }
         setPageTitle("Users");
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [canUserAccess]);
 
     const updateRow = useCallback(
         (id: number) => {
