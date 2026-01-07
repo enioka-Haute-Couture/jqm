@@ -113,18 +113,6 @@ public class ServiceAdmin
     @PUT
     @Path("node")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setNodes(List<NodeDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncNodes(cnx, dtos);
-            cnx.commit();
-        }
-    }
-
-    @POST
-    @Path("node")
-    @Consumes(MediaType.APPLICATION_JSON)
     public void setNode(NodeDto dto)
     {
         try (DbConn cnx = Helpers.getDbSession())
@@ -147,19 +135,6 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             return MetaService.getQueues(cnx);
-        }
-    }
-
-    @PUT
-    @Path("q")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @HttpCache
-    public void setQueues(List<QueueDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncQueues(cnx, dtos);
-            cnx.commit();
         }
     }
 
@@ -236,18 +211,6 @@ public class ServiceAdmin
     }
 
     @PUT
-    @Path("qmapping")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueueMappings(List<QueueMappingDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncQueueMappings(cnx, dtos);
-            cnx.commit();
-        }
-    }
-
-    @PUT
     @Path("qmapping/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public void setQueueMapping(@PathParam("id") Long id, QueueMappingDto dto)
@@ -292,18 +255,6 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             return MetaService.getJndiObjectResource(cnx);
-        }
-    }
-
-    @PUT
-    @Path("jndi")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setJndiResources(List<JndiObjectResourceDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncJndiObjectResource(cnx, dtos);
-            cnx.commit();
         }
     }
 
@@ -364,18 +315,6 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             return MetaService.getGlobalParameter(cnx);
-        }
-    }
-
-    @PUT
-    @Path("prm")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setGlobalParameters(List<GlobalParameterDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncGlobalParameters(cnx, dtos);
-            cnx.commit();
         }
     }
 
@@ -499,18 +438,6 @@ public class ServiceAdmin
         }
     }
 
-    @PUT
-    @Path("jd")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setJobDefs(List<JobDefDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncJobDefs(cnx, dtos);
-            cnx.commit();
-        }
-    }
-
     @GET
     @Path("jd/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -619,18 +546,6 @@ public class ServiceAdmin
         }
     }
 
-    @PUT
-    @Path("user")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setUsers(List<RUserDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncUsers(cnx, dtos);
-            cnx.commit();
-        }
-    }
-
     @GET
     @Path("user/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -688,18 +603,6 @@ public class ServiceAdmin
         try (DbConn cnx = Helpers.getDbSession())
         {
             return MetaService.getRoles(cnx);
-        }
-    }
-
-    @PUT
-    @Path("role")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setRoles(List<RRoleDto> dtos)
-    {
-        try (DbConn cnx = Helpers.getDbSession())
-        {
-            MetaService.syncRoles(cnx, dtos);
-            cnx.commit();
         }
     }
 

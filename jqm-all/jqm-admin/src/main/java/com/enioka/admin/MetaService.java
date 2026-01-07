@@ -208,32 +208,6 @@ public class MetaService
         return res;
     }
 
-    public static void syncGlobalParameters(DbConn cnx, List<GlobalParameterDto> dtos)
-    {
-        for (GlobalParameterDto existing : getGlobalParameter(cnx))
-        {
-            boolean foundInNewSet = false;
-            for (GlobalParameterDto newdto : dtos)
-            {
-                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
-                {
-                    foundInNewSet = true;
-                    break;
-                }
-            }
-
-            if (!foundInNewSet)
-            {
-                deleteGlobalParameter(cnx, existing.getId());
-            }
-        }
-
-        for (GlobalParameterDto dto : dtos)
-        {
-            upsertGlobalParameter(cnx, dto);
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // JNDI
     ///////////////////////////////////////////////////////////////////////////
@@ -841,32 +815,6 @@ public class MetaService
         }
     }
 
-    public static void syncJobDefs(DbConn cnx, List<JobDefDto> dtos)
-    {
-        for (JobDefDto existing : getJobDef(cnx))
-        {
-            boolean foundInNewSet = false;
-            for (JobDefDto newdto : dtos)
-            {
-                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
-                {
-                    foundInNewSet = true;
-                    break;
-                }
-            }
-
-            if (!foundInNewSet)
-            {
-                deleteJobDef(cnx, existing.getId());
-            }
-        }
-
-        for (JobDefDto dto : dtos)
-        {
-            upsertJobDef(cnx, dto);
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // NODE
     ///////////////////////////////////////////////////////////////////////////
@@ -1023,32 +971,6 @@ public class MetaService
         }
     }
 
-    public static void syncNodes(DbConn cnx, List<NodeDto> dtos)
-    {
-        for (NodeDto existing : getNodes(cnx))
-        {
-            boolean foundInNewSet = false;
-            for (NodeDto newdto : dtos)
-            {
-                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
-                {
-                    foundInNewSet = true;
-                    break;
-                }
-            }
-
-            if (!foundInNewSet)
-            {
-                deleteQueue(cnx, existing.getId());
-            }
-        }
-
-        for (NodeDto dto : dtos)
-        {
-            upsertNode(cnx, dto);
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // QUEUE
     ///////////////////////////////////////////////////////////////////////////
@@ -1165,32 +1087,6 @@ public class MetaService
             {
                 throw e;
             }
-        }
-    }
-
-    public static void syncQueues(DbConn cnx, List<QueueDto> dtos)
-    {
-        for (QueueDto existing : getQueues(cnx))
-        {
-            boolean foundInNewSet = false;
-            for (QueueDto newdto : dtos)
-            {
-                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
-                {
-                    foundInNewSet = true;
-                    break;
-                }
-            }
-
-            if (!foundInNewSet)
-            {
-                deleteQueue(cnx, existing.getId());
-            }
-        }
-
-        for (QueueDto dto : dtos)
-        {
-            upsertQueue(cnx, dto);
         }
     }
 
@@ -1471,32 +1367,6 @@ public class MetaService
         }
     }
 
-    public static void syncRoles(DbConn cnx, List<RRoleDto> dtos)
-    {
-        for (RRoleDto existing : getRoles(cnx))
-        {
-            boolean foundInNewSet = false;
-            for (RRoleDto newdto : dtos)
-            {
-                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
-                {
-                    foundInNewSet = true;
-                    break;
-                }
-            }
-
-            if (!foundInNewSet)
-            {
-                deleteRole(cnx, existing.getId(), false);
-            }
-        }
-
-        for (RRoleDto dto : dtos)
-        {
-            upsertRole(cnx, dto);
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // USER
     ///////////////////////////////////////////////////////////////////////////
@@ -1654,32 +1524,6 @@ public class MetaService
             {
                 cnx.runUpdate("user_add_role_by_id", newId, i);
             }
-        }
-    }
-
-    public static void syncUsers(DbConn cnx, List<RUserDto> dtos)
-    {
-        for (RUserDto existing : getUsers(cnx))
-        {
-            boolean foundInNewSet = false;
-            for (RUserDto newdto : dtos)
-            {
-                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
-                {
-                    foundInNewSet = true;
-                    break;
-                }
-            }
-
-            if (!foundInNewSet)
-            {
-                deleteUser(cnx, existing.getId());
-            }
-        }
-
-        for (RUserDto dto : dtos)
-        {
-            upsertUser(cnx, dto);
         }
     }
 }

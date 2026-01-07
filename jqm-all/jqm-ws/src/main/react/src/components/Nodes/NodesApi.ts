@@ -19,13 +19,13 @@ const useNodesApi = () => {
             .then((nodes) => setNodes(nodes))
             .catch(displayError);
     }, [displayError]);
-    
+
     const updateNode = useCallback(
         (node: Node) => {
-            return APIService.post(API_URL, node)
+            return APIService.put(API_URL, node)
                 .then(() => {
                     fetchNodes();
-                    displaySuccess("Successfully updated node");
+                    displaySuccess(`Successfully updated node ${node.name}`);
                 })
                 .catch(displayError);
         },
