@@ -44,7 +44,7 @@ export const NodesPage: React.FC = () => {
         }
         setPageTitle("Nodes");
         // eslint-disable-next-line
-    }, []);
+    }, [canUserAccess]);
 
     const handleOnViewLogs = useCallback(
         async (tableMeta: MUIDataTableMeta) => {

@@ -30,15 +30,14 @@ const QueuesPage: React.FC = () => {
 
     const { enqueueSnackbar } = useSnackbar();
 
+    const { canUserAccess } = useAuth();
+
     useEffect(() => {
         if (canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
             fetchQueues();
         }
         setPageTitle("Queues");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const { canUserAccess } = useAuth();
+    }, [canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
@@ -171,12 +170,12 @@ const QueuesPage: React.FC = () => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={"Add line Dialog"}>
-                                <CreateQueueDialog
-                                    showDialog={showDialog}
-                                    closeDialog={() => setShowDialog(false)}
-                                    createQueue={createQueue}
-                                    canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
-                                />
+                            <CreateQueueDialog
+                                showDialog={showDialog}
+                                closeDialog={() => setShowDialog(false)}
+                                createQueue={createQueue}
+                                canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
+                            />
                         </Tooltip>
                     </>}
                 <Tooltip title={"Refresh"}>

@@ -37,15 +37,16 @@ const ClassLoadersPage: React.FC = () => {
     const { classLoaders, fetchClassLoaders, createClassLoader, updateClassLoader, deleteClassLoaders } =
         useClassLoaderAPI();
 
+    const { canUserAccess } = useAuth();
+
     useEffect(() => {
         if (canUserAccess(PermissionObjectType.cl, PermissionAction.read)) {
             fetchClassLoaders();
         }
         setPageTitle("Class Loaders");
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [canUserAccess]);
 
-    const { canUserAccess } = useAuth();
 
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
@@ -215,8 +216,8 @@ const ClassLoadersPage: React.FC = () => {
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.cl, PermissionAction.create) &&
-                <>
-                    <Tooltip title={"Add line"}>
+                    <>
+                        <Tooltip title={"Add line"}>
 
                             <IconButton
                                 color="default"
@@ -225,15 +226,15 @@ const ClassLoadersPage: React.FC = () => {
                                 size="large">
                                 <AddCircleIcon />
                             </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"add line Dialog"}>
+                        </Tooltip>
+                        <Tooltip title={"add line Dialog"}>
                             <CreateClassLoaderDialog
                                 showDialog={showDialog}
                                 closeDialog={() => setShowDialog(false)}
                                 createClassLoader={createClassLoader}
                             />
-                    </Tooltip>
-                </>}
+                        </Tooltip>
+                    </>}
                 <Tooltip title={"Refresh"}>
                     <IconButton
                         color="default"

@@ -66,7 +66,7 @@ const MappingsPage: React.FC = () => {
         }
         setPageTitle('Mappings');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
