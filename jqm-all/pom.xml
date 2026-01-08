@@ -386,7 +386,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <centralSnapshotsUrl>https://central.sonatype.com/repository/snapshots/</centralSnapshotsUrl>
                 </configuration>
             </plugin>
 
