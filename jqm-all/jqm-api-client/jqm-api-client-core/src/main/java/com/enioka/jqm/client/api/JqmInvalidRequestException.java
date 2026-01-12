@@ -22,11 +22,20 @@ public class JqmInvalidRequestException extends JqmException
 {
     private static final long serialVersionUID = 2248971878792826983L;
 
+    /**
+     * Create a new exception with a custom message and a root cause.
+     * @param msg the error message
+     * @param e the root cause
+     */
     public JqmInvalidRequestException(String msg, Exception e)
     {
         super(msg, e);
     }
 
+    /**
+     * Create a new exception with a specific message.
+     * @param msg the error message
+     */
     public JqmInvalidRequestException(String msg)
     {
         super(msg);

@@ -72,7 +72,7 @@
         <plugin.compiler.version>3.13.0</plugin.compiler.version>
         <plugin.dependency.version>3.6.1</plugin.dependency.version>
         <plugin.jar.version>3.4.0</plugin.jar.version>
-        <plugin.javadoc.version>3.6.3</plugin.javadoc.version>
+        <plugin.javadoc.version>3.12</plugin.javadoc.version>
         <plugin.release.version>3.0.1</plugin.release.version>
         <plugin.source.version>3.3.1</plugin.source.version>
         <plugin.surefire.version>3.2.5</plugin.surefire.version>
@@ -265,15 +265,15 @@
         </profile>
 
         <!-- This will disable DocLint on Java >=8. -->
-        <profile>
-            <id>disable-doclint</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <javadoc.opts>-Xdoclint:none</javadoc.opts>
-            </properties>
-        </profile>
+<!--        <profile>-->
+<!--            <id>disable-doclint</id>-->
+<!--            <activation>-->
+<!--                <jdk>[1.8,)</jdk>-->
+<!--            </activation>-->
+<!--            <properties>-->
+<!--                <javadoc.opts>-Xdoclint:none</javadoc.opts>-->
+<!--            </properties>-->
+<!--        </profile>-->
 
 
         <profile>

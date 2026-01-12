@@ -76,9 +76,15 @@ public class QueryBaseImpl implements Query
     // //////////////////////////////////////////
 
     // JAX-RS javabean convention
-    public QueryBaseImpl()
-    {}
+    /**
+     * Default constructor for JAX-RS
+     */
+    public QueryBaseImpl() {}
 
+    /**
+     * Constructor.
+     * @param client the client to use for the query
+     */
     public QueryBaseImpl(JqmClientQuerySubmitCallback client)
     {
         this.parentClient = client;
@@ -88,7 +94,7 @@ public class QueryBaseImpl implements Query
      * Internal method. Not a public API. Used to change the client used by a query. The parameter type used is not a public interface on
      * purpose.
      *
-     * @param parentClient
+     * @param parentClient the new client to use
      */
     public void setParentClient(JqmClientQuerySubmitCallback parentClient)
     {
