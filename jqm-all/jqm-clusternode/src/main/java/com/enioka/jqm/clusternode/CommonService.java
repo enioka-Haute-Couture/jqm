@@ -37,7 +37,7 @@ final class CommonService
             Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             root.setLevel(Level.toLevel(level));
 
-            Logger log = (Logger) LoggerFactory.getLogger("com.enioka");
+            Logger log = (Logger) LoggerFactory.getLogger("com.enioka.jqm");
             log.setLevel(Level.toLevel(level));
             jqmlogger.info("Setting general log level at " + level + " which translates as actual logger level " + Level.toLevel(level));
         }
