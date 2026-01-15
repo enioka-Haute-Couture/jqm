@@ -101,6 +101,8 @@ class CronScheduler implements Runnable, TaskCollector
                 qr = cnx.runUpdate("w_update_take", this.node.getId(), this.node.getId(), this.node.getId(),
                         (int) (schedulerKeepAlive * 1.2 / 1000));
                 cnx.commit();
+                jqmlogger.info("Scheduler time is {}", (int) (schedulerKeepAlive * 1.2 / 1000));
+                jqmlogger.info("qr is {}", qr.toString());
             }
             catch (DatabaseException ex)
             {
@@ -120,7 +122,7 @@ class CronScheduler implements Runnable, TaskCollector
                 }
                 else
                 {
-                    jqmlogger.trace("This node is confirmed as master scheduler");
+                    jqmlogger.info("This node is confirmed as master scheduler");
                 }
             }
             else
@@ -129,6 +131,10 @@ class CronScheduler implements Runnable, TaskCollector
                 {
                     jqmlogger.info("This node is no longer master scheduler");
                     stopScheduler();
+                }
+                else
+                {
+                    jqmlogger.info("This node is confirmed as slave scheduler");
                 }
             }
 
