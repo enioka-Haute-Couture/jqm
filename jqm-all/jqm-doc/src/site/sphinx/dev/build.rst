@@ -101,6 +101,10 @@ Create a release inside GitHub and upload the zip and tar.gz produced by the jqm
 Docker Hub upload
 ++++++++++++++++++++
 
+Checkout the version tag ::
+
+    git checkout jqm-all-3.2.0
+
 For linux amd64 architecture, build the Docker image for the new release ::
 
     docker build --platform linux/amd64 --rm --pull --provenance=false --sbom=false -t enioka/jqm:3.2.0 -f ./linux/Dockerfile ../
