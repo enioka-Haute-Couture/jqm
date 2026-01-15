@@ -13,7 +13,6 @@
     <description>Test suite for the JQM engine + service</description>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
         <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m --add-opens
             java.naming/javax.naming.spi=ALL-UNNAMED</argLine>
     </properties>
