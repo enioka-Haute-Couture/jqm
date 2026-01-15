@@ -40,34 +40,85 @@ import com.enioka.jqm.client.api.State;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class QueryBaseImpl implements Query
 {
+    /** The jobInstance id to filter on. **/
     protected Long jobInstanceId;
+    /** The parentId to filter on. **/
     protected Long parentId;
+    /** The application names to filter on. **/
     protected List<String> applicationName = new ArrayList<>();
-    protected String user, sessionId;
-    protected String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
-    protected String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
-    protected String queueName, nodeName;
+    /** The user to filter on. **/
+    protected String user;
+    /** The session ID to filter on. **/
+    protected String sessionId;
+    /** The jobDefKeyword1 to filter on. **/
+    protected String jobDefKeyword1;
+    /** The jobDefKeyword2 to filter on. **/
+    protected String jobDefKeyword2;
+    /** The jobDefKeyword3 to filter on. **/
+    protected String jobDefKeyword3;
+    /** The jobDefModule to filter on. **/
+    protected String jobDefModule;
+    /** The jobDefApplication to filter on. **/
+    protected String jobDefApplication;
+    /** The instanceKeyword1 to filter on. **/
+    protected String instanceKeyword1;
+    /**The instanceKeyword2 to filter on. **/
+    protected String instanceKeyword2;
+    /** The instanceKeyword3 to filter on. **/
+    protected String instanceKeyword3;
+    /** The instanceModule to filter on. **/
+    protected String instanceModule;
+    /** the instaceApplication to filter on. **/
+    protected String instanceApplication;
+    /** The queue name to filter on. **/
+    protected String queueName;
+    /** The node name to filter on. **/
+    protected String nodeName;
+    /** The queue id to filter on. **/
     protected Long queueId;
-    protected Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
+    /** The enqueuedBefore date to filter on. **/
+    protected Calendar enqueuedBefore;
+    /** The enqueuedAfter date to filter on. **/
+    protected Calendar enqueuedAfter;
+    /** The beganRunningBefore date to filter on. **/
+    protected Calendar beganRunningBefore;
+    /** The beganRunningAfter date to filter on. **/
+    protected Calendar beganRunningAfter;
+    /** The endedBefore date to filter on. **/
+    protected Calendar endedBefore;
+    /** The endedAfter date to filter on. **/
+    protected Calendar endedAfter;
 
+    /** The status to filter on. **/
     @XmlElementWrapper(name = "statuses")
     @XmlElement(name = "status", type = State.class)
     protected List<State> status = new ArrayList<>();
 
-    protected Integer firstRow, pageSize = 50;
+    /** The firstRow to consider. **/
+    protected Integer firstRow;
+    /** The pageSize of the result. **/
+    protected Integer pageSize = 50;
 
+    /** Sorting specifications. **/
     @XmlElementWrapper(name = "sortby")
     @XmlElement(name = "sortitem", type = SortSpec.class)
     protected List<SortSpec> sorts = new ArrayList<>();
 
-    protected boolean queryLiveInstances = false, queryHistoryInstances = true;
+    /** Whether to query live instances or not. **/
+    protected boolean queryLiveInstances = false;
 
+    /** Whether to query history instances or not. **/
+    protected boolean queryHistoryInstances = true;
+
+    /** The result size. **/
     protected Integer resultSize;
 
+    /** The results of the query. **/
     @XmlElementWrapper(name = "instances")
     @XmlElement(name = "instance", type = JobInstance.class)
     protected List<JobInstance> results;
 
+    /** The client used to submit the query. **/
     @XmlTransient
     protected JqmClientQuerySubmitCallback parentClient;
 
@@ -76,9 +127,7 @@ public class QueryBaseImpl implements Query
     // //////////////////////////////////////////
 
     // JAX-RS javabean convention
-    /**
-     * Default constructor for JAX-RS
-     */
+    /** Default constructor for JAX-RS. **/
     public QueryBaseImpl() {}
 
     /**
@@ -105,6 +154,9 @@ public class QueryBaseImpl implements Query
     // Execution
     // //////////////////////////////////////////
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<JobInstance> invoke()
     {
@@ -115,6 +167,9 @@ public class QueryBaseImpl implements Query
     // Sort
     // //////////////////////////////////////////
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query addSortAsc(Sort column)
     {
@@ -122,6 +177,9 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query addSortDesc(Sort column)
     {
@@ -129,6 +187,10 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the sorting specifications.
+     * @return the sorting specifications
+     */
     public List<SortSpec> getSorts()
     {
         return this.sorts;
@@ -138,6 +200,9 @@ public class QueryBaseImpl implements Query
     // Results handling
     // //////////////////////////////////////////
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setPageSize(Integer pageSize)
     {
@@ -145,6 +210,9 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setFirstRow(Integer firstRow)
     {
@@ -152,6 +220,9 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getResultSize()
     {
@@ -169,11 +240,19 @@ public class QueryBaseImpl implements Query
         }
     }
 
+    /**
+     * Set the result size manually.
+     * @see #getResultSize()
+     * @param resultSize the resultSize to set
+     */
     public void setResultSize(Integer resultSize)
     {
         this.resultSize = resultSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<JobInstance> getResults()
     {
@@ -184,6 +263,11 @@ public class QueryBaseImpl implements Query
         return results;
     }
 
+    /**
+     * Set the result of a query manually.
+     * @see #getResults()
+     * @param results the results to set
+     */
     public void setResults(List<JobInstance> results)
     {
         this.results = results;
@@ -193,11 +277,19 @@ public class QueryBaseImpl implements Query
     // Stupid get/set
     // //////////////////////////////////////////
 
+    /**
+     * Get the job instance ID to filter on.
+     * @see #setJobInstanceId(Long)
+     * @return the job instance ID
+     */
     public Long getJobInstanceId()
     {
         return jobInstanceId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setJobInstanceId(Long jobInstanceId)
     {
@@ -205,11 +297,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the parent ID to filter on.
+     * @see #setParentId(Long)
+     * @return the parent ID
+     */
     public Long getParentId()
     {
         return parentId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setParentId(Long parentId)
     {
@@ -217,11 +317,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the application names to filter on.
+     * @see #setApplicationName(List)
+     * @return the application names
+     */
     public List<String> getApplicationName()
     {
         return applicationName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setApplicationName(List<String> applicationName)
     {
@@ -229,6 +337,9 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setApplicationName(String applicationName)
     {
@@ -237,11 +348,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the user to filter on.
+     * @see #setUser(String)
+     * @return the user
+     */
     public String getUser()
     {
         return user;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setUser(String user)
     {
@@ -249,11 +368,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the session ID to filter on.
+     * @see #setSessionId(String)
+     * @return the session ID
+     */
     public String getSessionId()
     {
         return sessionId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setSessionId(String sessionId)
     {
@@ -261,11 +388,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the jobDefKeyword1 to filter on.
+     * @see #setJobDefKeyword1(String)
+     * @return the jobDefKeyword1
+     */
     public String getJobDefKeyword1()
     {
         return jobDefKeyword1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setJobDefKeyword1(String jobDefKeyword1)
     {
@@ -273,11 +408,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the jobDefKeyword2 to filter on.
+     * @see #setJobDefKeyword2(String)
+     * @return the jobDefKeyword2
+     */
     public String getJobDefKeyword2()
     {
         return jobDefKeyword2;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setJobDefKeyword2(String jobDefKeyword2)
     {
@@ -285,11 +428,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the jobDefKeyword3 to filter on.
+     * @see #setJobDefKeyword3(String)
+     * @return the jobDefKeyword3
+     */
     public String getJobDefKeyword3()
     {
         return jobDefKeyword3;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setJobDefKeyword3(String jobDefKeyword3)
     {
@@ -297,11 +448,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the jobDefModule to filter on.
+     * @see #setJobDefModule(String)
+     * @return the jobDefModule
+     */
     public String getJobDefModule()
     {
         return jobDefModule;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setJobDefModule(String jobDefModule)
     {
@@ -309,11 +468,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the jobDefApplication to filter on.
+     * @see #setJobDefApplication(String)
+     * @return the jobDefApplication
+     */
     public String getJobDefApplication()
     {
         return jobDefApplication;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setJobDefApplication(String jobDefApplication)
     {
@@ -321,11 +488,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the instanceKeyword1 to filter on.
+     * @see #setInstanceKeyword1(String)
+     * @return the instanceKeyword1
+     */
     public String getInstanceKeyword1()
     {
         return instanceKeyword1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setInstanceKeyword1(String instanceKeyword1)
     {
@@ -333,11 +508,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the instanceKeyword2 to filter on.
+     * @see #setInstanceKeyword2(String)
+     * @return the instanceKeyword2
+     */
     public String getInstanceKeyword2()
     {
         return instanceKeyword2;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setInstanceKeyword2(String instanceKeyword2)
     {
@@ -345,11 +528,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the instanceKeyword3 to filter on.
+     * @see #setInstanceKeyword3(String)
+     * @return the instanceKeyword3
+     */
     public String getInstanceKeyword3()
     {
         return instanceKeyword3;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setInstanceKeyword3(String instanceKeyword3)
     {
@@ -357,11 +548,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the instanceModule to filter on.
+     * @see #setInstanceModule(String)
+     * @return the instanceModule
+     */
     public String getInstanceModule()
     {
         return instanceModule;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setInstanceModule(String instanceModule)
     {
@@ -369,11 +568,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the instanceApplication to filter on.
+     * @see #setInstanceApplication(String)
+     * @return the instanceApplication
+     */
     public String getInstanceApplication()
     {
         return instanceApplication;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setInstanceApplication(String instanceApplication)
     {
@@ -381,11 +588,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get whether to query live instances or not.
+     * @see #setQueryLiveInstances(boolean)
+     * @return whether to query live instances
+     */
     public boolean isQueryLiveInstances()
     {
         return queryLiveInstances;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setQueryLiveInstances(boolean queryLiveInstances)
     {
@@ -398,11 +613,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get whether to query history instances or not.
+     * @see #setQueryHistoryInstances(boolean)
+     * @return whether to query history instances
+     */
     public boolean isQueryHistoryInstances()
     {
         return queryHistoryInstances;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setQueryHistoryInstances(boolean queryHistoryInstances)
     {
@@ -410,11 +633,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the enqueue date before which to filter.
+     * @see #setEnqueuedBefore(Calendar)
+     * @return the date
+     */
     public Calendar getEnqueuedBefore()
     {
         return enqueuedBefore;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setEnqueuedBefore(Calendar enqueuedBefore)
     {
@@ -422,11 +653,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the enqueue date after which to filter.
+     * @see #setEnqueuedAfter(Calendar)
+     * @return the date
+     */
     public Calendar getEnqueuedAfter()
     {
         return enqueuedAfter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setEnqueuedAfter(Calendar enqueuedAfter)
     {
@@ -434,11 +673,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the running date before which to filter.
+     * @see #setBeganRunningBefore(Calendar)
+     * @return the date
+     */
     public Calendar getBeganRunningBefore()
     {
         return beganRunningBefore;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setBeganRunningBefore(Calendar beganRunningBefore)
     {
@@ -446,11 +693,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the running date after which to filter.
+     * @see #setBeganRunningAfter(Calendar)
+     * @return the date
+     */
     public Calendar getBeganRunningAfter()
     {
         return beganRunningAfter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setBeganRunningAfter(Calendar beganRunningAfter)
     {
@@ -458,11 +713,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the ended date before which to filter.
+     * @see #setEndedBefore(Calendar)
+     * @return the date
+     */
     public Calendar getEndedBefore()
     {
         return endedBefore;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setEndedBefore(Calendar endedBefore)
     {
@@ -470,11 +733,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the ended date after which to filter.
+     * @see #setEndedAfter(Calendar)
+     * @return the date
+     */
     public Calendar getEndedAfter()
     {
         return endedAfter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setEndedAfter(Calendar endedAfter)
     {
@@ -482,11 +753,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the status to filter on.
+     * @see #addStatusFilter(State)
+     * @return the status
+     */
     public List<State> getStatus()
     {
         return status;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query addStatusFilter(State status)
     {
@@ -494,21 +773,39 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the first row to consider.
+     * @see #setFirstRow(Integer)
+     * @return the first row
+     */
     public Integer getFirstRow()
     {
         return firstRow;
     }
 
+    /**
+     * Get the page size.
+     * @see #setPageSize(Integer)
+     * @return the page size
+     */
     public Integer getPageSize()
     {
         return pageSize;
     }
 
+    /**
+     * Get the queue name to filter on.
+     * @see #setQueueName(String)
+     * @return the queue name
+     */
     public String getQueueName()
     {
         return queueName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setQueueName(String queueName)
     {
@@ -516,11 +813,19 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the queue ID to filter on.
+     * @see #setQueueId(Long)
+     * @return the queue ID
+     */
     public Long getQueueId()
     {
         return queueId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setQueueId(Long queueId)
     {
@@ -528,6 +833,9 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Query setNodeName(String nodeName)
     {
@@ -535,6 +843,11 @@ public class QueryBaseImpl implements Query
         return this;
     }
 
+    /**
+     * Get the node name to filter on.
+     * @see #setNodeName(String)
+     * @return the node name
+     */
     public String getNodeName()
     {
         return nodeName;
