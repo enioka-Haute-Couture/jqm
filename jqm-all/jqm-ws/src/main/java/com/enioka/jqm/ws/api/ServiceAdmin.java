@@ -89,7 +89,7 @@ public class ServiceAdmin
     @GET
     @Path("node")
     @Produces(MediaType.APPLICATION_JSON)
-    @HttpCache("public, max-age=60")
+    @HttpCache
     public List<NodeDto> getNodes()
     {
         try (DbConn cnx = Helpers.getDbSession())
@@ -101,7 +101,7 @@ public class ServiceAdmin
     @GET
     @Path("node/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    @HttpCache("public, max-age=60")
+    @HttpCache
     public NodeDto getNode(@PathParam("id") long id)
     {
         try (DbConn cnx = Helpers.getDbSession())
