@@ -2,10 +2,12 @@ import { useCallback, useState } from "react";
 import { Node } from "./Node";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
+import { useTranslation } from "react-i18next";
 
 const API_URL = "/admin/node";
 
 const useNodesApi = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
 
     const [nodes, setNodes] = useState<Node[] | null>();
@@ -25,11 +27,13 @@ const useNodesApi = () => {
             return APIService.put(API_URL, node)
                 .then(() => {
                     fetchNodes();
-                    displaySuccess(`Successfully updated node ${node.name}`);
+                    displaySuccess(
+                        t("nodes.messages.successUpdate", { name: node.name })
+                    );
                 })
                 .catch(displayError);
         },
-        [fetchNodes, displaySuccess, displayError]
+        [fetchNodes, displaySuccess, displayError, t]
     );
 
     const fetchNodeLogs = useCallback(

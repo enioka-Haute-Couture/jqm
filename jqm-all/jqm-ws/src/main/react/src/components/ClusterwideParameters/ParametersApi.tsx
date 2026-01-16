@@ -2,10 +2,12 @@ import { useCallback, useState } from "react";
 import { Parameter } from "./Parameter";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
+import { useTranslation } from "react-i18next";
 
 const apiUrl = "/admin/prm";
 
 export const useParametersApi = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
     const [parameters, setParameters] = useState<Parameter[] | null>();
 
@@ -21,12 +23,12 @@ export const useParametersApi = () => {
                 .then(() => {
                     fetchParameters();
                     displaySuccess(
-                        `Successfully created new parameter: ${newParam.key}`
+                        t("clusterParameters.messages.successCreate", { key: newParam.key })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchParameters, displayError, displaySuccess]
+        [fetchParameters, displayError, displaySuccess, t]
     );
 
     const deleteParameter = useCallback(
@@ -37,13 +39,12 @@ export const useParametersApi = () => {
                 .then(() => {
                     fetchParameters();
                     displaySuccess(
-                        `Successfully deleted parameter${paramIds.length > 1 ? "s" : ""
-                        }`
+                        t("clusterParameters.messages.successDelete", { count: paramIds.length })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchParameters, displayError, displaySuccess]
+        [fetchParameters, displayError, displaySuccess, t]
     );
 
     const updateParameter = useCallback(
@@ -51,11 +52,11 @@ export const useParametersApi = () => {
             return APIService.put(`${apiUrl}/${parameter.id}`, parameter)
                 .then(() => {
                     fetchParameters();
-                    displaySuccess("Successfully saved parameter");
+                    displaySuccess(t("clusterParameters.messages.successSave"));
                 })
                 .catch(displayError);
         },
-        [fetchParameters, displayError, displaySuccess]
+        [fetchParameters, displayError, displaySuccess, t]
     );
 
     return {

@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { Container, Link, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import APIService from "../utils/APIService";
 import { setPageTitle } from "../utils/title";
 
 const HomePage: React.FC = () => {
+    const { t } = useTranslation();
     const [documentationLink, setDocumentationLink] = React.useState("http://jqm.readthedocs.org/en/master");
 
     useEffect(() => {
@@ -16,13 +18,13 @@ const HomePage: React.FC = () => {
     return (
         <Container>
             <Typography variant="h5">
-                Welcome to the JQM administration web console
+                {t("home.title")}
             </Typography>
             <Typography variant="body1">
-                On each tab, click the question mark icon for contextual help.
+                {t("home.helpText")}
             </Typography>
             <Typography variant="body1">
-                Further reference can be found in the <Link href={documentationLink}>full online documentation</Link> for the development branch .
+                {t("home.documentationText")} <Link href={documentationLink}>{t("home.documentationLink")}</Link> {t("home.documentationSuffix")}
             </Typography>
         </Container>
     );

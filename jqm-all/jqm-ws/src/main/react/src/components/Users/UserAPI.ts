@@ -3,10 +3,12 @@ import { User } from "./User";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { Role } from "../Roles/Role";
+import { useTranslation } from "react-i18next";
 
 const API_URL = "/admin/user";
 
 export const useUserAPI = () => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState<User[] | null>(null);
     const [roles, setRoles] = useState<Role[] | null>(null);
     const { displayError, displaySuccess } = useNotificationService();
@@ -32,12 +34,14 @@ export const useUserAPI = () => {
                 .then(() => {
                     fetchUsers();
                     displaySuccess(
-                        `Successfully created user: ${newUser.login}`
+                        t("users.messages.successCreate", {
+                            login: newUser.login,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess, fetchUsers]
+        [displayError, displaySuccess, fetchUsers, t]
     );
 
     const deleteUsers = useCallback(
@@ -48,14 +52,14 @@ export const useUserAPI = () => {
                 .then(() => {
                     fetchUsers();
                     displaySuccess(
-                        `Successfully deleted user${
-                            userIds.length > 1 ? "s" : ""
-                        }`
+                        t("users.messages.successDelete", {
+                            count: userIds.length,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess, fetchUsers]
+        [displayError, displaySuccess, fetchUsers, t]
     );
 
     const updateUser = useCallback(
@@ -63,11 +67,13 @@ export const useUserAPI = () => {
             return APIService.put(`${API_URL}/${user.id}`, user)
                 .then(() => {
                     fetchUsers();
-                    displaySuccess(`Successfully updated user ${user.login}`);
+                    displaySuccess(
+                        t("users.messages.successUpdate", { login: user.login })
+                    );
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess, fetchUsers]
+        [displayError, displaySuccess, fetchUsers, t]
     );
 
     const changePassword = useCallback(
@@ -76,11 +82,11 @@ export const useUserAPI = () => {
                 newPassword: password,
             })
                 .then(() => {
-                    displaySuccess(`Successfully updated password of user`);
+                    displaySuccess(t("users.messages.successPasswordChange"));
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess]
+        [displayError, displaySuccess, t]
     );
 
     const getCertificateDownloadURL = useCallback((userId: number) => {

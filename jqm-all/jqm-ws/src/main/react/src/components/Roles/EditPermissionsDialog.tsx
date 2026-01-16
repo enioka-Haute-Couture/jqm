@@ -22,41 +22,39 @@ import {
 } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
 
 const PERMISSION_ACTIONS: { [code: string]: string } = {
     read: "read",
     create: "create",
     update: "update",
     delete: "delete",
-    "*": "do everything on",
+    "*": "all",
 };
 
 const PERMISSION_OBJECT_TYPES: { [code: string]: string } = {
     node: "node",
     queue: "queue",
-    qmapping: "mapping",
-    jndi: "JNDI resource",
-    prm: "parameter",
-    jd: "job definition",
+    qmapping: "qmapping",
+    jndi: "jndi",
+    prm: "prm",
+    jd: "jd",
     user: "user",
     role: "role",
-    job_instance: "history and queue content",
-    logs: "job log files",
-    queue_position: "job position in queue",
-    files: "files produced",
-    "*": "all types",
+    job_instance: "job_instance",
+    logs: "logs",
+    queue_position: "queue_position",
+    files: "files",
+    "*": "all",
 };
 
 export const PermissionsForm: React.FC<{
     permissions: string[];
     setPermissions: (permissions: string[]) => void;
 }> = ({ permissions, setPermissions }) => {
-    const [newAction, setNewAction] = useState<string>(
-        Object.entries(PERMISSION_ACTIONS)[0][0]
-    );
-    const [newObjectType, setNewObjectType] = useState<string>(
-        Object.entries(PERMISSION_OBJECT_TYPES)[0][0]
-    );
+    const { t } = useTranslation();
+    const [newAction, setNewAction] = useState<string>("read");
+    const [newObjectType, setNewObjectType] = useState<string>("node");
 
     return <>
         <FormControl
@@ -65,7 +63,7 @@ export const PermissionsForm: React.FC<{
                 minWidth: 200,
             }}
         >
-            <InputLabel id="action-select-label">Action</InputLabel>
+            <InputLabel id="action-select-label">{t("roles.editPermissionsDialog.action")}</InputLabel>
             <Select
                 input={<Input />}
                 labelId="action-select-label"
@@ -76,13 +74,11 @@ export const PermissionsForm: React.FC<{
                         setNewAction(event.target.value as string);
                     }}
             >
-                {Object.entries(PERMISSION_ACTIONS).map(
-                    ([actionCode, actionLabel]) => (
-                        <MenuItem key={actionCode} value={actionCode}>
-                            {actionLabel}
-                        </MenuItem>
-                    )
-                )}
+                {Object.entries(PERMISSION_ACTIONS).map(([actionCode, actionKey]) => (
+                    <MenuItem key={actionCode} value={actionCode}>
+                        {t(`roles.permissionActions.${actionKey}`)}
+                    </MenuItem>
+                ))}
             </Select>
         </FormControl>
         <FormControl
@@ -92,7 +88,7 @@ export const PermissionsForm: React.FC<{
             }}
         >
             <InputLabel id="object-type-select-label">
-                On object of type
+                {t("roles.editPermissionsDialog.onObjectType")}
             </InputLabel>
             <Select
                 input={<Input />}
@@ -104,16 +100,11 @@ export const PermissionsForm: React.FC<{
                         setNewObjectType(event.target.value as string);
                     }}
             >
-                {Object.entries(PERMISSION_OBJECT_TYPES).map(
-                    ([objectTypeCode, objectTypeLabel]) => (
-                        <MenuItem
-                            key={objectTypeCode}
-                            value={objectTypeCode}
-                        >
-                            {objectTypeLabel}
-                        </MenuItem>
-                    )
-                )}
+                {Object.entries(PERMISSION_OBJECT_TYPES).map(([objectTypeCode, objectTypeKey]) => (
+                    <MenuItem key={objectTypeCode} value={objectTypeCode}>
+                        {t(`roles.permissionObjectTypes.${objectTypeKey}`)}
+                    </MenuItem>
+                ))}
             </Select>
         </FormControl>
         <Button
@@ -129,56 +120,53 @@ export const PermissionsForm: React.FC<{
             }}
             color="primary"
         >
-            Add permission
+            {t("roles.editPermissionsDialog.addPermission")}
         </Button>
         <TableContainer component={Paper}>
             <Table size="small" aria-label="Permissions">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Code</TableCell>
-                        <TableCell>Action</TableCell>
-                        <TableCell>Object type</TableCell>
-                        <TableCell>Actions</TableCell>
+                        <TableCell>{t("roles.editPermissionsDialog.code")}</TableCell>
+                        <TableCell>{t("roles.editPermissionsDialog.action")}</TableCell>
+                        <TableCell>{t("roles.editPermissionsDialog.objectType")}</TableCell>
+                        <TableCell>{t("common.actions")}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {permissions.map((permission, index) => (
-                        <TableRow key={permission}>
-                            <TableCell component="th" scope="row">
-                                {permission}
-                            </TableCell>
-                            <TableCell>
-                                {
-                                    PERMISSION_ACTIONS[
-                                    permission.split(":")[1]
-                                    ]
-                                }
-                            </TableCell>
-                            <TableCell>
-                                {
-                                    PERMISSION_OBJECT_TYPES[
-                                    permission.split(":")[0]
-                                    ]
-                                }
-                            </TableCell>
-                            <TableCell>
-                                {" "}
-                                <IconButton
-                                    color="default"
-                                    aria-label={"delete"}
-                                    onClick={() => {
-                                        setPermissions(
-                                            permissions.filter(
-                                                (_, i) => i !== index
-                                            )
-                                        );
-                                    }}
-                                    size="large">
-                                    <DeleteIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {permissions.map((permission, index) => {
+                        const [objectType, action] = permission.split(":");
+                        const actionKey = action === "*" ? "all" : action;
+                        const objectTypeKey = objectType === "*" ? "all" : objectType;
+                        return (
+                            <TableRow key={permission}>
+                                <TableCell component="th" scope="row">
+                                    {permission}
+                                </TableCell>
+                                <TableCell>
+                                    {t(`roles.permissionActions.${actionKey}`)}
+                                </TableCell>
+                                <TableCell>
+                                    {t(`roles.permissionObjectTypes.${objectTypeKey}`)}
+                                </TableCell>
+                                <TableCell>
+                                    {" "}
+                                    <IconButton
+                                        color="default"
+                                        aria-label={"delete"}
+                                        onClick={() => {
+                                            setPermissions(
+                                                permissions.filter(
+                                                    (_, i) => i !== index
+                                                )
+                                            );
+                                        }}
+                                        size="large">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
         </TableContainer>
@@ -190,6 +178,7 @@ export const EditPermissionsDialog: React.FC<{
     permissions: string[];
     setPermissions: (permissions: string[]) => void;
 }> = ({ closeDialog, permissions, setPermissions }) => {
+    const { t } = useTranslation();
     const [editedPermissions, setEditedPermissions] =
         useState<string[]>(permissions);
 
@@ -201,10 +190,10 @@ export const EditPermissionsDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit permissions</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("roles.editPermissionsDialog.title")}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Permissions describe what the role can do.
+                    {t("roles.editPermissionsDialog.description")}
                 </DialogContentText>
                 <PermissionsForm
                     permissions={editedPermissions}
@@ -217,7 +206,7 @@ export const EditPermissionsDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -229,7 +218,7 @@ export const EditPermissionsDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("roles.editPermissionsDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

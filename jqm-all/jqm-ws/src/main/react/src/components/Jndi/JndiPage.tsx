@@ -6,6 +6,7 @@ import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useTranslation } from "react-i18next";
 import { EditParametersDialog } from "./EditParametersDialog";
 import useJndiApi from "./JndiApi";
 import { JndiResource } from "./JndiResource";
@@ -19,8 +20,11 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 
 export const JndiPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTextLabels = useMUIDataTableTextLabels(t("jndi.noMatch"));
     const [showDropDown, setShowDropDown] = useState(false);
     const [showParameters, setShowParameters] = useState(false);
     const dropDownMenuPositionRef = useRef(null);
@@ -120,9 +124,9 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "JNDI Alias",
+            label: t("jndi.jndiAlias"),
             options: {
-                hint: "The name that will be used by payloads during resource lookup.",
+                hint: t("jndi.hints.jndiAlias"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -133,9 +137,9 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "type",
-            label: "Type",
+            label: t("jndi.type"),
             options: {
-                hint: "The fully qualified name of the resource class. E.g. java.io.File.File",
+                hint: t("jndi.hints.type"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -146,9 +150,9 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "factory",
-            label: "Factory",
+            label: t("jndi.factory"),
             options: {
-                hint: "The fully qualified name of the resource factory class. E.g. com.enioka.jqm.providers.FileFactory",
+                hint: t("jndi.hints.factory"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -159,9 +163,9 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "description",
-            label: "Description",
+            label: t("common.description"),
             options: {
-                hint: "Free text to remember what the resource is for.",
+                hint: t("jndi.hints.description"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -172,9 +176,9 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "singleton",
-            label: "Singleton",
+            label: t("jndi.singleton"),
             options: {
-                hint: "Tick for singleton resource. Differing from standard JNDI resource, a lookup on a singleton resource will always return the same instance (standard JNDI is: a new instance is created on each lookup). This is most helpful for connection pools, for which it is stupid to create a new instance on each call..",
+                hint: t("jndi.hints.singleton"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -186,7 +190,7 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "parameters",
-            label: "Parameters",
+            label: t("jndi.parameters"),
             options: {
                 filter: true,
                 sort: false,
@@ -202,7 +206,7 @@ export const JndiPage: React.FC = () => {
                         <Tooltip
                             title={
                                 editingRowId === tableMeta.rowIndex
-                                    ? "Click to edit parameters"
+                                    ? t("jndi.clickToEditParameters")
                                     : ""
                             }
                         >
@@ -226,7 +230,7 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -237,7 +241,9 @@ export const JndiPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.jndi, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.jndi, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -245,11 +251,7 @@ export const JndiPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No JNDI resources found',
-            }
-        },
+        textLabels: muiTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
@@ -257,7 +259,7 @@ export const JndiPage: React.FC = () => {
             return <>
                 {canUserAccess(PermissionObjectType.jndi, PermissionAction.create) &&
                     <>
-                        <Tooltip title={"Create new JNDI resource"}>
+                        <Tooltip title={t("jndi.createNewResource")}>
                             <IconButton
                                 color="default"
                                 aria-label={"Create new JNDI resource"}
@@ -282,7 +284,7 @@ export const JndiPage: React.FC = () => {
                         />
                     </>
                 }
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -291,7 +293,7 @@ export const JndiPage: React.FC = () => {
                         <RefreshIcon />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title={"Help"}>
+                <Tooltip title={t("common.help")}>
                     <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
@@ -320,15 +322,15 @@ export const JndiPage: React.FC = () => {
             <HelpDialog
                 isOpen={isHelpModalOpen}
                 onClose={() => setIsHelpModalOpen(false)}
-                title="JNDI Resources documentation"
-                header="Resources are Java objects which can be requested by jobs through a JNDI lookup."
+                title={t("jndi.documentation.title")}
+                header={t("jndi.documentation.header")}
                 descriptionParagraphs={[
-                    <>On this page, one may create or change resources. Creating a new resource does not require any reboot. Altering an already used <Box component="span" sx={{ fontWeight: 'bold' }}>singleton</Box> resource does require rebooting the nodes using it, as singleton resources are cached. Altering a non-singleton resource does not require any reboot.</>,
-                    "Please note that for a non-singleton resource, its class and factory class must be accessible to the payload: either in JQM_ROOT/ext or inside the payload's own dependencies. For a singleton resource, the classes must be inside ext (as they must be available to the engine itself, not only to the payload)."
+                    t("jndi.documentation.description1"),
+                    t("jndi.documentation.description2")
                 ]}
             />
             <MUIDataTable
-                title={"JNDI Resources"}
+                title={t("jndi.title")}
                 data={resources}
                 columns={columns}
                 options={options}

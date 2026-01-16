@@ -12,6 +12,7 @@ import {
     Theme
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { useTranslation } from "react-i18next";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -43,6 +44,7 @@ export const CreateJobDefinitionDialog: React.FC<{
     queues: Queue[];
     classLoaders: ClassLoader[]
 }> = ({ closeDialog, createJobDefinition, queues, classLoaders }) => {
+    const { t } = useTranslation();
     const [queueId, setQueueId] = useState<number>(queues[0].id!);
     const [applicationName, setApplicationName] = useState("");
     const [description, setDescription] = useState("");
@@ -64,11 +66,11 @@ export const CreateJobDefinitionDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle>Create job definition</DialogTitle>
+            <DialogTitle>{t("jobDefinitions.createDialog.title")}</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Name*"
+                    label={t("jobDefinitions.createDialog.nameLabel")}
                     value={applicationName}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setApplicationName(event.target.value);
@@ -78,7 +80,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Description"
+                    label={t("jobDefinitions.createDialog.descriptionLabel")}
                     value={description}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setDescription(event.target.value);
@@ -88,7 +90,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                 />
 
                 <FormControl fullWidth className={classes.Select}>
-                    <InputLabel id="queue-id-select-label">Queue*</InputLabel>
+                    <InputLabel id="queue-id-select-label">{t("jobDefinitions.createDialog.queueLabel")}</InputLabel>
                     <Select
                         labelId="queue-id-select-label"
                         fullWidth
@@ -118,7 +120,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                                 }}
                             />
                         }
-                        label="Enabled"
+                        label={t("jobDefinitions.createDialog.enabledLabel")}
                         labelPlacement="end"
                     />
                 </FormGroup>
@@ -134,14 +136,14 @@ export const CreateJobDefinitionDialog: React.FC<{
                                 }}
                             />
                         }
-                        label="Highlander"
+                        label={t("jobDefinitions.createDialog.highlanderLabel")}
                         labelPlacement="end"
                     />
                 </FormGroup>
 
                 <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="job-type-select-label">
-                        Job type*
+                        {t("jobDefinitions.createDialog.jobTypeLabel")}
                     </InputLabel>
                     <Select
                         labelId="job-type-select-label"
@@ -190,7 +192,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -231,7 +233,7 @@ export const CreateJobDefinitionDialog: React.FC<{
                         closeDialog();
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog >

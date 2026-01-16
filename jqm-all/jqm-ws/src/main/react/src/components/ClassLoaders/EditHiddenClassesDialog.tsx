@@ -19,6 +19,7 @@ import {
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { makeStyles } from "@mui/styles";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) => ({
     TextField: {
@@ -31,6 +32,7 @@ export const EditHiddenClassesDialog: React.FC<{
     hiddenClasses: string[];
     setHiddenClasses: (hiddenClasses: string[]) => void;
 }> = ({ closeDialog, hiddenClasses, setHiddenClasses }) => {
+    const { t } = useTranslation();
     const classes = useStyles();
 
     const [editedHiddenClasses, setEditedHiddenClasses] =
@@ -45,15 +47,15 @@ export const EditHiddenClassesDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit hidden classes</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("classLoaders.editHiddenClassesDialog.title")}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    A hidden class is a regexp defining classes never to load from the parent class loader.
+                    {t("classLoaders.editHiddenClassesDialog.description")}
                 </DialogContentText>
                 <>
                     <TextField
                         className={classes.TextField}
-                        label="Regexp*"
+                        label={t("classLoaders.editHiddenClassesDialog.regexpLabel")}
                         value={newHiddenClass}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
@@ -81,14 +83,14 @@ export const EditHiddenClassesDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Add
+                        {t("classLoaders.editHiddenClassesDialog.addButton")}
                     </Button>
                     <TableContainer component={Paper}>
                         <Table size="small" aria-label="Parameters">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Hidden class</TableCell>
-                                    <TableCell>Actions</TableCell>
+                                    <TableCell>{t("classLoaders.editHiddenClassesDialog.hiddenClassColumn")}</TableCell>
+                                    <TableCell>{t("common.actions")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -126,7 +128,7 @@ export const EditHiddenClassesDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -138,7 +140,7 @@ export const EditHiddenClassesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("classLoaders.editHiddenClassesDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

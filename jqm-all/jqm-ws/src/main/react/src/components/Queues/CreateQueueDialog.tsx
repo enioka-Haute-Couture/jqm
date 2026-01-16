@@ -7,6 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { useTranslation } from "react-i18next";
 import { Queue } from "./Queue";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -27,6 +28,7 @@ export const CreateQueueDialog: React.FC<{
     createQueue: (queue: Queue) => void;
     canBeDefaultQueue: boolean;
 }> = ({ showDialog, closeDialog, createQueue, canBeDefaultQueue }) => {
+    const { t } = useTranslation();
     const [queueName, setQueueName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [defaultQueue, setDefaultQueue] = useState(false);
@@ -37,11 +39,11 @@ export const CreateQueueDialog: React.FC<{
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle>Create queue</DialogTitle>
+            <DialogTitle>{t("queues.createQueueDialog.title")}</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Name*"
+                    label={t("queues.name")}
                     value={queueName}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setQueueName(event.target.value);
@@ -51,7 +53,7 @@ export const CreateQueueDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Description"
+                    label={t("queues.description")}
                     value={description}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setDescription(event.target.value);
@@ -72,7 +74,7 @@ export const CreateQueueDialog: React.FC<{
                         />
                     }
                     disabled={!canBeDefaultQueue}
-                    label="Default queue (disabled if one is already set)"
+                    label={t("queues.createQueueDialog.defaultQueueLabel")}
                     labelPlacement="top"
                 />
             </DialogContent>
@@ -82,7 +84,7 @@ export const CreateQueueDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -102,7 +104,7 @@ export const CreateQueueDialog: React.FC<{
                         setDefaultQueue(false);
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

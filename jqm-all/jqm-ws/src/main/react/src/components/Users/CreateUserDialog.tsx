@@ -11,6 +11,7 @@ import {
     Switch,
     Theme
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { makeStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -42,6 +43,7 @@ export const CreateUserDialog: React.FC<{
     createUser: (user: User) => void;
     roles: Role[];
 }> = ({ closeDialog, createUser, roles }) => {
+    const { t } = useTranslation();
     const [login, setLogin] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [fullName, setFullName] = useState<string>("");
@@ -56,11 +58,11 @@ export const CreateUserDialog: React.FC<{
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle>Create user</DialogTitle>
+            <DialogTitle>{t("users.createUserDialog.title")}</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Login*"
+                    label={t("users.login")}
                     value={login}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setLogin(event.target.value);
@@ -70,7 +72,7 @@ export const CreateUserDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="E-mail"
+                    label={t("users.email")}
                     type="email"
                     value={email}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +83,7 @@ export const CreateUserDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Full name"
+                    label={t("users.fullName")}
                     value={fullName}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setFullName(event.target.value);
@@ -102,12 +104,12 @@ export const CreateUserDialog: React.FC<{
                                 }}
                             />
                         }
-                        label="Locked"
+                        label={t("users.createUserDialog.lockedLabel")}
                         labelPlacement="end"
                     />
                 </FormGroup>
                 <FormControl fullWidth>
-                    <InputLabel id="user-roles-select-label">Roles</InputLabel>
+                    <InputLabel id="user-roles-select-label">{t("users.roles")}</InputLabel>
                     <Select
                         multiple
                         labelId="user-roles-select-label"
@@ -128,7 +130,7 @@ export const CreateUserDialog: React.FC<{
                 </FormControl>
                 <DatePicker
                     className={classes.DatePicker}
-                    label="Expiration date"
+                    label={t("users.expirationDate")}
                     format="dd/MM/yyyy"
                     value={expirationDate}
                     onChange={(date) => {
@@ -142,7 +144,7 @@ export const CreateUserDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -164,7 +166,7 @@ export const CreateUserDialog: React.FC<{
                         closeDialog();
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog >

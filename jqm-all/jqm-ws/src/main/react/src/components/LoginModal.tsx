@@ -9,9 +9,11 @@ import {
     Alert,
     Box,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../utils/AuthService";
 
 export const LoginModal: React.FC = () => {
+    const { t } = useTranslation();
     const { reLogin, status } = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -30,13 +32,13 @@ export const LoginModal: React.FC = () => {
         try {
             const success = await reLogin!(username, password);
             if (!success) {
-                setError("Invalid credentials. Please try again.");
+                setError(t("auth.invalidCredentials"));
             } else {
                 setUsername("");
                 setPassword("");
             }
         } catch (err) {
-            setError("An error occurred. Please try again.");
+            setError(t("auth.loginError"));
         } finally {
             setLoading(false);
         }
@@ -44,12 +46,11 @@ export const LoginModal: React.FC = () => {
 
     return (
         <Dialog open={true} disableEscapeKeyDown maxWidth="xs" fullWidth>
-            <DialogTitle>Session Expired</DialogTitle>
+            <DialogTitle>{t("auth.sessionExpired")}</DialogTitle>
             <form onSubmit={handleSubmit}>
                 <DialogContent>
                     <Box sx={{ mb: 2 }}>
-                        Your session has expired due to inactivity. Please log in
-                        again to continue.
+                        {t("auth.sessionExpiredMessage")}
                     </Box>
                     {error && (
                         <Alert severity="error" sx={{ mb: 2 }}>
@@ -59,7 +60,7 @@ export const LoginModal: React.FC = () => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Username"
+                        label={t("auth.username")}
                         type="text"
                         fullWidth
                         variant="outlined"
@@ -70,7 +71,7 @@ export const LoginModal: React.FC = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="Password"
+                        label={t("auth.password")}
                         type="password"
                         fullWidth
                         variant="outlined"
@@ -87,7 +88,7 @@ export const LoginModal: React.FC = () => {
                         color="primary"
                         disabled={loading || !username || !password}
                     >
-                        {loading ? "Logging in..." : "Log In"}
+                        {loading ? t("auth.loggingIn") : t("auth.logIn")}
                     </Button>
                 </DialogActions>
             </form>

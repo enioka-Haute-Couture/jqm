@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { JndiResource } from "./JndiResource";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
@@ -6,6 +7,7 @@ import { useNotificationService } from "../../utils/NotificationService";
 const apiUrl = "/admin/jndi";
 
 export const useJndiApi = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
     const [resources, setResources] = useState<JndiResource[]>([]);
 
@@ -21,12 +23,12 @@ export const useJndiApi = () => {
                 .then(() => {
                     fetchResources();
                     displaySuccess(
-                        `Successfully saved resource: ${resource.name}`
+                        t("jndi.messages.successSave", { name: resource.name })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchResources, displayError, displaySuccess]
+        [fetchResources, displayError, displaySuccess, t]
     );
     const deleteResource = useCallback(
         async (resourceIds: number[]) => {
@@ -36,13 +38,14 @@ export const useJndiApi = () => {
                 .then(() => {
                     fetchResources();
                     displaySuccess(
-                        `Successfully deleted resource${resourceIds.length > 1 ? "s" : ""
-                        }`
+                        t("jndi.messages.successDelete", {
+                            count: resourceIds.length,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchResources, displayError, displaySuccess]
+        [fetchResources, displayError, displaySuccess, t]
     );
 
     return {

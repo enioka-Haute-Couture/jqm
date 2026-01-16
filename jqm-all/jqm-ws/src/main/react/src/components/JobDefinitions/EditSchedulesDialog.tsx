@@ -32,6 +32,7 @@ import React, { ReactNode, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
 import cron from 'cron-validate'
+import { useTranslation } from "react-i18next";
 import { EditParametersDialog } from "./EditParametersDialog";
 import { JobDefinitionParameter, JobDefinitionSchedule } from "./JobDefinition";
 import { Queue } from "../Queues/Queue";
@@ -49,6 +50,7 @@ export const EditSchedulesDialog: React.FC<{
     setSchedules: (schedules: Array<JobDefinitionSchedule>) => void;
     queues: Queue[];
 }> = ({ closeDialog, schedules, setSchedules, queues }) => {
+    const { t } = useTranslation();
     const [editedSchedules, setEditedSchedules] =
         useState<Array<JobDefinitionSchedule>>(schedules);
     const [editParametersScheduleId, setEditParametersScheduleId] = useState<
@@ -68,7 +70,7 @@ export const EditSchedulesDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit schedules</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("jobDefinitions.editSchedulesDialog.title")}</DialogTitle>
             <DialogContent>
                 <>
                     <Typography>
@@ -76,12 +78,12 @@ export const EditSchedulesDialog: React.FC<{
                             target="_blank"
                             href="https://en.wikipedia.org/wiki/Cron"
                         >
-                            Wikipedia help on cron
+                            {t("jobDefinitions.editSchedulesDialog.wikipediaHelp")}
                         </Link>
                     </Typography>
                     <TextField
                         className={classes.TextField}
-                        label="Cron expression*"
+                        label={t("jobDefinitions.editSchedulesDialog.cronExpressionLabel")}
                         value={cronExpression}
                         error={cronExpressionValidationErrors != null}
                         helperText={<List dense>
@@ -110,7 +112,7 @@ export const EditSchedulesDialog: React.FC<{
 
                     <FormControl fullWidth style={{ marginBottom: "16px" }}>
                         <InputLabel id="queue-id-select-label">
-                            Queue override
+                            {t("jobDefinitions.editSchedulesDialog.queueOverrideLabel")}
                         </InputLabel>
                         <Select
                             labelId="queue-id-select-label"
@@ -152,16 +154,16 @@ export const EditSchedulesDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Add schedule
+                        {t("jobDefinitions.editSchedulesDialog.addSchedule")}
                     </Button>
                     <TableContainer component={Paper}>
                         <Table size="small" aria-label="Schedules">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Cron expression</TableCell>
-                                    <TableCell>Queue override</TableCell>
-                                    <TableCell>Parameters</TableCell>
-                                    <TableCell>Actions</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesDialog.cronExpressionColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesDialog.queueOverrideColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesDialog.parametersColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesDialog.actionsColumn")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -209,7 +211,7 @@ export const EditSchedulesDialog: React.FC<{
                                                 </IconButton>
                                                 <Tooltip
                                                     title={
-                                                        "Click to edit parameters"
+                                                        t("jobDefinitions.clickToEditParameters")
                                                     }
                                                 >
                                                     <IconButton
@@ -241,7 +243,7 @@ export const EditSchedulesDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -253,7 +255,7 @@ export const EditSchedulesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("jndi.editParametersDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

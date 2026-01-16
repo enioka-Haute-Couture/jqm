@@ -2,10 +2,12 @@ import { useCallback, useState } from "react";
 import { ClassLoader } from "./ClassLoader";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
+import { useTranslation } from "react-i18next";
 
 const API_URL = "/admin/cl";
 
 export const useClassLoaderAPI = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
 
     const [classLoaders, setClassLoaders] = useState<ClassLoader[] | null>();
@@ -22,12 +24,14 @@ export const useClassLoaderAPI = () => {
                 .then(() => {
                     fetchClassLoaders();
                     displaySuccess(
-                        `Successfully created class loader: ${newClassLoader.name}`
+                        t("classLoaders.messages.successCreate", {
+                            name: newClassLoader.name,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchClassLoaders, displayError, displaySuccess]
+        [fetchClassLoaders, displayError, displaySuccess, t]
     );
 
     const deleteClassLoaders = useCallback(
@@ -40,14 +44,14 @@ export const useClassLoaderAPI = () => {
                 .then(() => {
                     fetchClassLoaders();
                     displaySuccess(
-                        `Successfully deleted class loader${
-                            classLoaderIds.length > 1 ? "s" : ""
-                        }`
+                        t("classLoaders.messages.successDelete", {
+                            count: classLoaderIds.length,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchClassLoaders, displayError, displaySuccess]
+        [fetchClassLoaders, displayError, displaySuccess, t]
     );
 
     const updateClassLoader = useCallback(
@@ -55,11 +59,11 @@ export const useClassLoaderAPI = () => {
             return APIService.put(`${API_URL}/${classLoader.id}`, classLoader)
                 .then(() => {
                     fetchClassLoaders();
-                    displaySuccess("Successfully saved class loader");
+                    displaySuccess(t("classLoaders.messages.successSave"));
                 })
                 .catch(displayError);
         },
-        [fetchClassLoaders, displayError, displaySuccess]
+        [fetchClassLoaders, displayError, displaySuccess, t]
     );
 
     return {

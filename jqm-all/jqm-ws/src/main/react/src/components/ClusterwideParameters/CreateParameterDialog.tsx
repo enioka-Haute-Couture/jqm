@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Theme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { useTranslation } from "react-i18next";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -24,6 +25,7 @@ export const CreateParameterDialog: React.FC<{
     closeDialog: () => void;
     createParameter: (parameter: Parameter) => void;
 }> = ({ showDialog, closeDialog, createParameter }) => {
+    const { t } = useTranslation();
     const [parameterName, setParameterName] = useState<string>("");
     const [parameterValue, setParameterValue] = useState<string>("");
     const classes = useStyles();
@@ -33,11 +35,11 @@ export const CreateParameterDialog: React.FC<{
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle>Create parameter</DialogTitle>
+            <DialogTitle>{t("clusterParameters.createParameterDialog.title")}</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Name*"
+                    label={t("clusterParameters.createParameterDialog.nameLabel")}
                     value={parameterName}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setParameterName(event.target.value);
@@ -47,7 +49,7 @@ export const CreateParameterDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Value"
+                    label={t("clusterParameters.createParameterDialog.valueLabel")}
                     value={parameterValue}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setParameterValue(event.target.value);
@@ -62,7 +64,7 @@ export const CreateParameterDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -80,7 +82,7 @@ export const CreateParameterDialog: React.FC<{
                         setParameterValue("");
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

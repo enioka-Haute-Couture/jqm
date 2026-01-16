@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import React, { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 export const HelpDialog: React.FC<{
     isOpen: boolean;
@@ -8,6 +9,7 @@ export const HelpDialog: React.FC<{
     header: string;
     descriptionParagraphs: ReactNode[];
 }> = ({ isOpen, onClose: closeDialog, title, header, descriptionParagraphs }) => {
+    const { t } = useTranslation();
     return (
         <Dialog
             open={isOpen}
@@ -29,7 +31,7 @@ export const HelpDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    close
+                    {t("common.close")}
                 </Button>
             </DialogActions>
         </Dialog>

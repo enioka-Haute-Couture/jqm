@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import React, { ReactNode, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { JobDefinitionSpecificProperties, JobType } from "./JobDefinition";
 import { ClassLoader } from "../ClassLoaders/ClassLoader";
 
@@ -54,6 +55,7 @@ export const SpecificPropertiesForm: React.FC<{
     setClassLoaderId,
     classLoaders
 }) => {
+        const { t } = useTranslation();
         const classes = useStyles();
 
         return (
@@ -62,11 +64,9 @@ export const SpecificPropertiesForm: React.FC<{
                     <>
                         <TextField
                             className={classes.TextField}
-                            label="Path to the jar file*"
+                            label={t("jobDefinitions.editPropertiesDialog.pathToJarLabel")}
                             value={jarPath}
-                            helperText={
-                                "The relative path to the jar containing the class to run. It is relative to the 'directory containing jars' parameter of the different nodes."
-                            }
+                            helperText={t("jobDefinitions.editPropertiesDialog.pathToJarHelper")}
                             onChange={(
                                 event: React.ChangeEvent<HTMLInputElement>
                             ) => {
@@ -77,11 +77,9 @@ export const SpecificPropertiesForm: React.FC<{
                         />
                         <TextField
                             className={classes.TextField}
-                            label="Class to launch*"
+                            label={t("jobDefinitions.editPropertiesDialog.classToLaunchLabel")}
                             value={javaClassName}
-                            helperText={
-                                "The fully qualified name of the class to run. (it must either have a main function, or implement Runnable, or inherit from JobBase)."
-                            }
+                            helperText={t("jobDefinitions.editPropertiesDialog.classToLaunchHelper")}
                             onChange={(
                                 event: React.ChangeEvent<HTMLInputElement>
                             ) => {
@@ -93,7 +91,7 @@ export const SpecificPropertiesForm: React.FC<{
                         <FormControl
                             fullWidth
                         >
-                            <InputLabel id="class-loader-select-label">Class loader</InputLabel>
+                            <InputLabel id="class-loader-select-label">{t("jobDefinitions.editPropertiesDialog.classLoaderLabel")}</InputLabel>
                             <Select
                                 fullWidth
                                 value={classLoaderId || ''}
@@ -102,10 +100,10 @@ export const SpecificPropertiesForm: React.FC<{
                                 }}
                                 input={<Input />}
                                 labelId="class-loader-select-label"
-                                label="Class loader"
+                                label={t("jobDefinitions.editPropertiesDialog.classLoaderLabel")}
                             >
                                 <MenuItem value=''>
-                                    Default
+                                    {t("jobDefinitions.editPropertiesDialog.classLoaderDefault")}
                                 </MenuItem>
                                 {classLoaders.map((cl: ClassLoader) => (
                                     <MenuItem key={cl.id} value={cl.id}>
@@ -113,7 +111,7 @@ export const SpecificPropertiesForm: React.FC<{
                                     </MenuItem>
                                 ))}
                             </Select>
-                            <FormHelperText>The class loader used by the job.</FormHelperText>
+                            <FormHelperText>{t("jobDefinitions.editPropertiesDialog.classLoaderHelper")}</FormHelperText>
                         </FormControl>
                     </>
                 )
@@ -122,11 +120,9 @@ export const SpecificPropertiesForm: React.FC<{
                     jobType === JobType.process && (
                         <TextField
                             className={classes.TextField}
-                            label="Path to executable*"
+                            label={t("jobDefinitions.editPropertiesDialog.pathToExecutableLabel")}
                             value={jarPath}
-                            helperText={
-                                "Current path is node job directory. Do not add parameters here, just a path. Process is launched with the value of the provided parameters, sorted by key. Key is only used for sorting."
-                            }
+                            helperText={t("jobDefinitions.editPropertiesDialog.pathToExecutableHelper")}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setJarPath(event.target.value);
                             }}
@@ -142,7 +138,7 @@ export const SpecificPropertiesForm: React.FC<{
                                 component="fieldset"
                                 style={{ marginBottom: "16px" }}
                             >
-                                <FormLabel component="legend">Shell</FormLabel>
+                                <FormLabel component="legend">{t("jobDefinitions.editPropertiesDialog.shellLabel")}</FormLabel>
                                 <RadioGroup
                                     aria-label="Shell"
                                     name="shell"
@@ -156,26 +152,23 @@ export const SpecificPropertiesForm: React.FC<{
                                     <FormControlLabel
                                         value="DEFAULTSHELLCOMMAND"
                                         control={<Radio />}
-                                        label="Default OS shell"
+                                        label={t("jobDefinitions.editPropertiesDialog.defaultOsShellLabel")}
                                     />
                                     <FormControlLabel
                                         value="POWERSHELLCOMMAND"
                                         control={<Radio />}
-                                        label="Powershell"
+                                        label={t("jobDefinitions.editPropertiesDialog.powershellLabel")}
                                     />
                                 </RadioGroup>
                                 <FormHelperText>
-                                    Default shell is /bin/sh or cmd.exe. Powershell is
-                                    Powershell core under Linux and full under Windows.
+                                    {t("jobDefinitions.editPropertiesDialog.shellHelper")}
                                 </FormHelperText>
                             </FormControl>
                             <TextField
                                 className={classes.TextField}
-                                label="Shell command*"
+                                label={t("jobDefinitions.editPropertiesDialog.shellCommandLabel")}
                                 value={jarPath}
-                                helperText={
-                                    "Current path is node job directory. JQM environment variables (and others) may be used. 1000 max (988 remaining)."
-                                }
+                                helperText={t("jobDefinitions.editPropertiesDialog.shellCommandHelper")}
                                 onChange={(
                                     event: React.ChangeEvent<HTMLInputElement>
                                 ) => {
@@ -197,6 +190,7 @@ export const EditSpecificPropertiesDialog: React.FC<{
     setProperties: (properties: JobDefinitionSpecificProperties) => void;
     classLoaders: ClassLoader[];
 }> = ({ closeDialog, properties, setProperties, classLoaders }) => {
+    const { t } = useTranslation();
     const [javaClassName, setJavaClassName] = useState<string>(
         properties.javaClassName
     );
@@ -215,7 +209,7 @@ export const EditSpecificPropertiesDialog: React.FC<{
             maxWidth={"md"}
         >
             <DialogTitle id="form-dialog-title">
-                Edit {properties.jobType} specific properties
+                {t("jobDefinitions.editPropertiesDialog.title", { jobType: properties.jobType })}
             </DialogTitle>
             <DialogContent>
                 <SpecificPropertiesForm
@@ -237,7 +231,7 @@ export const EditSpecificPropertiesDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -259,7 +253,7 @@ export const EditSpecificPropertiesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("jndi.editParametersDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

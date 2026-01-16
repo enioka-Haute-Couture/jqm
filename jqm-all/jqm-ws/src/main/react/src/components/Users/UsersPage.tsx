@@ -10,6 +10,8 @@ import MUIDataTable, { MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows }
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useTranslation } from "react-i18next";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 import GetAppIcon from '@mui/icons-material/GetApp';
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
@@ -28,6 +30,8 @@ import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
 
 const UsersPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTableTextLabels = useMUIDataTableTextLabels(t("users.noMatch"));
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const loginInputRef = useRef(null);
     const emailInputRef = useRef(null);
@@ -63,9 +67,9 @@ const UsersPage: React.FC = () => {
             canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
             refresh();
         }
-        setPageTitle("Users");
+        setPageTitle(t("users.title"));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canUserAccess]);
+    }, [canUserAccess, t]);
 
     const updateRow = useCallback(
         (id: number) => {
@@ -130,9 +134,9 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "login",
-            label: "Login*",
+            label: t("users.login"),
             options: {
-                hint: "Must be unique. If used, certificates should certify CN=root",
+                hint: t("users.hints.login"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -144,9 +148,9 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "email",
-            label: "E-mail",
+            label: t("users.email"),
             options: {
-                hint: "Optional contact e-mail address",
+                hint: t("users.hints.email"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -159,9 +163,9 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "freeText",
-            label: "Full name",
+            label: t("users.fullName"),
             options: {
-                hint: "Optional description of the account (real name or service name)",
+                hint: t("users.hints.fullName"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -174,7 +178,7 @@ const UsersPage: React.FC = () => {
 
         {
             name: "locked",
-            label: "Locked",
+            label: t("users.locked"),
             options: {
                 filter: true,
                 sort: true,
@@ -187,7 +191,7 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "expirationDate",
-            label: "Expiration date",
+            label: t("users.expirationDate"),
             options: {
                 filter: true,
                 sort: true,
@@ -200,7 +204,7 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "roles",
-            label: "Roles",
+            label: t("users.roles"),
             options: {
                 filter: false,
                 sort: false,
@@ -222,7 +226,7 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -236,7 +240,7 @@ const UsersPage: React.FC = () => {
                     canUserAccess(PermissionObjectType.user, PermissionAction.delete),
                     canUserAccess(PermissionObjectType.user, PermissionAction.update) ? [
                         {
-                            title: "Download certificate",
+                            title: t("users.downloadCertificate"),
                             addIcon: () => <GetAppIcon />,
                             getLinkURL: (tableMeta: MUIDataTableMeta) => {
                                 const [userId] = tableMeta.rowData;
@@ -244,14 +248,15 @@ const UsersPage: React.FC = () => {
                             }
                         },
                         {
-                            title: "Change password. Passwords are ignored if a certificate is used. An empty password forces the use of a certificate.",
+                            title: t("users.changePassword"),
                             addIcon: () => <VpnKeyIcon />,
                             action: (tableMeta: MUIDataTableMeta) => {
                                 const [userId] = tableMeta.rowData;
                                 setChangePasswordUserId(userId);
                             },
                         },
-                    ] : []
+                    ] : [],
+                    t
                 ),
             },
         },
@@ -259,18 +264,14 @@ const UsersPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No users found',
-            }
-        },
+        textLabels: muiTableTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.user, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.user, PermissionAction.create) &&
-                    <Tooltip title={"Add line"}>
+                    <Tooltip title={t("common.add")}>
                         <IconButton
                             color="default"
                             aria-label={"add"}
@@ -280,7 +281,7 @@ const UsersPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                 }
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -314,7 +315,7 @@ const UsersPage: React.FC = () => {
         return (
             <Container maxWidth={false}>
                 <MUIDataTable
-                    title={"Users"}
+                    title={t("users.title")}
                     data={users}
                     columns={columns}
                     options={options}

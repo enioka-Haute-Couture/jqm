@@ -5,6 +5,8 @@ import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-dat
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DescriptionIcon from "@mui/icons-material/Description";
+import { useTranslation } from "react-i18next";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 import useNodesApi from "./NodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
 import {
@@ -18,6 +20,8 @@ import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
 
 export const NodesPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTableTextLabels = useMUIDataTableTextLabels(t("nodes.noMatch"));
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const nameInputRef = useRef(null);
     const dnsInputRef = useRef(null);
@@ -42,9 +46,9 @@ export const NodesPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.node, PermissionAction.read)) {
             fetchNodes();
         }
-        setPageTitle("Nodes");
+        setPageTitle(t("nodes.title"));
         // eslint-disable-next-line
-    }, [canUserAccess]);
+    }, [canUserAccess, t]);
 
     const handleOnViewLogs = useCallback(
         async (tableMeta: MUIDataTableMeta) => {
@@ -125,9 +129,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "Name**",
+            label: t("nodes.name"),
             options: {
-                hint: "The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the name given as a parameter to the node when starting. It is unique throughout the cluster. Default is server hostname in Windows, user name in Unix.",
+                hint: t("nodes.hints.name"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -139,9 +143,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "dns",
-            label: "DNS to bind to*",
+            label: t("nodes.dns"),
             options: {
-                hint: "The web APIs will bind on all interfaces that answer to a reverse DNS call of this name. Default is localhost, i.e. local-only binding.",
+                hint: t("nodes.hints.dns"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -153,9 +157,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "port",
-            label: "HTTP port*",
+            label: t("nodes.httpPort"),
             options: {
-                hint: "The web APIs will bind on this port. Default is a random free port.",
+                hint: t("nodes.hints.httpPort"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -167,9 +171,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "outputDirectory",
-            label: "File produced storage**",
+            label: t("nodes.outputDirectory"),
             options: {
-                hint: "Should batch jobs produce files, they would be stored in sub-directories of this directory. Absolute path strongly recommended, relative path are relative to JQM install directory.",
+                hint: t("nodes.hints.outputDirectory"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -181,9 +185,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "jobRepoDirectory",
-            label: "Directory containing jars**",
+            label: t("nodes.jobRepoDirectory"),
             options: {
-                hint: "The root directory containing all the jobs (payload jars). Absolute path strongly recommended, relative path are relative to JQM install directory.",
+                hint: t("nodes.hints.jobRepoDirectory"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -195,7 +199,7 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "tmpDirectory",
-            label: "Temporary directory*",
+            label: t("nodes.tmpDirectory"),
             options: {
                 filter: true,
                 sort: true,
@@ -208,9 +212,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "rootLogLevel",
-            label: "Log level*",
+            label: t("nodes.rootLogLevel"),
             options: {
-                hint: "Verbosity of the main log file. Valid values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL. See full documentation for the signification of these levels. In case of erroneous value, default value INFO is assumed.",
+                hint: t("nodes.hints.rootLogLevel"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -221,9 +225,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "jmxRegistryPort",
-            label: "Jmx Registry Port**",
+            label: t("nodes.jmxRegistryPort"),
             options: {
-                hint: "If 0, remote JMX is disabled. Default is 0.",
+                hint: t("nodes.hints.jmxRegistryPort"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -235,9 +239,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "jmxServerPort",
-            label: "Jmx Server Port**",
+            label: t("nodes.jmxServerPort"),
             options: {
-                hint: "If 0, remote JMX is disabled. Default is 0.",
+                hint: t("nodes.hints.jmxServerPort"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -249,7 +253,7 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "enabled",
-            label: "Enabled",
+            label: t("nodes.enabled"),
             options: {
                 filter: true,
                 sort: true,
@@ -262,9 +266,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "loapApiSimple",
-            label: "Simple API",
+            label: t("nodes.simpleApi"),
             options: {
-                hint: "If ticked, the simple web API will start. This API governs script interactions (execution request through wget & co, etc.) and file retrieval (logs, files created by batch jobs executions)",
+                hint: t("nodes.hints.simpleApi"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -276,9 +280,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "loadApiClient",
-            label: "Client API",
+            label: t("nodes.clientApi"),
             options: {
-                hint: "If ticked, the client web API will start. This API exposes the full JqmClient API - see full documentation.",
+                hint: t("nodes.hints.clientApi"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -290,9 +294,9 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "loadApiAdmin",
-            label: "Admin API",
+            label: t("nodes.adminApi"),
             options: {
-                hint: "If ticked, the administration web API will start. This API is only used by this web administration console and is an internal JQM API, not a public one. Disabling it disables this web console.",
+                hint: t("nodes.hints.adminApi"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -304,7 +308,7 @@ export const NodesPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -318,11 +322,12 @@ export const NodesPage: React.FC = () => {
                     canUserAccess(PermissionObjectType.node, PermissionAction.delete),
                     [
                         {
-                            title: "View node logs",
+                            title: t("nodes.viewNodeLogs"),
                             addIcon: () => <DescriptionIcon />,
                             action: handleOnViewLogs,
                         },
-                    ]
+                    ],
+                    t
                 ),
             },
         },
@@ -330,17 +335,13 @@ export const NodesPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No nodes found',
-            }
-        },
+        textLabels: muiTableTextLabels,
         download: false,
         print: false,
         selectableRows: "none" as SelectableRows,
         customToolbar: () => {
             return <>
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -349,7 +350,7 @@ export const NodesPage: React.FC = () => {
                         <RefreshIcon />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title={"Help"}>
+                <Tooltip title={t("common.help")}>
                     <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
@@ -372,16 +373,16 @@ export const NodesPage: React.FC = () => {
             <HelpDialog
                 isOpen={isHelpModalOpen}
                 onClose={() => setIsHelpModalOpen(false)}
-                title="Nodes documentation"
-                header="Nodes are instances of the JQM engine that actually run batch job instances. Basically, they are Unix init.d entries, Windows services or running containers."
+                title={t("nodes.documentation.title")}
+                header={t("nodes.documentation.header")}
                 descriptionParagraphs={[
-                    "On this page, one may change the characteristics of nodes.",
-                    <>Nodes can only be created through the command line <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>jqm.(sh|ps1) createnode [ nodename ]</Box>. Only nodes switched off for more than 10 minutes can be removed.</>,
-                    <>Changing fields marked with <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>**</Box> (two asterisks) while the node is running requires the node to be restarted for the change to be taken into account. Changes to other fields are automatically applied asynchronously (default is at most after one minute).</>
+                    t("nodes.documentation.paragraph1"),
+                    <>{t("nodes.documentation.paragraph2")} <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>{t("nodes.documentation.paragraph2Command")}</Box>{t("nodes.documentation.paragraph2End")}</>,
+                    <>{t("nodes.documentation.paragraph3")} <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>{t("nodes.documentation.paragraph3Marker")}</Box> {t("nodes.documentation.paragraph3End")}</>
                 ]}
             />
             <MUIDataTable
-                title={"Nodes"}
+                title={t("nodes.title")}
                 data={nodes}
                 columns={columns}
                 options={options}

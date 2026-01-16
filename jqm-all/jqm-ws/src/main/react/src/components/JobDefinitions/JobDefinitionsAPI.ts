@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { JobDefinition, JobType } from "./JobDefinition";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
+import { useTranslation } from "react-i18next";
 
 function pathTypeToJobType(pathType: string): JobType {
     switch (pathType) {
@@ -41,6 +42,7 @@ function jobDefinitionToPayload(jobDefinition: JobDefinition): any {
 const API_URL = "/admin/jd";
 
 export const useJobDefinitionsAPI = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
 
     const [jobDefinitions, setJobDefinitions] = useState<
@@ -87,12 +89,14 @@ export const useJobDefinitionsAPI = () => {
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess(
-                        `Successfully created job definition ${newJobDefinition.applicationName}`
+                        t("jobDefinitions.messages.successCreate", {
+                            name: newJobDefinition.applicationName,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchJobDefinitions, displayError, displaySuccess]
+        [fetchJobDefinitions, displayError, displaySuccess, t]
     );
 
     const deleteJobDefinitions = useCallback(
@@ -105,14 +109,14 @@ export const useJobDefinitionsAPI = () => {
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess(
-                        `Successfully deleted job definition${
-                            jobDefinitionsIds.length > 1 ? "s" : ""
-                        }`
+                        t("jobDefinitions.messages.successDelete", {
+                            count: jobDefinitionsIds.length,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchJobDefinitions, displayError, displaySuccess]
+        [fetchJobDefinitions, displayError, displaySuccess, t]
     );
 
     const updateJobDefinition = useCallback(
@@ -123,11 +127,11 @@ export const useJobDefinitionsAPI = () => {
             )
                 .then(() => {
                     fetchJobDefinitions();
-                    displaySuccess("Successfully saved job definition");
+                    displaySuccess(t("jobDefinitions.messages.successSave"));
                 })
                 .catch(displayError);
         },
-        [fetchJobDefinitions, displayError, displaySuccess]
+        [fetchJobDefinitions, displayError, displaySuccess, t]
     );
     return {
         jobDefinitions,
