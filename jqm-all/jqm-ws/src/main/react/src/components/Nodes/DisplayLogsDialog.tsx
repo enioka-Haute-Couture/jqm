@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -10,6 +11,7 @@ export const DisplayLogsDialog: React.FC<{
     closeDialog: () => void;
     logs: { nodeName: string; data: string } | undefined;
 }> = ({ showDialog, closeDialog, logs }) => {
+    const { t } = useTranslation();
     return (
         <Dialog
             open={showDialog}
@@ -18,7 +20,7 @@ export const DisplayLogsDialog: React.FC<{
             fullWidth
             maxWidth="xl"
         >
-            <DialogTitle>Latest logs for node {logs?.nodeName}</DialogTitle>
+            <DialogTitle>{t("nodes.displayLogsDialog.title", { nodeName: logs?.nodeName })}</DialogTitle>
             <DialogContent>
                 <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs?.data}</Typography>
             </DialogContent>
@@ -29,7 +31,7 @@ export const DisplayLogsDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    close
+                    {t("nodes.displayLogsDialog.close")}
                 </Button>
             </DialogActions>
         </Dialog>

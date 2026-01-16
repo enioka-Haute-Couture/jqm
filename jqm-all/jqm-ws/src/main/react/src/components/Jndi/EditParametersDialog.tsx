@@ -19,19 +19,21 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
 import { JndiParameter, JndiResource } from "./JndiResource";
 
 export const JndiParametersTable: React.FC<{
     parameters: JndiParameter[];
     setParameters: (parameters: JndiParameter[]) => void;
 }> = ({ parameters, setParameters }) => {
+    const { t } = useTranslation();
     return (
         <TableContainer component={Paper}>
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Value</TableCell>
+                        <TableCell>{t("jndi.editParametersDialog.name")}</TableCell>
+                        <TableCell>{t("jndi.editParametersDialog.value")}</TableCell>
                         <TableCell align="right"></TableCell>
                     </TableRow>
                 </TableHead>
@@ -114,6 +116,7 @@ export const EditParametersDialog: React.FC<{
     selectedResource: JndiResource | null;
     setSelectedResource: (newResource: JndiResource) => void;
 }> = ({ showDialog, closeDialog, selectedResource, setSelectedResource }) => {
+    const { t } = useTranslation();
     const [tmpParams, setTmpParams] = useState<JndiParameter[]>([]);
     const [newParamName, setNewParamName] = useState<string>("");
     const [newParamValue, setNewParamValue] = useState<string>("");
@@ -135,12 +138,12 @@ export const EditParametersDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit Parameters</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("jndi.editParametersDialog.title")}</DialogTitle>
             <DialogContent>
                 <>
                     <TextField
                         className={classes.TextField}
-                        label="Name*"
+                        label={`${t("jndi.editParametersDialog.name")}*`}
                         value={newParamName}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setNewParamName(event.target.value);
@@ -150,7 +153,7 @@ export const EditParametersDialog: React.FC<{
                     />
                     <TextField
                         className={classes.TextField}
-                        label="Value*"
+                        label={`${t("jndi.editParametersDialog.value")}*`}
                         value={newParamValue}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setNewParamValue(event.target.value);
@@ -172,10 +175,10 @@ export const EditParametersDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Add parameter
+                        {t("jndi.editParametersDialog.addParameter")}
                     </Button>
                     <DialogContentText>
-                        Add new or edit existing parameters
+                        {t("jndi.editParametersDialog.description")}
                     </DialogContentText>
                     <JndiParametersTable
                         parameters={tmpParams}
@@ -190,7 +193,7 @@ export const EditParametersDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -203,7 +206,7 @@ export const EditParametersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("jndi.editParametersDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

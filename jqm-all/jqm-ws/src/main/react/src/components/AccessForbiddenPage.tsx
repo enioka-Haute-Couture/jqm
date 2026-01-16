@@ -1,8 +1,10 @@
 import React from "react";
 import { Container, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../utils/AuthService";
 
 const AccessForbiddenPage: React.FC = () => {
+    const { t } = useTranslation();
     const { status } = useAuth();
 
     if (status === "LOGGING_IN") {
@@ -12,7 +14,7 @@ const AccessForbiddenPage: React.FC = () => {
     return (
         <Container>
             <Typography variant="h6">
-                You don't have permission to access this page.
+                {t("auth.accessForbidden")}
             </Typography>
         </Container>
     );

@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { JobDefinitionTags } from "./JobDefinition";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -23,6 +24,7 @@ export const EditTagsDialog: React.FC<{
     tags: JobDefinitionTags;
     setTags: (tags: JobDefinitionTags) => void;
 }> = ({ closeDialog, tags, setTags }) => {
+    const { t } = useTranslation();
     const [application, setApplication] = useState<string | undefined>(
         tags.application
     );
@@ -41,14 +43,14 @@ export const EditTagsDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit tags</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("jobDefinitions.editTagsDialog.title")}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Optionnal tags for classification and queries.
+                    {t("jobDefinitions.editTagsDialog.description")}
                 </DialogContentText>
                 <TextField
                     className={classes.TextField}
-                    label="Application"
+                    label={t("jobDefinitions.editTagsDialog.applicationLabel")}
                     value={application}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setApplication(event.target.value);
@@ -58,7 +60,7 @@ export const EditTagsDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Module"
+                    label={t("jobDefinitions.editTagsDialog.moduleLabel")}
                     value={module}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setModule(event.target.value);
@@ -68,7 +70,7 @@ export const EditTagsDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Keyword 1"
+                    label={t("jobDefinitions.editTagsDialog.keyword1Label")}
                     value={keyword1}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setKeyword1(event.target.value);
@@ -78,7 +80,7 @@ export const EditTagsDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Keyword 2"
+                    label={t("jobDefinitions.editTagsDialog.keyword2Label")}
                     value={keyword2}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setKeyword2(event.target.value);
@@ -88,7 +90,7 @@ export const EditTagsDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Keyword 3"
+                    label={t("jobDefinitions.editTagsDialog.keyword3Label")}
                     value={keyword3}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setKeyword3(event.target.value);
@@ -103,7 +105,7 @@ export const EditTagsDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -121,7 +123,7 @@ export const EditTagsDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("jndi.editParametersDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

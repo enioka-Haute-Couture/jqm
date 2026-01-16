@@ -29,6 +29,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { JobInstanceParameters } from "./JobInstance";
 import { JobLaunchParameters } from "./JobLaunchParameters";
 import { JobDefinition } from "../JobDefinitions/JobDefinition";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) =>
 ({
@@ -46,6 +47,7 @@ export const LaunchFormDialog: React.FC<{
     launchJob: (jobLauchParameters: JobLaunchParameters) => void;
     jobDefinitions: JobDefinition[];
 }> = ({ closeDialog, launchJob, jobDefinitions }) => {
+    const { t } = useTranslation();
     const [applicationName, setApplicationName] = useState<string>("");
     const [application, setApplication] = useState<string>("");
     const [parameters, setParameters] = useState<JobInstanceParameters[]>([]);
@@ -71,7 +73,7 @@ export const LaunchFormDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle>New launch</DialogTitle>
+            <DialogTitle>{t("runs.launchDialog.title")}</DialogTitle>
             <DialogContent>
                 <Autocomplete
                     fullWidth
@@ -93,42 +95,42 @@ export const LaunchFormDialog: React.FC<{
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label="Application name*"
+                            label={t("runs.launchDialog.applicationNameLabel")}
                             variant="standard"
                         />
                     )}
-                    noOptionsText="No job definitions found"
+                    noOptionsText={t("runs.launchDialog.applicationNameNoOptions")}
                 />
                 {/* // Name of the batch process to launch. */}
                 <TextField
                     className={classes.TextField}
-                    label="Username"
+                    label={t("runs.launchDialog.usernameLabel")}
                     value={user}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setUser(event.target.value);
                     }}
                     fullWidth
-                    helperText="Name that will appear in the history"
+                    helperText={t("runs.launchDialog.usernameHelper")}
                     variant="standard"
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Session ID"
+                    label={t("runs.launchDialog.sessionIdLabel")}
                     value={sessionId}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setSessionId(event.target.value);
                     }}
                     fullWidth
-                    helperText="Optional data that will appear in the history"
+                    helperText={t("runs.launchDialog.sessionIdHelper")}
                     variant="standard"
                 />
                 <FormControl
                     component="fieldset"
                     style={{ marginTop: "8px", marginBottom: "8px" }}
                 >
-                    <FormLabel component="legend">Start state</FormLabel>
+                    <FormLabel component="legend">{t("runs.launchDialog.startStateLabel")}</FormLabel>
                     <RadioGroup
-                        aria-label="Start state"
+                        aria-label={t("runs.launchDialog.startStateLabel")}
                         name="startState"
                         value={startState}
                         onChange={(
@@ -140,37 +142,36 @@ export const LaunchFormDialog: React.FC<{
                         <FormControlLabel
                             value="SUBMITTED"
                             control={<Radio />}
-                            label="Immediate start"
+                            label={t("runs.launchDialog.startStateImmediate")}
                         />
                         <FormControlLabel
                             value="HOLDED"
                             control={<Radio />}
-                            label="Paused until released
-"
+                            label={t("runs.launchDialog.startStatePaused")}
                         />
                     </RadioGroup>
                     <FormHelperText>
-                        API has more options: scheduled at a time, recurring...
+                        {t("runs.launchDialog.startStateHelper")}
                     </FormHelperText>
                 </FormControl>
 
                 <TextField
                     className={classes.TextField}
-                    label="Priority"
+                    label={t("runs.launchDialog.priorityLabel")}
                     value={priority}
                     type="number"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setPriority(event.target.value);
                     }}
                     fullWidth
-                    helperText="Higher priority job instances run before the others and have a bigger CPU share."
+                    helperText={t("runs.launchDialog.priorityHelper")}
                     variant="standard"
                 />
 
-                <Typography variant="h6">Parameters</Typography>
+                <Typography variant="h6">{t("runs.launchDialog.parametersTitle")}</Typography>
                 <TextField
                     className={classes.TextField}
-                    label="Key*"
+                    label={t("runs.launchDialog.parameterKeyLabel")}
                     value={key}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setKey(event.target.value);
@@ -180,7 +181,7 @@ export const LaunchFormDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Value"
+                    label={t("runs.launchDialog.parameterValueLabel")}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setValue(event.target.value);
@@ -208,15 +209,15 @@ export const LaunchFormDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Add parameter
+                    {t("runs.launchDialog.addParameter")}
                 </Button>
                 <TableContainer component={Paper}>
-                    <Table size="small" aria-label="Parameters">
+                    <Table size="small" aria-label={t("runs.launchDialog.parametersTitle")}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Key</TableCell>
-                                <TableCell>Value</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell>{t("runs.launchDialog.tableKeyColumn")}</TableCell>
+                                <TableCell>{t("runs.launchDialog.tableValueColumn")}</TableCell>
+                                <TableCell>{t("runs.launchDialog.tableActionsColumn")}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -253,7 +254,7 @@ export const LaunchFormDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -279,7 +280,7 @@ export const LaunchFormDialog: React.FC<{
                         closeDialog();
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

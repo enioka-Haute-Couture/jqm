@@ -32,6 +32,8 @@ import useJobDefinitionsAPI from "../JobDefinitions/JobDefinitionsAPI";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
+import { useTranslation } from "react-i18next";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 
 export type LOG_TYPE =
     "STDERR" |
@@ -40,6 +42,8 @@ export type LOG_TYPE =
     ;
 
 const RunsPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTableTextLabels = useMUIDataTableTextLabels(t("runs.noMatch"));
     const {
         count,
         page,
@@ -98,9 +102,9 @@ const RunsPage: React.FC = () => {
             canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
             refresh();
         }
-        setPageTitle("Runs");
+        setPageTitle(t("runs.title"));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canUserAccess]);
+    }, [canUserAccess, t]);
 
     const [showDetailsJobInstanceId, setShowDetailsJobInstanceId] = useState<
         string | null
@@ -116,7 +120,7 @@ const RunsPage: React.FC = () => {
     const columns = [
         {
             name: "id",
-            label: "id",
+            label: t("runs.id"),
             options: {
                 filter: true,
                 sort: true,
@@ -126,7 +130,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "applicationName",
-            label: "Application",
+            label: t("runs.applicationName"),
             options: {
                 filter: true,
                 sort: true,
@@ -136,7 +140,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "queueName",
-            label: "Queue",
+            label: t("runs.queueName"),
             options: {
                 filter: true,
                 sort: true,
@@ -148,7 +152,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "state",
-            label: "Status",
+            label: t("runs.state"),
             options: {
                 filter: true,
                 sort: true,
@@ -199,7 +203,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "enqueueDate",
-            label: "Enqueued",
+            label: t("runs.enqueueDate"),
             options: {
                 filter: true,
                 sort: true,
@@ -210,10 +214,10 @@ const RunsPage: React.FC = () => {
                         let filterChips = [];
 
                         if (v[0] && isValid(parseISO(v[0]))) {
-                            filterChips.push(`Created after: ${format(new Date(v[0]), "dd/MM/yyyy")}`);
+                            filterChips.push(`${t("runs.filterLabels.enqueuedAfter")}: ${format(parseISO(v[0]), 'yyyy-MM-dd')}`);
                         }
                         if (v[1] && isValid(parseISO(v[1]))) {
-                            filterChips.push(`Created before: ${format(new Date(v[1]), "dd/MM/yyyy")}`);
+                            filterChips.push(`${t("runs.filterLabels.enqueuedBefore")}: ${format(parseISO(v[1]), 'yyyy-MM-dd')}`);
                         }
                         return filterChips;
                     },
@@ -244,7 +248,7 @@ const RunsPage: React.FC = () => {
                         return <Stack direction="row" spacing={2}>
                             <DatePicker
                                 sx={{ flexGrow: 1 }}
-                                label="Created after"
+                                label={t("runs.filterLabels.enqueuedAfter")}
                                 format="dd/MM/yyyy"
                                 slotProps={{ field: { clearable: true } }}
                                 value={(filterList[index].length === 0 || !filterList[index][0]) ? null : new Date(filterList[index][0])}
@@ -260,7 +264,7 @@ const RunsPage: React.FC = () => {
                             />
                             <DatePicker
                                 sx={{ flexGrow: 1 }}
-                                label="Created before"
+                                label={t("runs.filterLabels.enqueuedBefore")}
                                 format="dd/MM/yyyy"
                                 slotProps={{ field: { clearable: true } }}
                                 value={(filterList[index].length !== 2 || !filterList[index][1]) ? null : new Date(filterList[index][1])}
@@ -286,7 +290,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "beganRunningDate",
-            label: "Began",
+            label: t("runs.beganRunningDate"),
             options: {
                 filter: false,
                 sort: true,
@@ -299,7 +303,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "endDate",
-            label: "Ended",
+            label: t("runs.endDate"),
             options: {
                 filter: false,
                 sort: true,
@@ -312,7 +316,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: '',
-            label: 'Duration',
+            label: t("runs.duration"),
             options: {
                 filter: false,
                 sort: false,
@@ -348,7 +352,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "user",
-            label: "User",
+            label: t("runs.user"),
             options: {
                 filter: true,
                 sort: true,
@@ -358,7 +362,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "parent",
-            label: "Parent",
+            label: t("runs.parent"),
             options: {
                 filter: true,
                 sort: true,
@@ -368,7 +372,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "progress",
-            label: "Progress",
+            label: t("runs.progress"),
             options: {
                 filter: false,
                 sort: false,
@@ -377,7 +381,7 @@ const RunsPage: React.FC = () => {
 
         {
             name: "sessionID",
-            label: "Session ID",
+            label: t("runs.sessionID"),
             options: {
                 filter: true,
                 sort: false,
@@ -387,7 +391,7 @@ const RunsPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("runs.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -397,10 +401,10 @@ const RunsPage: React.FC = () => {
 
                     return <>
                         {!queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) && (
-                            <Tooltip key={"Relaunch"} title={"Relaunch"}>
+                            <Tooltip key={"Relaunch"} title={t("runs.tooltips.relaunch")}>
                                 <IconButton
                                     color="default"
-                                    aria-label={"Relaunch"}
+                                    aria-label={t("runs.tooltips.relaunch")}
                                     onClick={() => {
                                         relaunchJob(jobInstanceId);
                                     }}
@@ -415,10 +419,10 @@ const RunsPage: React.FC = () => {
                                 {canUserAccess(PermissionObjectType.job_instance, PermissionAction.update) &&
                                     (
                                         <>
-                                            <Tooltip key={"Kill"} title={"Kill"}>
+                                            <Tooltip key={"Kill"} title={t("runs.tooltips.kill")}>
                                                 <IconButton
                                                     color="default"
-                                                    aria-label={"Kill"}
+                                                    aria-label={t("runs.tooltips.kill")}
                                                     onClick={() => {
                                                         killJob(jobInstanceId);
                                                     }}
@@ -430,11 +434,11 @@ const RunsPage: React.FC = () => {
                                             {status === "HOLDED" ? (
                                                 <Tooltip
                                                     key={"Resume"}
-                                                    title={"Resume"}
+                                                    title={t("runs.tooltips.resume")}
                                                 >
                                                     <IconButton
                                                         color="default"
-                                                        aria-label={"Resume"}
+                                                        aria-label={t("runs.tooltips.resume")}
                                                         onClick={() => {
                                                             resumeJob(jobInstanceId);
                                                         }}
@@ -443,10 +447,10 @@ const RunsPage: React.FC = () => {
                                                     </IconButton>
                                                 </Tooltip>
                                             ) : (
-                                                <Tooltip key={"Pause"} title={"Pause"}>
+                                                <Tooltip key={"Pause"} title={t("runs.tooltips.pause")}>
                                                     <IconButton
                                                         color="default"
-                                                        aria-label={"Pause"}
+                                                        aria-label={t("runs.tooltips.pause")}
                                                         onClick={() => {
                                                             pauseJob(jobInstanceId);
                                                         }}
@@ -461,11 +465,11 @@ const RunsPage: React.FC = () => {
                                 {canUserAccess(PermissionObjectType.queue_position, PermissionAction.update) &&
                                     <Tooltip
                                         key={"Switch queue"}
-                                        title={"Switch queue"}
+                                        title={t("runs.tooltips.switchQueue")}
                                     >
                                         <IconButton
                                             color="default"
-                                            aria-label={"Switch queue"}
+                                            aria-label={t("runs.tooltips.switchQueue")}
                                             onClick={() => {
                                                 setShowSwitchJobQueueId(
                                                     jobInstanceId
@@ -481,11 +485,11 @@ const RunsPage: React.FC = () => {
                         )}
                         <Tooltip
                             key={"Show details"}
-                            title={"Show details"}
+                            title={t("runs.tooltips.showDetails")}
                         >
                             <IconButton
                                 color="default"
-                                aria-label={"Show details"}
+                                aria-label={t("runs.tooltips.showDetails")}
                                 onClick={() => {
                                     setShowDetailsJobInstanceId(
                                         jobInstanceId
@@ -499,11 +503,11 @@ const RunsPage: React.FC = () => {
                         {canSeeIndividualLogs() && <>
                             <Tooltip
                                 key={"Log stdout"}
-                                title={"Log stdout"}
+                                title={t("runs.tooltips.logStdout")}
                             >
                                 <IconButton
                                     color="default"
-                                    aria-label={"Log stdout"}
+                                    aria-label={t("runs.tooltips.logStdout")}
                                     onClick={() => {
                                         setShowDetailsJobInstanceId(
                                             jobInstanceId
@@ -516,11 +520,11 @@ const RunsPage: React.FC = () => {
                             </Tooltip>
                             <Tooltip
                                 key={"Log stderr"}
-                                title={"Log stderr"}
+                                title={t("runs.tooltips.logStderr")}
                             >
                                 <IconButton
                                     color="default"
-                                    aria-label={"Log stderr"}
+                                    aria-label={t("runs.tooltips.logStderr")}
                                     onClick={() => {
                                         setShowDetailsJobInstanceId(
                                             jobInstanceId
@@ -540,11 +544,7 @@ const RunsPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No runs found',
-            }
-        },
+        textLabels: muiTableTextLabels,
         download: false,
         print: false,
         selectableRows: "none" as SelectableRows,
@@ -559,8 +559,7 @@ const RunsPage: React.FC = () => {
             _applyNewFilters?: (...args: any[]) => any
         ) => (
             <Typography style={{ marginTop: "32px" }}>
-                Give exact id for run / parent / session ; Use % for wildcard in
-                other fields
+                {t("runs.filterHelper")}
             </Typography>
         ),
         onTableChange: (action: string, tableState: MUIDataTableState) => {
@@ -599,14 +598,14 @@ const RunsPage: React.FC = () => {
                     }}
                     size="small"
                 >
-                    <ToggleButton value={false}>Ended</ToggleButton>
-                    <ToggleButton value={true}>Active</ToggleButton>
+                    <ToggleButton value={false}>{t("runs.toolbar.ended")}</ToggleButton>
+                    <ToggleButton value={true}>{t("runs.toolbar.active")}</ToggleButton>
                 </ToggleButtonGroup>
                 {canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) &&
-                    <Tooltip title={"New launch form"}>
+                    <Tooltip title={t("runs.tooltips.newLaunch")}>
                         <IconButton
                             color="default"
-                            aria-label={"New launch form"}
+                            aria-label={t("runs.tooltips.newLaunch")}
                             onClick={() =>
                                 fetchJobDefinitions().then(() =>
                                     setShowLaunchFormDialog(true)
@@ -617,10 +616,10 @@ const RunsPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                 }
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("runs.tooltips.refresh")}>
                     <IconButton
                         color="default"
-                        aria-label={"refresh"}
+                        aria-label={t("runs.tooltips.refresh")}
                         onClick={() => {
                             refresh();
                         }}
@@ -641,7 +640,7 @@ const RunsPage: React.FC = () => {
     return jobInstances && queues && parameters ? (
         <Container maxWidth={false}>
             <MUIDataTable
-                title={"Runs"}
+                title={t("runs.tableTitle")}
                 data={jobInstances}
                 columns={columns}
                 options={options}

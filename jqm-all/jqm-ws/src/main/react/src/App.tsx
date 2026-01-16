@@ -25,13 +25,16 @@ import { AuthProvider } from "./utils/AuthService";
 import { RunsPaginationProvider } from "./utils/RunsPaginationProvider";
 import ClassLoadersPage from "./components/ClassLoaders/ClassLoadersPage";
 import { LoginModal } from "./components/LoginModal";
+import { useTranslation } from "react-i18next";
+import { languageConfig } from "./i18n";
 
 
 
 
 
-const getMuiTheme = () =>
-    createTheme({
+
+const getMuiTheme = (locale: string) => {
+    return createTheme({
         palette: {
             primary: {
                 main: "#355759",
@@ -40,7 +43,76 @@ const getMuiTheme = () =>
                 main: "#147C94",
             },
         },
-    });
+    }, languageConfig[locale].muiLocale);
+};
+
+const AppContent: React.FC = () => {
+    const { i18n } = useTranslation();
+    const dateLocale = languageConfig[i18n.language]!.dateFnsLocale;
+    const theme = getMuiTheme(i18n.language);
+
+    return (
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={dateLocale}>
+            <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={theme}>
+                    <ForceLogin />
+                    <LoginModal />
+                    <SnackbarProvider
+                        maxSnack={4}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "left",
+                        }}
+                    >
+                        <MenuWrapper>
+                            <RunsPaginationProvider>
+                                <Switch>
+                                    <Route path="/nodes" exact={true}>
+                                        <NodesPage />
+                                    </Route>
+                                    <Route path="/queues" exact={true}>
+                                        <QueuesPage />
+                                    </Route>
+                                    <Route
+                                        path="/clusterwide-parameters"
+                                        exact={true}
+                                    >
+                                        <ClusterwideParametersPage />
+                                    </Route>
+                                    <Route path="/job-definitions" exact={true}>
+                                        <JobDefinitionsPage />
+                                    </Route>
+                                    <Route path="/users" exact={true}>
+                                        <UsersPage />
+                                    </Route>
+                                    <Route path="/mappings" exact={true}>
+                                        <MappingsPage />
+                                    </Route>
+                                    <Route path="/roles" exact={true}>
+                                        <RolesPage />
+                                    </Route>
+                                    <Route path="/jndi" exact={true}>
+                                        <JndiPage />
+                                    </Route>
+                                    <Route path="/classloaders" exact={true}>
+                                        <ClassLoadersPage />
+                                    </Route>
+                                    <Route path="/runs" exact={true}>
+                                        <RunsPage />
+                                    </Route>
+                                    <Route path="/" exact={true}>
+                                        <HomePage />
+                                    </Route>
+                                    <Redirect to="/" />
+                                </Switch>
+                            </RunsPaginationProvider>
+                        </MenuWrapper>
+                    </SnackbarProvider>
+                </ThemeProvider>
+            </StyledEngineProvider>
+        </LocalizationProvider>
+    );
+};
 
 function App() {
     // Support deployment behind reverse proxy with a path prefix
@@ -49,65 +121,7 @@ function App() {
     return (
         <Router basename={basename}>
             <AuthProvider>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <StyledEngineProvider injectFirst>
-                        <ThemeProvider theme={getMuiTheme()}>
-                            <ForceLogin />
-                            <LoginModal />
-                            <SnackbarProvider
-                                maxSnack={4}
-                                anchorOrigin={{
-                                    vertical: "bottom",
-                                    horizontal: "left",
-                                }}
-                            >
-                                <MenuWrapper>
-                                    <RunsPaginationProvider>
-                                        <Switch>
-                                            <Route path="/nodes" exact={true}>
-                                                <NodesPage />
-                                            </Route>
-                                            <Route path="/queues" exact={true}>
-                                                <QueuesPage />
-                                            </Route>
-                                            <Route
-                                                path="/clusterwide-parameters"
-                                                exact={true}
-                                            >
-                                                <ClusterwideParametersPage />
-                                            </Route>
-                                            <Route path="/job-definitions" exact={true}>
-                                                <JobDefinitionsPage />
-                                            </Route>
-                                            <Route path="/users" exact={true}>
-                                                <UsersPage />
-                                            </Route>
-                                            <Route path="/mappings" exact={true}>
-                                                <MappingsPage />
-                                            </Route>
-                                            <Route path="/roles" exact={true}>
-                                                <RolesPage />
-                                            </Route>
-                                            <Route path="/jndi" exact={true}>
-                                                <JndiPage />
-                                            </Route>
-                                            <Route path="/classloaders" exact={true}>
-                                                <ClassLoadersPage />
-                                            </Route>
-                                            <Route path="/runs" exact={true}>
-                                                <RunsPage />
-                                            </Route>
-                                            <Route path="/" exact={true}>
-                                                <HomePage />
-                                            </Route>
-                                            <Redirect to="/" />
-                                        </Switch>
-                                    </RunsPaginationProvider>
-                                </MenuWrapper>
-                            </SnackbarProvider>
-                        </ThemeProvider>
-                    </StyledEngineProvider>
-                </LocalizationProvider>
+                <AppContent />
             </AuthProvider>
         </Router>
     );

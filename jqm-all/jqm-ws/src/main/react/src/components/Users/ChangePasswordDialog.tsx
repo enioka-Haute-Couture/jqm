@@ -8,11 +8,13 @@ import {
     TextField,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const ChangePasswordDialog: React.FC<{
     closeDialog: () => void;
     changePassword: (password: string) => Promise<void>;
 }> = ({ closeDialog, changePassword }) => {
+    const { t } = useTranslation();
     const [password, setPassword] = useState<string>("");
 
     return (
@@ -21,16 +23,15 @@ export const ChangePasswordDialog: React.FC<{
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle id="form-dialog-title">Change password</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("users.changePasswordDialog.title")}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Passwords are ignored if a certificate is used. An empty
-                    password forces the use of a certificate.
+                    {t("users.changePasswordDialog.description")}
                 </DialogContentText>
                 <TextField
                     autoFocus
                     margin="dense"
-                    label="Password"
+                    label={t("users.changePasswordDialog.passwordLabel")}
                     type="password"
                     fullWidth
                     value={password}
@@ -46,7 +47,7 @@ export const ChangePasswordDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -58,7 +59,7 @@ export const ChangePasswordDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Save
+                    {t("users.changePasswordDialog.save")}
                 </Button>
             </DialogActions>
         </Dialog>

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Queue } from "./Queue";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
@@ -6,6 +7,7 @@ import { useNotificationService } from "../../utils/NotificationService";
 const API_URL = "/admin/q";
 
 export const useQueueAPI = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
 
     const [queues, setQueues] = useState<Queue[] | null>();
@@ -22,12 +24,14 @@ export const useQueueAPI = () => {
                 .then(() => {
                     fetchQueues();
                     displaySuccess(
-                        `Successfully created queue: ${newQueue.name}`
+                        t("queues.messages.successCreate", {
+                            name: newQueue.name,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchQueues, displayError, displaySuccess]
+        [fetchQueues, displayError, displaySuccess, t]
     );
 
     const deleteQueues = useCallback(
@@ -38,13 +42,14 @@ export const useQueueAPI = () => {
                 .then(() => {
                     fetchQueues();
                     displaySuccess(
-                        `Successfully deleted queue${queueIds.length > 1 ? "s" : ""
-                        }`
+                        t("queues.messages.successDelete", {
+                            count: queueIds.length,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [fetchQueues, displayError, displaySuccess]
+        [fetchQueues, displayError, displaySuccess, t]
     );
 
     const updateQueue = useCallback(
@@ -52,11 +57,11 @@ export const useQueueAPI = () => {
             return APIService.put(`${API_URL}/${queue.id}`, queue)
                 .then(() => {
                     fetchQueues();
-                    displaySuccess("Successfully saved queue");
+                    displaySuccess(t("queues.messages.successSave"));
                 })
                 .catch(displayError);
         },
-        [fetchQueues, displayError, displaySuccess]
+        [fetchQueues, displayError, displaySuccess, t]
     );
     return {
         queues,

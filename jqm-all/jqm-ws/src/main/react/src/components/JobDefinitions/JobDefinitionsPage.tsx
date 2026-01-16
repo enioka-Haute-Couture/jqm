@@ -13,6 +13,8 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import { Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useTranslation } from "react-i18next";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 import {
     JobDefinitionParameter,
     JobDefinitionSchedule,
@@ -43,6 +45,8 @@ import useClassLoaderAPI from "../ClassLoaders/ClassLoaderAPI";
 
 
 export const JobDefinitionsPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTableTextLabels = useMUIDataTableTextLabels(t("jobDefinitions.noMatch"));
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const applicationNameInputRef = useRef(null);
     const descriptionInputRef = useRef(null);
@@ -94,9 +98,9 @@ export const JobDefinitionsPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.queue, PermissionAction.read) && canUserAccess(PermissionObjectType.jd, PermissionAction.read)) {
             refresh();
         }
-        setPageTitle("Job definitions");
+        setPageTitle(t("jobDefinitions.title"));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canUserAccess]);
+    }, [canUserAccess, t]);
 
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
@@ -163,26 +167,26 @@ export const JobDefinitionsPage: React.FC = () => {
         if (value.jobType === JobType.java) {
             return (
                 <>
-                    Path to the jar file: {value.jarPath}
+                    {t("jobDefinitions.propertiesDisplay.pathToJar")}: {value.jarPath}
                     <br />
-                    Class to launch: {value.javaClassName}
+                    {t("jobDefinitions.propertiesDisplay.classToLaunch")}: {value.javaClassName}
                     <br />
-                    Class loader: {classLoaders?.find((cl) => cl.id === value.classLoaderId)?.name || 'default'}
+                    {t("jobDefinitions.propertiesDisplay.classLoader")}: {classLoaders?.find((cl) => cl.id === value.classLoaderId)?.name || t("jobDefinitions.editPropertiesDialog.classLoaderDefault")}
                 </>
             );
         } else if (value.jobType === JobType.shell) {
             return (
                 <>
-                    Shell:{" "}
+                    {t("jobDefinitions.propertiesDisplay.shell")}:{" "}
                     {value.pathType === "POWERSHELLCOMMAND"
-                        ? "Powershell"
-                        : "Default OS shell"}
+                        ? t("jobDefinitions.propertiesDisplay.powershell")
+                        : t("jobDefinitions.propertiesDisplay.defaultOsShell")}
                     <br />
-                    Shell command: {value.jarPath}
+                    {t("jobDefinitions.propertiesDisplay.shellCommand")}: {value.jarPath}
                 </>
             );
         } else {
-            return <>Path to executable: {value.jarPath}</>;
+            return <>{t("jobDefinitions.propertiesDisplay.pathToExecutable")}: {value.jarPath}</>;
         }
     };
 
@@ -194,34 +198,34 @@ export const JobDefinitionsPage: React.FC = () => {
         if (value.application) {
             result.push(
                 <span key="application">
-                    Application: {value.application} <br />
+                    {t("jobDefinitions.tagsDisplay.application")}: {value.application} <br />
                 </span>
             );
         }
         if (value.module) {
             result.push(
                 <span key="module">
-                    Module: {value.module} <br />
+                    {t("jobDefinitions.tagsDisplay.module")}: {value.module} <br />
                 </span>
             );
         }
         if (value.keyword1) {
             result.push(
                 <span key="keyword1">
-                    Keyword 1: {value.keyword1} <br />
+                    {t("jobDefinitions.tagsDisplay.keyword1")}: {value.keyword1} <br />
                 </span>
             );
         }
         if (value.keyword2) {
             result.push(
                 <span key="keyword2">
-                    Keyword 2: {value.keyword2} <br />
+                    {t("jobDefinitions.tagsDisplay.keyword2")}: {value.keyword2} <br />
                 </span>
             );
         }
         if (value.keyword3) {
             result.push(
-                <span key="keyword3">Keyword 3: {value.keyword3}</span>
+                <span key="keyword3">{t("jobDefinitions.tagsDisplay.keyword3")}: {value.keyword3}</span>
             );
         }
         return result;
@@ -243,9 +247,9 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "applicationName",
-            label: "Name*",
+            label: t("jobDefinitions.applicationName"),
             options: {
-                hint: "The key used to designate the Job Definition in the different APIs and dialogs",
+                hint: t("jobDefinitions.hints.applicationName"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -257,9 +261,9 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "description",
-            label: "Description",
+            label: t("jobDefinitions.description"),
             options: {
-                hint: "A human-readable description of what the job does",
+                hint: t("jobDefinitions.hints.description"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -271,9 +275,9 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "queueId",
-            label: "Default queue*",
+            label: t("jobDefinitions.defaultQueue"),
             options: {
-                hint: "The queue which will be used when submitting execution requests (if no specific queue is given at request time)",
+                hint: t("jobDefinitions.hints.defaultQueue"),
                 filter: false,
                 sort: false,
                 customBodyRender: renderArrayCell(
@@ -295,9 +299,9 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "enabled",
-            label: "Enabled",
+            label: t("jobDefinitions.enabled"),
             options: {
-                hint: "If disabled, all instances will always succeed instantly",
+                hint: t("jobDefinitions.hints.enabled"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -309,9 +313,9 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "highlander",
-            label: "Highlander",
+            label: t("jobDefinitions.highlander"),
             options: {
-                hint: "If checked, there can never be more than one instance of the Job Definition running at the same time, as well as no more than one waiting in any queue",
+                hint: t("jobDefinitions.hints.highlander"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -323,7 +327,7 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "jobType",
-            label: "Job type",
+            label: t("jobDefinitions.jobType"),
             options: {
                 filter: true,
                 sort: true,
@@ -339,14 +343,14 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "properties",
-            label: "Properties*",
+            label: t("jobDefinitions.properties"),
             options: {
-                hint: "Specific properties depending on the job type",
+                hint: t("jobDefinitions.hints.properties"),
                 filter: false,
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    "Click to edit specific properties",
+                    t("jobDefinitions.clickToEditProperties"),
                     properties,
                     printJobSpecificProperties,
                     setEditPropertiesJobDefinitionId
@@ -355,14 +359,14 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "tags",
-            label: "Tags",
+            label: t("jobDefinitions.tags"),
             options: {
-                hint: "Optionnal tags for classification and queries",
+                hint: t("jobDefinitions.hints.tags"),
                 filter: false,
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    "Click to edit tags",
+                    t("jobDefinitions.clickToEditTags"),
                     tags,
                     printJobTags,
                     setEditTagsJobDefinitionId
@@ -371,13 +375,13 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "parameters",
-            label: "Parameters",
+            label: t("jobDefinitions.parameters"),
             options: {
                 filter: false,
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    "Click to edit parameters",
+                    t("jobDefinitions.clickToEditParameters"),
                     parameters,
                     printJobParameters,
                     setEditParametersJobDefinitionId
@@ -386,7 +390,7 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "schedules",
-            label: "Schedules",
+            label: t("jobDefinitions.schedules"),
             options: {
                 filter: false,
                 sort: false,
@@ -402,7 +406,7 @@ export const JobDefinitionsPage: React.FC = () => {
                         <Tooltip
                             title={
                                 editingRowId === tableMeta.rowIndex
-                                    ? "Click to edit schedules"
+                                    ? t("jobDefinitions.clickToEditSchedules")
                                     : ""
                             }
                         >
@@ -424,7 +428,7 @@ export const JobDefinitionsPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -435,7 +439,9 @@ export const JobDefinitionsPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.jd, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.jd, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.jd, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -443,18 +449,14 @@ export const JobDefinitionsPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No job definitions found',
-            }
-        },
+        textLabels: muiTableTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.jd, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.jd, PermissionAction.create) &&
-                    <Tooltip title={"Add line"}>
+                    <Tooltip title={t("common.add")}>
                         <IconButton
                             color="default"
                             aria-label={"add"}
@@ -464,7 +466,7 @@ export const JobDefinitionsPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                 }
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -498,7 +500,7 @@ export const JobDefinitionsPage: React.FC = () => {
     return jobDefinitions && queues && classLoaders ? (
         <Container maxWidth={false}>
             <MUIDataTable
-                title={"Job definitions"}
+                title={t("jobDefinitions.title")}
                 data={jobDefinitions}
                 columns={columns}
                 options={options}

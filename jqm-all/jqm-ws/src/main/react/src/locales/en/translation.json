@@ -1,0 +1,655 @@
+{
+    "queues": {
+        "title": "Queues",
+        "noMatch": "No queues found",
+        "name": "Name*",
+        "description": "Description",
+        "isDefault": "Is default",
+        "documentation": {
+            "title": "Queues documentation",
+            "header": "These are FIFO (First In First Out) queues in which batch job execution requests will wait.",
+            "description": "On this page, one may change the characteristics of queues. Changes on this page do not require node reboots."
+        },
+        "hints": {
+            "name": "The name of the queue. This name is very important, as it the key used to designate the queue in the different APIs (for example, when submitting an execution request, one may specify by name a queue in which the request will wait). However, it can still be changed - internally, JQM uses an ID, not this name - the impact is only on the clients' side.",
+            "description": "A free text description that appears in reports",
+            "isDefault": "The queue used when none is specified. There can only be one default queue."
+        },
+        "createQueueDialog": {
+            "title": "Create queue",
+            "defaultQueueLabel": "Default queue (disabled if one is already set)"
+        },
+        "messages": {
+            "successCreate": "Successfully created queue: {{name}}",
+            "successDelete_one": "Successfully deleted queue",
+            "successDelete_other": "Successfully deleted queues",
+            "successSave": "Successfully saved queue",
+            "onlyOneDefault": "Only one default queue can be set"
+        }
+    },
+    "jndi": {
+        "title": "JNDI Resources",
+        "noMatch": "No JNDI resources found",
+        "createNewResource": "Create new JNDI resource",
+        "jndiAlias": "JNDI Alias",
+        "type": "Type",
+        "factory": "Factory",
+        "singleton": "Singleton",
+        "parameters": "Parameters",
+        "clickToEditParameters": "Click to edit parameters",
+        "documentation": {
+            "title": "JNDI Resources documentation",
+            "header": "Resources are Java objects which can be requested by jobs through a JNDI lookup.",
+            "description1": "On this page, one may create or change resources. Creating a new resource does not require any reboot. Altering an already used singleton resource does require rebooting the nodes using it, as singleton resources are cached. Altering a non-singleton resource does not require any reboot.",
+            "description2": "Please note that for a non-singleton resource, its class and factory class must be accessible to the payload: either in JQM_ROOT/ext or inside the payload's own dependencies. For a singleton resource, the classes must be inside ext (as they must be available to the engine itself, not only to the payload)."
+        },
+        "hints": {
+            "jndiAlias": "The name that will be used by payloads during resource lookup.",
+            "type": "The fully qualified name of the resource class. E.g. java.io.File.File",
+            "factory": "The fully qualified name of the resource factory class. E.g. com.enioka.jqm.providers.FileFactory",
+            "description": "Free text to remember what the resource is for.",
+            "singleton": "Tick for singleton resource. Differing from standard JNDI resource, a lookup on a singleton resource will always return the same instance (standard JNDI is: a new instance is created on each lookup). This is most helpful for connection pools, for which it is stupid to create a new instance on each call.."
+        },
+        "editParametersDialog": {
+            "title": "Edit Parameters",
+            "name": "Name",
+            "value": "Value",
+            "addParameter": "Add parameter",
+            "description": "Add new or edit existing parameters",
+            "validate": "Validate"
+        },
+        "resourceGroups": {
+            "databasePools": "Database Pools",
+            "messagesQ": "Messages Q & QCF",
+            "locators": "Locators",
+            "smtpMail": "SMTP Mail",
+            "genericResource": "Generic Resource"
+        },
+        "resourceTemplates": {
+            "oraclePool": "Oracle Pool",
+            "postgreSqlPool": "PostgreSQL Pool",
+            "mySqlPool": "MySQL Pool",
+            "fileOrDirectory": "File or directory",
+            "hsqldbPool": "HSQLDB pool",
+            "jdbcPoolOther": "JDBC Pool (other databases)",
+            "url": "URL",
+            "mqQcf": "IBM MQ QueueConnectionFactory",
+            "mqQ": "IBM MQ Queue",
+            "amqQcf": "Apache ActiveMQ QueueConnectionFactory",
+            "amqQ": "Apache ActiveMQ Queue",
+            "smtpServer": "SMTP server (mail session)",
+            "string": "String",
+            "generic": "Generic resource"
+        },
+        "messages": {
+            "successSave": "Successfully saved resource: {{name}}",
+            "successDelete_one": "Successfully deleted resource",
+            "successDelete_other": "Successfully deleted resources"
+        }
+    },
+    "muiDatatable": {
+        "body": {
+            "noMatch": "Sorry, no matching records found",
+            "toolTip": "Sort",
+            "columnHeaderTooltip": "Sort for {{column}}"
+        },
+        "pagination": {
+            "next": "Next Page",
+            "previous": "Previous Page",
+            "rowsPerPage": "Rows per page:",
+            "displayRows": "of"
+        },
+        "toolbar": {
+            "search": "Search",
+            "downloadCsv": "Download CSV",
+            "print": "Print",
+            "viewColumns": "View Columns",
+            "filterTable": "Filter Table"
+        },
+        "filter": {
+            "all": "All",
+            "title": "FILTERS",
+            "reset": "RESET"
+        },
+        "viewColumns": {
+            "title": "Show Columns",
+            "titleAria": "Show/Hide Table Columns"
+        },
+        "selectedRows": {
+            "text": "row(s) selected",
+            "delete": "Delete",
+            "deleteAria": "Delete Selected Rows"
+        }
+    },
+    "common": {
+        "welcome": "Welcome",
+        "add": "Add line",
+        "refresh": "Refresh",
+        "help": "Help",
+        "actions": "Actions",
+        "cancel": "Cancel",
+        "create": "Create",
+        "description": "Description",
+        "close": "Close",
+        "edit": "Edit line",
+        "delete": "Delete line",
+        "save": "Save changes",
+        "cancelChanges": "Cancel changes"
+    },
+    "home": {
+        "title": "Welcome to the JQM administration web console",
+        "helpText": "On each tab, click the question mark icon for contextual help.",
+        "documentationText": "Further reference can be found in the",
+        "documentationLink": "full online documentation",
+        "documentationSuffix": "for the development branch."
+    },
+    "menu": {
+        "home": "Home",
+        "nodes": "Nodes",
+        "queues": "Queues",
+        "mappings": "Mappings",
+        "jndiResources": "JNDI resources",
+        "clusterWideParams": "Cluster-wide params",
+        "classLoaders": "Class loaders",
+        "jobDefinitions": "Job definitions",
+        "users": "Users",
+        "roles": "Roles",
+        "runs": "Runs",
+        "logout": "Log out"
+    },
+    "mappings": {
+        "title": "Mappings",
+        "noMatch": "No mappings found",
+        "node": "Node*",
+        "queue": "Queue*",
+        "pollingInterval": "Polling Interval (ms)*",
+        "maxConcurrentInstances": "Max concurrent running instances*",
+        "enabled": "Enabled",
+        "documentation": {
+            "title": "Mappings documentation",
+            "header": "Mappings specify which nodes will poll which queues. They are basically nodes subscribing to queues.",
+            "description": "On this page, one may associate nodes with queues. Running nodes will (by default) check every minute if there are changes in their mappings."
+        },
+        "hints": {
+            "node": "The node which will poll the queue",
+            "queue": "The queue to poll",
+            "pollingInterval": "The polling interval, in milliseconds. Never go below one second. If updated on an active engine, it is applied to the next loop (not the current one).",
+            "maxConcurrentInstances": "The maximum number of parallel executions the node will allow for this queue (this translates directly as a max number of threads inside the engine)."
+        },
+        "createMappingDialog": {
+            "title": "Create mapping"
+        },
+        "messages": {
+            "successCreate": "Successfully created mapping between {{nodeName}} and {{queueName}}",
+            "successDelete_one": "Successfully deleted mapping",
+            "successDelete_other": "Successfully deleted mappings",
+            "successSave": "Successfully saved mapping"
+        }
+    },
+    "roles": {
+        "title": "Roles",
+        "noMatch": "No roles found",
+        "name": "Name*",
+        "permissions": "Permissions",
+        "clickToEditPermissions": "Click to edit permissions",
+        "hints": {
+            "name": "Name of the role. Must be unique.",
+            "description": "What the role does.",
+            "permissions": "What the role can do."
+        },
+        "createRoleDialog": {
+            "title": "Create role"
+        },
+        "editPermissionsDialog": {
+            "title": "Edit permissions",
+            "description": "Permissions describe what the role can do.",
+            "action": "Action",
+            "onObjectType": "On object of type",
+            "addPermission": "Add permission",
+            "code": "Code",
+            "objectType": "Object type",
+            "validate": "Validate"
+        },
+        "permissionActions": {
+            "read": "read",
+            "create": "create",
+            "update": "update",
+            "delete": "delete",
+            "all": "do everything on"
+        },
+        "permissionObjectTypes": {
+            "node": "node",
+            "queue": "queue",
+            "qmapping": "mapping",
+            "jndi": "JNDI resource",
+            "prm": "parameter",
+            "jd": "job definition",
+            "user": "user",
+            "role": "role",
+            "job_instance": "history and queue content",
+            "logs": "job log files",
+            "queue_position": "job position in queue",
+            "files": "files produced",
+            "all": "all types"
+        },
+        "messages": {
+            "successCreate": "Successfully created role: {{name}}",
+            "successDelete_one": "Successfully deleted role",
+            "successDelete_other": "Successfully deleted roles",
+            "successUpdate": "Successfully updated role {{name}}"
+        }
+    },
+    "auth": {
+        "sessionExpired": "Session Expired",
+        "sessionExpiredMessage": "Your session has expired due to inactivity. Please log in again to continue.",
+        "invalidCredentials": "Invalid credentials. Please try again.",
+        "loginError": "An error occurred. Please try again.",
+        "username": "Username",
+        "password": "Password",
+        "loggingIn": "Logging in...",
+        "logIn": "Log In",
+        "accessForbidden": "You don't have permission to access this page."
+    },
+    "errors": {
+        "genericError": "An error occurred, please contact support support@enioka.com for help",
+        "dismiss": "Dismiss"
+    },
+    "users": {
+        "title": "Users",
+        "noMatch": "No users found",
+        "login": "Login*",
+        "email": "E-mail",
+        "fullName": "Full name",
+        "locked": "Locked",
+        "expirationDate": "Expiration date",
+        "roles": "Roles",
+        "downloadCertificate": "Download certificate",
+        "changePassword": "Change password. Passwords are ignored if a certificate is used. An empty password forces the use of a certificate.",
+        "hints": {
+            "login": "Must be unique. If used, certificates should certify CN=root",
+            "email": "Optional contact e-mail address",
+            "fullName": "Optional description of the account (real name or service name)"
+        },
+        "createUserDialog": {
+            "title": "Create user",
+            "lockedLabel": "Locked"
+        },
+        "changePasswordDialog": {
+            "title": "Change password",
+            "description": "Passwords are ignored if a certificate is used. An empty password forces the use of a certificate.",
+            "passwordLabel": "Password",
+            "save": "Save"
+        },
+        "messages": {
+            "successCreate": "Successfully created user: {{login}}",
+            "successDelete_one": "Successfully deleted user",
+            "successDelete_other": "Successfully deleted users",
+            "successUpdate": "Successfully updated user {{login}}",
+            "successPasswordChange": "Successfully updated password of user"
+        }
+    },
+    "classLoaders": {
+        "title": "Class loaders",
+        "noMatch": "No class loaders found",
+        "name": "Name*",
+        "childFirst": "Child First",
+        "hiddenClasses": "Hidden Classes",
+        "tracingEnabled": "Tracing Enabled",
+        "persistent": "Persistent",
+        "allowedRunners": "Allowed Runners",
+        "clickToEditHiddenClasses": "Click to edit hidden classes",
+        "clickToEditAllowedRunners": "Click to edit allowed runners",
+        "hints": {
+            "name": "The key used to identify the class loader in the deployment descriptor. Unique.",
+            "childFirst": "Offer option to have child first class loading. Parent first is the norm in JSE.",
+            "hiddenClasses": "Offer possibility to hide Java classes from jobs. One or more regex defining classes never to load from the parent class loader.",
+            "tracingEnabled": "Activate listing all class loaded inside the job log",
+            "persistent": "When false, the class loader is transient: it is created to run a new job instance and is thrown out when the job instance ends. When true, it is not thrown out at the end and will be reused by all job instances created from the different job definitions using this class loader (therefore, multiple job definitions can share the same static context).",
+            "allowedRunners": "The different runners that are active in this context. If not set, the global parameter job_runners is used instead."
+        },
+        "createClassLoaderDialog": {
+            "title": "Create class loader",
+            "childFirstLabel": "Child first class loading",
+            "tracingEnabledLabel": "Tracing enabled",
+            "persistentLabel": "Persistent"
+        },
+        "editHiddenClassesDialog": {
+            "title": "Edit hidden classes",
+            "description": "A hidden class is a regexp defining classes never to load from the parent class loader.",
+            "regexpLabel": "Regexp*",
+            "addButton": "Add",
+            "hiddenClassColumn": "Hidden class",
+            "validate": "Validate"
+        },
+        "editAllowedRunnersDialog": {
+            "title": "Edit allowed runners",
+            "runnerLabel": "Runner*",
+            "addButton": "Add",
+            "allowedRunnerColumn": "Allowed runner",
+            "validate": "Validate"
+        },
+        "messages": {
+            "successCreate": "Successfully created class loader: {{name}}",
+            "successDelete_one": "Successfully deleted class loader",
+            "successDelete_other": "Successfully deleted class loaders",
+            "successSave": "Successfully saved class loader"
+        }
+    },
+    "clusterParameters": {
+        "title": "Cluster-wide parameters",
+        "noMatch": "No parameters found",
+        "key": "Key",
+        "value": "Value",
+        "hints": {
+            "key": "The parameter key. Not necessarily unique.",
+            "value": "The value of the parameter"
+        },
+        "documentation": {
+            "title": "Cluster-wide parameters documentation",
+            "header": "These parameters apply to every node inside the cluster.",
+            "description": "On this page, one may change the global cluster parameters. Please see the full documentation for the parameters. The need to reboot after a change depends on the parameter."
+        },
+        "createParameterDialog": {
+            "title": "Create parameter",
+            "nameLabel": "Name*",
+            "valueLabel": "Value"
+        },
+        "messages": {
+            "successCreate": "Successfully created new parameter: {{key}}",
+            "successDelete_one": "Successfully deleted parameter",
+            "successDelete_other": "Successfully deleted parameters",
+            "successSave": "Successfully saved parameter"
+        }
+    },
+    "nodes": {
+        "title": "Nodes",
+        "noMatch": "No nodes found",
+        "name": "Name**",
+        "dns": "DNS to bind to*",
+        "httpPort": "HTTP port*",
+        "outputDirectory": "File produced storage**",
+        "jobRepoDirectory": "Directory containing jars**",
+        "tmpDirectory": "Temporary directory*",
+        "rootLogLevel": "Log level*",
+        "jmxRegistryPort": "Jmx Registry Port**",
+        "jmxServerPort": "Jmx Server Port**",
+        "enabled": "Enabled",
+        "simpleApi": "Simple API",
+        "clientApi": "Client API",
+        "adminApi": "Admin API",
+        "viewNodeLogs": "View node logs",
+        "hints": {
+            "name": "The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the name given as a parameter to the node when starting. It is unique throughout the cluster. Default is server hostname in Windows, user name in Unix.",
+            "dns": "The web APIs will bind on all interfaces that answer to a reverse DNS call of this name. Default is localhost, i.e. local-only binding.",
+            "httpPort": "The web APIs will bind on this port. Default is a random free port.",
+            "outputDirectory": "Should batch jobs produce files, they would be stored in sub-directories of this directory. Absolute path strongly recommended, relative path are relative to JQM install directory.",
+            "jobRepoDirectory": "The root directory containing all the jobs (payload jars). Absolute path strongly recommended, relative path are relative to JQM install directory.",
+            "rootLogLevel": "Verbosity of the main log file. Valid values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL. See full documentation for the signification of these levels. In case of erroneous value, default value INFO is assumed.",
+            "jmxRegistryPort": "If 0, remote JMX is disabled. Default is 0.",
+            "jmxServerPort": "If 0, remote JMX is disabled. Default is 0.",
+            "simpleApi": "If ticked, the simple web API will start. This API governs script interactions (execution request through wget & co, etc.) and file retrieval (logs, files created by batch jobs executions)",
+            "clientApi": "If ticked, the client web API will start. This API exposes the full JqmClient API - see full documentation.",
+            "adminApi": "If ticked, the administration web API will start. This API is only used by this web administration console and is an internal JQM API, not a public one. Disabling it disables this web console."
+        },
+        "documentation": {
+            "title": "Nodes documentation",
+            "header": "Nodes are instances of the JQM engine that actually run batch job instances. Basically, they are Unix init.d entries, Windows services or running containers.",
+            "paragraph1": "On this page, one may change the characteristics of nodes.",
+            "paragraph2": "Nodes can only be created through the command line",
+            "paragraph2Command": "jqm.(sh|ps1) createnode [ nodename ]",
+            "paragraph2End": ". Only nodes switched off for more than 10 minutes can be removed.",
+            "paragraph3": "Changing fields marked with",
+            "paragraph3Marker": "**",
+            "paragraph3End": "(two asterisks) while the node is running requires the node to be restarted for the change to be taken into account. Changes to other fields are automatically applied asynchronously (default is at most after one minute)."
+        },
+        "displayLogsDialog": {
+            "title": "Latest logs for node {{nodeName}}",
+            "close": "close"
+        },
+        "messages": {
+            "successUpdate": "Successfully updated node {{name}}"
+        }
+    },
+    "jobDefinitions": {
+        "title": "Job definitions",
+        "noMatch": "No job definitions found",
+        "applicationName": "Name*",
+        "description": "Description",
+        "defaultQueue": "Default queue*",
+        "enabled": "Enabled",
+        "highlander": "Highlander",
+        "jobType": "Job type",
+        "properties": "Properties*",
+        "tags": "Tags",
+        "parameters": "Parameters",
+        "schedules": "Schedules",
+        "hints": {
+            "applicationName": "The key used to designate the Job Definition in the different APIs and dialogs",
+            "description": "A human-readable description of what the job does",
+            "defaultQueue": "The queue which will be used when submitting execution requests (if no specific queue is given at request time)",
+            "enabled": "If disabled, all instances will always succeed instantly",
+            "highlander": "If checked, there can never be more than one instance of the Job Definition running at the same time, as well as no more than one waiting in any queue",
+            "properties": "Specific properties depending on the job type",
+            "tags": "Optionnal tags for classification and queries"
+        },
+        "clickToEditProperties": "Click to edit specific properties",
+        "clickToEditTags": "Click to edit tags",
+        "clickToEditParameters": "Click to edit parameters",
+        "clickToEditSchedules": "Click to edit schedules",
+        "propertiesDisplay": {
+            "pathToJar": "Path to the jar file",
+            "classToLaunch": "Class to launch",
+            "classLoader": "Class loader",
+            "shell": "Shell",
+            "powershell": "Powershell",
+            "defaultOsShell": "Default OS shell",
+            "shellCommand": "Shell command",
+            "pathToExecutable": "Path to executable"
+        },
+        "tagsDisplay": {
+            "application": "Application",
+            "module": "Module",
+            "keyword1": "Keyword 1",
+            "keyword2": "Keyword 2",
+            "keyword3": "Keyword 3"
+        },
+        "createDialog": {
+            "title": "Create job definition",
+            "nameLabel": "Name*",
+            "descriptionLabel": "Description",
+            "queueLabel": "Queue*",
+            "enabledLabel": "Enabled",
+            "highlanderLabel": "Highlander",
+            "jobTypeLabel": "Job type*"
+        },
+        "editTagsDialog": {
+            "title": "Edit tags",
+            "description": "Optionnal tags for classification and queries.",
+            "applicationLabel": "Application",
+            "moduleLabel": "Module",
+            "keyword1Label": "Keyword 1",
+            "keyword2Label": "Keyword 2",
+            "keyword3Label": "Keyword 3"
+        },
+        "editPropertiesDialog": {
+            "title": "Edit {{jobType}} specific properties",
+            "pathToJarLabel": "Path to the jar file*",
+            "pathToJarHelper": "The relative path to the jar containing the class to run. It is relative to the 'directory containing jars' parameter of the different nodes.",
+            "classToLaunchLabel": "Class to launch*",
+            "classToLaunchHelper": "The fully qualified name of the class to run. (it must either have a main function, or implement Runnable, or inherit from JobBase).",
+            "classLoaderLabel": "Class loader",
+            "classLoaderHelper": "The class loader used by the job.",
+            "classLoaderDefault": "Default",
+            "pathToExecutableLabel": "Path to executable*",
+            "pathToExecutableHelper": "Current path is node job directory. Do not add parameters here, just a path. Process is launched with the value of the provided parameters, sorted by key. Key is only used for sorting.",
+            "shellLabel": "Shell",
+            "defaultOsShellLabel": "Default OS shell",
+            "powershellLabel": "Powershell",
+            "shellHelper": "Default shell is /bin/sh or cmd.exe. Powershell is Powershell core under Linux and full under Windows.",
+            "shellCommandLabel": "Shell command*",
+            "shellCommandHelper": "Current path is node job directory. JQM environment variables (and others) may be used. 1000 max (988 remaining)."
+        },
+        "editParametersDialog": {
+            "title": "Edit parameters",
+            "keyLabel": "Key*",
+            "valueLabel": "Value",
+            "addParameter": "Add parameter",
+            "keyColumn": "Key",
+            "valueColumn": "Value",
+            "actionsColumn": "Actions"
+        },
+        "editSchedulesDialog": {
+            "title": "Edit schedules",
+            "wikipediaHelp": "Wikipedia help on cron",
+            "cronExpressionLabel": "Cron expression*",
+            "queueOverrideLabel": "Queue override",
+            "addSchedule": "Add schedule",
+            "cronExpressionColumn": "Cron expression",
+            "queueOverrideColumn": "Queue override",
+            "parametersColumn": "Parameters",
+            "actionsColumn": "Actions"
+        },
+        "messages": {
+            "successCreate": "Successfully created job definition {{name}}",
+            "successDelete_one": "Successfully deleted job definition",
+            "successDelete_other": "Successfully deleted job definitions",
+            "successSave": "Successfully saved job definition"
+        }
+    },
+    "runs": {
+        "title": "Runs",
+        "tableTitle": "Runs",
+        "noMatch": "No runs found",
+        "filterHelper": "Give exact id for run / parent / session ; Use % for wildcard in other fields",
+        "id": "id",
+        "applicationName": "Application",
+        "queueName": "Queue",
+        "state": "Status",
+        "enqueueDate": "Enqueued",
+        "beganRunningDate": "Began",
+        "endDate": "Ended",
+        "duration": "Duration",
+        "user": "User",
+        "parent": "Parent",
+        "progress": "Progress",
+        "sessionID": "Session ID",
+        "actions": "Actions",
+        "statuses": {
+            "ATTRIBUTED": "Attributed",
+            "CRASHED": "Crashed",
+            "CANCELLED": "Cancelled",
+            "RUNNING": "Running",
+            "ENDED": "Ended",
+            "KILLED": "Killed",
+            "HOLDED": "Paused",
+            "SUBMITTED": "Submitted",
+            "SCHEDULED": "Scheduled"
+        },
+        "filterLabels": {
+            "enqueuedAfter": "Enqueued after",
+            "enqueuedBefore": "Enqueued before"
+        },
+        "tooltips": {
+            "relaunch": "Relaunch",
+            "kill": "Kill",
+            "resume": "Resume",
+            "pause": "Pause",
+            "switchQueue": "Switch queue",
+            "showDetails": "Show details",
+            "logStdout": "Log stdout",
+            "logStderr": "Log stderr",
+            "newLaunch": "New launch form",
+            "refresh": "Refresh"
+        },
+        "toolbar": {
+            "ended": "Ended",
+            "active": "Active"
+        },
+        "messages": {
+            "successKill": "Successfully killed job {{id}}",
+            "successPause": "Successfully paused job {{id}}",
+            "successResume": "Successfully resumed job {{id}}",
+            "successRelaunch": "Successfully relaunched job {{id}}",
+            "successSwitch": "Successfully switched job {{id}} to queue {{queueName}}",
+            "successLaunch": "Successfully launched job"
+        },
+        "detailsDialog": {
+            "title": "Job details",
+            "sectionIdentification": "Identification",
+            "sectionParameters": "Parameters",
+            "sectionQueue": "Queue",
+            "sectionMessages": "User messages",
+            "sectionFiles": "Files",
+            "sectionProgress": "Progress",
+            "sectionFlags": "Optional flags",
+            "fieldId": "Id",
+            "fieldApplicationName": "Application name",
+            "fieldApplication": "Application",
+            "fieldModule": "Module",
+            "fieldKeyword1": "Keyword 1",
+            "fieldKeyword2": "Keyword 2",
+            "fieldKeyword3": "Keyword 3",
+            "fieldSessionId": "Session ID",
+            "fieldQueueName": "Queue name",
+            "fieldPosition": "Position",
+            "fieldState": "State",
+            "fieldNode": "Node",
+            "fieldEnqueueDate": "Enqueue date",
+            "fieldExecutionDate": "Execution date",
+            "fieldEndDate": "End date",
+            "fieldProgress": "Progress",
+            "fieldEmail": "E-mail",
+            "fieldParentId": "Parent ID",
+            "fieldChildrenCount": "Children count",
+            "fieldUser": "User",
+            "fieldHighlander": "Highlander",
+            "fieldFromSchedule": "From schedule",
+            "fieldPriority": "Priority",
+            "fieldRunAfter": "Should only start after",
+            "fileId": "Id",
+            "parametersDialogTitle": "Parameters",
+            "logsDialogTitle": "Job {{id}}: {{logType}}",
+            "showAllParameters": "show all",
+            "logFiles": "Log files",
+            "logView": "view",
+            "logDownload": "download",
+            "logStdout": "stdout",
+            "logStderr": "stderr",
+            "noMessages": "No user messages",
+            "noFiles": "No files produced",
+            "buttonRelaunch": "Relaunch",
+            "buttonClose": "Close",
+            "buttonDownload": "Download",
+            "buttonSeeRaw": "See Raw",
+            "buttonCopy": "Copy"
+        },
+        "launchDialog": {
+            "title": "New launch",
+            "applicationNameLabel": "Application name*",
+            "applicationNameNoOptions": "No job definitions found",
+            "usernameLabel": "Username",
+            "usernameHelper": "Name that will appear in the history",
+            "sessionIdLabel": "Session ID",
+            "sessionIdHelper": "Optional data that will appear in the history",
+            "startStateLabel": "Start state",
+            "startStateImmediate": "Immediate start",
+            "startStatePaused": "Paused until released",
+            "startStateHelper": "API has more options: scheduled at a time, recurring...",
+            "priorityLabel": "Priority",
+            "priorityHelper": "Higher priority job instances run before the others and have a bigger CPU share.",
+            "parametersTitle": "Parameters",
+            "parameterKeyLabel": "Key*",
+            "parameterValueLabel": "Value",
+            "addParameter": "Add parameter",
+            "tableKeyColumn": "Key",
+            "tableValueColumn": "Value",
+            "tableActionsColumn": "Actions",
+            "buttonCancel": "Cancel",
+            "buttonCreate": "Create"
+        },
+        "switchQueueDialog": {
+            "title": "Switch job {{id}} queue",
+            "queueLabel": "Queue*"
+        }
+    }
+}

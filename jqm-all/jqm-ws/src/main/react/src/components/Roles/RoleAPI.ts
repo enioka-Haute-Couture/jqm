@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Role } from "./Role";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
@@ -6,6 +7,7 @@ import { useNotificationService } from "../../utils/NotificationService";
 const API_URL = "/admin/role";
 
 export const useRoleAPI = () => {
+    const { t } = useTranslation();
     const [roles, setRoles] = useState<Role[] | null>(null);
     const { displayError, displaySuccess } = useNotificationService();
     const fetchRoles = useCallback(() => {
@@ -22,12 +24,14 @@ export const useRoleAPI = () => {
                 .then(() => {
                     fetchRoles();
                     displaySuccess(
-                        `Successfully created role: ${newRole.name}`
+                        t("roles.messages.successCreate", {
+                            name: newRole.name,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess, fetchRoles]
+        [displayError, displaySuccess, fetchRoles, t]
     );
 
     const deleteRoles = useCallback(
@@ -38,14 +42,14 @@ export const useRoleAPI = () => {
                 .then(() => {
                     fetchRoles();
                     displaySuccess(
-                        `Successfully deleted role${
-                            roleIds.length > 1 ? "s" : ""
-                        }`
+                        t("roles.messages.successDelete", {
+                            count: roleIds.length,
+                        })
                     );
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess, fetchRoles]
+        [displayError, displaySuccess, fetchRoles, t]
     );
 
     const updateRole = useCallback(
@@ -53,11 +57,13 @@ export const useRoleAPI = () => {
             return APIService.put(`${API_URL}/${role.id}`, role)
                 .then(() => {
                     fetchRoles();
-                    displaySuccess(`Successfully updated role ${role.name}`);
+                    displaySuccess(
+                        t("roles.messages.successUpdate", { name: role.name })
+                    );
                 })
                 .catch(displayError);
         },
-        [displayError, displaySuccess, fetchRoles]
+        [displayError, displaySuccess, fetchRoles, t]
     );
 
     return { roles, fetchRoles, createRole, updateRole, deleteRoles };

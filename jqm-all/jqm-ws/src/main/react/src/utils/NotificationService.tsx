@@ -2,9 +2,11 @@ import { useCallback } from "react";
 import { useSnackbar } from "notistack";
 import React from "react";
 import { Button } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 
 export const useNotificationService = () => {
+    const { t } = useTranslation();
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
 
@@ -13,14 +15,14 @@ export const useNotificationService = () => {
 
             let message = reason?.details?.userReadableMessage ?
                 reason.details.userReadableMessage :
-                "An error occured, please contact support support@enioka.com for help"
+                t("errors.genericError")
 
             // make sure the letter starts with a capital letter
             message = message.charAt(0).toUpperCase() + message.slice(1);
 
             const action = (key: any) => {
                 return (<Button onClick={() => { closeSnackbar(key) }} sx={{ color: "white" }}>
-                    Dismiss
+                    {t("errors.dismiss")}
                 </Button>);
             }
             enqueueSnackbar(
@@ -32,7 +34,7 @@ export const useNotificationService = () => {
                 }
             );
         },
-        [enqueueSnackbar, closeSnackbar]
+        [enqueueSnackbar, closeSnackbar, t]
     );
 
     const displaySuccess = useCallback(
