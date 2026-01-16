@@ -6,6 +6,7 @@ import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useSnackbar } from "notistack";
+import { useTranslation } from "react-i18next";
 import { CreateQueueDialog } from "./CreateQueueDialog";
 import useQueueAPI from "./QueueAPI";
 import {
@@ -17,8 +18,11 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 
 const QueuesPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTextLabels = useMUIDataTableTextLabels(t("queues.noMatch"));
     const [showDialog, setShowDialog] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [defaultQueue, setDefaultQueue] = useState<boolean>(false);
@@ -54,7 +58,7 @@ const QueuesPage: React.FC = () => {
             const { value: description } = descriptionInputRef.current!;
 
             if (defaultQueue && queues?.some(q => q.defaultQueue)) {
-                enqueueSnackbar("Only one default queue can be set", {
+                enqueueSnackbar(t("queues.messages.onlyOneDefault"), {
                     variant: "warning",
                 });
                 return;
@@ -89,9 +93,9 @@ const QueuesPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "Name*",
+            label: t("queues.name"),
             options: {
-                hint: "The name of the queue. This name is very important, as it the key used to designate the queue in the different APIs (for example, when submitting an execution request, one may specify by name a queue in which the request will wait). However, it can still be changed - internally, JQM uses an ID, not this name - the impact is only on the clients' side.",
+                hint: t("queues.hints.name"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -102,9 +106,9 @@ const QueuesPage: React.FC = () => {
         },
         {
             name: "description",
-            label: "Description",
+            label: t("queues.description"),
             options: {
-                hint: "A free text description that appears in reports",
+                hint: t("queues.hints.description"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -115,9 +119,9 @@ const QueuesPage: React.FC = () => {
         },
         {
             name: "defaultQueue",
-            label: "Is default",
+            label: t("queues.isDefault"),
             options: {
-                hint: "The queue used when none is specified. There can only be one default queue.",
+                hint: t("queues.hints.isDefault"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -129,7 +133,7 @@ const QueuesPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -140,7 +144,9 @@ const QueuesPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.queue, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -148,11 +154,7 @@ const QueuesPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No queues found',
-            }
-        },
+        textLabels: muiTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.queue, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
@@ -160,7 +162,7 @@ const QueuesPage: React.FC = () => {
             return <>
                 {canUserAccess(PermissionObjectType.queue, PermissionAction.create) &&
                     <>
-                        <Tooltip title={"Add line"}>
+                        <Tooltip title={t("common.add")}>
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -169,16 +171,14 @@ const QueuesPage: React.FC = () => {
                                 <AddCircleIcon />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title={"Add line Dialog"}>
-                            <CreateQueueDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createQueue={createQueue}
-                                canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
-                            />
-                        </Tooltip>
+                        <CreateQueueDialog
+                            showDialog={showDialog}
+                            closeDialog={() => setShowDialog(false)}
+                            createQueue={createQueue}
+                            canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
+                        />
                     </>}
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -187,7 +187,7 @@ const QueuesPage: React.FC = () => {
                         <RefreshIcon />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title={"Help"}>
+                <Tooltip title={t("common.help")}>
                     <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
@@ -216,14 +216,14 @@ const QueuesPage: React.FC = () => {
             <HelpDialog
                 isOpen={isHelpModalOpen}
                 onClose={() => setIsHelpModalOpen(false)}
-                title="Queues documentation"
-                header="These are FIFO (First In First Out) queues in which batch job execution requests will wait."
+                title={t("queues.documentation.title")}
+                header={t("queues.documentation.header")}
                 descriptionParagraphs={[
-                    "On this page, one may change the characteristics of queues. Changes on this page do not require node reboots.",
+                    t("queues.documentation.description"),
                 ]}
             />
             <MUIDataTable
-                title={"Queues"}
+                title={t("queues.title")}
                 data={queues}
                 columns={columns}
                 options={options}

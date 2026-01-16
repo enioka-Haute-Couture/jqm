@@ -6,6 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField/TextField";
+import { useTranslation } from "react-i18next";
 import { Role } from "./Role";
 import { PermissionsForm } from "./EditPermissionsDialog";
 
@@ -31,6 +32,7 @@ export const CreateRoleDialog: React.FC<{
     const [permissions, setPermissions] = useState<string[]>([]);
 
     const classes = useStyles();
+    const { t } = useTranslation();
     return (
         <Dialog
             open={true}
@@ -39,11 +41,11 @@ export const CreateRoleDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle>Create role</DialogTitle>
+            <DialogTitle>{t("roles.createRoleDialog.title")}</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Name*"
+                    label={t("roles.name")}
                     value={name}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setName(event.target.value);
@@ -53,7 +55,7 @@ export const CreateRoleDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Description"
+                    label={t("common.description")}
                     value={description}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setDescription(event.target.value);
@@ -72,7 +74,7 @@ export const CreateRoleDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -89,7 +91,7 @@ export const CreateRoleDialog: React.FC<{
                         closeDialog();
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

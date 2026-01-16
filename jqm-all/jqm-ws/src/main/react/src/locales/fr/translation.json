@@ -1,0 +1,655 @@
+{
+    "queues": {
+        "title": "Files d'attente",
+        "noMatch": "Aucune file d'attente trouvée",
+        "name": "Nom*",
+        "description": "Description",
+        "isDefault": "Par défaut",
+        "documentation": {
+            "title": "Documentation des files d'attente",
+            "header": "Ce sont des files d'attente FIFO (First In First Out) dans lesquelles les demandes d'exécution de tâches batch attendront.",
+            "description": "Sur cette page, on peut modifier les caractéristiques des files d'attente. Les modifications sur cette page ne nécessitent pas de redémarrage des noeuds."
+        },
+        "hints": {
+            "name": "Le nom de la file d'attente. Ce nom est très important, car c'est la clé utilisée pour désigner la file d'attente dans les différentes API (par exemple, lors de la soumission d'une demande d'exécution, on peut spécifier par nom une file d'attente dans laquelle la demande attendra). Cependant, il peut toujours être modifié - en interne, JQM utilise un ID, pas ce nom - l'impact est uniquement du côté des clients.",
+            "description": "Une description en texte libre qui apparaît dans les rapports",
+            "isDefault": "La file d'attente utilisée lorsqu'aucune n'est spécifiée. Il ne peut y avoir qu'une seule file d'attente par défaut."
+        },
+        "createQueueDialog": {
+            "title": "Créer une file d'attente",
+            "defaultQueueLabel": "File d'attente par défaut (désactivée si une est déjà définie)"
+        },
+        "messages": {
+            "successCreate": "File d'attente créée avec succès : {{name}}",
+            "successDelete_one": "File d'attente supprimée avec succès",
+            "successDelete_other": "Files d'attente supprimées avec succès",
+            "successSave": "File d'attente enregistrée avec succès",
+            "onlyOneDefault": "Une seule file d'attente par défaut peut être définie"
+        }
+    },
+    "jndi": {
+        "title": "Ressources JNDI",
+        "noMatch": "Aucune ressource JNDI trouvée",
+        "createNewResource": "Créer une nouvelle ressource JNDI",
+        "jndiAlias": "Alias JNDI",
+        "type": "Type",
+        "factory": "Factory",
+        "singleton": "Singleton",
+        "parameters": "Paramètres",
+        "clickToEditParameters": "Cliquer pour éditer les paramètres",
+        "documentation": {
+            "title": "Documentation des ressources JNDI",
+            "header": "Les ressources sont des objets Java qui peuvent être demandés par les jobs via une recherche JNDI.",
+            "description1": "Sur cette page, on peut créer ou modifier des ressources. La création d'une nouvelle ressource ne nécessite aucun redémarrage. La modification d'une ressource singleton déjà utilisée nécessite le redémarrage des noeuds qui l'utilisent, car les ressources singleton sont mises en cache. La modification d'une ressource non-singleton ne nécessite aucun redémarrage.",
+            "description2": "Veuillez noter que pour une ressource non-singleton, sa classe et sa classe factory doivent être accessibles au payload : soit dans JQM_ROOT/ext, soit dans les dépendances propres au payload. Pour une ressource singleton, les classes doivent être dans ext (car elles doivent être disponibles pour le moteur lui-même, pas seulement pour le payload)."
+        },
+        "hints": {
+            "jndiAlias": "Le nom qui sera utilisé par les payloads lors de la recherche de ressource.",
+            "type": "Le nom qualifié complet de la classe de ressource. Ex : java.io.File.File",
+            "factory": "Le nom qualifié complet de la classe factory de ressource. Ex : com.enioka.jqm.providers.FileFactory",
+            "description": "Texte libre pour se souvenir de l'usage de la ressource.",
+            "singleton": "Cocher pour une ressource singleton. Contrairement à une ressource JNDI standard, une recherche sur une ressource singleton retournera toujours la même instance (JNDI standard : une nouvelle instance est créée à chaque recherche). Ceci est particulièrement utile pour les pools de connexion, pour lesquels il serait stupide de créer une nouvelle instance à chaque appel.."
+        },
+        "editParametersDialog": {
+            "title": "Éditer les paramètres",
+            "name": "Nom",
+            "value": "Valeur",
+            "addParameter": "Ajouter un paramètre",
+            "description": "Ajouter de nouveaux paramètres ou modifier les existants",
+            "validate": "Valider"
+        },
+        "resourceGroups": {
+            "databasePools": "Pools de bases de données",
+            "messagesQ": "Files de messages & QCF",
+            "locators": "Localisateurs",
+            "smtpMail": "Messagerie SMTP",
+            "genericResource": "Ressource générique"
+        },
+        "resourceTemplates": {
+            "oraclePool": "Pool Oracle",
+            "postgreSqlPool": "Pool PostgreSQL",
+            "mySqlPool": "Pool MySQL",
+            "fileOrDirectory": "Fichier ou répertoire",
+            "hsqldbPool": "Pool HSQLDB",
+            "jdbcPoolOther": "Pool JDBC (autres bases de données)",
+            "url": "URL",
+            "mqQcf": "IBM MQ QueueConnectionFactory",
+            "mqQ": "IBM MQ Queue",
+            "amqQcf": "Apache ActiveMQ QueueConnectionFactory",
+            "amqQ": "Apache ActiveMQ Queue",
+            "smtpServer": "Serveur SMTP (session mail)",
+            "string": "Chaîne de caractères",
+            "generic": "Ressource générique"
+        },
+        "messages": {
+            "successSave": "Ressource enregistrée avec succès : {{name}}",
+            "successDelete_one": "Ressource supprimée avec succès",
+            "successDelete_other": "Ressources supprimées avec succès"
+        }
+    },
+    "muiDatatable": {
+        "body": {
+            "noMatch": "Désolé, aucun enregistrement correspondant trouvé",
+            "toolTip": "Trier",
+            "columnHeaderTooltip": "Trier par {{column}}"
+        },
+        "pagination": {
+            "next": "Page suivante",
+            "previous": "Page précédente",
+            "rowsPerPage": "Lignes par page :",
+            "displayRows": "de"
+        },
+        "toolbar": {
+            "search": "Rechercher",
+            "downloadCsv": "Télécharger CSV",
+            "print": "Imprimer",
+            "viewColumns": "Afficher les colonnes",
+            "filterTable": "Filtrer le tableau"
+        },
+        "filter": {
+            "all": "Tous",
+            "title": "FILTRES",
+            "reset": "RÉINITIALISER"
+        },
+        "viewColumns": {
+            "title": "Afficher les colonnes",
+            "titleAria": "Afficher/Masquer les colonnes du tableau"
+        },
+        "selectedRows": {
+            "text": "ligne(s) sélectionnée(s)",
+            "delete": "Supprimer",
+            "deleteAria": "Supprimer les lignes sélectionnées"
+        }
+    },
+    "common": {
+        "welcome": "Bienvenue",
+        "add": "Ajouter une ligne",
+        "refresh": "Actualiser",
+        "help": "Aide",
+        "actions": "Actions",
+        "cancel": "Annuler",
+        "create": "Créer",
+        "description": "Description",
+        "close": "Fermer",
+        "edit": "Modifier la ligne",
+        "delete": "Supprimer la ligne",
+        "save": "Enregistrer les modifications",
+        "cancelChanges": "Annuler les modifications"
+    },
+    "home": {
+        "title": "Bienvenue sur la console d'administration web JQM",
+        "helpText": "Sur chaque onglet, cliquez sur l'icône point d'interrogation pour obtenir de l'aide contextuelle.",
+        "documentationText": "Vous trouverez davantage de références dans la",
+        "documentationLink": "documentation en ligne complète",
+        "documentationSuffix": "pour la branche de développement (en anglais)."
+    },
+    "menu": {
+        "home": "Accueil",
+        "nodes": "Noeuds",
+        "queues": "Files d'attente",
+        "mappings": "Mappages",
+        "jndiResources": "Ressources JNDI",
+        "clusterWideParams": "Paramètres de cluster",
+        "classLoaders": "Chargeurs de classes",
+        "jobDefinitions": "Définitions des jobs",
+        "users": "Utilisateurs",
+        "roles": "Rôles",
+        "runs": "Exécutions",
+        "logout": "Se déconnecter"
+    },
+    "mappings": {
+        "title": "Mappages",
+        "noMatch": "Aucun mappage trouvé",
+        "node": "noeud*",
+        "queue": "File d'attente*",
+        "pollingInterval": "Intervalle de polling (ms)*",
+        "maxConcurrentInstances": "Nombre max d'instances concurrentes*",
+        "enabled": "Activé",
+        "documentation": {
+            "title": "Documentation des mappages",
+            "header": "Les mappages spécifient quels noeuds vont scruter quelles files d'attente. Ce sont essentiellement des noeuds s'abonnant à des files d'attente.",
+            "description": "Sur cette page, on peut associer des noeuds à des files d'attente. Les noeuds en cours d'exécution vérifieront (par défaut) toutes les minutes s'il y a des changements dans leurs mappages."
+        },
+        "hints": {
+            "node": "Le noeud qui scrutera la file d'attente",
+            "queue": "La file d'attente à scruter",
+            "pollingInterval": "L'intervalle de polling, en millisecondes. Ne jamais descendre en dessous d'une seconde. Si mis à jour sur un moteur actif, il est appliqué à la prochaine boucle (pas celle en cours).",
+            "maxConcurrentInstances": "Le nombre maximum d'exécutions parallèles que le noeud autorisera pour cette file d'attente (cela se traduit directement par un nombre maximum de threads à l'intérieur du moteur)."
+        },
+        "createMappingDialog": {
+            "title": "Créer un mappage"
+        },
+        "messages": {
+            "successCreate": "Mappage créé avec succès entre {{nodeName}} et {{queueName}}",
+            "successDelete_one": "Mappage supprimé avec succès",
+            "successDelete_other": "Mappages supprimés avec succès",
+            "successSave": "Mappage enregistré avec succès"
+        }
+    },
+    "roles": {
+        "title": "Rôles",
+        "noMatch": "Aucun rôle trouvé",
+        "name": "Nom*",
+        "permissions": "Permissions",
+        "clickToEditPermissions": "Cliquer pour éditer les permissions",
+        "hints": {
+            "name": "Nom du rôle. Doit être unique.",
+            "description": "Ce que fait le rôle.",
+            "permissions": "Ce que le rôle peut faire."
+        },
+        "createRoleDialog": {
+            "title": "Créer un rôle"
+        },
+        "editPermissionsDialog": {
+            "title": "Éditer les permissions",
+            "description": "Les permissions décrivent ce que le rôle peut faire.",
+            "action": "Action",
+            "onObjectType": "Sur un objet de type",
+            "addPermission": "Ajouter une permission",
+            "code": "Code",
+            "objectType": "Type d'objet",
+            "validate": "Valider"
+        },
+        "permissionActions": {
+            "read": "lire",
+            "create": "créer",
+            "update": "modifier",
+            "delete": "supprimer",
+            "all": "tout faire sur"
+        },
+        "permissionObjectTypes": {
+            "node": "noeud",
+            "queue": "file d'attente",
+            "qmapping": "mappage",
+            "jndi": "ressource JNDI",
+            "prm": "paramètre",
+            "jd": "définition de job",
+            "user": "utilisateur",
+            "role": "rôle",
+            "job_instance": "historique et contenu de la file",
+            "logs": "fichiers de log de job",
+            "queue_position": "position du job dans la file",
+            "files": "fichiers produits",
+            "all": "tous types"
+        },
+        "messages": {
+            "successCreate": "Rôle créé avec succès : {{name}}",
+            "successDelete_one": "Rôle supprimé avec succès",
+            "successDelete_other": "Rôles supprimés avec succès",
+            "successUpdate": "Rôle {{name}} mis à jour avec succès"
+        }
+    },
+    "auth": {
+        "sessionExpired": "Session expirée",
+        "sessionExpiredMessage": "Votre session a expiré en raison d'inactivité. Veuillez vous reconnecter pour continuer.",
+        "invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
+        "loginError": "Une erreur s'est produite. Veuillez réessayer.",
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe",
+        "loggingIn": "Connexion en cours...",
+        "logIn": "Se connecter",
+        "accessForbidden": "Vous n'avez pas la permission d'accéder à cette page."
+    },
+    "errors": {
+        "genericError": "Une erreur s'est produite, veuillez contacter le support support@enioka.com pour obtenir de l'aide",
+        "dismiss": "Fermer"
+    },
+    "users": {
+        "title": "Utilisateurs",
+        "noMatch": "Aucun utilisateur trouvé",
+        "login": "Identifiant*",
+        "email": "E-mail",
+        "fullName": "Nom complet",
+        "locked": "Verrouillé",
+        "expirationDate": "Date d'expiration",
+        "roles": "Rôles",
+        "downloadCertificate": "Télécharger le certificat",
+        "changePassword": "Changer le mot de passe. Les mots de passe sont ignorés si un certificat est utilisé. Un mot de passe vide force l'utilisation d'un certificat.",
+        "hints": {
+            "login": "Doit être unique. Si utilisé, les certificats doivent certifier CN=root",
+            "email": "Adresse e-mail de contact optionnelle",
+            "fullName": "Description optionnelle du compte (nom réel ou nom du service)"
+        },
+        "createUserDialog": {
+            "title": "Créer un utilisateur",
+            "lockedLabel": "Verrouillé"
+        },
+        "changePasswordDialog": {
+            "title": "Changer le mot de passe",
+            "description": "Les mots de passe sont ignorés si un certificat est utilisé. Un mot de passe vide force l'utilisation d'un certificat.",
+            "passwordLabel": "Mot de passe",
+            "save": "Enregistrer"
+        },
+        "messages": {
+            "successCreate": "Utilisateur créé avec succès : {{login}}",
+            "successDelete_one": "Utilisateur supprimé avec succès",
+            "successDelete_other": "Utilisateurs supprimés avec succès",
+            "successUpdate": "Utilisateur {{login}} mis à jour avec succès",
+            "successPasswordChange": "Mot de passe de l'utilisateur mis à jour avec succès"
+        }
+    },
+    "classLoaders": {
+        "title": "Chargeurs de classes",
+        "noMatch": "Aucun chargeur de classes trouvé",
+        "name": "Nom*",
+        "childFirst": "Enfant en premier",
+        "hiddenClasses": "Classes cachées",
+        "tracingEnabled": "Traçage activé",
+        "persistent": "Persistant",
+        "allowedRunners": "Exécuteurs autorisés",
+        "clickToEditHiddenClasses": "Cliquer pour modifier les classes cachées",
+        "clickToEditAllowedRunners": "Cliquer pour modifier les exécuteurs autorisés",
+        "hints": {
+            "name": "La clé utilisée pour identifier le chargeur de classes dans le descripteur de déploiement. Unique.",
+            "childFirst": "Offre l'option d'avoir le chargement de classe enfant en premier. Parent en premier est la norme en JSE.",
+            "hiddenClasses": "Offre la possibilité de cacher des classes Java des jobs. Une ou plusieurs regex définissant les classes à ne jamais charger depuis le chargeur de classes parent.",
+            "tracingEnabled": "Active l'affichage de toutes les classes chargées dans le journal du job",
+            "persistent": "Lorsque faux, le chargeur de classes est transitoire : il est créé pour exécuter une nouvelle instance de job et est supprimé lorsque l'instance de job se termine. Lorsque vrai, il n'est pas supprimé à la fin et sera réutilisé par toutes les instances de job créées à partir des différentes définitions de job utilisant ce chargeur de classes (par conséquent, plusieurs définitions de job peuvent partager le même contexte statique).",
+            "allowedRunners": "Les différents exécuteurs actifs dans ce contexte. Si non défini, le paramètre global job_runners est utilisé à la place."
+        },
+        "createClassLoaderDialog": {
+            "title": "Créer un chargeur de classes",
+            "childFirstLabel": "Chargement de classe enfant en premier",
+            "tracingEnabledLabel": "Traçage activé",
+            "persistentLabel": "Persistant"
+        },
+        "editHiddenClassesDialog": {
+            "title": "Modifier les classes cachées",
+            "description": "Une classe cachée est une regexp définissant les classes à ne jamais charger depuis le chargeur de classes parent.",
+            "regexpLabel": "Regexp*",
+            "addButton": "Ajouter",
+            "hiddenClassColumn": "Classe cachée",
+            "validate": "Valider"
+        },
+        "editAllowedRunnersDialog": {
+            "title": "Modifier les exécuteurs autorisés",
+            "runnerLabel": "Exécuteur*",
+            "addButton": "Ajouter",
+            "allowedRunnerColumn": "Exécuteur autorisé",
+            "validate": "Valider"
+        },
+        "messages": {
+            "successCreate": "Chargeur de classes créé avec succès : {{name}}",
+            "successDelete_one": "Chargeur de classes supprimé avec succès",
+            "successDelete_other": "Chargeurs de classes supprimés avec succès",
+            "successSave": "Chargeur de classes enregistré avec succès"
+        }
+    },
+    "clusterParameters": {
+        "title": "Paramètres de cluster",
+        "noMatch": "Aucun paramètre trouvé",
+        "key": "Clé",
+        "value": "Valeur",
+        "hints": {
+            "key": "La clé du paramètre. Pas nécessairement unique.",
+            "value": "La valeur du paramètre"
+        },
+        "documentation": {
+            "title": "Documentation des paramètres de cluster",
+            "header": "Ces paramètres s'appliquent à chaque noeud à l'intérieur du cluster.",
+            "description": "Sur cette page, on peut modifier les paramètres globaux du cluster. Veuillez consulter la documentation complète pour les paramètres. La nécessité de redémarrer après une modification dépend du paramètre."
+        },
+        "createParameterDialog": {
+            "title": "Créer un paramètre",
+            "nameLabel": "Nom*",
+            "valueLabel": "Valeur"
+        },
+        "messages": {
+            "successCreate": "Nouveau paramètre créé avec succès : {{key}}",
+            "successDelete_one": "Paramètre supprimé avec succès",
+            "successDelete_other": "Paramètres supprimés avec succès",
+            "successSave": "Paramètre enregistré avec succès"
+        }
+    },
+    "nodes": {
+        "title": "Noeuds",
+        "noMatch": "Aucun noeud trouvé",
+        "name": "Nom**",
+        "dns": "DNS à lier*",
+        "httpPort": "Port HTTP*",
+        "outputDirectory": "Stockage des fichiers produits**",
+        "jobRepoDirectory": "Répertoire contenant les jars**",
+        "tmpDirectory": "Répertoire temporaire*",
+        "rootLogLevel": "Niveau de log*",
+        "jmxRegistryPort": "Port de registre JMX**",
+        "jmxServerPort": "Port serveur JMX**",
+        "enabled": "Activé",
+        "simpleApi": "API simple",
+        "clientApi": "API client",
+        "adminApi": "API admin",
+        "viewNodeLogs": "Voir les logs du noeud",
+        "hints": {
+            "name": "Le nom du noeud dans le cluster JQM. Il n'a aucun lien avec le nom d'hôte, les noms DNS, etc. C'est simplement le nom donné en paramètre au noeud lors du démarrage. Il est unique dans tout le cluster. Par défaut, c'est le nom d'hôte du serveur sous Windows, le nom d'utilisateur sous Unix.",
+            "dns": "Les API web se lieront à toutes les interfaces qui répondent à un appel DNS inverse de ce nom. Par défaut, c'est localhost, c'est-à-dire une liaison locale uniquement.",
+            "httpPort": "Les API web se lieront sur ce port. Par défaut, c'est un port libre aléatoire.",
+            "outputDirectory": "Si les travaux batch produisent des fichiers, ils seront stockés dans des sous-répertoires de ce répertoire. Chemin absolu fortement recommandé, les chemins relatifs sont relatifs au répertoire d'installation de JQM.",
+            "jobRepoDirectory": "Le répertoire racine contenant tous les jobs (jars de payload). Chemin absolu fortement recommandé, les chemins relatifs sont relatifs au répertoire d'installation de JQM.",
+            "rootLogLevel": "Verbosité du fichier de log principal. Les valeurs valides sont TRACE, DEBUG, INFO, WARN, ERROR, FATAL. Voir la documentation complète pour la signification de ces niveaux. En cas de valeur erronée, la valeur par défaut INFO est supposée.",
+            "jmxRegistryPort": "Si 0, le JMX distant est désactivé. Par défaut, c'est 0.",
+            "jmxServerPort": "Si 0, le JMX distant est désactivé. Par défaut, c'est 0.",
+            "simpleApi": "Si coché, l'API web simple démarrera. Cette API régit les interactions de scripts (demande d'exécution via wget & co, etc.) et la récupération de fichiers (logs, fichiers créés par les exécutions de jobs batch)",
+            "clientApi": "Si coché, l'API web client démarrera. Cette API expose l'API JqmClient complète - voir la documentation complète.",
+            "adminApi": "Si coché, l'API web d'administration démarrera. Cette API est uniquement utilisée par cette console d'administration web et est une API interne JQM, pas une API publique. La désactiver désactive cette console web."
+        },
+        "documentation": {
+            "title": "Documentation des noeuds",
+            "header": "Les noeuds sont des instances du moteur JQM qui exécutent réellement les instances de jobs batch. Fondamentalement, ce sont des entrées init.d Unix, des services Windows ou des conteneurs en cours d'exécution.",
+            "paragraph1": "Sur cette page, on peut modifier les caractéristiques des noeuds.",
+            "paragraph2": "Les noeuds ne peuvent être créés que via la ligne de commande",
+            "paragraph2Command": "jqm.(sh|ps1) createnode [ nomdunoeud ]",
+            "paragraph2End": ". Seuls les noeuds éteints depuis plus de 10 minutes peuvent être supprimés.",
+            "paragraph3": "Modifier les champs marqués avec",
+            "paragraph3Marker": "**",
+            "paragraph3End": "(deux astérisques) pendant que le noeud est en cours d'exécution nécessite le redémarrage du noeud pour que le changement soit pris en compte. Les modifications des autres champs sont automatiquement appliquées de manière asynchrone (par défaut, au plus tard après une minute)."
+        },
+        "displayLogsDialog": {
+            "title": "Derniers logs du noeud {{nodeName}}",
+            "close": "fermer"
+        },
+        "messages": {
+            "successUpdate": "Noeud {{name}} mis à jour avec succès"
+        }
+    },
+    "jobDefinitions": {
+        "title": "Définitions de jobs",
+        "noMatch": "Aucune définition de job trouvée",
+        "applicationName": "Nom*",
+        "description": "Description",
+        "defaultQueue": "File par défaut*",
+        "enabled": "Activé",
+        "highlander": "Highlander",
+        "jobType": "Type de job",
+        "properties": "Propriétés*",
+        "tags": "Tags",
+        "parameters": "Paramètres",
+        "schedules": "Planifications",
+        "hints": {
+            "applicationName": "La clé utilisée pour désigner la définition de job dans les différentes API et dialogues",
+            "description": "Une description lisible de ce que fait le job",
+            "defaultQueue": "La file qui sera utilisée lors de la soumission des demandes d'exécution (si aucune file spécifique n'est donnée au moment de la demande)",
+            "enabled": "Si désactivé, toutes les instances réussiront toujours instantanément",
+            "highlander": "Si coché, il ne peut jamais y avoir plus d'une instance de la définition de job en cours d'exécution en même temps, ainsi qu'au plus une en attente dans n'importe quelle file",
+            "properties": "Propriétés spécifiques selon le type de job",
+            "tags": "Tags optionnels pour la classification et les requêtes"
+        },
+        "clickToEditProperties": "Cliquer pour modifier les propriétés spécifiques",
+        "clickToEditTags": "Cliquer pour modifier les tags",
+        "clickToEditParameters": "Cliquer pour modifier les paramètres",
+        "clickToEditSchedules": "Cliquer pour modifier les planifications",
+        "propertiesDisplay": {
+            "pathToJar": "Chemin vers le fichier jar",
+            "classToLaunch": "Classe à lancer",
+            "classLoader": "Chargeur de classes",
+            "shell": "Shell",
+            "powershell": "Powershell",
+            "defaultOsShell": "Shell par défaut de l'OS",
+            "shellCommand": "Commande shell",
+            "pathToExecutable": "Chemin vers l'exécutable"
+        },
+        "tagsDisplay": {
+            "application": "Application",
+            "module": "Module",
+            "keyword1": "Mot-clé 1",
+            "keyword2": "Mot-clé 2",
+            "keyword3": "Mot-clé 3"
+        },
+        "createDialog": {
+            "title": "Créer une définition de job",
+            "nameLabel": "Nom*",
+            "descriptionLabel": "Description",
+            "queueLabel": "File*",
+            "enabledLabel": "Activé",
+            "highlanderLabel": "Highlander",
+            "jobTypeLabel": "Type de job*"
+        },
+        "editTagsDialog": {
+            "title": "Modifier les tags",
+            "description": "Tags optionnels pour la classification et les requêtes.",
+            "applicationLabel": "Application",
+            "moduleLabel": "Module",
+            "keyword1Label": "Mot-clé 1",
+            "keyword2Label": "Mot-clé 2",
+            "keyword3Label": "Mot-clé 3"
+        },
+        "editPropertiesDialog": {
+            "title": "Modifier les propriétés spécifiques {{jobType}}",
+            "pathToJarLabel": "Chemin vers le fichier jar*",
+            "pathToJarHelper": "Le chemin relatif vers le jar contenant la classe à exécuter. Il est relatif au paramètre 'répertoire contenant les jars' des différents nœuds.",
+            "classToLaunchLabel": "Classe à lancer*",
+            "classToLaunchHelper": "Le nom pleinement qualifié de la classe à exécuter. (elle doit soit avoir une fonction main, soit implémenter Runnable, soit hériter de JobBase).",
+            "classLoaderLabel": "Chargeur de classes",
+            "classLoaderHelper": "Le chargeur de classes utilisé par le job.",
+            "classLoaderDefault": "Par défaut",
+            "pathToExecutableLabel": "Chemin vers l'exécutable*",
+            "pathToExecutableHelper": "Le chemin actuel est le répertoire de job du nœud. Ne pas ajouter de paramètres ici, juste un chemin. Le processus est lancé avec la valeur des paramètres fournis, triés par clé. La clé n'est utilisée que pour le tri.",
+            "shellLabel": "Shell",
+            "defaultOsShellLabel": "Shell par défaut de l'OS",
+            "powershellLabel": "Powershell",
+            "shellHelper": "Le shell par défaut est /bin/sh ou cmd.exe. Powershell est Powershell core sous Linux et complet sous Windows.",
+            "shellCommandLabel": "Commande shell*",
+            "shellCommandHelper": "Le chemin actuel est le répertoire de job du nœud. Les variables d'environnement JQM (et autres) peuvent être utilisées. 1000 max (988 restants)."
+        },
+        "editParametersDialog": {
+            "title": "Modifier les paramètres",
+            "keyLabel": "Clé*",
+            "valueLabel": "Valeur",
+            "addParameter": "Ajouter un paramètre",
+            "keyColumn": "Clé",
+            "valueColumn": "Valeur",
+            "actionsColumn": "Actions"
+        },
+        "editSchedulesDialog": {
+            "title": "Modifier les planifications",
+            "wikipediaHelp": "Aide Wikipedia sur cron",
+            "cronExpressionLabel": "Expression cron*",
+            "queueOverrideLabel": "Surcharge de la file",
+            "addSchedule": "Ajouter une planification",
+            "cronExpressionColumn": "Expression cron",
+            "queueOverrideColumn": "Surcharge de la file",
+            "parametersColumn": "Paramètres",
+            "actionsColumn": "Actions"
+        },
+        "messages": {
+            "successCreate": "Définition de job {{name}} créée avec succès",
+            "successDelete_one": "Définition de job supprimée avec succès",
+            "successDelete_other": "Définitions de jobs supprimées avec succès",
+            "successSave": "Définition de job enregistrée avec succès"
+        }
+    },
+    "runs": {
+        "title": "Exécutions",
+        "tableTitle": "Exécutions",
+        "noMatch": "Aucune exécution trouvée",
+        "filterHelper": "Donnez l'id exact pour exécution / parent / session ; Utilisez % pour les jokers dans les autres champs",
+        "id": "id",
+        "applicationName": "Application",
+        "queueName": "File",
+        "state": "État",
+        "enqueueDate": "Mise en file",
+        "beganRunningDate": "Début",
+        "endDate": "Fin",
+        "duration": "Durée",
+        "user": "Utilisateur",
+        "parent": "Parent",
+        "progress": "Progression",
+        "sessionID": "ID de session",
+        "actions": "Actions",
+        "statuses": {
+            "ATTRIBUTED": "Attribué",
+            "CRASHED": "Échoué",
+            "CANCELLED": "Annulé",
+            "RUNNING": "En cours",
+            "ENDED": "Terminé",
+            "KILLED": "Tué",
+            "HOLDED": "En pause",
+            "SUBMITTED": "Soumis",
+            "SCHEDULED": "Planifié"
+        },
+        "filterLabels": {
+            "enqueuedAfter": "Mis en file après",
+            "enqueuedBefore": "Mis en file avant"
+        },
+        "tooltips": {
+            "relaunch": "Relancer",
+            "kill": "Tuer",
+            "resume": "Reprendre",
+            "pause": "Mettre en pause",
+            "switchQueue": "Changer de file",
+            "showDetails": "Afficher les détails",
+            "logStdout": "Journal stdout",
+            "logStderr": "Journal stderr",
+            "newLaunch": "Nouveau formulaire de lancement",
+            "refresh": "Rafraîchir"
+        },
+        "toolbar": {
+            "ended": "Terminées",
+            "active": "Actives"
+        },
+        "messages": {
+            "successKill": "Job {{id}} tué avec succès",
+            "successPause": "Job {{id}} mis en pause avec succès",
+            "successResume": "Job {{id}} repris avec succès",
+            "successRelaunch": "Job {{id}} relancé avec succès",
+            "successSwitch": "Job {{id}} basculé vers la file {{queueName}} avec succès",
+            "successLaunch": "Job lancé avec succès"
+        },
+        "detailsDialog": {
+            "title": "Détails du job",
+            "sectionIdentification": "Identification",
+            "sectionParameters": "Paramètres",
+            "sectionQueue": "File",
+            "sectionMessages": "Messages utilisateur",
+            "sectionFiles": "Fichiers",
+            "sectionProgress": "Progression",
+            "sectionFlags": "Options facultatives",
+            "fieldId": "Id",
+            "fieldApplicationName": "Nom de l'application",
+            "fieldApplication": "Application",
+            "fieldModule": "Module",
+            "fieldKeyword1": "Mot-clé 1",
+            "fieldKeyword2": "Mot-clé 2",
+            "fieldKeyword3": "Mot-clé 3",
+            "fieldSessionId": "ID de session",
+            "fieldQueueName": "Nom de la file",
+            "fieldPosition": "Position",
+            "fieldState": "État",
+            "fieldNode": "Nœud",
+            "fieldEnqueueDate": "Date de mise en file",
+            "fieldExecutionDate": "Date d'exécution",
+            "fieldEndDate": "Date de fin",
+            "fieldProgress": "Progression",
+            "fieldEmail": "E-mail",
+            "fieldParentId": "ID du parent",
+            "fieldChildrenCount": "Nombre d'enfants",
+            "fieldUser": "Utilisateur",
+            "fieldHighlander": "Highlander",
+            "fieldFromSchedule": "Du planning",
+            "fieldPriority": "Priorité",
+            "fieldRunAfter": "Ne doit démarrer qu'après",
+            "fileId": "Id",
+            "parametersDialogTitle": "Paramètres",
+            "logsDialogTitle": "Job {{id}} : {{logType}}",
+            "showAllParameters": "voir tout",
+            "logFiles": "Fichiers journaux",
+            "logView": "voir",
+            "logDownload": "télécharger",
+            "logStdout": "stdout",
+            "logStderr": "stderr",
+            "noMessages": "Aucun message utilisateur",
+            "noFiles": "Aucun fichier produit",
+            "buttonRelaunch": "Relancer",
+            "buttonClose": "Fermer",
+            "buttonDownload": "Télécharger",
+            "buttonSeeRaw": "Voir brut",
+            "buttonCopy": "Copier"
+        },
+        "launchDialog": {
+            "title": "Nouveau lancement",
+            "applicationNameLabel": "Nom de l'application*",
+            "applicationNameNoOptions": "Aucune définition de job trouvée",
+            "usernameLabel": "Nom d'utilisateur",
+            "usernameHelper": "Nom qui apparaîtra dans l'historique",
+            "sessionIdLabel": "ID de session",
+            "sessionIdHelper": "Données optionnelles qui apparaîtront dans l'historique",
+            "startStateLabel": "État de départ",
+            "startStateImmediate": "Démarrage immédiat",
+            "startStatePaused": "En pause jusqu'à reprise",
+            "startStateHelper": "L'API a plus d'options : planifié à une heure, récurrent...",
+            "priorityLabel": "Priorité",
+            "priorityHelper": "Les instances de jobs avec une priorité plus élevée s'exécutent avant les autres et ont une plus grande part de CPU.",
+            "parametersTitle": "Paramètres",
+            "parameterKeyLabel": "Clé*",
+            "parameterValueLabel": "Valeur",
+            "addParameter": "Ajouter un paramètre",
+            "tableKeyColumn": "Clé",
+            "tableValueColumn": "Valeur",
+            "tableActionsColumn": "Actions",
+            "buttonCancel": "Annuler",
+            "buttonCreate": "Créer"
+        },
+        "switchQueueDialog": {
+            "title": "Changer de file pour le job {{id}}",
+            "queueLabel": "File*"
+        }
+    }
+}

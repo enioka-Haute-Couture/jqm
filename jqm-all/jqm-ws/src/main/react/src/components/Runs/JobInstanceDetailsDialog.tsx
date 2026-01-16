@@ -25,10 +25,11 @@ import { LOG_TYPE } from "./RunsPage";
 import { JobInstance } from "./JobInstance";
 import { JobInstanceFile } from "./JobInstanceFile";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import { useTranslation } from "react-i18next";
 
 const formatDate = (date?: Date) => {
     if (date) {
-        return new Date(date).toUTCString();
+        return new Date(date).toLocaleString();
     } else {
         return "";
     }
@@ -46,6 +47,7 @@ export const JobInstanceDetailsDialog: React.FC<{
     relaunchJob: (jobId: number) => void;
     canSeeIndividualLogs: boolean;
 }> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType, relaunchJob, canSeeIndividualLogs }) => {
+    const { t } = useTranslation();
     const [showParameters, setShowParameters] = useState<boolean>(false);
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
@@ -120,40 +122,40 @@ export const JobInstanceDetailsDialog: React.FC<{
                 fullWidth
                 maxWidth={"lg"}
             >
-                <DialogTitle>Job details</DialogTitle>
+                <DialogTitle>{t("runs.detailsDialog.title")}</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
-                            <Typography variant="h6">Identification</Typography>
+                            <Typography variant="h6">{t("runs.detailsDialog.sectionIdentification")}</Typography>
                             <TableContainer component={Paper}>
                                 <Table size="small">
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>Id</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldId")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.id}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Parent job</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldParentId")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.parent}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Application</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldApplicationName")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.applicationName}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Session Id</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldSessionId")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.sessionID}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>From schedule</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldFromSchedule")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.fromSchedule}
                                             </TableCell>
@@ -165,18 +167,18 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 variant="middle"
                                 style={{ marginTop: "16px" }}
                             />
-                            <Typography variant="h6">Parameters</Typography>
+                            <Typography variant="h6">{t("runs.detailsDialog.sectionParameters")}</Typography>
 
                             <TableContainer component={Paper}>
-                                <Table size="small" aria-label="Parameters">
+                                <Table size="small" aria-label={t("runs.detailsDialog.sectionParameters")}>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Key</TableCell>
-                                            <TableCell>Value</TableCell>
+                                            <TableCell>{t("runs.launchDialog.tableKeyColumn")}</TableCell>
+                                            <TableCell>{t("runs.launchDialog.tableValueColumn")}</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {jobInstance.parameters.slice(0,10).map(
+                                        {jobInstance.parameters.slice(0, 10).map(
                                             (parameter) => (
                                                 <TableRow key={parameter.key}>
                                                     <TableCell
@@ -201,7 +203,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         }}
                                         style={{ margin: "8px" }}
                                     >
-                                        See all
+                                        {t("runs.detailsDialog.showAllParameters")}
                                     </Button>
                                 )
                                 }
@@ -213,12 +215,12 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         variant="middle"
                                         style={{ marginTop: "16px" }}
                                     />
-                                    <Typography variant="h6">Log files</Typography>
+                                    <Typography variant="h6">{t("runs.detailsDialog.logFiles")}</Typography>
                                     <TableContainer component={Paper}>
                                         <Table size="small">
                                             <TableBody>
                                                 <TableRow>
-                                                    <TableCell>Log stdout</TableCell>
+                                                    <TableCell>{t("runs.detailsDialog.logStdout")}</TableCell>
                                                     <TableCell>
                                                         <Link
                                                             href="#"
@@ -233,7 +235,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                                 );
                                                             }}
                                                         >
-                                                            view
+                                                            {t("runs.detailsDialog.logView")}
                                                         </Link>
                                                     </TableCell>
                                                     <TableCell>
@@ -248,12 +250,12 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                             }
                                                             }
                                                         >
-                                                            download
+                                                            {t("runs.detailsDialog.logDownload")}
                                                         </Link>
                                                     </TableCell>
                                                 </TableRow>
                                                 <TableRow>
-                                                    <TableCell>Log stderr</TableCell>
+                                                    <TableCell>{t("runs.detailsDialog.logStderr")}</TableCell>
                                                     <TableCell>
                                                         <Link
                                                             href="#"
@@ -269,7 +271,7 @@ export const JobInstanceDetailsDialog: React.FC<{
 
                                                             }}
                                                         >
-                                                            view
+                                                            {t("runs.detailsDialog.logView")}
                                                         </Link>
                                                     </TableCell>
                                                     <TableCell>
@@ -284,7 +286,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                                             }
                                                             }
                                                         >
-                                                            download
+                                                            {t("runs.detailsDialog.logDownload")}
                                                         </Link>
                                                     </TableCell>
                                                 </TableRow>
@@ -294,33 +296,33 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 </>)}
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant="h6">Queue</Typography>
+                            <Typography variant="h6">{t("runs.detailsDialog.sectionQueue")}</Typography>
 
                             <TableContainer component={Paper}>
                                 <Table size="small">
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>Name</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldQueueName")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.queueName}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Position</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldPosition")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.position}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell>
-                                                Affected to server
+                                                {t("runs.detailsDialog.fieldNode")}
                                             </TableCell>
                                             <TableCell>
                                                 {jobInstance.nodeName}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Priority</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldPriority")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.priority}
                                             </TableCell>
@@ -332,7 +334,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 variant="middle"
                                 style={{ marginTop: "16px" }}
                             />
-                            <Typography variant="h6">User messages</Typography>
+                            <Typography variant="h6">{t("runs.detailsDialog.sectionMessages")}</Typography>
 
                             <List dense>
                                 {jobInstance.messages.map((message) => (
@@ -347,13 +349,13 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         variant="middle"
                                         style={{ marginTop: "16px" }}
                                     />
-                                    <Typography variant="h6">Files created</Typography>
+                                    <Typography variant="h6">{t("runs.detailsDialog.sectionFiles")}</Typography>
                                     <TableContainer component={Paper}>
                                         <Table size="small">
                                             <TableBody>
                                                 {files?.map((file) => (
                                                     <TableRow key={file.id}>
-                                                        <TableCell>Id {file.id}</TableCell>
+                                                        <TableCell>{t("runs.detailsDialog.fileId")} {file.id}</TableCell>
                                                         <TableCell>
                                                             <Link
                                                                 href="#"
@@ -379,26 +381,26 @@ export const JobInstanceDetailsDialog: React.FC<{
                             }
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant="h6">Progress</Typography>
+                            <Typography variant="h6">{t("runs.detailsDialog.sectionProgress")}</Typography>
 
                             <TableContainer component={Paper}>
                                 <Table size="small">
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>Status</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldState")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.state}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Progress%</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldProgress")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.progress}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
                                             <TableCell>
-                                                Should only start after
+                                                {t("runs.detailsDialog.fieldRunAfter")}
                                             </TableCell>
                                             <TableCell>
                                                 {formatDate(
@@ -407,7 +409,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Enqueue time</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldEnqueueDate")}</TableCell>
                                             <TableCell>
                                                 {formatDate(
                                                     jobInstance.enqueueDate
@@ -415,7 +417,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Start time</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldExecutionDate")}</TableCell>
                                             <TableCell>
                                                 {formatDate(
                                                     jobInstance.beganRunningDate
@@ -423,7 +425,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>End time</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldEndDate")}</TableCell>
                                             <TableCell>
                                                 {formatDate(
                                                     jobInstance.endDate
@@ -437,49 +439,49 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 variant="middle"
                                 style={{ marginTop: "16px" }}
                             />
-                            <Typography variant="h6">Optional flags</Typography>
+                            <Typography variant="h6">{t("runs.detailsDialog.sectionFlags")}</Typography>
 
                             <TableContainer component={Paper}>
                                 <Table size="small">
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>Software</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldApplication")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.application}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Keyword 1</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldKeyword1")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.keyword1}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Keyword 2</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldKeyword2")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.keyword2}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Keyword 3</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldKeyword3")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.keyword3}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>Module</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldModule")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.module}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>User</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldUser")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.user}
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>User email</TableCell>
+                                            <TableCell>{t("runs.detailsDialog.fieldEmail")}</TableCell>
                                             <TableCell>
                                                 {jobInstance.email}
                                             </TableCell>
@@ -500,7 +502,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                             }}
                             style={{ margin: "8px" }}
                         >
-                            Relaunch
+                            {t("runs.detailsDialog.buttonRelaunch")}
                         </Button>
                     }
                     <Button
@@ -509,23 +511,23 @@ export const JobInstanceDetailsDialog: React.FC<{
                         onClick={closeDialog}
                         style={{ margin: "8px" }}
                     >
-                        Close
+                        {t("runs.detailsDialog.buttonClose")}
                     </Button>
                 </DialogActions>
             </Dialog >
             {showParameters && (
                 <Dialog
-                open={true}
-                onClose={() => setShowParameters(false)}
-                aria-labelledby="form-dialog-title"
-                fullWidth>
-                    <DialogTitle> Parameters</DialogTitle>
+                    open={true}
+                    onClose={() => setShowParameters(false)}
+                    aria-labelledby="form-dialog-title"
+                    fullWidth>
+                    <DialogTitle>{t("runs.detailsDialog.parametersDialogTitle")}</DialogTitle>
                     <DialogContent>
-                        <Table size="small" aria-label="Parameters">
+                        <Table size="small" aria-label={t("runs.detailsDialog.parametersDialogTitle")}>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Key</TableCell>
-                                    <TableCell>Value</TableCell>
+                                    <TableCell>{t("runs.launchDialog.tableKeyColumn")}</TableCell>
+                                    <TableCell>{t("runs.launchDialog.tableValueColumn")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -554,7 +556,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                             onClick={() => setShowParameters(false)}
                             style={{ margin: "8px" }}
                         >
-                            Close
+                            {t("runs.detailsDialog.buttonClose")}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -570,7 +572,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                     fullWidth
                     maxWidth={"xl"}
                 >
-                    <DialogTitle>Job {jobInstance.id}: {logType.toLowerCase()} </DialogTitle>
+                    <DialogTitle>{t("runs.detailsDialog.logsDialogTitle", { id: jobInstance.id, logType: logType.toLowerCase() })}</DialogTitle>
                     <DialogContent>
                         <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
                     </DialogContent>
@@ -584,7 +586,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 }
                             }}
                         >
-                            Download
+                            {t("runs.detailsDialog.buttonDownload")}
                         </Button>
                         <Button
                             size="small"
@@ -604,7 +606,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 }
                             }}
                         >
-                            See Raw
+                            {t("runs.detailsDialog.buttonSeeRaw")}
                         </Button>
                         <Button
                             size="small"
@@ -615,7 +617,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                 }
                             }}
                         >
-                            Copy
+                            {t("runs.detailsDialog.buttonCopy")}
                         </Button>
 
                         <Button
@@ -627,7 +629,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                             }}
                             style={{ margin: "8px" }}
                         >
-                            Close
+                            {t("runs.detailsDialog.buttonClose")}
                         </Button>
                     </DialogActions>
                 </Dialog>

@@ -3,7 +3,7 @@ import { JndiResource } from "./JndiResource";
 export const resourceTemplates: { [key: string]: JndiResource } = {};
 
 resourceTemplates["jndiOracle"] = {
-    uiName: "Oracle Pool",
+    uiName: "jndi.resourceTemplates.oraclePool",
     name: "jdbc/oracle",
     auth: "CONTAINER",
     type: "javax.sql.DataSource",
@@ -99,7 +99,7 @@ resourceTemplates["jndiOracle"] = {
 };
 
 resourceTemplates["jndiPs"] = {
-    uiName: "PostgreSQL Pool",
+    uiName: "jndi.resourceTemplates.postgreSqlPool",
     name: "jdbc/ps",
     auth: "CONTAINER",
     type: "javax.sql.DataSource",
@@ -183,7 +183,7 @@ resourceTemplates["jndiPs"] = {
 };
 
 resourceTemplates["jndiMySql"] = {
-    uiName: "MySQL Pool",
+    uiName: "jndi.resourceTemplates.mySqlPool",
     name: "jdbc/mysql",
     auth: "CONTAINER",
     type: "javax.sql.DataSource",
@@ -267,7 +267,7 @@ resourceTemplates["jndiMySql"] = {
 };
 
 resourceTemplates["jndiFile"] = {
-    uiName: "File or directory",
+    uiName: "jndi.resourceTemplates.fileOrDirectory",
     name: "fs/filename",
     auth: "CONTAINER",
     type: "java.io.File.File",
@@ -283,7 +283,7 @@ resourceTemplates["jndiFile"] = {
 };
 
 resourceTemplates["jndiHsqlDb"] = {
-    uiName: "HSQLDB pool",
+    uiName: "jndi.resourceTemplates.hsqldbPool",
     name: "jdbc/hsqldb",
     auth: "CONTAINER",
     type: "javax.sql.DataSource",
@@ -367,7 +367,7 @@ resourceTemplates["jndiHsqlDb"] = {
 };
 
 resourceTemplates["jndiOtherDb"] = {
-    uiName: "JDBC Pool (other databases)",
+    uiName: "jndi.resourceTemplates.jdbcPoolOther",
     name: "jdbc/otherdb",
     auth: "CONTAINER",
     type: "javax.sql.DataSource",
@@ -431,7 +431,7 @@ resourceTemplates["jndiOtherDb"] = {
 };
 
 resourceTemplates["jndiUrl"] = {
-    uiName: "URL",
+    uiName: "jndi.resourceTemplates.url",
     name: "url/urlname",
     auth: "CONTAINER",
     type: "java.io.URL",
@@ -447,7 +447,7 @@ resourceTemplates["jndiUrl"] = {
 };
 
 resourceTemplates["jndiMqQcf"] = {
-    uiName: "MQSeries QCF",
+    uiName: "jndi.resourceTemplates.mqQcf",
     name: "jms/qcf_mq",
     auth: "CONTAINER",
     type: "com.ibm.mq.jms.MQQueueConnectionFactory",
@@ -479,7 +479,7 @@ resourceTemplates["jndiMqQcf"] = {
 };
 
 resourceTemplates["jndiMqQ"] = {
-    uiName: "MQSeries Q",
+    uiName: "jndi.resourceTemplates.mqQ",
     name: "jms/q_mq",
     auth: "CONTAINER",
     type: "com.ibm.mq.jms.MQQueue",
@@ -495,7 +495,7 @@ resourceTemplates["jndiMqQ"] = {
 };
 
 resourceTemplates["jndiAmqQcf"] = {
-    uiName: "AMQ QCF",
+    uiName: "jndi.resourceTemplates.amqQcf",
     name: "jms/qcf_amq",
     auth: "CONTAINER",
     type: "org.apache.activemq.ActiveMQConnectionFactory",
@@ -511,7 +511,7 @@ resourceTemplates["jndiAmqQcf"] = {
 };
 
 resourceTemplates["jndiAmqQ"] = {
-    uiName: "AMQ Q",
+    uiName: "jndi.resourceTemplates.amqQ",
     name: "jms/q_amq",
     auth: "CONTAINER",
     type: "org.apache.activemq.command.ActiveMQQueue",
@@ -527,7 +527,7 @@ resourceTemplates["jndiAmqQ"] = {
 };
 
 resourceTemplates["jndiString"] = {
-    uiName: "String",
+    uiName: "jndi.resourceTemplates.string",
     name: "string/new_string",
     auth: "CONTAINER",
     type: "java.lang.String",
@@ -543,7 +543,7 @@ resourceTemplates["jndiString"] = {
 };
 
 resourceTemplates["jndiMail"] = {
-    uiName: "SMTP server",
+    uiName: "jndi.resourceTemplates.smtpServer",
     name: "mail/newsession",
     auth: "CONTAINER",
     type: "jakarta.mail.Session",
@@ -571,7 +571,7 @@ resourceTemplates["jndiMail"] = {
 };
 
 resourceTemplates["jndiGeneric"] = {
-    uiName: "New Generic resource",
+    uiName: "jndi.resourceTemplates.generic",
     name: "domain/name",
     auth: "CONTAINER",
     type: "com.yourcompany.YourClass",

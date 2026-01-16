@@ -11,6 +11,7 @@ import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-dat
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useTranslation } from "react-i18next";
 import { CreateMappingDialog } from "./CreateMappingDialog";
 import useMappingAPI from "./MappingAPI";
 import {
@@ -27,8 +28,11 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 
 const MappingsPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTextLabels = useMUIDataTableTextLabels(t("mappings.noMatch"));
     const [showDialog, setShowDialog] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
 
@@ -128,9 +132,9 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "nodeId",
-            label: "Node*",
+            label: t("mappings.node"),
             options: {
-                hint: "The node which will poll the queue",
+                hint: t("mappings.hints.node"),
                 filter: false,
                 sort: false,
                 customBodyRender: renderArrayCell(
@@ -152,9 +156,9 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "queueId",
-            label: "Queue*",
+            label: t("mappings.queue"),
             options: {
-                hint: "The queue to poll",
+                hint: t("mappings.hints.queue"),
                 filter: false,
                 sort: false,
                 customBodyRender: renderArrayCell(
@@ -176,9 +180,9 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "pollingInterval",
-            label: "Polling Interval (ms)*",
+            label: t("mappings.pollingInterval"),
             options: {
-                hint: "The polling interval, in milliseconds. Never go below one second. If updated on an active engine, it is applied to the next loop (not the current one).",
+                hint: t("mappings.hints.pollingInterval"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -191,9 +195,9 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "nbThread",
-            label: "Max concurrent running instances*",
+            label: t("mappings.maxConcurrentInstances"),
             options: {
-                hint: "The maximum number of parallel executions the node will allow for this queue (this translates directly as a max number of threads inside the engine).",
+                hint: t("mappings.hints.maxConcurrentInstances"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -206,7 +210,7 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "enabled",
-            label: "Enabled",
+            label: t("mappings.enabled"),
             options: {
                 filter: true,
                 sort: true,
@@ -219,7 +223,7 @@ const MappingsPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -230,7 +234,9 @@ const MappingsPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.qmapping, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.qmapping, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.qmapping, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -238,11 +244,7 @@ const MappingsPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No mappings found',
-            }
-        },
+        textLabels: muiTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.qmapping, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
@@ -250,7 +252,7 @@ const MappingsPage: React.FC = () => {
             return <>
                 {canUserAccess(PermissionObjectType.qmapping, PermissionAction.create) &&
                     <>
-                        <Tooltip title={"Add line"}>
+                        <Tooltip title={t("common.add")}>
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -268,7 +270,7 @@ const MappingsPage: React.FC = () => {
                             />
                         )}
                     </>}
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -277,7 +279,7 @@ const MappingsPage: React.FC = () => {
                         <RefreshIcon />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title={"Help"}>
+                <Tooltip title={t("common.help")}>
                     <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
@@ -309,14 +311,14 @@ const MappingsPage: React.FC = () => {
             <HelpDialog
                 isOpen={isHelpModalOpen}
                 onClose={() => setIsHelpModalOpen(false)}
-                title="Mappings documentation"
-                header="Mappings specify which nodes will poll which queues. They are basically nodes subscribing to queues."
+                title={t("mappings.documentation.title")}
+                header={t("mappings.documentation.header")}
                 descriptionParagraphs={[
-                    "On this page, one may associate nodes with queues. Running nodes will (by default) check every minute if there are changes in their mappings."
+                    t("mappings.documentation.description")
                 ]}
             />
             <MUIDataTable
-                title={"Mappings"}
+                title={t("mappings.title")}
                 data={mappings}
                 columns={columns}
                 options={options}

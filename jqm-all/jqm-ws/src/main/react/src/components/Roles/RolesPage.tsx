@@ -9,6 +9,7 @@ import MUIDataTable, { MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows }
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useTranslation } from "react-i18next";
 import { useRoleAPI } from "./RoleAPI";
 import { EditPermissionsDialog } from "./EditPermissionsDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
@@ -17,8 +18,11 @@ import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 
 const RolesPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTextLabels = useMUIDataTableTextLabels(t("roles.noMatch"));
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const nameInputRef = useRef(null);
     const descriptionInputRef = useRef(null);
@@ -91,9 +95,9 @@ const RolesPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "Name*",
+            label: t("roles.name"),
             options: {
-                hint: "Name of the role. Must be unique.",
+                hint: t("roles.hints.name"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -105,9 +109,9 @@ const RolesPage: React.FC = () => {
         },
         {
             name: "description",
-            label: "Description",
+            label: t("common.description"),
             options: {
-                hint: "What the role does.",
+                hint: t("roles.hints.description"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -119,14 +123,14 @@ const RolesPage: React.FC = () => {
         },
         {
             name: "permissions",
-            label: "Permissions",
+            label: t("roles.permissions"),
             options: {
-                hint: "What the role can do.",
+                hint: t("roles.hints.permissions"),
                 filter: false,
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    "Click to edit permissions",
+                    t("roles.clickToEditPermissions"),
                     permissions,
                     (value: any[]) => (value as string[]).join(", "),
                     setEditPermissionsRoleId
@@ -135,7 +139,7 @@ const RolesPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -146,7 +150,9 @@ const RolesPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.role, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.role, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.role, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -154,18 +160,14 @@ const RolesPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No roles found',
-            }
-        },
+        textLabels: muiTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.role, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.role, PermissionAction.create) &&
-                    <Tooltip title={"Add line"}>
+                    <Tooltip title={t("common.add")}>
                         <IconButton
                             color="default"
                             aria-label={"add"}
@@ -175,7 +177,7 @@ const RolesPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                 }
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -208,7 +210,7 @@ const RolesPage: React.FC = () => {
         return (
             <Container maxWidth={false}>
                 <MUIDataTable
-                    title={"Roles"}
+                    title={t("roles.title")}
                     data={roles}
                     columns={columns}
                     options={options}

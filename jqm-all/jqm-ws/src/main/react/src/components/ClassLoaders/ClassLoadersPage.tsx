@@ -4,6 +4,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useTranslation } from "react-i18next";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 import { useClassLoaderAPI } from "./ClassLoaderAPI";
 import { CreateClassLoaderDialog } from "./CreateClassLoaderDialog";
 import { EditHiddenClassesDialog } from "./EditHiddenClassesDialog";
@@ -15,6 +17,8 @@ import { renderActionsCell, renderBooleanCell, renderInputCell } from "../TableC
 import { renderDialogCell } from "../TableCells/renderDialogCell";
 
 const ClassLoadersPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTableTextLabels = useMUIDataTableTextLabels(t("classLoaders.noMatch"));
     const [showDialog, setShowDialog] = useState(false);
     const [editHiddenClassesClId, setEditHiddenClassesClId] = useState<
         string | null
@@ -43,9 +47,9 @@ const ClassLoadersPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.cl, PermissionAction.read)) {
             fetchClassLoaders();
         }
-        setPageTitle("Class Loaders");
+        setPageTitle(t("classLoaders.title"));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canUserAccess]);
+    }, [canUserAccess, t]);
 
 
     const handleOnDelete = useCallback(
@@ -98,9 +102,9 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "Name*",
+            label: t("classLoaders.name"),
             options: {
-                hint: "The key used to identify the class loader in the deployment descriptor. Unique.",
+                hint: t("classLoaders.hints.name"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -112,9 +116,9 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "childFirst",
-            label: "Child First",
+            label: t("classLoaders.childFirst"),
             options: {
-                hint: "Offer option to have child first class loading. Parent firstis the norm in JSE.",
+                hint: t("classLoaders.hints.childFirst"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -126,14 +130,14 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "hiddenClasses",
-            label: "Hidden Classes",
+            label: t("classLoaders.hiddenClasses"),
             options: {
-                hint: 'Offer possibility to hide Java classes from jobs. One or more regex defining classes never to load from the parent class loader.',
+                hint: t("classLoaders.hints.hiddenClasses"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    "Click to edit hidden classes",
+                    t("classLoaders.clickToEditHiddenClasses"),
                     hiddenClasses,
                     (value: string) => value,
                     setEditHiddenClassesClId
@@ -142,9 +146,9 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "tracingEnabled",
-            label: "Tracing Enabled",
+            label: t("classLoaders.tracingEnabled"),
             options: {
-                hint: "Activate listing all class loaded inside the job log",
+                hint: t("classLoaders.hints.tracingEnabled"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -156,9 +160,9 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "persistent",
-            label: "Persistent",
+            label: t("classLoaders.persistent"),
             options: {
-                hint: 'When false, the class loader is transient: it is created to run a new job instance and is thrown out when the job instance ends. When true, it is not thrown out at the end and will be reused by all job instances created from the different job definitions using this class loader(therefore, multiple job definitions can share the same static context).',
+                hint: t("classLoaders.hints.persistent"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell(
@@ -170,14 +174,14 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "allowedRunners",
-            label: "Allowed Runners",
+            label: t("classLoaders.allowedRunners"),
             options: {
-                hint: 'The different runners that are active in this context. If not set, the global parameter job_runners is used instead.',
+                hint: t("classLoaders.hints.allowedRunners"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    "Click to edit allowed runners",
+                    t("classLoaders.clickToEditAllowedRunners"),
                     allowedRunners,
                     (value: string) => value,
                     setEditAllowedRunnersClId
@@ -186,7 +190,7 @@ const ClassLoadersPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -197,7 +201,9 @@ const ClassLoadersPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.queue, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -205,11 +211,7 @@ const ClassLoadersPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No class loaders found',
-            }
-        },
+        textLabels: muiTableTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.cl, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
@@ -217,7 +219,7 @@ const ClassLoadersPage: React.FC = () => {
             return <>
                 {canUserAccess(PermissionObjectType.cl, PermissionAction.create) &&
                     <>
-                        <Tooltip title={"Add line"}>
+                        <Tooltip title={t("common.add")}>
 
                             <IconButton
                                 color="default"
@@ -227,7 +229,7 @@ const ClassLoadersPage: React.FC = () => {
                                 <AddCircleIcon />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title={"add line Dialog"}>
+                        <Tooltip title={t("common.add")}>
                             <CreateClassLoaderDialog
                                 showDialog={showDialog}
                                 closeDialog={() => setShowDialog(false)}
@@ -235,7 +237,7 @@ const ClassLoadersPage: React.FC = () => {
                             />
                         </Tooltip>
                     </>}
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -267,7 +269,7 @@ const ClassLoadersPage: React.FC = () => {
     return classLoaders ? (
         <Container maxWidth={false}>
             <MUIDataTable
-                title={"Class loaders"}
+                title={t("classLoaders.title")}
                 data={classLoaders}
                 columns={columns}
                 options={options}

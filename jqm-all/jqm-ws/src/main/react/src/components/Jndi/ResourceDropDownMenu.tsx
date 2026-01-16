@@ -3,6 +3,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListSubheader from "@mui/material/ListSubheader";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { useTranslation } from "react-i18next";
 import { resourceTemplates } from "./resourceTemplates";
 import { JndiResource } from "./JndiResource";
 
@@ -13,7 +14,7 @@ const getResourceTemplate = (key: string) => ({
 
 const resourceTemplatesList = [
     {
-        title: "Database Pools",
+        titleKey: "jndi.resourceGroups.databasePools",
         resources: [
             getResourceTemplate("jndiOracle"),
             getResourceTemplate("jndiMySql"),
@@ -23,7 +24,7 @@ const resourceTemplatesList = [
         ],
     },
     {
-        title: "Messages Q & QCF",
+        titleKey: "jndi.resourceGroups.messagesQ",
         resources: [
             getResourceTemplate("jndiMqQcf"),
             getResourceTemplate("jndiMqQ"),
@@ -32,7 +33,7 @@ const resourceTemplatesList = [
         ],
     },
     {
-        title: "Locators",
+        titleKey: "jndi.resourceGroups.locators",
         resources: [
             getResourceTemplate("jndiFile"),
             getResourceTemplate("jndiUrl"),
@@ -40,11 +41,11 @@ const resourceTemplatesList = [
         ],
     },
     {
-        title: "SMTP Mail",
+        titleKey: "jndi.resourceGroups.smtpMail",
         resources: [getResourceTemplate("jndiMail")],
     },
     {
-        title: "Generic Resource",
+        titleKey: "jndi.resourceGroups.genericResource",
         resources: [getResourceTemplate("jndiGeneric")],
     },
 ];
@@ -57,17 +58,18 @@ export const ResourceDropDownMenu: React.FC<{
     onClose: () => void;
     onSelectResource: (resource: JndiResource) => void;
 }> = ({ menuPositiontRef, show, onClose, onOpen, onSelectResource }) => {
+    const { t } = useTranslation();
     const selectGroupList: any[] = [];
-    resourceTemplatesList.forEach(({ title, resources }) => {
+    resourceTemplatesList.forEach(({ titleKey, resources }) => {
         selectGroupList.push(
-            <ListSubheader key={title} disableSticky>
-                {title}
+            <ListSubheader key={titleKey} disableSticky>
+                {t(titleKey)}
             </ListSubheader>
         );
         resources.map(({ uiName, resourceKey }) =>
             selectGroupList.push(
                 <MenuItem key={resourceKey} value={resourceKey}>
-                    {uiName}
+                    {t(uiName || "")}
                 </MenuItem>
             )
         );

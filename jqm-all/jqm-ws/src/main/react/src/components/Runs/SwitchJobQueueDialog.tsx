@@ -15,6 +15,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import makeStyles from "@mui/styles/makeStyles";
 import { Queue } from "../Queues/Queue";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) =>
 ({
@@ -32,6 +33,7 @@ export const SwitchJobQueueDialog: React.FC<{
     queues: Queue[];
     switchJobQueue: (jobId: number, queueId: number) => void;
 }> = ({ closeDialog, jobId, queues, switchJobQueue }) => {
+    const { t } = useTranslation();
     const [queueId, setQueueId] = useState<number | undefined>();
 
     const classes = useStyles();
@@ -44,10 +46,10 @@ export const SwitchJobQueueDialog: React.FC<{
             fullWidth
             maxWidth={"sm"}
         >
-            <DialogTitle>Switch job {jobId} queue</DialogTitle>
+            <DialogTitle>{t("runs.switchQueueDialog.title", { id: jobId })}</DialogTitle>
             <DialogContent>
                 <FormControl fullWidth className={classes.Select}>
-                    <InputLabel id="queue-select-label">Queue*</InputLabel>
+                    <InputLabel id="queue-select-label">{t("runs.switchQueueDialog.queueLabel")}</InputLabel>
                     <Select
                         labelId="queue-select-label"
                         fullWidth
@@ -72,7 +74,7 @@ export const SwitchJobQueueDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -85,7 +87,7 @@ export const SwitchJobQueueDialog: React.FC<{
                         closeDialog();
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

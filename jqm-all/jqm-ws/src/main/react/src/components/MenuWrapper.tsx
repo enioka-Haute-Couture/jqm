@@ -29,8 +29,11 @@ import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import UploadIcon from "@mui/icons-material/Upload";
 import { Button, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
+import LanguageIcon from '@mui/icons-material/Language';
+import { useTranslation } from "react-i18next";
 import { PermissionAction, PermissionObjectType, useAuth } from "../utils/AuthService";
 import APIService from "../utils/APIService";
+import { languageConfig } from "../i18n";
 
 const drawerWidth = 240;
 
@@ -106,9 +109,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function MenuWrapper(props: any) {
     const theme = useTheme();
+    const { t, i18n } = useTranslation();
     const [open, setOpen] = React.useState(true);
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [langAnchorEl, setLangAnchorEl] = React.useState(null);
     const openUserMenu = Boolean(anchorEl);
+    const openLangMenu = Boolean(langAnchorEl);
 
     const { userLogin, canUserAccess, logout } = useAuth();
 
@@ -126,6 +132,19 @@ export default function MenuWrapper(props: any) {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleLangMenu = (event: any) => {
+        setLangAnchorEl(event.currentTarget);
+    };
+
+    const handleLangClose = () => {
+        setLangAnchorEl(null);
+    };
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng);
+        handleLangClose();
     };
 
     const [version, setVersion] = React.useState("");
@@ -157,6 +176,32 @@ export default function MenuWrapper(props: any) {
                     </Typography>
 
                     <div>
+                        <IconButton
+                            color="inherit"
+                            aria-controls="language-menu"
+                            aria-haspopup="true"
+                            onClick={handleLangMenu}
+                            sx={{ marginRight: "8px" }}
+                        >
+                            <LanguageIcon />
+                        </IconButton>
+                        <Menu
+                            id="language-menu"
+                            anchorEl={langAnchorEl}
+                            open={openLangMenu}
+                            onClose={handleLangClose}
+                        >
+                            {Object.keys(i18n.options.resources || {}).map((lng) => (
+                                <MenuItem
+                                    key={lng}
+                                    onClick={() => changeLanguage(lng)}
+                                    selected={i18n.language === lng}
+                                >
+                                    {languageConfig[lng]?.name || lng}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+
                         <Button
                             color="inherit"
                             startIcon={<AccountCircle />}
@@ -172,7 +217,7 @@ export default function MenuWrapper(props: any) {
                             open={openUserMenu}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={() => { logout(); handleClose(); }} component="a" href="/auth/logout">Log out</MenuItem>
+                            <MenuItem onClick={() => { logout(); handleClose(); }} component="a" href="/auth/logout">{t("menu.logout")}</MenuItem>
                         </Menu>
                     </div>
 
@@ -190,7 +235,7 @@ export default function MenuWrapper(props: any) {
                         <ListItemIcon>
                             <HomeIcon />
                         </ListItemIcon>
-                        <ListItemText primary={"Home"} />
+                        <ListItemText primary={t("menu.home")} />
                     </ListItem>
                     {canUserAccess(PermissionObjectType.node, PermissionAction.read) && (
                         <ListItem
@@ -202,7 +247,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemIcon>
                                 <ScatterPlotIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"Nodes"} />
+                            <ListItemText primary={t("menu.nodes")} />
                         </ListItem>
                     )}
                     {canUserAccess(PermissionObjectType.queue, PermissionAction.read) && (
@@ -215,7 +260,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemIcon>
                                 <PendingIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"Queues"} />
+                            <ListItemText primary={t("menu.queues")} />
                         </ListItem>
                     )}
                 </List>
@@ -234,7 +279,7 @@ export default function MenuWrapper(props: any) {
                                     <AccountTreeIcon />
 
                                 </ListItemIcon>
-                                <ListItemText primary={"Mappings"} />
+                                <ListItemText primary={t("menu.mappings")} />
                             </ListItem>
                         )}
                     {canUserAccess(PermissionObjectType.jndi, PermissionAction.read) && (
@@ -247,7 +292,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemIcon>
                                 <SettingsIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"JNDI ressources"} />
+                            <ListItemText primary={t("menu.jndiResources")} />
                         </ListItem>
                     )}
                     {canUserAccess(PermissionObjectType.prm, PermissionAction.read) && (
@@ -260,7 +305,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemIcon>
                                 <GroupWorkIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"Cluster-wide params"} />
+                            <ListItemText primary={t("menu.clusterWideParams")} />
                         </ListItem>
                     )}
                     {canUserAccess(PermissionObjectType.cl, PermissionAction.read) && (
@@ -273,7 +318,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemIcon>
                                 <UploadIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"Class loaders"} />
+                            <ListItemText primary={t("menu.classLoaders")} />
 
                         </ListItem>
                     )}
@@ -289,7 +334,7 @@ export default function MenuWrapper(props: any) {
                                 <ListItemIcon>
                                     <AssignmentIcon />
                                 </ListItemIcon>
-                                <ListItemText primary={"Job definitions"} />
+                                <ListItemText primary={t("menu.jobDefinitions")} />
                             </ListItem>
                         )}
                     {canUserAccess(PermissionObjectType.user, PermissionAction.read) &&
@@ -303,7 +348,7 @@ export default function MenuWrapper(props: any) {
                                 <ListItemIcon>
                                     <SupervisorAccountIcon />
                                 </ListItemIcon>
-                                <ListItemText primary={"Users"} />
+                                <ListItemText primary={t("menu.users")} />
                             </ListItem>
                         )}
                     {canUserAccess(PermissionObjectType.role, PermissionAction.read) && (
@@ -316,7 +361,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemIcon>
                                 <SecurityIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"Roles"} />
+                            <ListItemText primary={t("menu.roles")} />
                         </ListItem>
                     )}
                     {canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
@@ -330,7 +375,7 @@ export default function MenuWrapper(props: any) {
                                 <ListItemIcon>
                                     <QueryBuilderIcon />
                                 </ListItemIcon>
-                                <ListItemText primary={"Runs"} />
+                                <ListItemText primary={t("menu.runs")} />
                             </ListItem>
                         )}
                 </List>

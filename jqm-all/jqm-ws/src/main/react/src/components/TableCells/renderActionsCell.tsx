@@ -5,6 +5,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { MUIDataTableMeta } from "mui-datatables";
+import { TFunction } from "i18next";
 
 export interface extraActionItem {
     title: string;
@@ -23,11 +24,12 @@ export const renderActionsCell =
         canEdit: boolean,
         canDelete: boolean,
         extraActionItems: extraActionItem[] = [],
+        t: TFunction
     ) =>
         (value: any, tableMeta: MUIDataTableMeta) => {
             if (editingRowId === tableMeta.rowIndex) {
                 return <>
-                    <Tooltip title={"Cancel changes"}>
+                    <Tooltip title={t("common.cancelChanges")}>
                         <IconButton
                             color="default"
                             aria-label={"cancel"}
@@ -36,7 +38,7 @@ export const renderActionsCell =
                             <CancelIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title={"Save changes"}>
+                    <Tooltip title={t("common.save")}>
                         <IconButton
                             color="default"
                             aria-label={"save"}
@@ -84,7 +86,7 @@ export const renderActionsCell =
                 }
 
                     {canEdit &&
-                        <Tooltip title={"Edit line"}>
+                        <Tooltip title={t("common.edit")}>
                             <IconButton
                                 color="default"
                                 aria-label={"edit"}
@@ -95,7 +97,7 @@ export const renderActionsCell =
                         </Tooltip>
                     }
                     {onDelete && canDelete && (
-                        <Tooltip title={"Delete line"}>
+                        <Tooltip title={t("common.delete")}>
                             <IconButton
                                 color="default"
                                 aria-label={"delete"}

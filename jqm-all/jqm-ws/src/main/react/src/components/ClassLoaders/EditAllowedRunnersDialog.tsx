@@ -18,6 +18,7 @@ import {
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { makeStyles } from "@mui/styles";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) => ({
     TextField: {
@@ -30,6 +31,7 @@ export const EditAllowedRunnersDialog: React.FC<{
     allowedRunners: string[];
     setAllowedRunners: (AllowedRunners: string[]) => void;
 }> = ({ closeDialog, allowedRunners, setAllowedRunners }) => {
+    const { t } = useTranslation();
     const classes = useStyles();
 
     const [editedAllowedRunners, setEditedAllowedRunners] =
@@ -44,12 +46,12 @@ export const EditAllowedRunnersDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit allowed runners</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("classLoaders.editAllowedRunnersDialog.title")}</DialogTitle>
             <DialogContent>
                 <>
                     <TextField
                         className={classes.TextField}
-                        label="Runner*"
+                        label={t("classLoaders.editAllowedRunnersDialog.runnerLabel")}
                         value={newAllowedRunner}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
@@ -77,14 +79,14 @@ export const EditAllowedRunnersDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Add
+                        {t("classLoaders.editAllowedRunnersDialog.addButton")}
                     </Button>
                     <TableContainer component={Paper}>
                         <Table size="small" aria-label="Parameters">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Allowed runner</TableCell>
-                                    <TableCell>Actions</TableCell>
+                                    <TableCell>{t("classLoaders.editAllowedRunnersDialog.allowedRunnerColumn")}</TableCell>
+                                    <TableCell>{t("common.actions")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -122,7 +124,7 @@ export const EditAllowedRunnersDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -134,7 +136,7 @@ export const EditAllowedRunnersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("classLoaders.editAllowedRunnersDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

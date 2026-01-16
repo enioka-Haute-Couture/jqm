@@ -5,6 +5,8 @@ import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-dat
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useTranslation } from "react-i18next";
+import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 import { CreateParameterDialog } from "./CreateParameterDialog";
 import useParametersApi from "./ParametersApi";
 import { renderActionsCell, renderInputCell } from "../TableCells";
@@ -14,6 +16,8 @@ import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
 
 const ClusterwideParametersPage: React.FC = () => {
+    const { t } = useTranslation();
+    const muiTableTextLabels = useMUIDataTableTextLabels(t("clusterParameters.noMatch"));
     const [showDialog, setShowDialog] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const paramKeyInputRef = useRef(null);
@@ -33,8 +37,8 @@ const ClusterwideParametersPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
             fetchParameters();
         }
-        setPageTitle("Cluster-wide parameters");
-    }, [fetchParameters, canUserAccess]);
+        setPageTitle(t("clusterParameters.title"));
+    }, [fetchParameters, canUserAccess, t]);
 
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
@@ -76,9 +80,9 @@ const ClusterwideParametersPage: React.FC = () => {
         },
         {
             name: "key",
-            label: "Key",
+            label: t("clusterParameters.key"),
             options: {
-                hint: "The parameter key. Not necessarily unique.",
+                hint: t("clusterParameters.hints.key"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -89,9 +93,9 @@ const ClusterwideParametersPage: React.FC = () => {
         },
         {
             name: "value",
-            label: "Value",
+            label: t("clusterParameters.value"),
             options: {
-                hint: "The value of the parameter",
+                hint: t("clusterParameters.hints.value"),
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
@@ -102,7 +106,7 @@ const ClusterwideParametersPage: React.FC = () => {
         },
         {
             name: "",
-            label: "Actions",
+            label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
@@ -113,7 +117,9 @@ const ClusterwideParametersPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     canUserAccess(PermissionObjectType.prm, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.prm, PermissionAction.delete)
+                    canUserAccess(PermissionObjectType.prm, PermissionAction.delete),
+                    [],
+                    t
                 ),
             },
         },
@@ -121,19 +127,15 @@ const ClusterwideParametersPage: React.FC = () => {
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
-        textLabels: {
-            body: {
-                noMatch: 'No parameters found',
-            }
-        },
+        textLabels: muiTableTextLabels,
         download: false,
         print: false,
         selectableRows: (canUserAccess(PermissionObjectType.prm, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
                 {canUserAccess(PermissionObjectType.prm, PermissionAction.create) &&
-                <>
-                    <Tooltip title={"Add line"}>
+                    <>
+                        <Tooltip title={t("common.add")}>
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
@@ -141,18 +143,18 @@ const ClusterwideParametersPage: React.FC = () => {
                                 size="large">
                                 <AddCircleIcon />
                             </IconButton>
-                            </Tooltip>
+                        </Tooltip>
 
-                    <Tooltip title={"Add line dialog"}>
+                        <Tooltip title={t("common.add")}>
                             <CreateParameterDialog
                                 showDialog={showDialog}
                                 closeDialog={() => setShowDialog(false)}
                                 createParameter={createParameter}
                             />
-                    </Tooltip>
+                        </Tooltip>
                     </>
                 }
-                <Tooltip title={"Refresh"}>
+                <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
                         aria-label={"refresh"}
@@ -161,7 +163,7 @@ const ClusterwideParametersPage: React.FC = () => {
                         <RefreshIcon />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title={"Help"}>
+                <Tooltip title={t("common.help")}>
                     <IconButton color="default" aria-label={"help"} size="large" onClick={() => setIsHelpModalOpen(true)}>
                         <HelpIcon />
                     </IconButton>
@@ -190,14 +192,14 @@ const ClusterwideParametersPage: React.FC = () => {
             <HelpDialog
                 isOpen={isHelpModalOpen}
                 onClose={() => setIsHelpModalOpen(false)}
-                title="Cluster-wide parameters documentation"
-                header="These parameters apply to every node inside the cluster."
+                title={t("clusterParameters.documentation.title")}
+                header={t("clusterParameters.documentation.header")}
                 descriptionParagraphs={[
-                    "On this page, one may change the global cluster parameters. Please see the full documentation for the parameters. The need to reboot after a change depends on the parameter."
+                    t("clusterParameters.documentation.description")
                 ]}
             />
             <MUIDataTable
-                title={"Cluster-wide parameters"}
+                title={t("clusterParameters.title")}
                 data={parameters}
                 columns={columns}
                 options={options}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, FormGroup, Switch, Theme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { useTranslation } from "react-i18next";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -28,6 +29,7 @@ export const CreateClassLoaderDialog: React.FC<{
     closeDialog: () => void;
     createClassLoader: (classLoader: ClassLoader) => Promise<void>;
 }> = ({ showDialog, closeDialog, createClassLoader }) => {
+    const { t } = useTranslation();
     const [name, setName] = useState<string>("");
     const [childFirst, setChildFirst] = useState<boolean>(false);
     const [hiddenClasses, setHiddenClasses] = useState<string>("");
@@ -43,11 +45,11 @@ export const CreateClassLoaderDialog: React.FC<{
             aria-labelledby="form-dialog-title"
             fullWidth
         >
-            <DialogTitle>Create class loader</DialogTitle>
+            <DialogTitle>{t("classLoaders.createClassLoaderDialog.title")}</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Name*"
+                    label={t("classLoaders.name")}
                     value={name}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setName(event.target.value);
@@ -68,13 +70,13 @@ export const CreateClassLoaderDialog: React.FC<{
                                 }}
                             />
                         }
-                        label="Child first class loading"
+                        label={t("classLoaders.createClassLoaderDialog.childFirstLabel")}
                         labelPlacement="top"
                     />
                 </FormGroup>
                 <TextField
                     className={classes.TextField}
-                    label="Hidden classes"
+                    label={t("classLoaders.hiddenClasses")}
                     value={hiddenClasses}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setHiddenClasses(event.target.value);
@@ -96,7 +98,7 @@ export const CreateClassLoaderDialog: React.FC<{
                                 }}
                             />
                         }
-                        label="Tracing enabled"
+                        label={t("classLoaders.createClassLoaderDialog.tracingEnabledLabel")}
                         labelPlacement="top"
                     />
                 </FormGroup>
@@ -114,13 +116,13 @@ export const CreateClassLoaderDialog: React.FC<{
                                 }}
                             />
                         }
-                        label="Persistent"
+                        label={t("classLoaders.createClassLoaderDialog.persistentLabel")}
                         labelPlacement="top"
                     />
                 </FormGroup>
                 <TextField
                     className={classes.TextField}
-                    label="Allowed runners"
+                    label={t("classLoaders.allowedRunners")}
                     value={allowedRunners}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setAllowedRunners(event.target.value);
@@ -135,7 +137,7 @@ export const CreateClassLoaderDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -156,7 +158,7 @@ export const CreateClassLoaderDialog: React.FC<{
                         setName("");
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>

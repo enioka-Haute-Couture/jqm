@@ -7,6 +7,7 @@ import { useNotificationService } from "../../utils/NotificationService";
 import useQueueAPI from "../Queues/QueueAPI";
 import { useRunsPagination } from "../../utils/RunsPaginationProvider";
 import useParametersApi from "../ClusterwideParameters/ParametersApi";
+import { useTranslation } from "react-i18next";
 
 const API_URL = "/client/ji";
 
@@ -24,6 +25,7 @@ interface JobInstanceFilters {
 }
 
 export const useJobInstanceAPI = () => {
+    const { t } = useTranslation();
     const { displayError, displaySuccess } = useNotificationService();
 
     const {
@@ -178,7 +180,9 @@ export const useJobInstanceAPI = () => {
                         queryLiveInstances,
                         filterList
                     );
-                    displaySuccess(`Successfully killed job ${jobId}`);
+                    displaySuccess(
+                        t("runs.messages.successKill", { id: jobId })
+                    );
                 })
                 .catch(displayError);
         },
@@ -191,6 +195,7 @@ export const useJobInstanceAPI = () => {
             fetchJobInstances,
             displayError,
             displaySuccess,
+            t,
         ]
     );
 
@@ -205,7 +210,9 @@ export const useJobInstanceAPI = () => {
                         queryLiveInstances,
                         filterList
                     );
-                    displaySuccess(`Successfully paused job ${jobId}`);
+                    displaySuccess(
+                        t("runs.messages.successPause", { id: jobId })
+                    );
                 })
                 .catch(displayError);
         },
@@ -218,6 +225,7 @@ export const useJobInstanceAPI = () => {
             fetchJobInstances,
             displayError,
             displaySuccess,
+            t,
         ]
     );
 
@@ -232,7 +240,9 @@ export const useJobInstanceAPI = () => {
                         queryLiveInstances,
                         filterList
                     );
-                    displaySuccess(`Successfully resumed job ${jobId}`);
+                    displaySuccess(
+                        t("runs.messages.successResume", { id: jobId })
+                    );
                 })
                 .catch(displayError);
         },
@@ -245,6 +255,7 @@ export const useJobInstanceAPI = () => {
             fetchJobInstances,
             displayError,
             displaySuccess,
+            t,
         ]
     );
 
@@ -267,7 +278,9 @@ export const useJobInstanceAPI = () => {
                         queryLiveInstances,
                         filterList
                     );
-                    displaySuccess(`Successfully relaunched job ${jobId}`);
+                    displaySuccess(
+                        t("runs.messages.successRelaunch", { id: jobId })
+                    );
                 })
                 .catch(displayError);
         },
@@ -280,6 +293,7 @@ export const useJobInstanceAPI = () => {
             fetchJobInstances,
             displayError,
             displaySuccess,
+            t,
         ]
     );
 
@@ -287,6 +301,9 @@ export const useJobInstanceAPI = () => {
         async (jobId: number, queueId: number) => {
             return APIService.post(`/client/q/${queueId}/${jobId}`, {})
                 .then(() => {
+                    const queueName = queues?.find(
+                        (queue) => queue.id === queueId
+                    )?.name;
                     fetchJobInstances(
                         page,
                         rowsPerPage,
@@ -295,7 +312,10 @@ export const useJobInstanceAPI = () => {
                         filterList
                     );
                     displaySuccess(
-                        `Successfully switch job ${jobId} to queue ${queueId}`
+                        t("runs.messages.successSwitch", {
+                            id: jobId,
+                            queueName: queueName,
+                        })
                     );
                 })
                 .catch(displayError);
@@ -309,6 +329,8 @@ export const useJobInstanceAPI = () => {
             fetchJobInstances,
             displayError,
             displaySuccess,
+            queues,
+            t,
         ]
     );
 
@@ -323,7 +345,7 @@ export const useJobInstanceAPI = () => {
                         queryLiveInstances,
                         filterList
                     );
-                    displaySuccess(`Successfully created job`);
+                    displaySuccess(t("runs.messages.successLaunch"));
                 })
                 .catch(displayError);
         },
@@ -336,6 +358,7 @@ export const useJobInstanceAPI = () => {
             fetchJobInstances,
             displayError,
             displaySuccess,
+            t,
         ]
     );
 

@@ -18,6 +18,7 @@ import {
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { makeStyles } from "@mui/styles";
+import { useTranslation } from "react-i18next";
 import { JobDefinitionParameter } from "./JobDefinition";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -31,6 +32,7 @@ export const EditParametersDialog: React.FC<{
     parameters: Array<JobDefinitionParameter>;
     setParameters: (parameters: Array<JobDefinitionParameter>) => void;
 }> = ({ closeDialog, parameters, setParameters }) => {
+    const { t } = useTranslation();
     const [editedParameters, setEditedParameters] =
         useState<Array<JobDefinitionParameter>>(parameters);
 
@@ -47,12 +49,12 @@ export const EditParametersDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">Edit parameters</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("jobDefinitions.editParametersDialog.title")}</DialogTitle>
             <DialogContent>
                 <>
                     <TextField
                         className={classes.TextField}
-                        label="Key*"
+                        label={t("jobDefinitions.editParametersDialog.keyLabel")}
                         value={key}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
@@ -64,7 +66,7 @@ export const EditParametersDialog: React.FC<{
                     />
                     <TextField
                         className={classes.TextField}
-                        label="Value"
+                        label={t("jobDefinitions.editParametersDialog.valueLabel")}
                         value={value}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
@@ -95,15 +97,15 @@ export const EditParametersDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Add parameter
+                        {t("jobDefinitions.editParametersDialog.addParameter")}
                     </Button>
                     <TableContainer component={Paper}>
                         <Table size="small" aria-label="Parameters">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Key</TableCell>
-                                    <TableCell>Value</TableCell>
-                                    <TableCell>Actions</TableCell>
+                                    <TableCell>{t("jobDefinitions.editParametersDialog.keyColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editParametersDialog.valueColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editParametersDialog.actionsColumn")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -142,7 +144,7 @@ export const EditParametersDialog: React.FC<{
                     style={{ margin: "8px" }}
                     onClick={closeDialog}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -154,7 +156,7 @@ export const EditParametersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Validate
+                    {t("jndi.editParametersDialog.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

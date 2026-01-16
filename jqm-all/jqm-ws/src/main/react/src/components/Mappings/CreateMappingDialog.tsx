@@ -17,6 +17,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { useTranslation } from "react-i18next";
 import { Mapping } from "./Mapping";
 import { Queue } from "../Queues/Queue";
 import { Node } from "../Nodes/Node";
@@ -48,16 +49,17 @@ export const CreateMappingDialog: React.FC<{
     const [nbThread, setNbThread] = useState<string>("");
     const [enabled, setEnabled] = useState(true);
     const classes = useStyles();
+    const { t } = useTranslation();
     return (
         <Dialog
             open={true}
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle>Create queue</DialogTitle>
+            <DialogTitle>{t("mappings.createMappingDialog.title")}</DialogTitle>
             <DialogContent>
                 <FormControl fullWidth className={classes.Select}>
-                    <InputLabel id="node-id-select-label">Node*</InputLabel>
+                    <InputLabel id="node-id-select-label">{t("mappings.node")}</InputLabel>
                     <Select
                         labelId="node-id-select-label"
                         fullWidth
@@ -76,7 +78,7 @@ export const CreateMappingDialog: React.FC<{
                     </Select>
                 </FormControl>
                 <FormControl fullWidth className={classes.Select}>
-                    <InputLabel id="queue-id-select-label">Queue*</InputLabel>
+                    <InputLabel id="queue-id-select-label">{t("mappings.queue")}</InputLabel>
                     <Select
                         labelId="queue-id-select-label"
                         fullWidth
@@ -96,7 +98,7 @@ export const CreateMappingDialog: React.FC<{
                 </FormControl>
                 <TextField
                     className={classes.TextField}
-                    label="Polling interval (ms)*"
+                    label={t("mappings.pollingInterval")}
                     value={pollingInterval}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setPollingInterval(event.target.value);
@@ -107,7 +109,7 @@ export const CreateMappingDialog: React.FC<{
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Max concurrent running instances*"
+                    label={t("mappings.maxConcurrentInstances")}
                     value={nbThread}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setNbThread(event.target.value);
@@ -128,7 +130,7 @@ export const CreateMappingDialog: React.FC<{
                             }}
                         />
                     }
-                    label="Enabled"
+                    label={t("mappings.enabled")}
                     labelPlacement="end"
                 />
             </DialogContent>
@@ -138,7 +140,7 @@ export const CreateMappingDialog: React.FC<{
                     onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
-                    Cancel
+                    {t("common.cancel")}
                 </Button>
                 <Button
                     variant="contained"
@@ -165,7 +167,7 @@ export const CreateMappingDialog: React.FC<{
                         closeDialog();
                     }}
                 >
-                    Create
+                    {t("common.create")}
                 </Button>
             </DialogActions>
         </Dialog>
