@@ -117,6 +117,7 @@ public class ServiceClient
         target.setRunAfter(jd.getRunAfter());
         target.setScheduleId(jd.getScheduleId());
         target.setSessionID(jd.getSessionID());
+        target.setTraceId(jd.getTraceId());
         if (jd.getStartState() == State.HOLDED)
         {
             target.startHeld();
@@ -136,6 +137,8 @@ public class ServiceClient
         ji.setUser(jd.getUser());
         ji.setPosition(Long.MAX_VALUE);
         ji.setApplication(jd.getApplication());
+        ji.setTraceId(jd.getTraceId());
+        ji.setApplicationName(jd.getApplicationName());
 
         return ji;
     }

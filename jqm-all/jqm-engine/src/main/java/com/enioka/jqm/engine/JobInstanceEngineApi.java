@@ -96,6 +96,7 @@ class JobInstanceEngineApi implements JobManager
         jr.setUser(user == null ? ji.getUserName() : user);
         jr.setEmail(mail);
         jr.setSessionID(sessionId == null ? this.ji.getSessionID() : sessionId);
+        jr.setTraceId(this.ji.getTraceId());
         jr.setApplication(application == null ? this.ji.getJD().getApplication() : application);
         jr.setModule(module == null ? this.ji.getJD().getModule() : module);
         jr.setKeyword1(keyword1);
