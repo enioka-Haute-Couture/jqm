@@ -90,6 +90,16 @@ public interface JobRequest extends Serializable
 
     /**
      * <strong>Optional</strong><br>
+     * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
+     * Default is null.
+     *
+     * @param traceId
+     *            max length is 100
+     */
+    public JobRequest setTraceId(String traceId);
+
+    /**
+     * <strong>Optional</strong><br>
      * The application making the query. E.g.: Accounting, Interfaces, ...
      *
      * @param application

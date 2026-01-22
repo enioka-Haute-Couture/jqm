@@ -46,6 +46,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     private String applicationName;
     private String sessionID;
+    private String traceId;
     private String application;
     private String user;
     private String module;
@@ -180,6 +181,30 @@ public class JobRequestBaseImpl implements JobRequest
     public JobRequest setSessionID(String sessionID)
     {
         this.sessionID = sessionID;
+        return this;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
+     * Default is null.
+     */
+    public String getTraceId()
+    {
+        return traceId;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
+     * Default is null.
+     *
+     * @param traceId
+     *            max length is 100
+     */
+    public JobRequest setTraceId(String traceId)
+    {
+        this.traceId = traceId;
         return this;
     }
 

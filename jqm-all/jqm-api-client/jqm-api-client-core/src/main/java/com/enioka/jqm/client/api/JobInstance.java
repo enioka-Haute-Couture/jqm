@@ -43,6 +43,7 @@ public class JobInstance
     private Long parent;
     private String user;
     private String sessionID;
+    private String traceId;
     private State state;
     private Long position;
     private Integer priority;
@@ -109,6 +110,18 @@ public class JobInstance
     public void setSessionID(String sessionID)
     {
         this.sessionID = sessionID;
+    }
+
+    /**
+     * The trace ID that was given at enqueue time. Optional.
+     */
+    public void setTraceId(String traceId)
+    {
+        this.traceId = traceId;
+    }
+
+    public String getTraceId(){
+        return this.traceId;
     }
 
     /**
