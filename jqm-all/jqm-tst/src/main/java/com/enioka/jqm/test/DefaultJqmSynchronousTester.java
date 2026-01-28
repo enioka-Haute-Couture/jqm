@@ -85,7 +85,8 @@ public class DefaultJqmSynchronousTester implements JqmSynchronousTester
      * Start of the fluent API to construct a test case.
      *
      * @param className
-     * @return
+     *            class name
+     * @return JqmSynchronousTester
      */
     public static JqmSynchronousTester create(String className)
     {
@@ -96,7 +97,8 @@ public class DefaultJqmSynchronousTester implements JqmSynchronousTester
      * Start of the fluent API to construct a test case.
      *
      * @param clazz
-     * @return
+     *            class
+     * @return JqmSynchronousTester
      */
     public static JqmSynchronousTester create(Class<?> clazz)
     {

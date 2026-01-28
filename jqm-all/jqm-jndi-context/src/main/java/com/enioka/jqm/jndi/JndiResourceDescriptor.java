@@ -51,6 +51,8 @@ class JndiResourceDescriptor extends Reference
     /**
      * Singleton means: one per engine, loaded with the engine class loader. Not singleton = one created at each lookup call, loaded with
      * the payload class loader.
+     *
+     * @return boolean
      */
     boolean isSingleton()
     {

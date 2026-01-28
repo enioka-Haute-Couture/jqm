@@ -151,6 +151,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
     /**
      * Called at the beginning of the main loop to check if the poller config is up to date (nbThread, pause...)
+     *
+     * @param cnx
+     *            db connection
      */
     private void refreshDeploymentParameter(DbConn cnx)
     {
@@ -417,6 +420,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
     /**
      * Called when a payload thread has ended. This also notifies the poller to poll once again.
+     *
+     * @param ji
+     *            job instance
      */
     void releaseResources(JobInstance ji)
     {

@@ -12,10 +12,9 @@ import com.enioka.jqm.client.api.JqmClientFactory;
  * It is most suited for integration tests.<br>
  * <br>
  * It starts full JQM nodes running on an in-memory embedded database. They are started with all web API disabled.<br>
- * The user should handle interactions with the nodes through the normal client APIs. See {@link JqmClient}. As
- * the web services are not loaded, the file retrieval methods of these APIs will not work, so the tester provides a
- * {@link #getDeliverableContent(Deliverable)} method to compensate. The tester also provides a few helper methods (accelerators) that
- * encapsulate the client API.<br>
+ * The user should handle interactions with the nodes through the normal client APIs. See {@link JqmClient}. As the web services are not
+ * loaded, the file retrieval methods of these APIs will not work, so the tester provides a {@link #getDeliverableContent(Deliverable)}
+ * method to compensate. The tester also provides a few helper methods (accelerators) that encapsulate the client API.<br>
  *
  * If using resources (JNDI), they must be put inside a resource.xml file at the root of class loader search.<br>
  * Note that tester instances are not thread safe.
@@ -32,6 +31,7 @@ public interface JqmAsynchronousTester extends AutoCloseable
      *
      * @param nodeName
      *            the name of the node. Must be unique.
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester addNode(String nodeName);
 
@@ -40,11 +40,18 @@ public interface JqmAsynchronousTester extends AutoCloseable
      *
      * @param level
      *            TRACE, DEBUG, INFO, WARNING, ERROR (or anything, which is interpreted as INFO)
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester setNodesLogLevel(String level);
 
     /**
      * Set or update a global parameter.
+     *
+     * @param key
+     *            key
+     * @param value
+     *            value
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester addGlobalParameter(String key, String value);
 
@@ -60,12 +67,23 @@ public interface JqmAsynchronousTester extends AutoCloseable
      *
      * @param name
      *            must be unique.
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester addQueue(String name);
 
     /**
      * Set one or more nodes to poll a queue for new job instances.<br>
      * This must be called before starting the engines.
+     *
+     * @param queueName
+     *            name of the queue to be polled
+     * @param maxJobsRunning
+     *            maximum number of parallel job instances
+     * @param pollingIntervallMs
+     *            polling interval in milliseconds
+     * @param nodeName
+     *            one or more node names which should poll this queue
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester deployQueueToNode(String queueName, int maxJobsRunning, int pollingIntervallMs, String... nodeName);
 
@@ -91,7 +109,8 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * The job definition is only be ready after {@link TestJobDefinition#addJobDefinition()} is called (fluent API).
      *
      * @param classToRun
-     * @return
+     *            class to run
+     * @return JQMAsynchronousTester
      */
     public TestJobDefinition createJobDefinitionFromClassPath(Class<? extends Object> classToRun);
 
@@ -117,9 +136,12 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * The job definition is only be ready after {@link TestJobDefinition#addJobDefinition()} is called (fluent API).
      *
      * @param name
+     *            name
      * @param className
+     *            class name
      * @param jarPath
-     * @return
+     *            jar path
+     * @return TestJobDefinition
      */
     public TestJobDefinition createJobDefinitionFromLibrary(String name, String className, String jarPath);
 
@@ -130,6 +152,8 @@ public interface JqmAsynchronousTester extends AutoCloseable
     /**
      * A helper method which creates a preset environment with a single node called 'node1' and a single queue named 'queue1' being polled
      * every 100ms by the node with at most 10 parallel running job instances..
+     *
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester createSingleNodeOneQueue();
 
@@ -140,6 +164,8 @@ public interface JqmAsynchronousTester extends AutoCloseable
     /**
      * This actually starts the different engines configured with {@link #addNode(String)}.<br>
      * This can usually only be called once (it can actually be called again but only after calling {@link #stop()}).
+     *
+     * @return JQMAsynchronousTester
      */
     public JqmAsynchronousTester start();
 
@@ -147,6 +173,8 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * Helper method to enqueue a new launch request. Simple JqmClientFactory.getClient().enqueue wrapper.
      *
      * @return the request ID.
+     * @param name
+     *            name of the job definition to launch
      */
     public Long enqueue(String name);
 
@@ -202,37 +230,59 @@ public interface JqmAsynchronousTester extends AutoCloseable
 
     /**
      * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all ended (KO and OK) job instances.
+     *
+     * @return int
      */
     public int getHistoryAllCount();
 
     /**
      * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all non-ended (waiting in queue, running...) job instances.
+     *
+     * @return int
      */
     public int getQueueAllCount();
 
     /**
      * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all OK-ended job instances.
+     *
+     * @return int
      */
     public int getOkCount();
 
     /**
      * Helper query (directly uses {@link JqmClientFactory}). Gives the count of all non-OK-ended job instances.
+     *
+     * @return int
      */
     public int getNonOkCount();
 
     /**
      * Helper method. Tests if {@link #getOkCount()} is equal to the given parameter.
+     *
+     * @param expectedOkCount
+     *            expected value for ok count
+     * @return boolean
      */
     public boolean testOkCount(long expectedOkCount);
 
     /**
      * Helper method. Tests if {@link #getNonOkCount()} is equal to the given parameter.
+     *
+     * @param expectedKoCount
+     *            expected value for non-ok count
+     * @return boolean
      */
     public boolean testKoCount(long expectedKoCount);
 
     /**
      * Helper method. Tests if {@link #getOkCount()} is equal to the first parameter and if {@link #getNonOkCount()} is equal to the second
      * parameter.
+     *
+     * @param expectedOkCount
+     *            expected value for ok count
+     * @param expectedKoCount
+     *            expected value for non-ok count
+     * @return boolean
      */
     public boolean testCounts(long expectedOkCount, long expectedKoCount);
 
@@ -241,7 +291,11 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * Also, returned files do not self-destruct on stream close.<br>
      * See the javadoc of the original method for details.
      *
+     * @param file
+     *            Deliverable
+     * @return InputStream
      * @throws FileNotFoundException
+     *             if the file is not found
      */
     public InputStream getDeliverableContent(Deliverable file) throws FileNotFoundException;
 

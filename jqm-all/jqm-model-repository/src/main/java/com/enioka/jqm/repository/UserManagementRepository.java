@@ -18,9 +18,12 @@ public class UserManagementRepository
      * @param cnx
      *            an open connection. No commit is done here.
      * @param roleName
+     *            the name of the role
      * @param description
+     *            a description for role
      * @param permissions
-     * @return
+     *            the permissions to assign to the role
+     * @return RRole
      */
     public static RRole createRoleIfMissing(DbConn cnx, String roleName, String description, String... permissions)
     {
@@ -37,11 +40,15 @@ public class UserManagementRepository
      * Creates a new user if does not exist. If it exists, it is unlocked and roles are reset (password is untouched).
      *
      * @param cnx
+     *            db connection
      * @param login
+     *            the login
      * @param password
      *            the raw password. it will be hashed.
      * @param description
+     *            user description
      * @param roles
+     *            roles to assign to the user
      */
     public static void createUserIfMissing(DbConn cnx, String login, String password, String description, String... roles)
     {

@@ -19,8 +19,8 @@ public interface JobInstanceTracker
      * Must be thread-safe.
      *
      * @param cnx
-     *                a ready to use connection to the main database. Should not be stored as it closed by the engine soon after calling
-     *                this method.
+     *            a ready to use connection to the main database. Should not be stored as it closed by the engine soon after calling this
+     *            method.
      */
     public void initialize(DbConn cnx);
 
@@ -31,12 +31,14 @@ public interface JobInstanceTracker
      * Called within a dedicated thread. - this method should NOT create any thread (the payload itself, outside JQM's responsibility,
      * may)<br>
      * When this method is called, the context class loader is the engine class loader - as a loader is part of the engine.<br>
+     *
+     * @return State
      */
     public State run();
 
     /**
-     * Called after {@link com.enioka.jqm.model.JobInstance } {@link com.enioka.jqm.runner.api.JobRunnerCallback} has completed. Cleanup work should go here. Not called finalize because
-     * reserved word.
+     * Called after {@link com.enioka.jqm.model.JobInstance } {@link com.enioka.jqm.runner.api.JobRunnerCallback} has completed. Cleanup
+     * work should go here. Not called finalize because reserved word.
      */
     public void wrap();
 
@@ -47,6 +49,7 @@ public interface JobInstanceTracker
      * to the job.
      *
      * @param instruction
+     *            instriction to handle
      */
     public void handleInstruction(Instruction instruction);
 }

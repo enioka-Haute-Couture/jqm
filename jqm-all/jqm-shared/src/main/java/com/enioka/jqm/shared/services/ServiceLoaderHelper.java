@@ -16,10 +16,11 @@ public class ServiceLoaderHelper
      * Get all plugins of the given generic type. Always returns fresh instances.
      *
      * @param <T>
+     *            the generic type
      * @param serviceLoader
-     *            - instead of using directly the type, we ask the calling module to use ServiceLoader itself as this is how JPMS works
-     *            (otherwose this lirbary should "use" all service types...)
-     * @return
+     *            instead of using directly the type, we ask the calling module to use ServiceLoader itself as this is how JPMS works
+     *            (otherwise this library should "use" all service types...)
+     * @return a list of all service instances of the requested type
      */
     public static <T> List<T> getServices(ServiceLoader<T> serviceLoader)
     {

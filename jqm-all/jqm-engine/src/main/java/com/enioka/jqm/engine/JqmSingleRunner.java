@@ -42,6 +42,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
      * Runs an existing JobInstance.
      *
      * @param job
+     *            job instance to run
      * @return the result of the run
      */
     public static JobInstance run(com.enioka.jqm.model.JobInstance job)

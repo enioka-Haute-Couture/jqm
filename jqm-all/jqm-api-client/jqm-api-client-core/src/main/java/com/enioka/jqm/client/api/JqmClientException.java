@@ -22,16 +22,29 @@ public class JqmClientException extends JqmException
 {
     private static final long serialVersionUID = 338795021501465434L;
 
+    /**
+     * Create a new exception with a specific message.
+     * @param message the error message
+     */
     public JqmClientException(String message)
     {
         super(message);
     }
 
+    /**
+     * Create a new exception around a throwable cause
+     * @param cause the root cause
+     * @param message the error message
+     */
     public JqmClientException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
+    /**
+     * Create a new exception around a throwable cause
+     * @param cause the root cause
+     */
     public JqmClientException(Throwable cause)
     {
         super("an internal JQM client exception occured", cause);

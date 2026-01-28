@@ -52,6 +52,8 @@ public class JobDefParameter implements Serializable
     /**
      * The name of the parameter.<br>
      * Max length is 50.
+     *
+     * @return String
      */
     public String getKey()
     {
@@ -60,6 +62,9 @@ public class JobDefParameter implements Serializable
 
     /**
      * See {@link #getKey()}
+     *
+     * @param key
+     *            key to set
      */
     public void setKey(final String key)
     {
@@ -69,6 +74,8 @@ public class JobDefParameter implements Serializable
     /**
      * Value of the parameter.<br>
      * Max length is 1000.
+     *
+     * @return String
      */
     public String getValue()
     {
@@ -77,6 +84,9 @@ public class JobDefParameter implements Serializable
 
     /**
      * See {@link #getValue()}
+     *
+     * @param value
+     *            value to set
      */
     public void setValue(final String value)
     {
@@ -85,6 +95,8 @@ public class JobDefParameter implements Serializable
 
     /**
      * A technical ID without special meaning.
+     *
+     * @return long
      */
     public long getId()
     {

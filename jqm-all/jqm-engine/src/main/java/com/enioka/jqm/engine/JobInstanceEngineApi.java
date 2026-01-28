@@ -58,7 +58,9 @@ class JobInstanceEngineApi implements JobManager
      * from the context.
      *
      * @param msg
+     *            the message to send
      * @throws JqmKillException
+     *             if the job has been killed
      */
     @Override
     public void sendMsg(String msg)
@@ -73,23 +75,25 @@ class JobInstanceEngineApi implements JobManager
     /**
      * Update the {@link com.enioka.jqm.model.History} with the given progress data.
      *
-     * @param msg
+     * @param progress
+     *            the progress to send (0-100)
      * @throws JqmKillException
+     *             if the job has been killed
      */
     @Override
-    public void sendProgress(Integer msg)
+    public void sendProgress(Integer progress)
     {
         try (DbConn cnx = Helpers.getNewDbSession())
         {
-            this.ji.setProgress(msg); // Not persisted, but useful to the Loader.
-            cnx.runUpdate("jj_update_progress_by_id", msg, ji.getId());
+            this.ji.setProgress(progress); // Not persisted, but useful to the Loader.
+            cnx.runUpdate("jj_update_progress_by_id", progress, ji.getId());
             cnx.commit();
         }
     }
 
     @Override
     public long enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
-                        String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         JobRequest jr = getJqmClient().newJobRequest(applicationName, user);
         jr.setApplicationName(applicationName);
@@ -113,7 +117,7 @@ class JobInstanceEngineApi implements JobManager
 
     @Override
     public long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
-                            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         long i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
         waitChild(i);

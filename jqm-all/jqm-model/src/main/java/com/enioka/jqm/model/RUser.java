@@ -153,6 +153,8 @@ public class RUser implements Serializable
 
     /**
      * When the object was last modified. Read only.
+     *
+     * @return Calendar
      */
     public Calendar getLastModified()
     {
@@ -161,6 +163,9 @@ public class RUser implements Serializable
 
     /**
      * See {@link #getLastModified()}
+     *
+     * @param lastModified
+     *            last modified date to set
      */
     protected void setLastModified(Calendar lastModified)
     {
@@ -204,7 +209,7 @@ public class RUser implements Serializable
     }
 
     public static long create(DbConn cnx, String login, String password_hash, String password_salt, Calendar expiration, Boolean internal,
-                              String... role_names)
+            String... role_names)
     {
         QueryResult r = cnx.runUpdate("user_insert", null, expiration, null, password_salt, internal, false, login, password_hash);
         long newId = r.getGeneratedId();

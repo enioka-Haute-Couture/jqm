@@ -48,36 +48,50 @@ public interface JqmEngineMBean
 
     /**
      * The total number of job instances that were run on this node since the last node restart.
+     *
+     * @return long
      */
     long getCumulativeJobInstancesCount();
 
     /**
      * The number of currently running job instances
+     *
+     * @return long
      */
     long getCurrentlyRunningJobCount();
 
     /**
      * True if, for all pollers, the last time the poller looped was less than a polling period ago.
+     *
+     * @return boolean
      */
     boolean isAllPollersPolling();
 
     /**
      * True if at least one queue is full.
+     *
+     * @return boolean
      */
     boolean isFull();
 
     /**
      * The number of seconds since engine start.
+     *
+     * @return long
      */
     long getUptime();
 
     /**
      * The package version, in x.x.x form.
+     *
+     * @return String
      */
     String getVersion();
 
     /**
      * The count, for all pollers, of running jobs that have run for more than their maxTimeRunning time.
+     *
+     * @return int
      */
     int getLateJobs();
 }
