@@ -12,6 +12,9 @@ public interface JqmEngineHandler
 {
     /**
      * Called by the internal poller on each loop.
+     *
+     * @param n
+     *            node
      */
     void onConfigurationChanged(Node n);
 
@@ -25,6 +28,9 @@ public interface JqmEngineHandler
 
     /**
      * Called even before the configuration is read. Mostly useful for dealing with static contexts.
+     *
+     * @param nodeName
+     *            String
      */
     void onNodeStarting(String nodeName);
 
@@ -42,6 +48,7 @@ public interface JqmEngineHandler
      * Called when a job instance is being prepared to run.
      *
      * @param ji
+     *            the job instance about to run
      */
     void onJobInstancePreparing(JobInstance ji);
 

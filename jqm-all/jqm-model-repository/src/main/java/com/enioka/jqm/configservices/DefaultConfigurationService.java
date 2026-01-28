@@ -25,6 +25,9 @@ public class DefaultConfigurationService
     /**
      * Creates or updates metadata common to all nodes: default queue, global parameters, roles...<br>
      * It is idempotent. It also has the effect of making broken metadata viable again.
+     * 
+     * @param cnx
+     *            database connection
      */
     public static void updateConfiguration(DbConn cnx)
     {

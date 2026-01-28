@@ -72,6 +72,8 @@ class LibraryResolverFS
      * @param jd
      *            the JobDefinition that should be resolved
      * @throws JqmPayloadException
+     *             if something goes wrong during dependency resolution
+     * @return URL[]
      */
     synchronized URL[] getLibraries(Node n, JobDef jd) throws JqmPayloadException
     {
@@ -85,6 +87,12 @@ class LibraryResolverFS
     /**
      * Returns true if the libraries should be loaded in cache. Two cases: never loaded and should be reloaded (jar is more recent than
      * cache)
+     *
+     * @param node
+     *            node
+     * @param jd
+     *            job definition
+     * @return boolean
      */
     private boolean shouldLoad(Node node, JobDef jd)
     {

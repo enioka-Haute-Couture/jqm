@@ -63,8 +63,11 @@ public class XmlConfigurationParser
      * Will import all configuration from an XML file. Creates and commits a transaction.
      *
      * @param path
+     *            path to the XML file
      * @param cnx
+     *            db connection
      * @throws JqmXmlException
+     *             if an error occurs during parsing or import
      */
     public static void parse(String path, DbConn cnx) throws JqmXmlException
     {

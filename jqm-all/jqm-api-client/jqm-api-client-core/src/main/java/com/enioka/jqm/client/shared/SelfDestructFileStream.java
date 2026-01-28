@@ -30,12 +30,20 @@ public class SelfDestructFileStream extends FileInputStream
     File f = null;
     public String nameHint = null;
 
+    /**
+     * Constructor.
+     * @param file the file to wrap
+     * @throws FileNotFoundException if the file does not exist.
+     */
     public SelfDestructFileStream(File file) throws FileNotFoundException
     {
         super(file);
         this.f = file;
     }
 
+    /**
+     * Closes the stream and deletes the underlying file.
+     */
     @Override
     public void close() throws IOException
     {

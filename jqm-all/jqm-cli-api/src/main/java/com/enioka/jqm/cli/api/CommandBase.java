@@ -22,6 +22,8 @@ public abstract class CommandBase
 
     /**
      * Actually run the command.
+     * 
+     * @return the exit code
      */
     public abstract int doWork();
 

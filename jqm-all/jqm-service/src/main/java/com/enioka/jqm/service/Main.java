@@ -44,6 +44,7 @@ public class Main
      * Windows service entry point for service start
      *
      * @param args
+     *            args
      */
     static void start(String[] args)
     {
@@ -55,6 +56,7 @@ public class Main
      * Windows service entry point for service stop
      *
      * @param args
+     *            args
      */
     static void stop(String[] args)
     {

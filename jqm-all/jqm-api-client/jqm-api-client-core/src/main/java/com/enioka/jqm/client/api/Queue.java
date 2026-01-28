@@ -33,6 +33,11 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Queue implements Serializable
 {
+    /**
+     * Default constructor.
+     */
+    public Queue(){}
+
     private static final long serialVersionUID = 5730264060976148489L;
 
     private long id;
@@ -41,12 +46,18 @@ public class Queue implements Serializable
 
     /**
      * Each queue has a unique ID
+     * @return the queue ID
      */
     public long getId()
     {
         return id;
     }
 
+    /**
+     * Set the queue ID.
+     * @see #getId()
+     * @param id the queue ID
+     */
     public void setId(long id)
     {
         this.id = id;
@@ -54,12 +65,18 @@ public class Queue implements Serializable
 
     /**
      * Name of the queue, usually descriptive.
+     * @return the queue name
      */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Set the queue name.
+     * @see #getName()
+     * @param name the queue name
+     */
     public void setName(String name)
     {
         this.name = name;
@@ -67,12 +84,18 @@ public class Queue implements Serializable
 
     /**
      * Queue description.
+     * @return the queue description
      */
     public String getDescription()
     {
         return description;
     }
 
+    /**
+     * Set the queue description.
+     * @see #getDescription()
+     * @param description the queue description
+     */
     public void setDescription(String description)
     {
         this.description = description;

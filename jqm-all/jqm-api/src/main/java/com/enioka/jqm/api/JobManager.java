@@ -128,7 +128,7 @@ public interface JobManager
      *
      * @return the third keyword that was given inside the job definition, null if none.
      */
-	String definitionKeyword3();
+    String definitionKeyword3();
 
     /**
      * Optional arbitrary user classification
@@ -141,8 +141,8 @@ public interface JobManager
      * Parameters are from the Job Definition (i.e. default parameters) as well as values given at enqueue time. This is the privileged way
      * of giving parameters to a job instance.
      *
-     * @return a <code>Map</code> of all parameters (random order) with the Map key being the name of the parameter and the
-     *         Map value the value of the parameter.
+     * @return a <code>Map</code> of all parameters (random order) with the Map key being the name of the parameter and the Map value the
+     *         value of the parameter.
      */
     Map<String, String> parameters();
 
@@ -152,8 +152,9 @@ public interface JobManager
     String defaultConnect();
 
     /*
-     * *************************************************************************************
+     **************************************************************************************
      * METHODS
+     **************************************************************************************
      */
 
     /**
@@ -161,6 +162,7 @@ public interface JobManager
      * <strong>All parameters are nullable but applicationName</strong>
      *
      * @param applicationName
+     *            Name of the application to run (i.e. JobDefinition name)
      * @param user
      *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
      * @param mail
@@ -183,16 +185,36 @@ public interface JobManager
      * @see #enqueueSync sync enqueue for a synchronous variant
      */
     long enqueue(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1,
-                 String keyword2, String keyword3, Map<String, String> parameters);
+            String keyword2, String keyword3, Map<String, String> parameters);
 
     /**
      * Enqueues a new execution request and waits for the execution to end.
      *
+     * @param applicationName
+     *            Name of the application to run (i.e. JobDefinition name)
+     * @param user
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param mail
+     *            Give an e-mail address to send a mail at the end of run. Leave null if no mail is needed.
+     * @param sessionId
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param application
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param module
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param keyword1
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param keyword2
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param keyword3
+     *            Arbitrary user classification (not used by the JQM engine, only in reporting queries and potentially in jobs themselves)
+     * @param parameters
+     *            <strong>nullable</strong>
      * @return the ID of the new request
-     * @see #enqueue the synchronous variant for the description of parameters
+     * @see #enqueue for an asynchronous variant
      */
-    long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
-                     String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
+    long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1,
+            String keyword2, String keyword3, Map<String, String> parameters);
 
     /**
      * Messages are strings that can be retrieved during run by other applications, so that interactive human users may have a measure of
@@ -221,6 +243,7 @@ public interface JobManager
      *
      * @return the <code>DataSource</code> to the default database.
      * @throws NamingException
+     *             if a naming error occurs
      */
     DataSource getDefaultConnection() throws NamingException;
 
@@ -235,6 +258,8 @@ public interface JobManager
      *            an optional classification (only used for user queries, not the engine itself)
      *
      * @return the deliverable unique ID
+     * @throws java.io.IOException
+     *             if an error occurs
      */
     long addDeliverable(String path, String fileLabel) throws IOException;
 
@@ -247,8 +272,8 @@ public interface JobManager
     File getWorkDir();
 
     /**
-     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed and such. Java makes it
-     * impossible to kill a thread properly, so calling this function is the only way to allow it. <br>
+     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed and such. Java makes
+     * it impossible to kill a thread properly, so calling this function is the only way to allow it. <br>
      * Note: this function is also called by the other functions of the API.
      */
     void yield();
@@ -271,7 +296,8 @@ public interface JobManager
     void waitChildren();
 
     /**
-     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure) <br>
+     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure)
+     * <br>
      * Also see {@link #hasSucceeded} and {@link #hasFailed}: these methods also allow to check for end with the added value of getting the
      * status.
      *

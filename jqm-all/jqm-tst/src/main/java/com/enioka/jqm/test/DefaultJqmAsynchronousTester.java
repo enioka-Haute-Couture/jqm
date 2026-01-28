@@ -80,6 +80,8 @@ public class DefaultJqmAsynchronousTester implements JqmAsynchronousTester
 
     /**
      * Equivalent to simply calling the constructor. Present for consistency.
+     * 
+     * @return JqmAsynchronousTester
      */
     public static JqmAsynchronousTester create()
     {

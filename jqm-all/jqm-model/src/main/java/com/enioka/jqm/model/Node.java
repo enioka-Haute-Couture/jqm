@@ -78,6 +78,9 @@ public class Node implements Serializable
 
     /**
      * See {@link #getId()}
+     *
+     * @param id
+     *            the unique identifier to set
      */
     void setId(final long id)
     {
@@ -172,6 +175,8 @@ public class Node implements Serializable
 
     /**
      * That field is polled be the engine: if true, it will stop at once. this is one of the three ways to send a stop order to an engine.
+     *
+     * @return boolean
      */
     public boolean isStop()
     {

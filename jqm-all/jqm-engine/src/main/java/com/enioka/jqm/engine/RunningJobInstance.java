@@ -55,7 +55,9 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
      * Constructor for JI coming from queue pollers.
      *
      * @param ji
+     *            job instance
      * @param qp
+     *            queue poller
      */
     RunningJobInstance(JobInstance ji, QueuePoller qp)
     {
@@ -67,6 +69,11 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
 
     /**
      * Constructor for single runner
+     *
+     * @param ji
+     *            job instance
+     * @param jr
+     *            job runner
      */
     RunningJobInstance(JobInstance ji, JobRunner jr)
     {
@@ -198,6 +205,9 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
 
     /**
      * For external payloads. This is used to force the end of run.
+     *
+     * @param s
+     *            state
      */
     void endOfRun(State s)
     {

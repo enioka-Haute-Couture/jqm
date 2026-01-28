@@ -89,7 +89,10 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
      *            the CLM having created this CL.
      * @param h
      *            given as parameter because its constructor needs the database.
+     * @param parentModuleLayer
+     *            the parent module layer.
      * @throws JobRunnerException
+     *             if something goes wrong during launch.
      */
     public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h,
             ModuleLayer parentModuleLayer) throws JobRunnerException

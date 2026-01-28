@@ -67,6 +67,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
      * Create a new Context
      *
      * @throws NamingException
+     *             if an error occurs
      */
     JndiContext() throws NamingException
     {
@@ -311,6 +312,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
      * Will register the given Registry as a provider for the RMI: context. If there is already a registered Registry, the call is ignored.
      *
      * @param r
+     *            registry
      */
     void registerRmiContext(Registry r)
     {
