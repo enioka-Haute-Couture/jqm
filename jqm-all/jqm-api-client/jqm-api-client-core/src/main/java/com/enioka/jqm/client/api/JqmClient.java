@@ -65,6 +65,8 @@ public interface JqmClient
      * either be enqued by calling {@link com.enioka.jqm.client.api.JobRequest#enqueue()} or by giving it to enqueue(JobRequest) in any
      * client instance.
      *
+     * @param applicationName the name of the application to run
+     * @param user the user who is submitting the job
      * @return a new empty JobRequest
      */
     JobRequest newJobRequest(String applicationName, String user);
@@ -161,7 +163,7 @@ public interface JqmClient
 
     /**
      * @deprecated use {@link #resumeQueuedJob(long)} instead.
-     * @param jobId
+     * @param jobId the id of the job instance to resume
      */
     void resumeJob(long jobId);
 
@@ -183,7 +185,7 @@ public interface JqmClient
      * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(long)}
      * was used.
      *
-     * @param jobId
+     * @param jobId the id of the job instance to resume
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job instance was never paused, job instance does not exist...)
      * @throws JqmClientException
@@ -313,7 +315,7 @@ public interface JqmClient
      * function again to refresh the data. <br>
      * This function queries both the active queues and the history. If not job is found, an exception is raised.
      *
-     * @param jobId
+     * @param jobId the id of the job instance to retrieve.
      * @return the characteristics of the job instance.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
@@ -343,6 +345,7 @@ public interface JqmClient
     /**
      * List all currently running or waiting job instances for a given "user" (see userName parameter at enqueue time)
      *
+     * @param userName the username of the user for whom to list the jobs.
      * @return the characteristics of the job instances.
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -365,7 +368,7 @@ public interface JqmClient
      * Get all messages that were created by a given job instance (running or done). Note that in addition to eventual messages created by
      * the payload itself, the JQM engine creates some messages so there should always be some for a completed job instance.
      *
-     * @param jobId
+     * @param jobId the id of the job instance to query.
      * @return all messages as strings
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
@@ -377,7 +380,7 @@ public interface JqmClient
     /**
      * Get the progress indication that may have been given by a job instance (running or done).
      *
-     * @param jobId
+     * @param jobId the id of the job instance to query.
      * @return the progress, or 0 if none was given.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
@@ -393,7 +396,8 @@ public interface JqmClient
     /**
      * Return all metadata concerning the (potential) files created by the job instance.
      *
-     * @param jobId
+     * @param jobId the id of the job instance to query.
+     * @return the list of deliverables
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
      * @throws JqmClientException
@@ -407,7 +411,7 @@ public interface JqmClient
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
      *
-     * @param jobId
+     * @param jobId the id of the job instance to query.
      * @return a list of streams
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
@@ -460,6 +464,8 @@ public interface JqmClient
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
      *
+     * @param jobId the id of the job instance to query.
+     * @return the standard output stream
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job instance does not exist)
      * @throws JqmClientException
@@ -473,6 +479,8 @@ public interface JqmClient
      * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
      * all implementations, the engine that has run the instance must be up.</strong>
      *
+     * @param jobId the id of the job instance to query.
+     * @return the standard error stream
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
      * @throws JqmClientException
@@ -487,6 +495,11 @@ public interface JqmClient
     /**
      * Add a file to the job instance. Only job instance that have not started yet are eligible. The file will be copied to the JQM server
      * and made available to the running job instance inside the outputfile directory of the instance.
+     *
+     * @param jobId the id of the job instance to which to add the file.
+     * @param name the name of the file to add
+     * @param file the file to add
+     * @return the id of the file added
      */
     public long addJobFile(long jobId, String name, InputStream file);
 
@@ -508,32 +521,28 @@ public interface JqmClient
      * All subscribers to the given queue pause until {@link #resumeQueue(Queue)} is called (can also be reactivated from the UI by an
      * administrator).
      *
-     * @param q
-     *            the queue to pause
+     * @param q the queue to pause
      */
     void pauseQueue(Queue q);
 
     /**
      * Resume all subscribers to the given queue. Idempotent.
      *
-     * @param q
-     *            the queue to resume.
+     * @param q the queue to resume.
      */
     void resumeQueue(Queue q);
 
     /**
      * All job instances waiting inside this queue are purged. Does not affect job instances already running.
      *
-     * @param q
-     *            the queue to clear.
+     * @param q the queue to clear.
      */
     void clearQueue(Queue q);
 
     /**
      * Query the status of a given queue
      *
-     * @param q
-     *            the queue to query
+     * @param q the queue to query
      * @return the status at the time of call.
      */
     QueueStatus getQueueStatus(Queue q);
@@ -541,8 +550,7 @@ public interface JqmClient
     /**
      * Query capacity.
      *
-     * @param q
-     *            the queue to query
+     * @param q the queue to query
      * @return sum of maximum parallel instances for the queue around the active nodes
      */
     int getQueueEnabledCapacity(Queue q);
@@ -565,6 +573,7 @@ public interface JqmClient
      * "application" is the optional tag that can be given inside the <code> &lt;application&gt;</code> tag of the JobDef XML file.<br>
      * If application is null, this method is equivalent to {@link #getJobDefinitions()}.
      *
+     * @param application the application name to filter on, or null to get all job definitions
      * @return a list of JobDef
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -573,6 +582,9 @@ public interface JqmClient
 
     /**
      * Gets a {@link JobDef} from its {@link JobDef#getApplicationName()}. Throws if the job definition does not exists.
+     *
+     * @param name the application name
+     * @return the job definition
      */
     JobDef getJobDefinition(String name);
 

@@ -46,6 +46,11 @@ public class XmlJobDefExporter
 
     /**
      * Exports all available queues to an XML file.
+     *
+     * @param path
+     *            file path
+     * @param cnx
+     *            database connection
      */
     public static void export(String path, DbConn cnx) throws JqmXmlException
     {
@@ -58,6 +63,13 @@ public class XmlJobDefExporter
 
     /**
      * Exports several (given) job def to a XML file.
+     *
+     * @param xmlPath
+     *            XML file path
+     * @param jobDefList
+     *            list of job definitions to export
+     * @param cnx
+     *            database connection
      */
     static void export(String xmlPath, List<JobDef> jobDefList, DbConn cnx) throws JqmXmlException
     {
@@ -93,6 +105,13 @@ public class XmlJobDefExporter
 
     /**
      * Exports several (given) job def to a given stream. Stream is not closed here.
+     *
+     * @param os
+     *            output stream to write XML to
+     * @param jobDefList
+     *            list of job definitions to export
+     * @param cnx
+     *            database connection
      */
     public static void export(OutputStream os, List<JobDef> jobDefList, DbConn cnx) throws JqmXmlException
     {

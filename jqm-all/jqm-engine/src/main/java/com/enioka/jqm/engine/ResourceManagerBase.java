@@ -68,6 +68,7 @@ public abstract class ResourceManagerBase
      * Default implementation does nothing.
      *
      * @param ji
+     *            job instance
      */
     void releaseResource(JobInstance ji)
     {}
@@ -76,6 +77,11 @@ public abstract class ResourceManagerBase
      * Called when the engine has decided to actually run the job instance.<br>
      * Either this or {@link #rollbackResourceBooking(JobInstance, DbConn)} are called when the engine has made a decision.<br>
      * Default implementation does nothing. This method should never fail. Risky operations are done in bookResource.
+     *
+     * @param ji
+     *            job instance
+     * @param cnx
+     *            database connection
      */
     void commitResourceBooking(JobInstance ji, DbConn cnx)
     {}
@@ -85,6 +91,11 @@ public abstract class ResourceManagerBase
      * Either this or {@link #commitResourceBooking(JobInstance, DbConn)} are called when the engine has made a decision.<br>
      * Default implementation calls {@link #releaseResource(JobInstance)} (which does nothing by default).<br>
      * This method should never fail. Risky operations are done in bookResource.
+     *
+     * @param ji
+     *            job instance
+     * @param cnx
+     *            database connection
      */
     void rollbackResourceBooking(JobInstance ji, DbConn cnx)
     {
@@ -95,7 +106,7 @@ public abstract class ResourceManagerBase
      * According to this resource manager, how many job instances could now be launched? This should be a very fast approximation with
      * reasonable hypothesis (which may use parameters). Do not implement if not compatible with this type of resource.
      *
-     * @return
+     * @return int
      */
     int getSlotsAvailable()
     {
@@ -105,7 +116,7 @@ public abstract class ResourceManagerBase
     /**
      * The prefix for all parameter names. Default is empty.
      *
-     * @return
+     * @return String
      */
     String getParameterRoot()
     {
@@ -121,6 +132,9 @@ public abstract class ResourceManagerBase
      * Note that the RM key can change, but never the RM ID.<br>
      * <br>
      * This will often be overloaded - but calling the base implementation may still be useful as it handles configuration precedence.
+     *
+     * @param configuration
+     *            resource manager
      */
     void refreshConfiguration(ResourceManager configuration)
     {

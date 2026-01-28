@@ -111,7 +111,12 @@ class MultiplexPrintStream extends PrintStream
         }
     }
 
-    /** Check to make sure that the stream has not been closed */
+    /**
+     * Check to make sure that the stream has not been closed
+     *
+     * @throws java.io.IOException
+     *             if the stream is closed
+     */
     private void ensureOpen() throws IOException
     {
         if (out == null)

@@ -20,7 +20,8 @@ package com.enioka.jqm.test.api;
  * For example, a simple JUnit test could be:
  *
  * <pre>
- * {@code public void testOne()
+ * {@code
+ * public void testOne()
  * {
  *     JobInstance res = JqmAsynchronousTesterJse.create("com.enioka.jqm.test.Payload1").run();
  *     Assert.assertEquals(State.ENDED, res.getState());
@@ -34,7 +35,10 @@ public interface JqmSynchronousTester extends AutoCloseable
      * Add a parameter to the job definition.
      *
      * @param key
+     *            key
      * @param value
+     *            value
+     * @return JQMSynchronousTester
      */
     public JqmSynchronousTester addParameter(String key, String value);
 
@@ -42,6 +46,8 @@ public interface JqmSynchronousTester extends AutoCloseable
      * Set the job class to run
      *
      * @param clazz
+     *            class
+     * @return JQMSynchronousTester
      */
     public JqmSynchronousTester setJobClass(Class<?> clazz);
 
@@ -49,11 +55,15 @@ public interface JqmSynchronousTester extends AutoCloseable
      * Set the job class to run
      *
      * @param className
+     *            class name
+     * @return JQMSynchronousTester
      */
     public JqmSynchronousTester setJobClass(String className);
 
     /**
      * Synchronously start the job inside the embedded JQM engine.
+     *
+     * @return JobInstance
      */
     public com.enioka.jqm.client.api.JobInstance run();
 

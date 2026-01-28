@@ -32,7 +32,14 @@ public interface JobRunner extends AutoCloseable
      * The job runner should create a new tracker - but NOT launch it.
      *
      * @param toRun
-     * @return
+     *            job instance to run
+     * @param engineApi
+     *            job manager
+     * @param cb
+     *            callback interface
+     *
+     * @return JobInstanceTracker
+     *
      */
     public JobInstanceTracker getTracker(JobInstance toRun, JobManager engineApi, JobRunnerCallback cb);
 }

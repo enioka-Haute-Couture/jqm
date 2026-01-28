@@ -21,6 +21,8 @@ public interface TestJobDefinition
     /**
      * Name of the job definition, as used in the enqueue API. Always has a default.
      *
+     * @param applicationName
+     *            name of the job definition
      * @return the builder for the tester.
      */
     public TestJobDefinition setName(String applicationName);
@@ -29,11 +31,15 @@ public interface TestJobDefinition
      * The jobs will run on this queue. If no set (or set to null) will run on the default queue.
      *
      * @param queueName
+     *            name of the queue
+     * @return the builder for the tester.
      */
     public TestJobDefinition setQueueName(String queueName);
 
     /**
      * This enables Highlander mode. See the documentation on Highlander jobs.
+     *
+     * @return the builder for the tester.
      */
     public TestJobDefinition enableHighlander();
 
@@ -43,6 +49,8 @@ public interface TestJobDefinition
      * @param key
      *            must be unique
      * @param value
+     *            value
+     * @return the builder for the tester.
      */
     public TestJobDefinition addParameter(String key, String value);
 
@@ -50,6 +58,8 @@ public interface TestJobDefinition
      * An optional classifier.
      *
      * @param application
+     *            application to set
+     * @return the builder for the tester.
      */
     public TestJobDefinition setApplication(String application);
 
@@ -57,6 +67,8 @@ public interface TestJobDefinition
      * An optional classifier.
      *
      * @param module
+     *            module to set
+     * @return the builder for the tester.
      */
     public TestJobDefinition setModule(String module);
 
@@ -64,6 +76,8 @@ public interface TestJobDefinition
      * An optional classifier.
      *
      * @param keyword1
+     *            keyword1 to set
+     * @return the builder for the tester.
      */
     public TestJobDefinition setKeyword1(String keyword1);
 
@@ -71,6 +85,8 @@ public interface TestJobDefinition
      * An optional classifier.
      *
      * @param keyword2
+     *            keyword2 to set
+     * @return the builder for the tester.
      */
     public TestJobDefinition setKeyword2(String keyword2);
 
@@ -78,6 +94,8 @@ public interface TestJobDefinition
      * An optional classifier.
      *
      * @param keyword3
+     *            keyword3 to set
+     * @return the builder for the tester.
      */
     public TestJobDefinition setKeyword3(String keyword3);
 
@@ -88,6 +106,7 @@ public interface TestJobDefinition
      *
      * @param specificIsolationContext
      *            name of the class loader to use or null to use default behaviour.
+     * @return the builder for the tester.
      */
     public TestJobDefinition setSpecificIsolationContext(String specificIsolationContext);
 
@@ -97,6 +116,8 @@ public interface TestJobDefinition
      * JQM.
      *
      * @param childFirstClassLoader
+     *            true to enable child-first class loading
+     * @return the builder for the tester.
      */
     public TestJobDefinition setChildFirstClassLoader(boolean childFirstClassLoader);
 
@@ -105,11 +126,15 @@ public interface TestJobDefinition
      * payload (inside the payload libraries for example) it will not be loaded.
      *
      * @param canonicalClassName
+     *            canonical class name
+     * @return the builder for the tester.
      */
     public TestJobDefinition addHiddenJavaClasses(String canonicalClassName);
 
     /**
      * Enable verbose class loading fot his payload.
+     *
+     * @return the builder for the tester.
      */
     public TestJobDefinition enableClassLoaderTracing();
 }

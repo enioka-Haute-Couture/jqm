@@ -259,6 +259,10 @@ public class TestHelpers
 
     /**
      * Ended JI, but not OK.
+     *
+     * @param cnx
+     *            db connection
+     * @return count of non ok JI
      */
     public static int getNonOkCount(DbConn cnx)
     {

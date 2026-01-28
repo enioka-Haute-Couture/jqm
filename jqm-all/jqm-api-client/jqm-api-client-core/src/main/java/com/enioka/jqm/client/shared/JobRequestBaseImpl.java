@@ -68,14 +68,29 @@ public class JobRequestBaseImpl implements JobRequest
     private JqmClientEnqueueCallback enqueueCallback;
 
     // JAXB convention
+
+    /**
+     * Default constructor for JAXB.
+     */
     public JobRequestBaseImpl()
     {}
 
+    /**
+     * Constructor
+     * 
+     * @param enqueueCallback
+     *            enqueue callback
+     */
     public JobRequestBaseImpl(JqmClientEnqueueCallback enqueueCallback)
     {
         this.enqueueCallback = enqueueCallback;
     }
 
+    /**
+     * Enqueues the job request using the provided enqueue callback.
+     * 
+     * @return the job ID of the enqueued job
+     */
     @Override
     public long enqueue()
     {
@@ -83,13 +98,14 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself.
      *
      * @param key
      *            max length is 50
      * @param value
      *            max length is 1000
+     * @return this jobRequest
      */
     public JobRequest addParameter(String key, String value)
     {
@@ -98,6 +114,16 @@ public class JobRequestBaseImpl implements JobRequest
         return this;
     }
 
+    /**
+     * Validates that the parameter key and value are within the allowed length limits.
+     * 
+     * @see #addParameter(String, String) addParameter(String key, String value) for a description of the parameters
+     *
+     * @param key
+     *            the key of the parameter to validate
+     * @param value
+     *            the value of the parameter to validate
+     */
     private void validateParameter(String key, String value)
     {
         if (key == null || key.isEmpty() || key.length() > 50 || value == null || value.isEmpty() || value.length() > 1000)
@@ -111,7 +137,8 @@ public class JobRequestBaseImpl implements JobRequest
      * See {@link #addParameter(String, String)}
      *
      * @param prms
-     * @return
+     *            the parameters to add
+     * @return this jobRequest
      */
     public JobRequest addParameters(Map<String, String> prms)
     {
@@ -124,10 +151,11 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     /**
-     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
-     * job itself. If there is no parameter named key, no error is thrown.
+     * Parameters are key,value pairs that are passed at runtime to the job. The amount of required parameters depends on the requested job
+     * itself. If there is no parameter named key, no error is thrown.
      *
      * @param key
+     *            the key of the parameter to delete
      */
     public void delParameter(String key)
     {
@@ -137,6 +165,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Compulsory</strong> (unless {@link com.enioka.jqm.client.api.JobRequest#setScheduleId(Long)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
+     *
+     * @return the application name
      */
     public String getApplicationName()
     {
@@ -149,6 +179,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param applicationName
      *            max length is 100
+     * @return this jobRequest
      */
     public JobRequest setApplicationName(String applicationName)
     {
@@ -164,6 +195,8 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * It is possible to link a job instance to an arbitrary ID, such as a session ID and later query result by this ID.<br>
      * Default is null.
+     *
+     * @return the session ID
      */
     public String getSessionID()
     {
@@ -177,6 +210,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param sessionID
      *            max length is 100
+     * @return this jobRequest
      */
     public JobRequest setSessionID(String sessionID)
     {
@@ -188,6 +222,8 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * It is possible to link context of a job instance to others job instances, set this field to do so.<br>
      * Default is null.
+     *
+     * @return String
      */
     public String getTraceId()
     {
@@ -211,6 +247,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * The application making the query. E.g.: Accounting, Interfaces, ...
+     *
+     * @return the application name
      */
     public String getApplication()
     {
@@ -223,6 +261,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param application
      *            max length is 50
+     * @return this jobRequest
      */
     public JobRequest setApplication(String application)
     {
@@ -233,6 +272,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
+     *
+     * @return the module name
      */
     public String getModule()
     {
@@ -245,6 +286,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param module
      *            max length is 50
+     * @return this jobRequest
      */
     public JobRequest setModule(String module)
     {
@@ -255,6 +297,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
+     *
+     * @return the keyword1
      */
     public String getKeyword1()
     {
@@ -267,6 +311,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param keyword1
      *            max length is 50
+     * @return this jobRequest
      */
     public JobRequest setKeyword1(String keyword1)
     {
@@ -277,6 +322,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
+     *
+     * @return the keyword2
      */
     public String getKeyword2()
     {
@@ -289,6 +336,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param keyword2
      *            max length is 50
+     * @return this jobRequest
      */
     public JobRequest setKeyword2(String keyword2)
     {
@@ -299,6 +347,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
+     *
+     * @return the keyword3
      */
     public String getKeyword3()
     {
@@ -311,6 +361,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param keyword3
      *            max length is 50
+     * @return this jobRequest
      */
     public JobRequest setKeyword3(String keyword3)
     {
@@ -320,12 +371,21 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Get the Map of all parameters. This is a copy, not the original map so changes made to the result map are not taken into account.
+     *
+     * @return a copy of the parameters map
      */
     public Map<String, String> getParameters()
     {
         return new HashMap<>(parameters);
     }
 
+    /**
+     * After validating the parameters, set them to the job request.
+     * 
+     * @param parameters
+     *            dictionary of all parameters.
+     * @return this jobRequest
+     */
     public JobRequest setParameters(Map<String, String> parameters)
     {
         for (Map.Entry<String, String> e : parameters.entrySet())
@@ -339,6 +399,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * It is possible to associate a user to a job execution request, and later query job execution by user.
+     *
+     * @return the username
      */
     public String getUser()
     {
@@ -351,6 +413,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param user
      *            max length is 50
+     * @return this jobRequest
      */
     public JobRequest setUser(String user)
     {
@@ -361,6 +424,8 @@ public class JobRequestBaseImpl implements JobRequest
     /**
      * <strong>Optional</strong><br>
      * The email of the user that want to received a notification.
+     *
+     * @return the email
      */
     public String getEmail()
     {
@@ -373,6 +438,7 @@ public class JobRequestBaseImpl implements JobRequest
      *
      * @param email
      *            max length is 100
+     * @return this jobRequest
      */
     public JobRequest setEmail(String email)
     {
@@ -384,6 +450,8 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
      * parent.
+     *
+     * @return the parent job ID, or null if there is no parent.
      */
     public String getParentJobId()
     {
@@ -394,6 +462,10 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
      * there is no parent.
+     *
+     * @param parentJobId
+     *            the parent job ID
+     * @return this jobRequest
      */
     public JobRequest setParentJobId(String parentJobId)
     {
@@ -405,6 +477,8 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
      * parent.
+     *
+     * @return the parent job ID
      */
     public Long getParentID()
     {
@@ -415,6 +489,10 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
      * there is no parent.
+     *
+     * @param parentJobId
+     *            the parent job ID
+     * @return this jobRequest
      */
     public JobRequest setParentID(Long parentJobId)
     {
@@ -429,6 +507,8 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Most of the time, this should be left to null.</strong> This parameter is only provided to avoid doing two API calls for a
      * single execution request (first enqueue, then change queue) when it is certain a specific queue will have to be used.<br>
      * If there is no queue of this name, the enqueue method will throw a <code>JqmInvalidRequestException</code>.
+     *
+     * @return the queue name
      */
     public String getQueueName()
     {
@@ -442,6 +522,10 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Most of the time, this should be left to null.</strong> This parameter is only provided to avoid doing two API calls for a
      * single execution request (first enqueue, then change queue) when it is certain a specific queue will have to be used.<br>
      * If there is no queue of this name, the enqueue method will throw a <code>JqmInvalidRequestException</code>.
+     *
+     * @param queueName
+     *            the queue name
+     * @return this jobRequest
      */
     public JobRequest setQueueName(String queueName)
     {
@@ -453,6 +537,8 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
+     *
+     * @return the schedule ID
      */
     public Long getScheduleId()
     {
@@ -463,6 +549,10 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
+     *
+     * @param id
+     *            the schedule ID
+     * @return this jobRequest
      */
     public JobRequest setScheduleId(Long id)
     {
@@ -476,6 +566,10 @@ public class JobRequestBaseImpl implements JobRequest
      * JQM node). This method allows to change this, and to put the request inside the queue but not run it when it reaches the top of the
      * queue. It will only be eligible for run when the given date is reached. When the given date is reached, standard queuing resumes.<br>
      * The resolution of this function is the minute: seconds and lower are ignored (truncated).<br>
+     *
+     * @param whenToRun
+     *            the date when the job should run
+     * @return this jobRequest
      */
     public JobRequest setRunAfter(Calendar whenToRun)
     {
@@ -491,6 +585,11 @@ public class JobRequestBaseImpl implements JobRequest
         return this;
     }
 
+    /**
+     * Getter for the run after date.
+     * 
+     * @return the run after date
+     */
     public Calendar getRunAfter()
     {
         return this.runAfter;
@@ -502,6 +601,10 @@ public class JobRequestBaseImpl implements JobRequest
      * optionally queue and parameters. (all other JobRequest elements are ignored). Note that when using this, there is no request
      * immediately added to the queues - the actual requests will be created by the schedule.<br>
      * When creating a new recurrence, the ID returned by {@link JobRequest#enqueue()} is actually the schedule ID.
+     *
+     * @param cronExpression
+     *            the cron expression for the recurrence
+     * @return this jobRequest
      */
     public JobRequest setRecurrence(String cronExpression)
     {
@@ -509,6 +612,12 @@ public class JobRequestBaseImpl implements JobRequest
         return this;
     }
 
+    /**
+     * Getter for the recurrence cron expression
+     * 
+     * @see #setRecurrence(String)
+     * @return the cron expression for the recurrence
+     */
     public String getRecurrence()
     {
         return this.recurrence;
@@ -518,7 +627,9 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * The default behaviour for a newly submitted JobRequest is to run as soon as possible (i.e. as soon as there is a free slot inside a
      * JQM node). This method allows to change this, and to put the request inside the queue but not run it until the
-     * {@link JqmClient#resumeJob(long)} method is called on the newly created job instance.
+     * {@link JqmClient#resumeQueuedJob(long)} method is called on the newly created job instance.
+     *
+     * @return this jobRequest
      */
     public JobRequest startHeld()
     {
@@ -526,6 +637,11 @@ public class JobRequestBaseImpl implements JobRequest
         return this;
     }
 
+    /**
+     * Getter for the start state of the job request
+     * 
+     * @return the start state
+     */
     public State getStartState()
     {
         return this.startState;
@@ -540,7 +656,8 @@ public class JobRequestBaseImpl implements JobRequest
      * Priority must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. To remove priority, set it to null.
      *
      * @param priority
-     * @return
+     *            the priority to set.
+     * @return this jobRequest
      */
     public JobRequest setPriority(Integer priority)
     {
@@ -558,6 +675,12 @@ public class JobRequestBaseImpl implements JobRequest
         return this;
     }
 
+    /**
+     * Getter for the priority
+     *
+     * @see #setPriority(Integer)
+     * @return the priority
+     */
     public Integer getPriority()
     {
         return this.priority;

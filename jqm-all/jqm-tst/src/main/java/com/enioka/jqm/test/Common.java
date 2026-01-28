@@ -54,7 +54,7 @@ final class Common
      * A small helper which reads a file set by Maven to get the current artifact version. Only way that works reliably both at runtime and
      * in unit tests.
      *
-     * @return
+     * @return String
      */
     static String getMavenVersion()
     {

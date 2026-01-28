@@ -94,6 +94,13 @@ final class Helpers
 
     /**
      * Create a text message that will be stored in the database. Must be called inside a transaction.
+     *
+     * @param textMessage
+     *            the text message to store
+     * @param jobInstance
+     *            job instance
+     * @param cnx
+     *            db connection
      */
     static void createMessage(String textMessage, JobInstance jobInstance, DbConn cnx)
     {
@@ -113,6 +120,7 @@ final class Helpers
      *            Job Instance ID
      * @param cnx
      *            the DbConn to use.
+     * @return generated id
      */
     static long createDeliverable(String path, String originalFileName, String fileFamily, Long jobId, DbConn cnx)
     {
@@ -222,10 +230,15 @@ final class Helpers
      * MailSessionFactory offered to payloads, making it accessible also to the engine.
      *
      * @param to
+     *            email recipient
      * @param subject
+     *            email subject
      * @param body
+     *            email body
      * @param mailSessionJndiAlias
+     *            email session JNDI alias
      * @throws JqmRuntimeException
+     *             in case of mail sending failure
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     static void sendMessage(String to, String subject, String body, String mailSessionJndiAlias)

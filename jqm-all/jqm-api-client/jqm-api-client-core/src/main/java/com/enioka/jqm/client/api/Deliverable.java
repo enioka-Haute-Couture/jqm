@@ -38,10 +38,10 @@ public class Deliverable
     /**
      * Construction. This will not create a new file on the file system!
      *
-     * @param filePath
-     * @param fileFamily
-     * @param id
-     * @param originalName
+     * @param filePath the file path
+     * @param fileFamily the file family
+     * @param id the deliverable ID
+     * @param originalName the original file name
      */
     public Deliverable(String filePath, String fileFamily, Long id, String originalName)
     {
@@ -60,6 +60,8 @@ public class Deliverable
 
     /**
      * File Path on the JQM server. This is purely informational.
+     *
+     * @return the file path
      */
     public String getFilePath()
     {
@@ -78,6 +80,8 @@ public class Deliverable
 
     /**
      * Unique ID of the file. This is purely technical and has no meaning to end users.
+     *
+     * @return the ID
      */
     public long getId()
     {
@@ -86,6 +90,8 @@ public class Deliverable
 
     /**
      * The name of the file as it was when created by the payload.
+     *
+     * @return the original file name
      */
     public String getOriginalName()
     {

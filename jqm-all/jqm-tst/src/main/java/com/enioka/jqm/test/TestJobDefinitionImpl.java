@@ -65,6 +65,8 @@ class TestJobDefinitionImpl implements TestJobDefinition
      *            a free text describing the job definition
      * @param testedClass
      *            the class containing the job to run.
+     * @param tester
+     *            DefaultJqmAsynchronousTester
      * @return the object itself (fluid API)
      */
     public static TestJobDefinitionImpl createFromClassPath(String name, String description, Class<? extends Object> testedClass,
@@ -92,7 +94,9 @@ class TestJobDefinitionImpl implements TestJobDefinition
      *            the class containing the job to run (full canonical name, i.e. including package name)
      * @param jarPath
      *            path to the jar file, relative to the current directory.
-     * @return
+     * @param tester
+     *            DefaultJqmAsynchronousTester
+     * @return TestJobDefinitionImpl
      */
     public static TestJobDefinitionImpl createFromJar(String name, String description, String testedClassCanonicalName, String jarPath,
             DefaultJqmAsynchronousTester tester)

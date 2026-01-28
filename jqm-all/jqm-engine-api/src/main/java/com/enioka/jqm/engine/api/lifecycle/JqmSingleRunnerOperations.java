@@ -9,7 +9,8 @@ public interface JqmSingleRunnerOperations
      * Start immediately the given JobRequest. It will not update its status inside the database. Synchronous method.
      *
      * @param jobInstanceId
-     * @return
+     *            the job instance to run
+     * @return JobInstance
      */
     public JobInstance runAtOnce(long jobInstanceId);
 }

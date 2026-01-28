@@ -37,6 +37,15 @@ public class XmlQueueExporter
 
     /**
      * Exports a single queue to an XML file.
+     *
+     * @param path
+     *            file path
+     * @param queueName
+     *            name of the queue to export
+     * @param cnx
+     *            database connection
+     * @throws JqmXmlException
+     *             if export fails
      */
     static void export(String path, String queueName, DbConn cnx) throws JqmXmlException
     {
@@ -62,6 +71,13 @@ public class XmlQueueExporter
 
     /**
      * Exports all available queues to an XML file.
+     *
+     * @param path
+     *            file path
+     * @param cnx
+     *            database connection
+     * @throws JqmXmlException
+     *             if export fails
      */
     public static void export(String path, DbConn cnx) throws JqmXmlException
     {
@@ -74,6 +90,15 @@ public class XmlQueueExporter
 
     /**
      * Exports all available queues to an XML file.
+     *
+     * @param path
+     *            file path
+     * @param cnx
+     *            database connection
+     * @param qNames
+     *            list of queue names to export
+     * @throws JqmXmlException
+     *             if export fails
      */
     public static void export(String path, DbConn cnx, List<String> qNames) throws JqmXmlException
     {
@@ -100,6 +125,15 @@ public class XmlQueueExporter
 
     /**
      * Exports several (given) queues to an XML file.
+     *
+     * @param path
+     *            file path
+     * @param queueList
+     *            list of queues to export
+     * @param cnx
+     *            database connection
+     * @throws JqmXmlException
+     *             if export fails
      */
     static void export(String path, List<Queue> queueList, DbConn cnx) throws JqmXmlException
     {
@@ -137,7 +171,7 @@ public class XmlQueueExporter
         }
         catch (java.io.IOException e)
         {
-            throw new JqmXmlException("Coul npot save the XML file", e);
+            throw new JqmXmlException("Could not save the XML file", e);
         }
     }
 

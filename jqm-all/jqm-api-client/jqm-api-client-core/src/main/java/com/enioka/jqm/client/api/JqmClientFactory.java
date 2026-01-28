@@ -14,8 +14,14 @@ import org.slf4j.LoggerFactory;
 import com.enioka.jqm.shared.exceptions.JqmMissingPluginException;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
+/**
+ * Factory for creating JQM clients. This class provides methods to retrieve clients with different configurations.
+ */
 public final class JqmClientFactory
 {
+    /**
+     * Logger for this class.
+     */
     protected static Logger jqmlogger = LoggerFactory.getLogger(JqmClientFactory.class);
 
     private static Properties props = new Properties();
@@ -57,10 +63,8 @@ public final class JqmClientFactory
      * that created <code>JqmClient</code>s are cached - therefore it is customary to use this function <strong>before creating any
      * clients</strong>.
      *
-     * @param properties
-     *            a non null property bag
-     * @throws InvalidParameterException
-     *             if props is null
+     * @param properties a non-null property bag
+     * @throws InvalidParameterException if props is null
      */
     public static void setProperties(Properties properties)
     {
@@ -74,10 +78,8 @@ public final class JqmClientFactory
     /**
      * See {@link #setProperties(Properties)}
      *
-     * @param key
-     *            a non null non empty parameter key.
-     * @param value
-     *            value of the parameter.
+     * @param key a non null non empty parameter key.
+     * @param value value of the parameter.
      */
     public static void setProperty(String key, Object value)
     {
@@ -92,6 +94,10 @@ public final class JqmClientFactory
         props.put(key, value);
     }
 
+    /**
+     * If props is not null, remove a property.
+     * @param key the key of the property to remove.
+     */
     public static void removeProperty(String key)
     {
         if (props == null)
@@ -116,6 +122,7 @@ public final class JqmClientFactory
      * Return the default client for a specific subtype of JQM client. Note this client is shared in the static context. (said otherwise:
      * the same client is always returned inside a same class loading context). The initialization cost is only paid at first call.
      *
+     * @param clazz the subtype of JQM client.
      * @return the default client for this client subtype.
      */
     public static JqmClient getClient(Class<? extends IClientFactory> clazz)
@@ -127,12 +134,11 @@ public final class JqmClientFactory
      * Return a new client that may be cached or not. Given properties are always use when not cached, and only used at creation time for
      * cached clients.
      *
-     * @param name
-     *            if null, default client. Otherwise, helpful to retrieve cached clients later.
-     * @param p
-     *            a set of properties. Implementation specific. Unknown properties are silently ignored.
-     * @param cached
-     *            if false, the client will not be cached and subsequent calls with the same name will return different objects.
+     * @param clazz the subtype of JQM client.
+     * @param name if null, default client. Otherwise, helpful to retrieve cached clients later.
+     * @param p a set of properties. Implementation specific. Unknown properties are silently ignored.
+     * @param cached if false, the client will not be cached and subsequent calls with the same name will return different objects.
+     * @return a new client.
      */
     public static JqmClient getClient(String name, Properties p, boolean cached, Class<? extends IClientFactory> clazz)
     {

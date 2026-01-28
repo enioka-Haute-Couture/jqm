@@ -206,7 +206,13 @@ public class ClassloaderManager
     /**
      * Returns all the URL that should be inside the classpath. This includes the jar itself if any.
      *
+     * @param ji
+     *            job instance
+     * @param cb
+     *            job runner callback
      * @throws JqmPayloadException
+     *             if something goes wrong during dependency resolution
+     * @return URL[]
      */
     private URL[] getClasspath(JobInstance ji, JobRunnerCallback cb) throws JqmPayloadException
     {

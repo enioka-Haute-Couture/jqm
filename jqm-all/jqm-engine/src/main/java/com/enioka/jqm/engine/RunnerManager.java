@@ -46,7 +46,8 @@ class RunnerManager implements AutoCloseable
      * Retrieves the most adequate {@link JobRunner} for a given {@link JobInstance}. Throws {@link JqmRuntimeException} if none was found.
      *
      * @param ji
-     * @return
+     *            job instance
+     * @return JobRunner
      */
     JobRunner getRunner(JobInstance ji)
     {

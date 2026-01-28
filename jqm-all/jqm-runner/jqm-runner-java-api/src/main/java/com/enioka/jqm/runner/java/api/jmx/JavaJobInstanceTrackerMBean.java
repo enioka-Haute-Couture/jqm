@@ -33,51 +33,71 @@ public interface JavaJobInstanceTrackerMBean
 
     /**
      * The name of the Job Definition that was used for this launch.
+     *
+     * @return String
      */
     String getApplicationName();
 
     /**
      * Time a request was made. (request time, no startup time)
+     *
+     * @return Calendar
      */
     Calendar getEnqueueDate();
 
     /**
      * An optional tag that can be defined at enqueue time.
+     *
+     * @return String
      */
     String getKeyword1();
 
     /**
      * An optional tag that can be defined at enqueue time.
+     *
+     * @return String
      */
     String getKeyword2();
 
     /**
      * An optional tag that can be defined at enqueue time.
+     *
+     * @return String
      */
     String getKeyword3();
 
     /**
      * An optional tag that can be defined at enqueue time.
+     *
+     * @return String
      */
     String getModule();
 
     /**
      * An optional tag that can be defined at enqueue time.
+     *
+     * @return String
      */
     String getUser();
 
     /**
      * An optional tag that can be defined at enqueue time.
+     *
+     * @return String
      */
     String getSessionId();
 
     /**
      * The unique ID of the launch. It holds no special meaning.
+     *
+     * @return Long
      */
     Long getId();
 
     /**
      * Number of seconds the job instance has been running.
+     *
+     * @return Long
      */
     Long getRunTimeSeconds();
 }

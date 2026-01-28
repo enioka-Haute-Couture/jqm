@@ -32,7 +32,8 @@ public class ScheduledJob implements Serializable
      * Fluent API builder.
      *
      * @param cronExpression
-     * @return
+     *            cron expression
+     * @return ScheduledJob
      */
     public static ScheduledJob create(String cronExpression)
     {
@@ -57,6 +58,8 @@ public class ScheduledJob implements Serializable
      * See {@link #getId()}
      *
      * @param id
+     *            id
+     * @return ScheduledJob
      */
     public ScheduledJob setId(Long id)
     {
@@ -67,7 +70,7 @@ public class ScheduledJob implements Serializable
     /**
      * A valid cron expression.
      *
-     * @return
+     * @return String
      */
     public String getCronExpression()
     {
@@ -78,6 +81,8 @@ public class ScheduledJob implements Serializable
      * See {@link #getCronExpression()}.
      *
      * @param cronExpression
+     *            cron expression
+     * @return ScheduledJob
      */
     public ScheduledJob setCronExpression(String cronExpression)
     {
@@ -88,7 +93,7 @@ public class ScheduledJob implements Serializable
     /**
      * This date is updated whenever the object (or one of its parameters) gets updated. This allows easier parameter sync.
      *
-     * @return
+     * @return Calendar
      */
     public Calendar getLastUpdated()
     {
@@ -99,6 +104,7 @@ public class ScheduledJob implements Serializable
      * See {@link #getLastUpdated()}
      *
      * @param lastUpdated
+     *            last updated date
      */
     public void setLastUpdated(Calendar lastUpdated)
     {
@@ -109,7 +115,7 @@ public class ScheduledJob implements Serializable
      * A scheduled job can override the default queue of its {@link JobDefDto}. If null, the {@link JobDefDto} default queue is used (or the
      * global default queue if it has none).
      *
-     * @return
+     * @return Long
      */
     public Long getQueue()
     {
@@ -120,6 +126,8 @@ public class ScheduledJob implements Serializable
      * See {@link #getQueue()}
      *
      * @param queue
+     *            queue to set
+     * @return ScheduledJob
      */
     public ScheduledJob setQueue(Long queue)
     {
@@ -142,6 +150,7 @@ public class ScheduledJob implements Serializable
      * See {@link #getParameters()}.
      *
      * @param parameters
+     *            parameters to set
      */
     public void setParameters(Map<String, String> parameters)
     {
@@ -152,8 +161,10 @@ public class ScheduledJob implements Serializable
      * Add a parameter to the override parameters. See {@link #getParameters()}.
      *
      * @param key
+     *            key
      * @param value
-     * @return
+     *            value
+     * @return ScheduledJob
      */
     public ScheduledJob addParameter(String key, String value)
     {
@@ -170,6 +181,7 @@ public class ScheduledJob implements Serializable
     /**
      * The default priority for job instances created from this scheduled job. Null if the default.
      *
+     * @return Integer
      */
     public Integer getPriority()
     {

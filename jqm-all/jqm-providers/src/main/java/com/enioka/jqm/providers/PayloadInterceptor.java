@@ -94,6 +94,10 @@ public class PayloadInterceptor extends JdbcInterceptor
 
     /**
      * Called by the engine to trigger the cleanup at the end of a payload thread.
+     *
+     * @param t
+     *            the thread to clean up
+     * @return the number of connections that were closed
      */
     public static int forceCleanup(Thread t)
     {

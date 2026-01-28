@@ -184,6 +184,9 @@ public class DeploymentParameter
 
     /**
      * See {@link #getLastModified()}
+     *
+     * @param lastModified
+     *            the lastmodified to set
      */
     protected void setLastModified(Calendar lastModified)
     {
@@ -219,6 +222,20 @@ public class DeploymentParameter
 
     /**
      * Create a new entry in the database. No commit performed.
+     *
+     * @param cnx
+     *            db connection
+     * @param enabled
+     *            enabled
+     * @param nodeId
+     *            node id
+     * @param nbThread
+     *            number of threads
+     * @param pollingInterval
+     *            polling interval
+     * @param qId
+     *            queue id
+     * @return deployment parameter
      */
     public static DeploymentParameter create(DbConn cnx, Boolean enabled, long nodeId, Integer nbThread, Integer pollingInterval, long qId)
     {

@@ -37,9 +37,12 @@ import com.enioka.jqm.model.RUser;
  */
 public final class SimpleApiSecurity
 {
+    /** Logger. */
     private static Logger jqmlogger = LoggerFactory.getLogger(SimpleApiSecurity.class);
 
+    /** A JQM user */
     private static volatile RUser user;
+    /** */
     private static volatile String secret;
     private static volatile Duet logindata;
     private static Boolean useAuth = null;
@@ -51,6 +54,7 @@ public final class SimpleApiSecurity
         public String pass;
     }
 
+    /** The default constructor **/
     private SimpleApiSecurity()
     {
         // Helper static class
@@ -59,6 +63,8 @@ public final class SimpleApiSecurity
     /**
      * Will create (or recreate) if necessary the temporary login data.<br>
      * Will create its own transaction - therefore the given connection must not have any active transaction.
+     * @param cnx the database connection to use.
+     * @return the login data
      */
     public static Duet getId(DbConn cnx)
     {

@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +112,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      * @param nodeName
      *            the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
+     *             in case of initialization error
      */
     public void start(String nodeName, JqmEngineHandler h)
     {
@@ -523,7 +523,9 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      * To be called at node startup - it purges all job instances associated to this node.
      *
      * @param cnx
+     *            db connection
      * @param node
+     *            the node
      */
     private void purgeDeadJobInstances(DbConn cnx, Node node)
     {
@@ -586,6 +588,9 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     /**
      * Helper that removes the nodes that were automatically created and removed in some orchestrators (K8s, etc).<br>
      * They should be removed on shutdown, but in case of crash they remain and should be cleaned at new node restart.
+     *
+     * @param cnx
+     *            db connection
      */
     private void cleanupTransientNodes(DbConn cnx)
     {
@@ -612,7 +617,9 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      * In some environments (K8s) nodes are transient and will never restart after being shutdown. This removes the node.
      *
      * @param cnx
+     *            db connection
      * @param node
+     *            the node
      */
     private void cleanupSelfOnShutdown(DbConn cnx, Node node)
     {
@@ -633,6 +640,9 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      * A poller should call this method when it encounters a database connection issue, and then should stop.<br>
      * This will ensure the poller is restarted when database connectivity is restored.<br>
      * Only pollers which have called this method are restarted, other are deemed not to have crashed.
+     *
+     * @param qp
+     *            queue poller
      */
     void pollerRestartNeeded(QueuePoller qp)
     {
