@@ -17,6 +17,10 @@ class CommandNewNode extends CommandBase
             "--port-web" }, description = "Port for web services of the new node. Default is a random free port.", required = false)
     private int port = 0;
 
+    @Parameter(names = { "-i",
+            "--interface" }, description = "The interface name on which the node will listen for its network-related functions.", required = false)
+    private String dns = "localhost";
+
     @Override
     public int doWork()
     {
@@ -24,7 +28,7 @@ class CommandNewNode extends CommandBase
         {
             jqmlogger.info("Creating engine node " + nodeName);
             DefaultConfigurationService.updateConfiguration(cnx);
-            DefaultConfigurationService.updateNodeConfiguration(nodeName, cnx, port);
+            DefaultConfigurationService.updateNodeConfiguration(nodeName, cnx, port, dns);
             return 0;
         }
         catch (Exception e)
