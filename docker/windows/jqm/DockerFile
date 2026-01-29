@@ -24,7 +24,7 @@ WORKDIR /jqm-all
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
 USER ContainerAdministrator
-RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS% && mkdir C:\TEMP && echo F | xcopy /S /Q /Y /F jqm-service\target\jqm-*.zip C:\TEMP\jqm.zip && mvn clean
+RUN mvn install -DskipTests=%SKIP_TESTS% -Pbuild-frontend %MVN_SETTINGS% && mkdir C:\TEMP && echo F | xcopy /S /Q /Y /F jqm-service\target\jqm-*.zip C:\TEMP\jqm.zip && mvn clean
 
 
 

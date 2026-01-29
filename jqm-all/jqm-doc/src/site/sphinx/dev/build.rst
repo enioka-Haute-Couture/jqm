@@ -33,7 +33,7 @@ Full build & tests
 
 There is no distinction between tests & integration tests in JQM so this will run all tests. ::
 
-	mvn clean install
+	mvn clean install -Pbuild-frontend
 
 Sonar snapshot (deprecated)
 ++++++++++++++++++
@@ -58,14 +58,14 @@ This creates a Git tag with the release version and updates the POMs to the next
 
 Then the test package must be test-deployed in a two-node configuration. To build the release version for testing::
 
-	mvn package -Prelease -DskipTests scm:checkout -Drevision=<tag-name>
+	mvn package -Prelease -Pbuild-frontend -DskipTests scm:checkout -Drevision=<tag-name>
 
 Release
 +++++++++++++
 
 This will checkout the release tag, build it, and upload to Maven Central Repository. ::
 
-     mvn release:perform -Darguments='-Dgpg.keyname=<keyname> -Prelease -DskipTests'
+     mvn release:perform -Darguments='-Dgpg.keyname=<keyname> -Prelease -Pbuild-frontend -DskipTests'
 
 Maven Central Repository validation
 ************************************

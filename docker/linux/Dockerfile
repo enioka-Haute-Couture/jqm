@@ -9,7 +9,7 @@ RUN apt update && apt install unzip
 
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
-RUN --mount=type=cache,target=/root/.m2/repository mvn install -DskipTests=${SKIP_TESTS} ${MVN_SETTINGS}
+RUN --mount=type=cache,target=/root/.m2/repository mvn install -DskipTests=${SKIP_TESTS} -Pbuild-frontend ${MVN_SETTINGS}
 RUN mkdir /jqm
 RUN unzip ./jqm-service/target/jqm*.zip -d /tmp/
 RUN mv /tmp/jqm*/ /tmp/jqm/

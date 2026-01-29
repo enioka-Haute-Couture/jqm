@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -22,25 +23,51 @@
 
 
     <profiles>
-        <!-- Disable yarn prod build when using dev mode -->
         <profile>
-            <id>dev</id>
-            <activation>
-                <property>
-                    <!-- Also disable this build when inside eclipse or vs code. -->
-                    <name>m2e.version</name>
-                </property>
-            </activation>
+            <id>build-frontend</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
                         <version>${jsplugin.version}</version>
+
+                        <configuration>
+                            <nodeVersion>v20.14.0</nodeVersion>
+                            <yarnVersion>v1.22.22</yarnVersion>
+                            <installDirectory>target/</installDirectory>
+                            <workingDirectory>src/main/react</workingDirectory>
+                        </configuration>
+
                         <executions>
                             <execution>
+                                <id>install node and yarn</id>
+                                <goals>
+                                    <goal>install-node-and-yarn</goal>
+                                </goals>
+                                <phase>initialize</phase>
+                            </execution>
+
+                            <execution>
+                                <id>yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                                <phase>prepare-package</phase>
+                            </execution>
+
+                            <execution>
                                 <id>yarn build</id>
-                                <phase>none</phase>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>build</arguments>
+                                </configuration>
+                                <phase>prepare-package</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -128,51 +155,6 @@
             </plugin>
 
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>${jsplugin.version}</version>
-
-                <configuration>
-                    <nodeVersion>v20.14.0</nodeVersion>
-                    <yarnVersion>v1.22.22</yarnVersion>
-                    <installDirectory>target/</installDirectory>
-                    <workingDirectory>src/main/react</workingDirectory>
-                </configuration>
-
-                <executions>
-                    <execution>
-                        <id>install node and yarn</id>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                        <phase>initialize</phase>
-                    </execution>
-
-                    <execution>
-                        <id>yarn install</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install</arguments>
-                        </configuration>
-                        <phase>prepare-package</phase>
-                    </execution>
-
-                    <execution>
-                        <id>yarn build</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>build</arguments>
-                        </configuration>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${plugin.war.version}</version>
@@ -183,6 +165,7 @@
                             <filtering>true</filtering>
                         </resource>
                     </webResources>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
 
