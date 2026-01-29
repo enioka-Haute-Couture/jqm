@@ -25,7 +25,7 @@ public class DefaultConfigurationService
     /**
      * Creates or updates metadata common to all nodes: default queue, global parameters, roles...<br>
      * It is idempotent. It also has the effect of making broken metadata viable again.
-     * 
+     *
      * @param cnx
      *            database connection
      */
@@ -118,8 +118,10 @@ public class DefaultConfigurationService
      *            an EntityManager on which a transaction will be opened.
      * @param port
      *            the port of the node
+     * @param dns
+     *            the DNS name of the node
      */
-    public static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
+    public static void updateNodeConfiguration(String nodeName, DbConn cnx, int port, String dns)
     {
         // Node
         Long nodeId = null;
@@ -132,7 +134,7 @@ public class DefaultConfigurationService
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
 
             nodeId = Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
-                    System.getProperty("user.dir") + "/tmp/", "localhost", "INFO").getId();
+                    System.getProperty("user.dir") + "/tmp/", dns, "INFO").getId();
             cnx.commit();
         }
 
