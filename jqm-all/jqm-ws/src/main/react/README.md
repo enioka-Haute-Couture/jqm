@@ -5,7 +5,7 @@
 Build JQM from latest 3.x.x:
 
 ```bash
-mvn package -DskipTests
+mvn package -DskipTests -Pbuild-frontend
 ```
 
 From the jqm-3.x.x-SNAPSHOT folder, run the following commands:
@@ -37,3 +37,11 @@ If the web console port is different from `59977`, **set the environment variabl
 The Web UI can be deployed behind a reverse proxy with a path prefix.
 
 **Set the environment variable `VITE_BASE_PATH`** to the wanted path with a leading slash but no trailing slash. (e.g. `export VITE_BASE_PATH=/marsu/pi/lami`)
+
+## Packaging
+
+The frontend is not built by default to speed things up.
+
+During development after making changes to the React app, include them in the build by running `yarn build` before `mvn package`.
+
+For production builds use the `-Pbuild-frontend` option with `mvn package`.

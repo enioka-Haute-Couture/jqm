@@ -25,6 +25,8 @@ jobs:
               with:
                   distribution: "zulu"
                   java-version: ${{ matrix.java }}
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -49,6 +51,8 @@ jobs:
                   postgresql db: "jqm"
                   postgresql user: "jqm"
                   postgresql password: "jqm"
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -77,6 +81,8 @@ jobs:
               with:
                   java-version: 21
                   distribution: "zulu"
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -104,6 +110,8 @@ jobs:
                   mysql database: "jqm"
                   mysql user: "jqm"
                   mysql password: "jqm"
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -130,6 +138,8 @@ jobs:
               with:
                   java-version: 21
                   distribution: "zulu"
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -156,6 +166,8 @@ jobs:
               with:
                   java-version: 21
                   distribution: "zulu"
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -216,7 +228,7 @@ jobs:
                   server-username: MAVEN_CENTRAL_USERNAME
                   server-password: MAVEN_CENTRAL_PASSWORD
             - name: Publish package
-              run: mvn deploy -DskipTests
+              run: mvn deploy -DskipTests -Pbuild-frontend
               env:
                   MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
                   MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
