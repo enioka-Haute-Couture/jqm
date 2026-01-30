@@ -337,10 +337,17 @@ export const JobInstanceDetailsDialog: React.FC<{
 
                             <TableContainer component={Paper}>
                                 <Table size="small">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Message</TableCell>
+                                            <TableCell>Date</TableCell>
+                                        </TableRow>
+                                    </TableHead>
                                     <TableBody>
                                         {jobInstance.messages.slice(0, 3).map((message, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{message.length > 20 ? message.substring(0, 20) + '...' : message}</TableCell>
+                                                <TableCell>{message.textMessage.length > 20 ? message.textMessage.substring(0, 20) + '...' : message.textMessage}</TableCell>
+                                                <TableCell>{message.creationDate ? formatDate(message.creationDate) : ''}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -596,10 +603,17 @@ export const JobInstanceDetailsDialog: React.FC<{
                     <DialogTitle>{t("runs.detailsDialog.messagesDialogTitle")}</DialogTitle>
                     <DialogContent>
                         <Table size="small" aria-label={t("runs.detailsDialog.messagesDialogTitle")}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Message</TableCell>
+                                    <TableCell>Date</TableCell>
+                                </TableRow>
+                            </TableHead>
                             <TableBody>
                                 {jobInstance.messages.map((message, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{message}</TableCell>
+                                        <TableCell>{message.textMessage}</TableCell>
+                                        <TableCell>{message.creationDate ? formatDate(message.creationDate) : ''}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

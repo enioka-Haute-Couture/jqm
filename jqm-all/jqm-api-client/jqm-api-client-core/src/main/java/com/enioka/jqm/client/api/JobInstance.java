@@ -59,8 +59,8 @@ public class JobInstance
     private Map<String, String> parameters = new HashMap<>();
     private Integer progress;
     @XmlElementWrapper(name = "messages")
-    @XmlElement(name = "message", type = String.class)
-    private List<String> messages = new ArrayList<>();
+    @XmlElement(name = "message", type = Message.class)
+    private List<Message> messages = new ArrayList<>();
     private Calendar enqueueDate, beganRunningDate, endDate, runAfter;
     private String nodeName;
     private boolean highlander;
@@ -297,13 +297,13 @@ public class JobInstance
     }
 
     /**
-     * An optional list of strings that running user code may emit from time to time. Used to give an idea of the progress of the job
+     * An optional list of messages that running user code may emit from time to time. Used to give an idea of the progress of the job
      * instance.<br>
      * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(long)} call and may not be up to date!</strong>
      *
      * @return the list of messages.
      */
-    public List<String> getMessages()
+    public List<Message> getMessages()
     {
         return messages;
     }
@@ -314,7 +314,7 @@ public class JobInstance
      * @param messages
      *            the list of messages.
      */
-    public void setMessages(List<String> messages)
+    public void setMessages(List<Message> messages)
     {
         this.messages = messages;
     }

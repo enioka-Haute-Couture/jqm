@@ -683,8 +683,8 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     {
         try
         {
-            QueryBaseImpl res = target.path("ji/query").request(MediaType.APPLICATION_XML).post(Entity.entity(query, MediaType.APPLICATION_XML),
-                    QueryBaseImpl.class);
+            QueryBaseImpl res = target.path("ji/query").request(MediaType.APPLICATION_XML)
+                    .post(Entity.entity(query, MediaType.APPLICATION_XML), QueryBaseImpl.class);
             query.setResultSize(res.getResultSize());
             query.setResults(res.getResults() != null ? res.getResults() : new ArrayList<>());
             return res.getResults();
@@ -704,7 +704,8 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<String> getJobMessages(long idJob)
+    public List<Message> getJobMessages(long idJob)
+
     {
         try
         {

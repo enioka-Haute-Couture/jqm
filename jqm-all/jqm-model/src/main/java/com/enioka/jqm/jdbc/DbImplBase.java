@@ -261,11 +261,11 @@ class DbImplBase
         queries.put("jiprm_select_by_ji_list", "SELECT ID, JOB_INSTANCE, KEYNAME, VALUE FROM __T__JOB_INSTANCE_PARAMETER WHERE JOB_INSTANCE IN(UNNEST(?))");
 
         // MESSAGE
-        queries.put("message_insert",  "INSERT INTO __T__MESSAGE(ID, JOB_INSTANCE, TEXT_MESSAGE) VALUES(JQM_PK.nextval, ?, ?)");
+        queries.put("message_insert",  "INSERT INTO __T__MESSAGE(ID, JOB_INSTANCE, TEXT_MESSAGE, CREATION_DATE) VALUES(JQM_PK.nextval, ?, ?, CURRENT_TIMESTAMP)");
         queries.put("message_delete_all", "DELETE FROM __T__MESSAGE");
         queries.put("message_delete_by_ji",queries.get("message_delete_all") + " WHERE JOB_INSTANCE=?");
-        queries.put("message_select_all", "SELECT ID, JOB_INSTANCE, TEXT_MESSAGE FROM __T__MESSAGE");
-        queries.put("message_select_by_ji_list", queries.get("message_select_all") + " WHERE JOB_INSTANCE IN(UNNEST(?))");
+        queries.put("message_select_all", "SELECT ID, JOB_INSTANCE, TEXT_MESSAGE, CREATION_DATE FROM __T__MESSAGE");
+        queries.put("message_select_by_ji_list", queries.get("message_select_all") + " WHERE JOB_INSTANCE IN(UNNEST(?))" + " ORDER BY CREATION_DATE");
         queries.put("message_select_count_all", "SELECT COUNT(1) FROM __T__MESSAGE");
 
         // JNDI
