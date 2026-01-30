@@ -70,7 +70,7 @@ chmod 750 conf
 chmod 640 conf/*
 
 # db is only used with hsqldb, and contains the database which is modified by the engine.
-chmod 770 db 
+chmod 770 db
 chmod 660 db/* 2>/dev/null
 
 # ext contains libraries contained inside the payload lib path. Modified by installing new payloads.
@@ -86,6 +86,10 @@ find jobs -type f -exec chmod 640 {} \;
 chmod 750 lib
 chmod 640 lib/*.jar
 chmod 640 lib/*.xsd
+
+# plugins contains the JQM runtime plugins
+chmod 750 plugins
+find plugins -type f -exec chmod 640 {} \;
 
 # logs contains both engine logs and payload logs. May contain sensitive data
 chmod 770 logs
@@ -105,5 +109,5 @@ chmod 770 webapp
 chmod 640 webapp/*.war
 
 # single files
-chmod 640 *.jar 
+chmod 640 *.jar
 chmod 750 *.sh *.ps1
