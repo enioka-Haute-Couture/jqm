@@ -3,6 +3,11 @@ export interface JobInstanceParameters {
     value: string;
 }
 
+export interface Message {
+    textMessage: string;
+    creationDate: Date;
+}
+
 export interface JobInstance {
     id?: number;
     application?: string;
@@ -18,7 +23,7 @@ export interface JobInstance {
     enqueueDate?: Date;
     fromSchedule: boolean;
     highlander: boolean;
-    messages: Array<string>;
+    messages: Array<Message>;
     nodeName: string;
     parameters: Array<JobInstanceParameters>;
     parent?: number;
