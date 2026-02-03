@@ -16,9 +16,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import Link from "@mui/material/Link";
 import fileDownload from "js-file-download";
 import { LOG_TYPE } from "./RunsPage";
@@ -49,6 +46,8 @@ export const JobInstanceDetailsDialog: React.FC<{
 }> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr, fetchFiles, fetchFileContent, displayedLogType, relaunchJob, canSeeIndividualLogs }) => {
     const { t } = useTranslation();
     const [showParameters, setShowParameters] = useState<boolean>(false);
+    const [showMessages, setShowMessages] = useState<boolean>(false);
+    const [showFiles, setShowFiles] = useState<boolean>(false);
     const [logs, setLogs] = useState<String | null>(null);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
@@ -203,7 +202,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                         }}
                                         style={{ margin: "8px" }}
                                     >
-                                        {t("runs.detailsDialog.showAllParameters")}
+                                        {t("runs.detailsDialog.showAll")}
                                     </Button>
                                 )
                                 }
@@ -336,13 +335,28 @@ export const JobInstanceDetailsDialog: React.FC<{
                             />
                             <Typography variant="h6">{t("runs.detailsDialog.sectionMessages")}</Typography>
 
-                            <List dense>
-                                {jobInstance.messages.map((message) => (
-                                    <ListItem key={message}>
-                                        <ListItemText primary={message} />
-                                    </ListItem>
-                                ))}
-                            </List>
+                            <TableContainer component={Paper}>
+                                <Table size="small">
+                                    <TableBody>
+                                        {jobInstance.messages.slice(0, 3).map((message, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{message.length > 20 ? message.substring(0, 20) + '...' : message}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            {jobInstance.messages.length > 3 && (
+                                <Button
+                                    size="small"
+                                    onClick={() => {
+                                        setShowMessages(true);
+                                    }}
+                                    style={{ margin: "8px" }}
+                                >
+                                    {t("runs.detailsDialog.showAll")}
+                                </Button>
+                            )}
                             {canUserAccess(PermissionObjectType.files, PermissionAction.read) &&
                                 (<>
                                     <Divider
@@ -353,7 +367,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                                     <TableContainer component={Paper}>
                                         <Table size="small">
                                             <TableBody>
-                                                {files?.map((file) => (
+                                                {files?.slice(0, 3).map((file) => (
                                                     <TableRow key={file.id}>
                                                         <TableCell>{t("runs.detailsDialog.fileId")} {file.id}</TableCell>
                                                         <TableCell>
@@ -377,6 +391,17 @@ export const JobInstanceDetailsDialog: React.FC<{
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
+                                    {files && files.length > 3 && (
+                                        <Button
+                                            size="small"
+                                            onClick={() => {
+                                                setShowFiles(true);
+                                            }}
+                                            style={{ margin: "8px" }}
+                                        >
+                                            {t("runs.detailsDialog.showAll")}
+                                        </Button>
+                                    )}
                                 </>)
                             }
                         </Grid>
@@ -554,6 +579,82 @@ export const JobInstanceDetailsDialog: React.FC<{
                             variant="contained"
                             size="small"
                             onClick={() => setShowParameters(false)}
+                            style={{ margin: "8px" }}
+                        >
+                            {t("runs.detailsDialog.buttonClose")}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {showMessages && (
+                <Dialog
+                    open={true}
+                    onClose={() => setShowMessages(false)}
+                    aria-labelledby="form-dialog-title"
+                    maxWidth="lg"
+                    fullWidth>
+                    <DialogTitle>{t("runs.detailsDialog.messagesDialogTitle")}</DialogTitle>
+                    <DialogContent>
+                        <Table size="small" aria-label={t("runs.detailsDialog.messagesDialogTitle")}>
+                            <TableBody>
+                                {jobInstance.messages.map((message, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{message}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => setShowMessages(false)}
+                            style={{ margin: "8px" }}
+                        >
+                            {t("runs.detailsDialog.buttonClose")}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {showFiles && (
+                <Dialog
+                    open={true}
+                    onClose={() => setShowFiles(false)}
+                    aria-labelledby="form-dialog-title"
+                    fullWidth>
+                    <DialogTitle>{t("runs.detailsDialog.sectionFiles")}</DialogTitle>
+                    <DialogContent>
+                        <Table size="small" aria-label={t("runs.detailsDialog.sectionFiles")}>
+                            <TableBody>
+                                {files?.map((file) => (
+                                    <TableRow key={file.id}>
+                                        <TableCell>{file.id}</TableCell>
+                                        <TableCell>
+                                            <Link
+                                                href="#"
+                                                onClick={(event: any) => {
+                                                    event.preventDefault()
+                                                    fetchFileContent(
+                                                        file.id!
+                                                    ).then((response) =>
+                                                        fileDownload(response as string, `${file.fileFamily}.${file.id}.txt`));
+                                                }
+                                                }
+                                            >
+                                                {file.fileFamily}
+                                            </Link>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => setShowFiles(false)}
                             style={{ margin: "8px" }}
                         >
                             {t("runs.detailsDialog.buttonClose")}
