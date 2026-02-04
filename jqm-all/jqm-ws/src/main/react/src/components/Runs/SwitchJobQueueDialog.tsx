@@ -29,9 +29,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const SwitchJobQueueDialog: React.FC<{
     closeDialog: () => void;
-    jobId: number;
+    jobId?: number;
     queues: Queue[];
-    switchJobQueue: (jobId: number, queueId: number) => void;
+    switchJobQueue: (queueId: number) => void;
 }> = ({ closeDialog, jobId, queues, switchJobQueue }) => {
     const { t } = useTranslation();
     const [queueId, setQueueId] = useState<number | undefined>();
@@ -46,7 +46,7 @@ export const SwitchJobQueueDialog: React.FC<{
             fullWidth
             maxWidth={"sm"}
         >
-            <DialogTitle>{t("runs.switchQueueDialog.title", { id: jobId })}</DialogTitle>
+            <DialogTitle>{jobId ? t("runs.switchQueueDialog.title", { id: jobId }) : t("runs.switchQueueDialog.titleBulk")}</DialogTitle>
             <DialogContent>
                 <FormControl fullWidth className={classes.Select}>
                     <InputLabel id="queue-select-label">{t("runs.switchQueueDialog.queueLabel")}</InputLabel>
@@ -83,11 +83,11 @@ export const SwitchJobQueueDialog: React.FC<{
                     disabled={!queueId}
                     style={{ margin: "8px" }}
                     onClick={() => {
-                        switchJobQueue(jobId, queueId!);
+                        switchJobQueue(queueId!);
                         closeDialog();
                     }}
                 >
-                    {t("common.create")}
+                    {t("common.change")}
                 </Button>
             </DialogActions>
         </Dialog>

@@ -134,7 +134,9 @@
         "edit": "Edit line",
         "delete": "Delete line",
         "save": "Save changes",
-        "cancelChanges": "Cancel changes"
+        "cancelChanges": "Cancel changes",
+        "change": "Change",
+        "confirm": "Confirm"
     },
     "home": {
         "title": "Welcome to the JQM administration web console",
@@ -571,7 +573,15 @@
         },
         "toolbar": {
             "ended": "Ended",
-            "active": "Active"
+            "active": "Active",
+            "selectAll": "All",
+            "selectPage": "Page",
+            "unselectAll": "Erase",
+            "bulkRelaunch": "Relaunch",
+            "bulkKill": "Kill",
+            "bulkPause": "Pause",
+            "bulkResume": "Resume",
+            "bulkSwitchQueue": "Switch queue"
         },
         "messages": {
             "successKill": "Successfully killed job {{id}}",
@@ -579,6 +589,11 @@
             "successResume": "Successfully resumed job {{id}}",
             "successRelaunch": "Successfully relaunched job {{id}}",
             "successSwitch": "Successfully switched job {{id}} to queue {{queueName}}",
+            "successBulkKill": "Successfully killed {{count}} job(s)",
+            "successBulkPause": "Successfully paused {{count}} job(s)",
+            "successBulkResume": "Successfully resumed {{count}} job(s)",
+            "successBulkRelaunch": "Successfully relaunched {{count}} job(s)",
+            "successBulkSwitch": "Successfully switched {{count}} job(s) to queue {{queueName}}",
             "successLaunch": "Successfully launched job"
         },
         "detailsDialog": {
@@ -658,7 +673,12 @@
         },
         "switchQueueDialog": {
             "title": "Switch job {{id}} queue",
+            "titleBulk": "Switch selected jobs' queue",
             "queueLabel": "Queue*"
+        },
+        "selectAllConfirmationDialog": {
+            "title": "Select all matching runs?",
+            "message": "This will select the {{total}} runs matching the filters, not only the ones displayed on this page. Please use with caution. Performance of the bulk actions may be slow for large result sets"
         }
     }
 }

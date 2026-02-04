@@ -134,7 +134,9 @@
         "edit": "Modifier la ligne",
         "delete": "Supprimer la ligne",
         "save": "Enregistrer les modifications",
-        "cancelChanges": "Annuler les modifications"
+        "cancelChanges": "Annuler les modifications",
+        "change": "Changer",
+        "confirm": "Confirmer"
     },
     "home": {
         "title": "Bienvenue sur la console d'administration web JQM",
@@ -571,7 +573,15 @@
         },
         "toolbar": {
             "ended": "Terminées",
-            "active": "Actives"
+            "active": "Actives",
+            "selectAll": "Tout",
+            "selectPage": "Page",
+            "unselectAll": "Effacer",
+            "bulkRelaunch": "Relancer",
+            "bulkKill": "Tuer",
+            "bulkPause": "Mettre en pause",
+            "bulkResume": "Reprendre",
+            "bulkSwitchQueue": "Changer de file"
         },
         "messages": {
             "successKill": "Job {{id}} tué avec succès",
@@ -579,6 +589,11 @@
             "successResume": "Job {{id}} repris avec succès",
             "successRelaunch": "Job {{id}} relancé avec succès",
             "successSwitch": "Job {{id}} basculé vers la file {{queueName}} avec succès",
+            "successBulkKill": "{{count}} job(s) tué(s) avec succès",
+            "successBulkPause": "{{count}} job(s) mis en pause avec succès",
+            "successBulkResume": "{{count}} job(s) repris avec succès",
+            "successBulkRelaunch": "{{count}} job(s) relancé(s) avec succès",
+            "successBulkSwitch": "{{count}} job(s) basculé(s) vers la file {{queueName}} avec succès",
             "successLaunch": "Job lancé avec succès"
         },
         "detailsDialog": {
@@ -658,7 +673,12 @@
         },
         "switchQueueDialog": {
             "title": "Changer de file pour le job {{id}}",
+            "titleBulk": "Changer la file des jobs sélectionnés",
             "queueLabel": "File*"
+        },
+        "selectAllConfirmationDialog": {
+            "title": "Sélectionner toutes les exécutions correspondantes ?",
+            "message": "Cela sélectionnera les {{total}} exécutions correspondantes aux filtres, pas seulement celles affichées sur cette page. À utiliser avec prudence. Les performances des actions en masse peuvent être lentes pour de grands ensembles de résultats."
         }
     }
 }

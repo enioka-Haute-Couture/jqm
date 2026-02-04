@@ -319,6 +319,25 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
         return jd.enqueue();
     }
 
+    @Override
+    public List<Long> bulkEnqueueFromHistory(List<Long> jobIds)
+    {
+        try
+        {
+            return target.path("ji/bulk").request().post(Entity.entity(jobIds, MediaType.APPLICATION_JSON), new GenericType<List<Long>>()
+            {
+            });
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////
     // Job destruction
     ///////////////////////////////////////////////////////////////////////
@@ -375,6 +394,23 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
+    public int killJobs(List<Long> jobIds)
+    {
+        try
+        {
+            return target.path("ji/killed").request().post(Entity.entity(jobIds, MediaType.APPLICATION_JSON), Integer.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
     public void removeRecurrence(long scheduleId)
     {
         try
@@ -414,11 +450,45 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
+    public int pauseQueuedJobs(List<Long> jobIds)
+    {
+        try
+        {
+            return target.path("ji/paused").request().post(Entity.entity(jobIds, MediaType.APPLICATION_JSON), Integer.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
     public void resumeQueuedJob(long idJob)
     {
         try
         {
             target.path("ji/paused/" + idJob).request().delete();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public int resumeQueuedJobs(List<Long> jobIds)
+    {
+        try
+        {
+            return target.path("ji/resumed").request().post(Entity.entity(jobIds, MediaType.APPLICATION_JSON), Integer.class);
         }
         catch (BadRequestException e)
         {
@@ -511,6 +581,20 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     public void setJobQueue(long idJob, Queue queue)
     {
         setJobQueue(idJob, queue.getId());
+    }
+
+    @Override
+    public int setJobQueues(List<Long> jobIds, long queueId)
+    {
+        try
+        {
+            return target.path("q").path(String.valueOf(queueId)).path("jobs").request()
+                    .post(Entity.entity(jobIds, MediaType.APPLICATION_JSON), Integer.class);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("Could not set job queues", e);
+        }
     }
 
     @Override

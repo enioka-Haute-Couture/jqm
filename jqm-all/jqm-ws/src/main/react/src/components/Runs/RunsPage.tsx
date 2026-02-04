@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
+    Button,
     Container,
+    Divider,
     Grid,
     IconButton,
     Stack,
@@ -11,8 +13,11 @@ import {
 } from "@mui/material";
 
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
+import MUIDataTable, { DisplayData, FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
+import CheckBoxOutlineIcon from "@mui/icons-material/CheckBox";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
 import WarningIcon from '@mui/icons-material/Warning';
@@ -34,6 +39,7 @@ import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
 import { useTranslation } from "react-i18next";
 import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 
 export type LOG_TYPE =
     "STDERR" |
@@ -53,14 +59,20 @@ const RunsPage: React.FC = () => {
         queryLiveInstances,
         jobInstances,
         fetchJobInstances,
+        fetchAllJobInstanceIds,
         launchJob,
         killJob,
+        bulkKillJobs,
         pauseJob,
+        bulkPauseJobs,
         resumeJob,
+        bulkResumeJobs,
         relaunchJob,
+        bulkRelaunchJobs,
         queues,
         fetchQueues,
         switchJoqQueue,
+        bulkSwitchJobQueue,
         fetchLogsStdout,
         fetchLogsStderr,
         fetchFiles,
@@ -97,6 +109,8 @@ const RunsPage: React.FC = () => {
 
     const [displayedLogType, setLogType] = useState<LOG_TYPE>("NONE");
 
+    const [selectedJobInstanceIds, setSelectedJobInstanceIds] = useState<number[]>([]);
+
     useEffect(() => {
         if (canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
             canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
@@ -105,6 +119,10 @@ const RunsPage: React.FC = () => {
         setPageTitle(t("runs.title"));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canUserAccess, t]);
+
+    useEffect(() => {
+        setSelectedJobInstanceIds([]);
+    }, [queryLiveInstances]);
 
     const [showDetailsJobInstanceId, setShowDetailsJobInstanceId] = useState<
         string | null
@@ -116,6 +134,58 @@ const RunsPage: React.FC = () => {
     const [showSwitchJobQueueId, setShowSwitchJobQueueId] = useState<
         number | null
     >(null);
+
+    const [showBulkSwitchQueue, setShowBulkSwitchQueue] = useState<boolean>(false);
+
+    const [showSelectAllConfirmationDialog, setShowSelectAllConfirmationDialog] = useState<boolean>(false);
+
+    const handleSelectAll = () => {
+        setShowSelectAllConfirmationDialog(true);
+    }
+
+    const handleSelectPage = () => {
+        if (jobInstances) {
+            const currentPageIds = jobInstances.map(ji => ji.id!);
+            setSelectedJobInstanceIds(Array.from(new Set([...selectedJobInstanceIds, ...currentPageIds])));
+        }
+    };
+
+    const handleUnselectPage = () => {
+        if (jobInstances) {
+            const currentPageIds = jobInstances.map(ji => ji.id!);
+            setSelectedJobInstanceIds(selectedJobInstanceIds.filter(id => !currentPageIds.includes(id)));
+        }
+    };
+
+    const handleUnselectAll = () => {
+        setSelectedJobInstanceIds([]);
+    };
+
+    const handleBulkRelaunch = () => {
+        bulkRelaunchJobs(selectedJobInstanceIds);
+        setSelectedJobInstanceIds([]);
+    };
+
+    const handleBulkKill = () => {
+        bulkKillJobs(selectedJobInstanceIds);
+        setSelectedJobInstanceIds([]);
+    };
+
+    const handleBulkPause = () => {
+        bulkPauseJobs(selectedJobInstanceIds);
+        setSelectedJobInstanceIds([]);
+    };
+
+    const handleBulkResume = () => {
+        bulkResumeJobs(selectedJobInstanceIds);
+        setSelectedJobInstanceIds([]);
+    };
+
+    const handleBulkSwitchQueue = (queueId: number) => {
+        bulkSwitchJobQueue(selectedJobInstanceIds, queueId);
+        setSelectedJobInstanceIds([]);
+        setShowBulkSwitchQueue(false);
+    };
 
     const columns = [
         {
@@ -547,11 +617,146 @@ const RunsPage: React.FC = () => {
         textLabels: muiTableTextLabels,
         download: false,
         print: false,
-        selectableRows: "none" as SelectableRows,
+        selectableRows: "multiple" as SelectableRows,
         serverSide: true,
         search: false,
         count: count,
         page: page,
+        selectToolbarPlacement: 'above' as "replace" | "above" | "none",
+        customToolbarSelect: (
+            selectedRows: { data: Array<{ index: number; dataIndex: number }>; lookup: { [key: number]: boolean } },
+            displayData: DisplayData,
+            setSelectedRows: (rows: number[]) => void,
+        ) => {
+            const allSelected = selectedJobInstanceIds.length === count;
+            const hasSelection = selectedJobInstanceIds.length > 0;
+
+            const currentPageIds = jobInstances?.map(ji => ji.id!) || [];
+            const selectedOnPage = selectedJobInstanceIds.filter(id => currentPageIds.includes(id));
+            const pageSelectionState =
+                selectedOnPage.length === 0 ? 'none' :
+                    selectedOnPage.length === currentPageIds.length ? 'all' :
+                        'partial';
+
+            return (
+                <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
+                    {!queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) && (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<ReplayIcon />}
+                            onClick={handleBulkRelaunch}
+                            disabled={!hasSelection}
+                        >
+                            {t("runs.toolbar.bulkRelaunch")}
+                        </Button>
+                    )}
+                    {queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.update) && (
+                        <>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<StopIcon />}
+                                onClick={handleBulkKill}
+                                disabled={!hasSelection}
+                            >
+                                {t("runs.toolbar.bulkKill")}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<PauseIcon />}
+                                onClick={handleBulkPause}
+                                disabled={!hasSelection}
+                            >
+                                {t("runs.toolbar.bulkPause")}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<PlayArrowIcon />}
+                                onClick={handleBulkResume}
+                                disabled={!hasSelection}
+                            >
+                                {t("runs.toolbar.bulkResume")}
+                            </Button>
+                        </>
+                    )}
+                    {queryLiveInstances && canUserAccess(PermissionObjectType.queue_position, PermissionAction.update) && (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<FlipCameraAndroidIcon />}
+                            onClick={() => setShowBulkSwitchQueue(true)}
+                            disabled={!hasSelection}
+                        >
+                            {t("runs.toolbar.bulkSwitchQueue")}
+                        </Button>
+                    )}
+                    <Divider orientation="vertical" flexItem />
+                    <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<CheckBoxOutlineIcon />}
+                        onClick={handleSelectAll}
+                        disabled={allSelected}
+                    >
+                        {t("runs.toolbar.selectAll")}
+                    </Button>
+                    <Button
+                        variant="text"
+                        size="small"
+                        startIcon={
+                            pageSelectionState === 'all' ? <CheckBoxOutlineIcon /> :
+                                pageSelectionState === 'partial' ? <IndeterminateCheckBoxIcon /> :
+                                    <CheckBoxOutlineBlankIcon />
+                        }
+                        onClick={pageSelectionState === 'all' ? handleUnselectPage : handleSelectPage}
+                    >
+                        {t("runs.toolbar.selectPage")}
+                    </Button>
+                    <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<CheckBoxOutlineBlankIcon />}
+                        onClick={handleUnselectAll}
+                    >
+                        {t("runs.toolbar.unselectAll")}
+                    </Button>
+                </Stack>
+            );
+        },
+        selectableRowsHeader: false, // Does not work with server side pagination
+        rowsSelected: jobInstances
+            ? (() => {
+                const currentPageIndices = jobInstances
+                    .map((ji, index) => (selectedJobInstanceIds.includes(ji.id!) ? index : null))
+                    .filter((index): index is number => index !== null);
+
+                // Add placeholder indices For selected items not on current page
+                const currentPageIds = jobInstances.map(ji => ji.id!);
+                const notOnCurrentPageCount = selectedJobInstanceIds.filter(id => !currentPageIds.includes(id)).length;
+                const placeholderIndices = Array.from({ length: notOnCurrentPageCount }, (_, i) => rowsPerPage! + i);
+
+                return [...currentPageIndices, ...placeholderIndices];
+            })()
+            : [],
+        onRowSelectionChange: (currentRowsSelected: any[], allRowsSelected: any[], rowsSelected?: any[]) => {
+            if (!jobInstances) return;
+
+            const currentPageIds = jobInstances.map(ji => ji.id!);
+            const selectedOnCurrentPage = allRowsSelected
+                .filter((row: any) => row.dataIndex < jobInstances.length)
+                .map((row: any) => jobInstances[row.dataIndex].id!);
+            const selectionsFromOtherPages = selectedJobInstanceIds.filter(
+                id => !currentPageIds.includes(id)
+            );
+
+            // Merge sekectuibs from other pages with current page selections
+            const newSelectedIds = [...selectionsFromOtherPages, ...selectedOnCurrentPage];
+
+            setSelectedJobInstanceIds(newSelectedIds);
+        },
         rowsPerPage: rowsPerPage!,
         sortOrder: sortOrder!,
         customFilterDialogFooter: (
@@ -679,7 +884,28 @@ const RunsPage: React.FC = () => {
                     closeDialog={() => setShowSwitchJobQueueId(null)}
                     jobId={showSwitchJobQueueId}
                     queues={queues}
-                    switchJobQueue={switchJoqQueue}
+                    switchJobQueue={(queueId) => switchJoqQueue(showSwitchJobQueueId, queueId)}
+                />
+            )}
+            {showBulkSwitchQueue && (
+                <SwitchJobQueueDialog
+                    closeDialog={() => setShowBulkSwitchQueue(false)}
+                    queues={queues}
+                    switchJobQueue={(queueId) => handleBulkSwitchQueue(queueId)}
+                />
+            )}
+            {showSelectAllConfirmationDialog && (
+                <ConfirmationDialog
+                    isOpen={showSelectAllConfirmationDialog}
+                    onClose={() => setShowSelectAllConfirmationDialog(false)}
+                    onConfirm={() => {
+                        fetchAllJobInstanceIds(queryLiveInstances, filterList).then(allIds => {
+                            setSelectedJobInstanceIds(allIds);
+                            setShowSelectAllConfirmationDialog(false);
+                        });
+                    }}
+                    title={t("runs.selectAllConfirmationDialog.title")}
+                    message={t("runs.selectAllConfirmationDialog.message", { total: count })}
                 />
             )}
         </Container>

@@ -373,6 +373,46 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
     }
 
+    @Override
+    public List<Long> bulkEnqueueFromHistory(List<Long> jobIds)
+    {
+        jqmlogger.trace("Relaunching " + jobIds.size() + " job instances from history");
+        List<Long> newJobIds = new ArrayList<>();
+
+        try (DbConn cnx = getDbSession())
+        {
+            // Keep only non-CANCELLED jobs
+            List<Long> validJobIds = new ArrayList<>();
+            ResultSet rs = cnx.runSelect("history_select_ids_without_status_in", "CANCELLED", jobIds);
+            while (rs.next())
+            {
+                validJobIds.add(rs.getLong(1));
+            }
+            rs.close();
+
+            jqmlogger.debug("Filtered {} jobs, {} remain after removing CANCELLED", jobIds.size(), validJobIds.size());
+
+            for (Long jobId : validJobIds)
+            {
+                try
+                {
+                    Long newJobId = enqueueFromHistory(jobId);
+                    newJobIds.add(newJobId);
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.warn("Failed to relaunch job instance " + jobId, e);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Error during bulk relaunch", e);
+        }
+
+        return newJobIds;
+    }
+
     // Helper. Current transaction is committed in some cases.
     private Object highlanderMode(JobDef jd, DbConn cnx)
     {
@@ -608,6 +648,45 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
+    public int killJobs(List<Long> jobIds)
+    {
+        jqmlogger.trace("Killing " + jobIds.size() + " job instances");
+
+        try (DbConn cnx = getDbSession())
+        {
+            // Keep only non-HOLDED jobs
+            List<Long> validJobIds = new ArrayList<>();
+            ResultSet rs = cnx.runSelect("ji_select_ids_without_status_in", "HOLDED", jobIds);
+            while (rs.next())
+            {
+                validJobIds.add(rs.getLong(1));
+            }
+            rs.close();
+
+            jqmlogger.debug("Filtered {} jobs, {} remain after removing HOLDED", jobIds.size(), validJobIds.size());
+
+            for (Long jobId : validJobIds)
+            {
+                try
+                {
+                    killJob(jobId);
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.warn("Failed to kill job instance " + jobId, e);
+                }
+            }
+
+            return validJobIds.size();
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Error during bulk kill", e);
+            throw new JqmClientException("Could not kill jobs", e);
+        }
+    }
+
+    @Override
     public void removeRecurrence(long scheduleId)
     {
         try (DbConn cnx = getDbSession())
@@ -626,7 +705,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
         catch (Exception e)
         {
-            throw new JqmClientException("Could not kill a job (internal error)", e);
+            throw new JqmClientException("Could not remove recurrence (internal error)", e);
         }
     }
 
@@ -656,6 +735,45 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     @Override
+    public int pauseQueuedJobs(List<Long> jobIds)
+    {
+        jqmlogger.trace("Pausing " + jobIds.size() + " job instances");
+
+        try (DbConn cnx = getDbSession())
+        {
+            // Keep only non-HOLDED jobs
+            List<Long> validJobIds = new ArrayList<>();
+            ResultSet rs = cnx.runSelect("ji_select_ids_without_status_in", "HOLDED", jobIds);
+            while (rs.next())
+            {
+                validJobIds.add(rs.getLong(1));
+            }
+            rs.close();
+
+            jqmlogger.debug("Filtered {} jobs, {} remain after removing already HOLDED", jobIds.size(), validJobIds.size());
+
+            for (Long jobId : validJobIds)
+            {
+                try
+                {
+                    pauseQueuedJob(jobId);
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.warn("Failed to pause job instance " + jobId, e);
+                }
+            }
+
+            return validJobIds.size();
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Error during bulk pause", e);
+            throw new JqmClientException("Could not pause jobs", e);
+        }
+    }
+
+    @Override
     public void resumeJob(long jobId)
     {
         resumeQueuedJob(jobId);
@@ -678,6 +796,45 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not resume a job (internal error)", e);
+        }
+    }
+
+    @Override
+    public int resumeQueuedJobs(List<Long> jobIds)
+    {
+        jqmlogger.trace("Resuming " + jobIds.size() + " job instances");
+
+        try (DbConn cnx = getDbSession())
+        {
+            // Keep only HOLDED jobs
+            List<Long> validJobIds = new ArrayList<>();
+            ResultSet rs = cnx.runSelect("ji_select_ids_with_status_in", "HOLDED", jobIds);
+            while (rs.next())
+            {
+                validJobIds.add(rs.getLong(1));
+            }
+            rs.close();
+
+            jqmlogger.debug("Filtered {} jobs, {} remain that are HOLDED", jobIds.size(), validJobIds.size());
+
+            for (Long jobId : validJobIds)
+            {
+                try
+                {
+                    resumeQueuedJob(jobId);
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.warn("Failed to resume job instance " + jobId, e);
+                }
+            }
+
+            return validJobIds.size();
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Error during bulk resume", e);
+            throw new JqmClientException("Could not resume jobs", e);
         }
     }
 
@@ -798,6 +955,26 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     public void setJobQueue(long idJob, com.enioka.jqm.client.api.Queue queue)
     {
         setJobQueue(idJob, queue.getId());
+    }
+
+    @Override
+    public int setJobQueues(List<Long> jobIds, long queueId)
+    {
+        jqmlogger.trace("Setting queue for " + jobIds.size() + " job instances");
+        int count = 0;
+        for (Long jobId : jobIds)
+        {
+            try
+            {
+                setJobQueue(jobId, queueId);
+                count++;
+            }
+            catch (JqmClientException e)
+            {
+                jqmlogger.warn("Could not set queue for job instance " + jobId, e);
+            }
+        }
+        return count;
     }
 
     @Override
