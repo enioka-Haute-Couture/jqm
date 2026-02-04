@@ -48,25 +48,9 @@ export const useJobInstanceAPI = () => {
 
     const { parameters, fetchParameters } = useParametersApi();
 
-    const fetchJobInstances = useCallback(
-        async (
-            newPage: number,
-            newRowsPerPage: number,
-            newSortOrder: MUISortOptions,
-            newQueryLiveInstances: boolean,
-            newFilterList: string[][]
-        ) => {
-            if (newQueryLiveInstances !== queryLiveInstances) {
-                setJobInstances(null);
-            }
-            setPage(newPage);
-            setRowsPerPage(newRowsPerPage);
-            setSortOrder(newSortOrder);
-            setQueryLiveInstances(newQueryLiveInstances);
-
+    const buildFilterQuery = useCallback(
+        (newFilterList: string[][]) => {
             let filterQuery: JobInstanceFilters = { statuses: [] };
-
-            setFilterList(newFilterList);
 
             if (
                 newFilterList[0]?.length > 0 &&
@@ -101,6 +85,31 @@ export const useJobInstanceAPI = () => {
             if (newFilterList[11]?.length > 0) {
                 filterQuery.sessionId = newFilterList[11][0];
             }
+
+            return filterQuery;
+        },
+        [queues]
+    );
+
+    const fetchJobInstances = useCallback(
+        async (
+            newPage: number,
+            newRowsPerPage: number,
+            newSortOrder: MUISortOptions,
+            newQueryLiveInstances: boolean,
+            newFilterList: string[][]
+        ) => {
+            if (newQueryLiveInstances !== queryLiveInstances) {
+                setJobInstances(null);
+            }
+            setPage(newPage);
+            setRowsPerPage(newRowsPerPage);
+            setSortOrder(newSortOrder);
+            setQueryLiveInstances(newQueryLiveInstances);
+
+            setFilterList(newFilterList);
+
+            const filterQuery = buildFilterQuery(newFilterList);
 
             var sortColumnName = newSortOrder.name.toUpperCase();
             // For some reason field names and filter names are not the same, so do mapping here
@@ -166,7 +175,33 @@ export const useJobInstanceAPI = () => {
             setFilterList,
             displayError,
             queues,
+            buildFilterQuery,
         ]
+    );
+
+    const fetchAllJobInstanceIds = useCallback(
+        async (
+            newQueryLiveInstances: boolean,
+            newFilterList: string[][]
+        ): Promise<number[]> => {
+            const filterQuery = buildFilterQuery(newFilterList);
+
+            let request = {
+                ...filterQuery,
+                queryLiveInstances: newQueryLiveInstances,
+                queryHistoryInstances: !newQueryLiveInstances,
+                firstRow: 0,
+                pageSize: 999999, // Large number to get all IDs
+            };
+
+            return APIService.post(`${API_URL}/query/ids`, request)
+                .then((response: number[]) => response)
+                .catch((error) => {
+                    displayError(error);
+                    return [];
+                });
+        },
+        [buildFilterQuery, displayError]
     );
 
     const killJob = useCallback(
@@ -182,6 +217,38 @@ export const useJobInstanceAPI = () => {
                     );
                     displaySuccess(
                         t("runs.messages.successKill", { id: jobId })
+                    );
+                })
+                .catch(displayError);
+        },
+        [
+            page,
+            rowsPerPage,
+            sortOrder,
+            filterList,
+            queryLiveInstances,
+            fetchJobInstances,
+            displayError,
+            displaySuccess,
+            t,
+        ]
+    );
+
+    const bulkKillJobs = useCallback(
+        async (jobIds: number[]) => {
+            return APIService.post(`${API_URL}/killed`, jobIds)
+                .then((count: number) => {
+                    fetchJobInstances(
+                        page,
+                        rowsPerPage,
+                        sortOrder!,
+                        queryLiveInstances,
+                        filterList
+                    );
+                    displaySuccess(
+                        t("runs.messages.successBulkKill", {
+                            count: count,
+                        })
                     );
                 })
                 .catch(displayError);
@@ -229,6 +296,38 @@ export const useJobInstanceAPI = () => {
         ]
     );
 
+    const bulkPauseJobs = useCallback(
+        async (jobIds: number[]) => {
+            return APIService.post(`${API_URL}/paused`, jobIds)
+                .then((count: number) => {
+                    fetchJobInstances(
+                        page,
+                        rowsPerPage,
+                        sortOrder!,
+                        queryLiveInstances,
+                        filterList
+                    );
+                    displaySuccess(
+                        t("runs.messages.successBulkPause", {
+                            count: count,
+                        })
+                    );
+                })
+                .catch(displayError);
+        },
+        [
+            page,
+            rowsPerPage,
+            sortOrder,
+            filterList,
+            queryLiveInstances,
+            fetchJobInstances,
+            displayError,
+            displaySuccess,
+            t,
+        ]
+    );
+
     const resumeJob = useCallback(
         async (jobId: number) => {
             return APIService.delete(`${API_URL}/paused/${jobId}`)
@@ -242,6 +341,38 @@ export const useJobInstanceAPI = () => {
                     );
                     displaySuccess(
                         t("runs.messages.successResume", { id: jobId })
+                    );
+                })
+                .catch(displayError);
+        },
+        [
+            page,
+            rowsPerPage,
+            sortOrder,
+            filterList,
+            queryLiveInstances,
+            fetchJobInstances,
+            displayError,
+            displaySuccess,
+            t,
+        ]
+    );
+
+    const bulkResumeJobs = useCallback(
+        async (jobIds: number[]) => {
+            return APIService.post(`${API_URL}/resumed`, jobIds)
+                .then((count: number) => {
+                    fetchJobInstances(
+                        page,
+                        rowsPerPage,
+                        sortOrder!,
+                        queryLiveInstances,
+                        filterList
+                    );
+                    displaySuccess(
+                        t("runs.messages.successBulkResume", {
+                            count: count,
+                        })
                     );
                 })
                 .catch(displayError);
@@ -297,6 +428,38 @@ export const useJobInstanceAPI = () => {
         ]
     );
 
+    const bulkRelaunchJobs = useCallback(
+        async (jobIds: number[]) => {
+            return APIService.post(`${API_URL}/bulk`, jobIds)
+                .then((jobIds: number[]) => {
+                    fetchJobInstances(
+                        page,
+                        rowsPerPage,
+                        sortOrder!,
+                        queryLiveInstances,
+                        filterList
+                    );
+                    displaySuccess(
+                        t("runs.messages.successBulkRelaunch", {
+                            count: jobIds.length,
+                        })
+                    );
+                })
+                .catch(displayError);
+        },
+        [
+            page,
+            rowsPerPage,
+            sortOrder,
+            filterList,
+            queryLiveInstances,
+            fetchJobInstances,
+            displayError,
+            displaySuccess,
+            t,
+        ]
+    );
+
     const switchJoqQueue = useCallback(
         async (jobId: number, queueId: number) => {
             return APIService.post(`/client/q/${queueId}/${jobId}`, {})
@@ -314,6 +477,43 @@ export const useJobInstanceAPI = () => {
                     displaySuccess(
                         t("runs.messages.successSwitch", {
                             id: jobId,
+                            queueName: queueName,
+                        })
+                    );
+                })
+                .catch(displayError);
+        },
+        [
+            page,
+            rowsPerPage,
+            sortOrder,
+            filterList,
+            queryLiveInstances,
+            fetchJobInstances,
+            displayError,
+            displaySuccess,
+            queues,
+            t,
+        ]
+    );
+
+    const bulkSwitchJobQueue = useCallback(
+        async (jobIds: number[], queueId: number) => {
+            return APIService.post(`/client/q/${queueId}/bulk`, jobIds)
+                .then((count: number) => {
+                    const queueName = queues?.find(
+                        (queue) => queue.id === queueId
+                    )?.name;
+                    fetchJobInstances(
+                        page,
+                        rowsPerPage,
+                        sortOrder!,
+                        queryLiveInstances,
+                        filterList
+                    );
+                    displaySuccess(
+                        t("runs.messages.successBulkSwitch", {
+                            count: count,
                             queueName: queueName,
                         })
                     );
@@ -425,14 +625,20 @@ export const useJobInstanceAPI = () => {
         queryLiveInstances,
         jobInstances,
         fetchJobInstances,
+        fetchAllJobInstanceIds,
         launchJob,
         killJob,
+        bulkKillJobs,
         pauseJob,
+        bulkPauseJobs,
         resumeJob,
+        bulkResumeJobs,
         relaunchJob,
+        bulkRelaunchJobs,
         queues,
         fetchQueues,
         switchJoqQueue,
+        bulkSwitchJobQueue,
         fetchLogsStdout,
         fetchLogsStderr,
         fetchFiles,
