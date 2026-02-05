@@ -18,13 +18,12 @@ package com.enioka.jqm.ws.api;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.enioka.jqm.client.api.*;
 import org.slf4j.Logger;
@@ -157,6 +156,15 @@ public class ServiceClient
         return Helpers.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
+    @Path("ji/bulk")
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<Long> bulkEnqueueFromHistory(List<Long> jobIds)
+    {
+        return Helpers.getClient().bulkEnqueueFromHistory(jobIds);
+    }
+
     @Path("ji/cancelled/{jobId}")
     @POST
     public void cancelJob(@PathParam("jobId") long jobId)
@@ -178,6 +186,15 @@ public class ServiceClient
         Helpers.getClient().killJob(jobId);
     }
 
+    @Path("ji/killed")
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public int killJobs(List<Long> jobIds)
+    {
+        return Helpers.getClient().killJobs(jobIds);
+    }
+
     @Path("schedule/{scheduleId}")
     @DELETE
     public void removeRecurrence(@PathParam("scheduleId") long scheduleId)
@@ -192,11 +209,29 @@ public class ServiceClient
         Helpers.getClient().pauseQueuedJob(jobId);
     }
 
+    @Path("ji/paused")
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public int pauseQueuedJobs(List<Long> jobIds)
+    {
+        return Helpers.getClient().pauseQueuedJobs(jobIds);
+    }
+
     @Path("ji/paused/{jobId}")
     @DELETE
     public void resumeQueuedJob(@PathParam("jobId") long jobId)
     {
         Helpers.getClient().resumeQueuedJob(jobId);
+    }
+
+    @Path("ji/resumed") // DELETE does not work well with a body, so POST on /resume is used
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public int resumeQueuedJobs(List<Long> jobIds)
+    {
+        return Helpers.getClient().resumeQueuedJobs(jobIds);
     }
 
     public void resumeJob(@PathParam("jobId") long jobId)
@@ -238,6 +273,15 @@ public class ServiceClient
     public void setJobQueue(@PathParam("jobId") long jobId, @PathParam("queueId") long queueId)
     {
         Helpers.getClient().setJobQueue(jobId, queueId);
+    }
+
+    @Path("q/{queueId: [0-9]+}/bulk")
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public int setJobQueues(@PathParam("queueId") long queueId, List<Long> jobIds)
+    {
+        return Helpers.getClient().setJobQueues(jobIds, queueId);
     }
 
     // No need to expose. Client side work.
@@ -356,6 +400,18 @@ public class ServiceClient
         query.setParentClient((JqmClientQuerySubmitCallback) client);
         query.invoke();
         return query;
+    }
+
+    @Path("ji/query/ids")
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<Long> getJobsQueryIds(QueryBaseImpl query)
+    {
+        var client = Helpers.getClient();
+        query.setParentClient((JqmClientQuerySubmitCallback) client);
+        List<JobInstance> results = query.invoke();
+        return results.stream().map(JobInstance::getId).collect(Collectors.toList());
     }
 
     @Path("ji/{jobId}/messages")
