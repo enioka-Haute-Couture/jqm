@@ -3,8 +3,12 @@ package com.enioka.jqm.test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ServiceLoader;
+
+import javax.sql.DataSource;
 
 import com.enioka.jqm.client.api.Deliverable;
 import com.enioka.jqm.client.api.JqmClientFactory;
@@ -113,4 +117,22 @@ public class JqmTesterAsyncTest2
         tester.stop();
     }
 
+    // Test JNDI resource retrieval from test code
+    @Test
+    public void testSix() throws SQLException
+    {
+        try (JqmAsynchronousTester tester = DefaultJqmAsynchronousTester.create().createSingleNodeOneQueue())
+        {
+            // retrieve the resource
+            DataSource ds = tester.getResource("jdbc/test");
+            Assert.assertNotNull(ds);
+
+            // Check the resource is usable
+            try (Connection cnx = ds.getConnection())
+            {
+                Assert.assertNotNull(cnx);
+                Assert.assertFalse(cnx.isClosed());
+            }
+        }
+    }
 }

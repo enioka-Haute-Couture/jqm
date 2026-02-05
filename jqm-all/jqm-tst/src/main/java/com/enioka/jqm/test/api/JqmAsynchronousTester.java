@@ -207,6 +207,21 @@ public interface JqmAsynchronousTester extends AutoCloseable
      */
     public void stop();
 
+    /**
+     * Retrieve a JNDI resource by its name.
+     *
+     * This allows test code to access the same resources that jobs use, to check changes made by a job in DB for exemple.
+     *
+     * @param <T>
+     *            the expected type of the resource
+     * @param jndiName
+     *            the JNDI name of the resource
+     * @return the resource object cast to the expected type
+     * @throws javax.naming.NamingException
+     *             if the resource cannot be found or accessed
+     */
+    public <T> T getResource(String jndiName);
+
     ///////////////////////////////////////////////////////////////////////////
     // POST TEST
     ///////////////////////////////////////////////////////////////////////////
