@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.MetaInfServices;
 
@@ -80,7 +83,7 @@ public class DefaultJqmAsynchronousTester implements JqmAsynchronousTester
 
     /**
      * Equivalent to simply calling the constructor. Present for consistency.
-     * 
+     *
      * @return JqmAsynchronousTester
      */
     public static JqmAsynchronousTester create()
@@ -290,6 +293,21 @@ public class DefaultJqmAsynchronousTester implements JqmAsynchronousTester
         this.engines.clear();
         this.queues.clear();
         this.nodes.clear();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getResource(String jndiName)
+    {
+        try
+        {
+            InitialContext ctx = new InitialContext();
+            return (T) ctx.lookup(jndiName);
+        }
+        catch (NamingException e)
+        {
+            throw new RuntimeException("Failed to lookup JNDI resource: " + jndiName, e);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
