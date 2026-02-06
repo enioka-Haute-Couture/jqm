@@ -307,8 +307,12 @@ final class Helpers
                 || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-                || (cause != null && cause.getMessage().equals("This connection has been closed"))
-                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
-                || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
+                || (cause != null && cause.getMessage() != null && cause.getMessage().equals("This connection has been closed"))
+                || (cause instanceof SQLException && e.getMessage() != null
+                        && e.getMessage().equals("Failed to validate a newly established connection."))
+                || (cause instanceof SQLException && cause.getMessage() != null
+                        && cause.getMessage().contains("Listener refused the connection"))
+                || (cause instanceof SQLNonTransientException && cause.getMessage() != null
+                        && cause.getMessage().equals("connection exception: closed"));
     }
 }
