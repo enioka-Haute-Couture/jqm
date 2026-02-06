@@ -1,10 +1,15 @@
 package com.enioka.jqm.runner.java;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobManager;
@@ -29,6 +34,7 @@ public class JavaRunner implements JobRunner
     private ClassloaderManager classloaderManager;
     private boolean oneLogPerLaunch = false;
     private PrintStream originalStdOut, originalStdErr;
+    private Logger jqmlogger = LoggerFactory.getLogger(JavaRunner.class);
 
     @Override
     public void close()
@@ -51,6 +57,9 @@ public class JavaRunner implements JobRunner
     {
         // Get all runners from registry
         var javaJobRunners = ServiceLoaderHelper.getServices(ServiceLoader.load(JavaJobRunner.class));
+
+        // Check that all referenced runners exist
+        validateRunnersExistence(javaJobRunners);
 
         // Init CL manager
         classloaderManager = new ClassloaderManager(javaJobRunners);
@@ -99,5 +108,44 @@ public class JavaRunner implements JobRunner
     public JobInstanceTracker getTracker(JobInstance toRun, JobManager engineApi, JobRunnerCallback cb)
     {
         return new JavaJobInstanceTracker(toRun, cb, classloaderManager, engineApi);
+    }
+
+    /**
+     * Validates that all runners referenced in classloader configurations exist. Logs an error for any missing runner references.
+     *
+     * @param javaJobRunners
+     *            list of available JavaJobRunner implementations
+     */
+    private void validateRunnersExistence(List<JavaJobRunner> javaJobRunners)
+    {
+        try (DbConn cnx = DbManager.getDb().getConn())
+        {
+            var classloaders = com.enioka.jqm.model.Cl.select(cnx, "cl_select_all");
+
+            Set<String> availableRunnerNames = javaJobRunners.stream().map(runner -> runner.getClass().getCanonicalName())
+                    .collect(Collectors.toSet());
+
+            for (var cl : classloaders)
+            {
+                String allowedRunners = cl.getAllowedRunners();
+
+                if (allowedRunners != null && !allowedRunners.trim().isEmpty())
+                {
+                    String[] runnerClassNames = allowedRunners.split(",");
+
+                    for (String runnerClassName : runnerClassNames)
+                    {
+                        String runnerName = runnerClassName.trim();
+
+                        if (!runnerName.isEmpty() && !availableRunnerNames.contains(runnerName))
+                        {
+                            jqmlogger.error(
+                                    "Class loader '{}' references a runner '{}' which does not exist. To prevent a failure at runtime install the runner or update the configuration.",
+                                    cl.getName(), runnerName);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
