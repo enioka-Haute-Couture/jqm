@@ -50,6 +50,14 @@ Below are some samples & details for various cases.
 JDBC
 *****
 
+.. warning:: **Never bundle JDBC drivers with your payload or use DriverManager directly!**
+
+	Registering JDBC drivers in the payload classpath causes severe classloader leaks that prevent garbage collection
+	of the payload classloader. (cf. :doc:`../dev/classloaders` for more details on classloaders).
+
+	**Always use JNDI datasources** to access databases. JDBC drivers should be placed in the JQM ``ext``
+	directory and configured as JNDI resources in singleton mode. This is the only safe way to use JDBC in JQM payloads.
+
 ::
 
         DataSource ds = InitialContext.doLookup("jdbc/superalias");
