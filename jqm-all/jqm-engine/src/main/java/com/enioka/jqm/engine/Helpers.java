@@ -303,12 +303,17 @@ final class Helpers
     static boolean testDbFailure(Exception e)
     {
         Throwable cause = e.getCause();
+        Throwable rootCause = ExceptionUtils.getRootCause(e);
+
         return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-                || (cause != null && cause.getMessage().equals("This connection has been closed"))
-                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
-                || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
+                || (rootCause != null && rootCause.getClass().getName().equals("oracle.net.ns.NetException"))
+                || (cause != null && cause.getMessage() != null && cause.getMessage().equals("This connection has been closed"))
+                || (cause instanceof SQLException && e.getMessage() != null
+                        && e.getMessage().equals("Failed to validate a newly established connection."))
+                || (cause instanceof SQLNonTransientException && cause.getMessage() != null
+                        && cause.getMessage().equals("connection exception: closed"));
     }
 }
