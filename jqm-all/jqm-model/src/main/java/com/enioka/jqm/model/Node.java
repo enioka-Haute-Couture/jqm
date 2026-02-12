@@ -485,10 +485,10 @@ public class Node implements Serializable
         }
     }
 
-    public static List<Node> select(DbConn cnx, String query_key, Object... args)
+    public static List<Node> select(DbConn cnx, String queryKey, Object... args)
     {
         List<Node> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -502,9 +502,9 @@ public class Node implements Serializable
         return res;
     }
 
-    public static Node select_single(DbConn cnx, String query_key, Object... args)
+    public static Node selectSingle(DbConn cnx, String queryKey, Object... args)
     {
-        List<Node> nn = select(cnx, query_key, args);
+        List<Node> nn = select(cnx, queryKey, args);
         if (nn.size() == 0)
         {
             throw new NoResultException("No node with this ID");

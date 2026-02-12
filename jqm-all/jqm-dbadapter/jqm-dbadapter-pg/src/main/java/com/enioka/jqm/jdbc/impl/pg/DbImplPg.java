@@ -29,7 +29,7 @@ public class DbImplPg extends DbAdapter
 
     public DbImplPg()
     {
-        this.IDS[0] = "id";
+        this.ids[0] = "id";
     }
 
     @Override

@@ -17,7 +17,8 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 public class Schedule implements Serializable
 {
     /** Default Constructor. **/
-    public Schedule(){}
+    public Schedule()
+    {}
 
     private static final long serialVersionUID = -8520223502712009225L;
 
@@ -29,6 +30,7 @@ public class Schedule implements Serializable
 
     /**
      * The schedule ID. This is the same ID returned by {@link JobRequest#enqueue()}.
+     *
      * @return the schedule ID
      */
     public long getId()
@@ -38,8 +40,10 @@ public class Schedule implements Serializable
 
     /**
      * Sets the schedule ID.
+     *
      * @see #getId()
-     * @param id the schedule ID
+     * @param id
+     *            the schedule ID
      */
     public void setId(long id)
     {
@@ -48,6 +52,7 @@ public class Schedule implements Serializable
 
     /**
      * The recurrence expression, in cron syntax.
+     *
      * @return the cron expression
      */
     public String getCronExpression()
@@ -57,8 +62,10 @@ public class Schedule implements Serializable
 
     /**
      * Sets the recurrence expression.
+     *
      * @see #getCronExpression()
-     * @param cronExpression the cron expression
+     * @param cronExpression
+     *            the cron expression
      */
     public void setCronExpression(String cronExpression)
     {
@@ -67,6 +74,7 @@ public class Schedule implements Serializable
 
     /**
      * Optional. This is an overload of the default priority of the job definition (itself optional).
+     *
      * @return the priority
      */
     public Integer getPriority()
@@ -76,8 +84,10 @@ public class Schedule implements Serializable
 
     /**
      * Sets the priority.
+     *
      * @see #getPriority()
-     * @param priority the priority
+     * @param priority
+     *            the priority
      */
     public void setPriority(Integer priority)
     {
@@ -86,6 +96,7 @@ public class Schedule implements Serializable
 
     /**
      * Optional. This is an overload of the default queue of the job definition.
+     *
      * @return the queue
      */
     public Queue getQueue()
@@ -95,8 +106,10 @@ public class Schedule implements Serializable
 
     /**
      * Sets the queue.
+     *
      * @see #getQueue()
-     * @param queue the queue
+     * @param queue
+     *            the queue
      */
     public void setQueue(Queue queue)
     {
@@ -107,6 +120,7 @@ public class Schedule implements Serializable
      * A set of parameters (key/value pairs) which are available to job instances at runtime. Parameters can be defined at multiple levels:
      * here, inside the job definition, and inside the {@link JobRequest}. In case a parameter key exists at multiple levels, the parameter
      * defined here has the least priority.
+     *
      * @return the parameters
      */
     public Map<String, String> getParameters()
@@ -116,8 +130,10 @@ public class Schedule implements Serializable
 
     /**
      * Sets the parameters.
+     *
      * @see #getParameters()
-     * @param parameters the parameters
+     * @param parameters
+     *            the parameters
      */
     public void setParameters(Map<String, String> parameters)
     {

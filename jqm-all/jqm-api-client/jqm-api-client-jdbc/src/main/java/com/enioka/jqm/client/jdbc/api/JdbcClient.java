@@ -26,7 +26,14 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,7 +226,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             // Standard case: execution by applicationName.
             try
             {
-                jobDef = JobDef.select_key(cnx, runRequest.getApplicationName());
+                jobDef = JobDef.selectKey(cnx, runRequest.getApplicationName());
             }
             catch (NonUniqueResultException ex)
             {
@@ -266,7 +273,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
 
         // Parameters are both from the JobDef and the execution request.
-        Map<String, String> prms = JobDefParameter.select_map(cnx, "jdprm_select_all_for_jd", jobDef.getId());
+        Map<String, String> prms = JobDefParameter.selectMap(cnx, "jdprm_select_all_for_jd", jobDef.getId());
         if (sj != null)
         {
             prms.putAll(sj.getParameters());
@@ -274,13 +281,13 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         prms.putAll(runRequest.getParameters());
 
         // On which queue?
-        Long queue_id = null;
+        Long queueId = null;
         if (runRequest.getQueueName() != null)
         {
             // use requested key if given.
             try
             {
-                queue_id = cnx.runSelectSingle("q_select_by_key", 1, Long.class, runRequest.getQueueName());
+                queueId = cnx.runSelectSingle("q_select_by_key", 1, Long.class, runRequest.getQueueName());
             }
             catch (NoResultException e)
             {
@@ -290,12 +297,12 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
         else if (sj != null && sj.getQueue() != null)
         {
-            queue_id = sj.getQueue();
+            queueId = sj.getQueue();
         }
         else
         {
             // use default queue otherwise
-            queue_id = jobDef.getQueue();
+            queueId = jobDef.getQueue();
         }
 
         // Priority can come from schedule, JD, request. (in order of ascending priority)
@@ -327,10 +334,11 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         // Now create the JI
         try
         {
-            Long id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
+            Long id = JobInstance.enqueue(cnx, startingState, queueId, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
-                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getTraceId(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
-                sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), priority, Instruction.RUN, prms);
+                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getTraceId(), runRequest.getUser(),
+                    runRequest.getEmail(), jobDef.isHighlander(), sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(),
+                    priority, Instruction.RUN, prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();
@@ -422,7 +430,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
      */
     private JobRequestBaseImpl getJobRequest(Long launchId, DbConn cnx)
     {
-        Map<String, String> prms = RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", launchId);
+        Map<String, String> prms = RuntimeParameter.selectMap(cnx, "jiprm_select_by_ji", launchId);
         ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", launchId);
 
         try
@@ -474,7 +482,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         JobDef jobDef = null;
         try
         {
-            jobDef = JobDef.select_key(cnx, jr.getApplicationName());
+            jobDef = JobDef.selectKey(cnx, jr.getApplicationName());
         }
         catch (NonUniqueResultException ex)
         {
@@ -518,7 +526,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             }
 
             History.create(cnx, idJob, State.CANCELLED, null);
-            JobInstance.delete_id(cnx, idJob);
+            JobInstance.deleteId(cnx, idJob);
             cnx.commit();
         }
         catch (RuntimeException e)
@@ -549,7 +557,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
             cnx.runUpdate("jiprm_delete_by_ji", idJob);
             cnx.runUpdate("message_delete_by_ji", idJob);
-            JobInstance.delete_id(cnx, idJob);
+            JobInstance.deleteId(cnx, idJob);
             cnx.commit();
         }
         catch (JqmClientException e)
@@ -803,12 +811,12 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             {
                 throw new JqmInvalidRequestException("Job does not exist or is already running.");
             }
-            long queue_id = rs1.getLong(1);
-            int internal_id = rs1.getInt(2);
+            long queueId = rs1.getLong(1);
+            int internalId = rs1.getInt(2);
             rs1.close();
 
             // Step 2 : get the current rank of the JI.
-            int current = cnx.runSelectSingle("ji_select_current_pos", Integer.class, internal_id, queue_id);
+            int current = cnx.runSelectSingle("ji_select_current_pos", Integer.class, internalId, queueId);
 
             // Step 3 : select target position
             int betweenUp = 0;
@@ -831,7 +839,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             }
 
             // Step 4 : update the JI.
-            List<JobInstance> currentJobs = JobInstance.select(cnx, "ji_select_by_queue", queue_id);
+            List<JobInstance> currentJobs = JobInstance.select(cnx, "ji_select_by_queue", queueId);
             if (currentJobs.isEmpty())
             {
                 cnx.runUpdate("jj_update_rank_by_id", 0, idJob);
@@ -1025,15 +1033,6 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         return "";
     }
 
-    private String getIntPredicate(String fieldName, Integer filterValue, List<Object> prms)
-    {
-        if (filterValue == null)
-        {
-            return "";
-        }
-        return getLongPredicate(fieldName, filterValue.longValue(), prms);
-    }
-
     private String getLongPredicate(String fieldName, Long filterValue, List<Object> prms)
     {
         if (filterValue != null)
@@ -1148,8 +1147,10 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
                         + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
-                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE, ji.PRIORITY, ji.DATE_NOT_BEFORE "
-                        + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ";
+                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, "
+                        + "ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE, "
+                        + "ji.PRIORITY, ji.DATE_NOT_BEFORE FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID "
+                        + "LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ";
 
                 if (wh.length() > 3)
                 {
@@ -1205,7 +1206,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, PRIORITY AS PRIORITY, DATE_NOT_BEFORE FROM __T__HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, "
+                        + "PRIORITY AS PRIORITY, DATE_NOT_BEFORE FROM __T__HISTORY ";
 
                 if (wh.length() > 3)
                 {
@@ -1383,9 +1385,11 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     @Override
     public com.enioka.jqm.client.api.JobInstance getJob(long idJob)
     {
-        List<com.enioka.jqm.client.api.JobInstance> jobList = this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke();
+        List<com.enioka.jqm.client.api.JobInstance> jobList = this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true)
+                .setQueryLiveInstances(true).invoke();
 
-        if (jobList.isEmpty()){
+        if (jobList.isEmpty())
+        {
             throw new JqmInvalidRequestException("No job with id " + idJob + " found :");
         }
         return jobList.get(0);
@@ -1714,7 +1718,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     {
         try (DbConn cnx = getDbSession())
         {
-            cnx.runUpdate("dp_update_enable_by_queue_id", Boolean.FALSE, q.getId());
+            cnx.runUpdate("dp_update_enable_by_queueId", Boolean.FALSE, q.getId());
             cnx.commit();
             jqmlogger.info("Queue {} has been paused", q.getId());
         }
@@ -1729,7 +1733,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     {
         try (DbConn cnx = getDbSession())
         {
-            cnx.runUpdate("dp_update_enable_by_queue_id", Boolean.TRUE, q.getId());
+            cnx.runUpdate("dp_update_enable_by_queueId", Boolean.TRUE, q.getId());
             cnx.commit();
             jqmlogger.info("Queue {} has been resumed", q.getId());
         }
@@ -1744,7 +1748,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     {
         try (DbConn cnx = getDbSession())
         {
-            QueryResult qr = cnx.runUpdate("ji_delete_waiting_in_queue_id", q.getId());
+            QueryResult qr = cnx.runUpdate("ji_delete_waiting_in_queueId", q.getId());
             cnx.commit();
             jqmlogger.info("{} waiting job instances were removed from queue {}", qr.nbUpdated, q.getId());
         }
@@ -1892,7 +1896,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                     ids.add(jd.getId());
                 }
                 sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
-                allParams = JobDefParameter.select_all(cnx, "jdprm_select_all_for_jd_list", ids);
+                allParams = JobDefParameter.selectAll(cnx, "jdprm_select_all_for_jd_list", ids);
             }
 
             for (JobDef jd : dbr)

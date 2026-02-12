@@ -14,6 +14,7 @@ import com.enioka.jqm.xml.XmlJobDefParser;
 
 import org.apache.commons.io.FileUtils;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Import-JobDef", commandDescription = "Import one or multiple deployment descriptors.")
 class CommandImportJobDef extends CommandBase
 {

@@ -31,6 +31,7 @@ import com.enioka.jqm.webserver.api.WebServerConfiguration;
  * Main implementation of the HTTP(S) server.<br>
  * Some parts inspired by https://northcoder.com/post/jetty-11-secure-connections/
  */
+@SuppressWarnings("checkstyle:LineLength")
 @MetaInfServices(WebServer.class)
 public class JettyServer implements WebServer
 {

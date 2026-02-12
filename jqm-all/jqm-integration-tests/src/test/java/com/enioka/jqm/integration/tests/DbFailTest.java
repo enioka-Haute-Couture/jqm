@@ -14,7 +14,7 @@ public class DbFailTest extends JqmBaseTest
     public void before()
     {
         // These tests are HSQLDB dependent.
-        AssumeHsqldb();
+        assumeHsqldb();
 
         // TODO: write some tests for PGSQL.
     }

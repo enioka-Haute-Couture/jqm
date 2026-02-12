@@ -31,6 +31,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("checkstyle:LineLength")
 public class ShellRunnerTestWithSimpleApi extends JqmBaseTest
 {
     /**

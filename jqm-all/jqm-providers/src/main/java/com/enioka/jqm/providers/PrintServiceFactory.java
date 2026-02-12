@@ -31,7 +31,7 @@ public class PrintServiceFactory implements ObjectFactory
 
     /**
      * Helper method to avoid instantiating a factory to create a service. Should be used in non-JNDI environments.
-     * 
+     *
      * @return PrintService
      */
     public static PrintService getService()

@@ -430,12 +430,12 @@ public class ClientApiTestJdbc extends JqmBaseTest
         after = Calendar.getInstance();
         after.add(Calendar.YEAR, -1);
         jqmClient.setJobRunAfter(i2, after);
-        Assert.assertTrue(com.enioka.jqm.model.JobInstance.select_id(cnx, i2).getNotBefore().before(Calendar.getInstance()));
+        Assert.assertTrue(com.enioka.jqm.model.JobInstance.selectId(cnx, i2).getNotBefore().before(Calendar.getInstance()));
 
         long i4 = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
-        Assert.assertNull(com.enioka.jqm.model.JobInstance.select_id(cnx, i4).getNotBefore());
+        Assert.assertNull(com.enioka.jqm.model.JobInstance.selectId(cnx, i4).getNotBefore());
         jqmClient.setJobRunAfter(i4, after);
-        Assert.assertTrue(com.enioka.jqm.model.JobInstance.select_id(cnx, i4).getNotBefore().before(Calendar.getInstance()));
+        Assert.assertTrue(com.enioka.jqm.model.JobInstance.selectId(cnx, i4).getNotBefore().before(Calendar.getInstance()));
 
         //////////////////////////////////
         // Schedule
@@ -447,11 +447,11 @@ public class ClientApiTestJdbc extends JqmBaseTest
         Assert.assertEquals("* * * * *", jd.getSchedules().get(0).getCronExpression());
         Assert.assertEquals(null, jd.getSchedules().get(0).getQueue());
 
-        JobDef jd_client = jqmClient.getJobDefinition("MarsuApplication");
-        Assert.assertEquals(idJobDef, jd_client.getId());
-        Assert.assertEquals(1, jd_client.getSchedules().size());
-        Assert.assertEquals(i3, jd_client.getSchedules().get(0).getId());
-        Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
+        JobDef jdClient = jqmClient.getJobDefinition("MarsuApplication");
+        Assert.assertEquals(idJobDef, jdClient.getId());
+        Assert.assertEquals(1, jdClient.getSchedules().size());
+        Assert.assertEquals(i3, jdClient.getSchedules().get(0).getId());
+        Assert.assertEquals("* * * * *", jdClient.getSchedules().get(0).getCronExpression());
 
         jqmClient.setScheduleRecurrence(i3, "1 * * * *");
         jd = MetaService.getJobDef(cnx, idJobDef);

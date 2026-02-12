@@ -35,11 +35,13 @@ import com.enioka.jqm.jdbc.QueryResult;
  * Persistence class for storing the definition of all the user codes (the payloads) that can be run by the JQM engines. It contains all the
  * metadata needed to create an execution request (a {@link JobInstance}).
  */
+@SuppressWarnings("checkstyle:MemberName")
 public class JobDef implements Serializable
 {
     private static final long serialVersionUID = -3276834475433922990L;
 
-    public enum PathType {
+    public enum PathType
+    {
         /**
          * The path is a local file system path.
          */
@@ -396,7 +398,7 @@ public class JobDef implements Serializable
 
     public Map<String, String> getParametersMap(DbConn cnx)
     {
-        return JobDefParameter.select_map(cnx, "jdprm_select_all_for_jd", this.id);
+        return JobDefParameter.selectMap(cnx, "jdprm_select_all_for_jd", this.id);
     }
 
     /**
@@ -589,10 +591,10 @@ public class JobDef implements Serializable
         return tmp;
     }
 
-    public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
+    public static List<JobDef> select(DbConn cnx, String queryKey, Object... args)
     {
         List<JobDef> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -610,11 +612,11 @@ public class JobDef implements Serializable
     }
 
     public static long create(DbConn cnx, String description, String javaClassName, Map<String, String> parameters, String jarPath,
-            long queue_id, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            long queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
             String keyword2, String keyword3, boolean highlander, Long classLoaderId, PathType pathType)
     {
         QueryResult r = cnx.runUpdate("jd_insert", application, applicationName, classLoaderId, description, true, false, highlander,
-                jarPath, javaClassName, null, keyword1, keyword2, keyword3, maxTimeRunning, module, pathType.toString(), queue_id);
+                jarPath, javaClassName, null, keyword1, keyword2, keyword3, maxTimeRunning, module, pathType.toString(), queueId);
         long newId = r.getGeneratedId();
 
         if (parameters != null)
@@ -628,7 +630,7 @@ public class JobDef implements Serializable
         return newId;
     }
 
-    public static JobDef select_key(DbConn cnx, String name)
+    public static JobDef selectKey(DbConn cnx, String name)
     {
         List<JobDef> res = select(cnx, "jd_select_by_key", name);
         if (res.isEmpty())

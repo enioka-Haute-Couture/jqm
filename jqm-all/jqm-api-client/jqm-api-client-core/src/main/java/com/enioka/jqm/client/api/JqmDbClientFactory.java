@@ -13,11 +13,14 @@ public class JqmDbClientFactory
     /**
      * Default constructor.
      */
-    public JqmDbClientFactory(){}
+    public JqmDbClientFactory()
+    {}
 
     /**
      * Set the properties for the database client factory.
-     * @param properties the properties to set
+     *
+     * @param properties
+     *            the properties to set
      */
     public static void setProperties(Properties properties)
     {
@@ -26,8 +29,11 @@ public class JqmDbClientFactory
 
     /**
      * Set a single property for the database client factory.
-     * @param key the key of the property to set
-     * @param value the value of the property to set
+     *
+     * @param key
+     *            the key of the property to set
+     * @param value
+     *            the value of the property to set
      */
     public static void setProperty(String key, Object value)
     {
@@ -36,6 +42,7 @@ public class JqmDbClientFactory
 
     /**
      * Get a database client.
+     *
      * @return a database client
      */
     public static JqmClient getClient()
@@ -45,9 +52,13 @@ public class JqmDbClientFactory
 
     /**
      * Get a database client.
-     * @param name name of the client to get
-     * @param p properties to use for the client
-     * @param cached whether the client should be cached or not
+     *
+     * @param name
+     *            name of the client to get
+     * @param p
+     *            properties to use for the client
+     * @param cached
+     *            whether the client should be cached or not
      * @return a database client
      */
     public static JqmClient getClient(String name, Properties p, boolean cached)

@@ -38,6 +38,7 @@ import com.enioka.jqm.jdbc.QueryResult;
  * specified inside the execution request and associated to the {@link JobInstance}. Therefore, this table is purely metadata and is never
  * used in TP processing.
  */
+@SuppressWarnings("checkstyle:MemberName")
 public class JobDefParameter implements Serializable
 {
     private static final long serialVersionUID = -5308516206913425230L;
@@ -103,10 +104,10 @@ public class JobDefParameter implements Serializable
         return id;
     }
 
-    public static List<JobDefParameter> select(DbConn cnx, String query_key, Object... args)
+    public static List<JobDefParameter> select(DbConn cnx, String queryKey, Object... args)
     {
         List<JobDefParameter> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -127,10 +128,10 @@ public class JobDefParameter implements Serializable
         return res;
     }
 
-    public static Map<Long, List<JobDefParameter>> select_all(DbConn cnx, String query_key, Object... args)
+    public static Map<Long, List<JobDefParameter>> selectAll(DbConn cnx, String queryKey, Object... args)
     {
         Map<Long, List<JobDefParameter>> res = new HashMap<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -158,10 +159,10 @@ public class JobDefParameter implements Serializable
         return res;
     }
 
-    public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
+    public static Map<String, String> selectMap(DbConn cnx, String queryKey, Object... args)
     {
         Map<String, String> res = new HashMap<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {

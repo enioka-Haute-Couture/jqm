@@ -9,6 +9,7 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.GlobalParameter;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Set-WebConfiguration", commandDescription = "Changes the way JQM exposes its web services and GUI.")
 class CommandSetWebConfiguration extends CommandBase
 {
@@ -62,7 +63,8 @@ class CommandSetWebConfiguration extends CommandBase
         return 0;
     }
 
-    enum Action {
+    enum Action
+    {
         /**
          * Changes all configuration options needed to enable the web UI on HTTP (not HTTPS).
          */

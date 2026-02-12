@@ -1,6 +1,11 @@
 package com.enioka.jqm.runner.shell;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
@@ -54,7 +59,7 @@ class StreamGobbler extends Thread
     public void run()
     {
         Thread.currentThread().setName(this.threadName);
-        try(PrintWriter pw = new PrintWriter(this.os))
+        try (PrintWriter pw = new PrintWriter(this.os))
         {
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);

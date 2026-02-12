@@ -218,7 +218,8 @@ public abstract class ResourceManagerBase
     /**
      * The result of a booking request.
      */
-    enum BookingStatus {
+    enum BookingStatus
+    {
         /**
          * The necessary resources have been booked - they are not available to anyone else until released.
          */

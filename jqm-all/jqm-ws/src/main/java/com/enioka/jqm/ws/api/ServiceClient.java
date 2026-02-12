@@ -18,18 +18,28 @@ package com.enioka.jqm.ws.api;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
-import com.enioka.jqm.client.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.client.api.Deliverable;
+import com.enioka.jqm.client.api.JobDef;
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.JobRequest;
+import com.enioka.jqm.client.api.JqmClient;
+import com.enioka.jqm.client.api.JqmClientException;
+import com.enioka.jqm.client.api.JqmDbClientFactory;
+import com.enioka.jqm.client.api.JqmInvalidRequestException;
+import com.enioka.jqm.client.api.JqmWsClientFactory;
+import com.enioka.jqm.client.api.Query;
+import com.enioka.jqm.client.api.Queue;
+import com.enioka.jqm.client.api.QueueStatus;
+import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.JqmClientQuerySubmitCallback;
 import com.enioka.jqm.client.shared.QueryBaseImpl;
@@ -590,7 +600,7 @@ public class ServiceClient
         {
             try
             {
-                n = Node.select_single(cnx, "node_select_by_id", jqmNodeId);
+                n = Node.selectSingle(cnx, "node_select_by_id", jqmNodeId);
             }
             catch (NoResultException e)
             {
@@ -599,7 +609,7 @@ public class ServiceClient
 
             try
             {
-                ji = com.enioka.jqm.model.JobInstance.select_id(cnx, jobId);
+                ji = com.enioka.jqm.model.JobInstance.selectId(cnx, jobId);
             }
             catch (DatabaseException e)
             {

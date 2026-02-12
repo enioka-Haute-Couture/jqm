@@ -28,6 +28,7 @@ import com.enioka.jqm.jdbc.DbConn;
  * Persistence class for storing the execution log. All finished {@link JobInstance}s end up in this table (and are purged from
  * {@link JobInstance}).
  */
+@SuppressWarnings("checkstyle:MemberName")
 public class History implements Serializable
 {
     private static final long serialVersionUID = -5249529794213078668L;
@@ -717,12 +718,12 @@ public class History implements Serializable
     }
 
     /**
-     * @param return_code
+     * @param returnCode
      *            the return code to set
      */
-    public void setReturnCode(Integer return_code)
+    public void setReturnCode(Integer returnCode)
     {
-        this.return_code = return_code;
+        this.return_code = returnCode;
     }
 
     /**
@@ -777,7 +778,7 @@ public class History implements Serializable
      */
     public static void create(DbConn cnx, long launchId, State finalState, Calendar endDate)
     {
-        JobInstance ji = JobInstance.select_id(cnx, launchId);
+        JobInstance ji = JobInstance.selectId(cnx, launchId);
         create(cnx, ji, finalState, endDate);
 
     }

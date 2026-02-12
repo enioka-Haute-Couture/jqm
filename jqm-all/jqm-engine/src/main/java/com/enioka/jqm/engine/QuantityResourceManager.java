@@ -20,11 +20,11 @@ import com.enioka.jqm.model.ResourceManager;
  */
 public class QuantityResourceManager extends ResourceManagerBase
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(QuantityResourceManager.class);
+    private static final Logger jqmlogger = LoggerFactory.getLogger(QuantityResourceManager.class);
 
-    private static String PRM_ROOT = "com.enioka.jqm.rm.quantity.";
-    private static String PRM_QUANTITY = "quantity";
-    private static String PRM_CONSUMPTION = "consumption";
+    private static final String PRM_ROOT = "com.enioka.jqm.rm.quantity.";
+    private static final String PRM_QUANTITY = "quantity";
+    private static final String PRM_CONSUMPTION = "consumption";
 
     private AtomicInteger availableUnits = new AtomicInteger(0);
     private int previousMaxUnits = 0;

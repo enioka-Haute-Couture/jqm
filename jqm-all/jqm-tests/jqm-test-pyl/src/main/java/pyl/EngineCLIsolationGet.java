@@ -1,6 +1,6 @@
 package pyl;
 
-import com.enioka.jqm.TestCLIsolation.TestStatic;
+import com.enioka.jqm.testclisolation.TestStatic;
 
 public class EngineCLIsolationGet
 {

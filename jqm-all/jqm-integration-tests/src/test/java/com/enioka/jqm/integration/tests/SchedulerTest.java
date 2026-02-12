@@ -122,11 +122,11 @@ public class SchedulerTest extends JqmBaseTest
         long scheduleId = jqmClient.newJobRequest("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
                 .enqueue();
 
-        JobDef jd_client = jqmClient.getJobDefinition("MarsuApplication");
-        Assert.assertEquals(id, jd_client.getId());
-        Assert.assertEquals(1, jd_client.getSchedules().size());
-        Assert.assertEquals(scheduleId, jd_client.getSchedules().get(0).getId());
-        Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
+        JobDef jdClient = jqmClient.getJobDefinition("MarsuApplication");
+        Assert.assertEquals(id, jdClient.getId());
+        Assert.assertEquals(1, jdClient.getSchedules().size());
+        Assert.assertEquals(scheduleId, jdClient.getSchedules().get(0).getId());
+        Assert.assertEquals("* * * * *", jdClient.getSchedules().get(0).getCronExpression());
 
         addAndStartEngine();
 

@@ -39,17 +39,15 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import com.enioka.jqm.xml.XmlJobDefParser;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class MiscTest extends JqmBaseTest
 {
     @Rule
-    public final GreenMailRule greenMail = new GreenMailRule(new ServerSetup[] {
-        new ServerSetup(10025, null, ServerSetup.PROTOCOL_SMTP),
-        new ServerSetup(10143, null, ServerSetup.PROTOCOL_IMAP)
-    });
+    public final GreenMailRule greenMail = new GreenMailRule(new ServerSetup[] { new ServerSetup(10025, null, ServerSetup.PROTOCOL_SMTP),
+            new ServerSetup(10143, null, ServerSetup.PROTOCOL_IMAP) });
+
     @Test
     public void testEmail() throws Exception
     {
@@ -113,7 +111,7 @@ public class MiscTest extends JqmBaseTest
     {
         // The PU test expects an HSQLDB database which does not exist when running the
         // tests on other databases
-        AssumeHsqldb();
+        assumeHsqldb();
 
         CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "SA", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);

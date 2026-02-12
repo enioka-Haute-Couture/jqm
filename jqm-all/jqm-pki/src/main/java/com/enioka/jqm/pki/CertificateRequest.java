@@ -66,8 +66,8 @@ public class CertificateRequest
     private Integer size = 2048;
     private X509CertificateHolder authorityCertificate = null;
     private PrivateKey authorityKey = null;
-    private String Subject;
-    private KeyPurposeId[] EKU;
+    private String subject;
+    private KeyPurposeId[] eku;
     private int keyUsage = 0;
     private int validityYear = 10;
 
@@ -83,14 +83,14 @@ public class CertificateRequest
     {
         this.prettyName = prettyName;
 
-        Subject = "CN=JQM-CA,OU=ServerProducts,O=Oxymores,C=FR";
+        subject = "CN=JQM-CA,OU=ServerProducts,O=Oxymores,C=FR";
         size = 4096;
 
-        EKU = new KeyPurposeId[4];
-        EKU[0] = KeyPurposeId.id_kp_codeSigning;
-        EKU[1] = KeyPurposeId.id_kp_serverAuth;
-        EKU[2] = KeyPurposeId.id_kp_clientAuth;
-        EKU[3] = KeyPurposeId.id_kp_emailProtection;
+        eku = new KeyPurposeId[4];
+        eku[0] = KeyPurposeId.id_kp_codeSigning;
+        eku[1] = KeyPurposeId.id_kp_serverAuth;
+        eku[2] = KeyPurposeId.id_kp_clientAuth;
+        eku[3] = KeyPurposeId.id_kp_emailProtection;
 
         keyUsage = KeyUsage.cRLSign | KeyUsage.keyCertSign;
 
@@ -104,12 +104,12 @@ public class CertificateRequest
         authorityCertificate = authority;
         authorityKey = issuerPrivateKey;
 
-        this.Subject = subject;
+        this.subject = subject;
 
         size = 2048;
 
-        EKU = new KeyPurposeId[1];
-        EKU[0] = KeyPurposeId.id_kp_clientAuth;
+        eku = new KeyPurposeId[1];
+        eku[0] = KeyPurposeId.id_kp_clientAuth;
 
         keyUsage = KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
 
@@ -123,12 +123,12 @@ public class CertificateRequest
         authorityCertificate = authority;
         authorityKey = issuerPrivateKey;
 
-        this.Subject = subject;
+        this.subject = subject;
 
         size = 2048;
 
-        EKU = new KeyPurposeId[1];
-        EKU[0] = KeyPurposeId.id_kp_serverAuth;
+        eku = new KeyPurposeId[1];
+        eku[0] = KeyPurposeId.id_kp_serverAuth;
 
         keyUsage = KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
 
@@ -145,8 +145,7 @@ public class CertificateRequest
                 throw new PkiException(
                         "couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
             }
-            try (FileWriter fw = new FileWriter(path);
-                 JcaPEMWriter wr = new JcaPEMWriter(fw))
+            try (FileWriter fw = new FileWriter(path); JcaPEMWriter wr = new JcaPEMWriter(fw))
             {
                 wr.writeObject(holder);
                 wr.flush();
@@ -160,8 +159,7 @@ public class CertificateRequest
 
     public String writePemPublicToString()
     {
-        try (StringWriter sw = new StringWriter();
-             JcaPEMWriter wr = new JcaPEMWriter(sw))
+        try (StringWriter sw = new StringWriter(); JcaPEMWriter wr = new JcaPEMWriter(sw))
         {
             wr.writeObject(holder);
             wr.flush();
@@ -175,8 +173,7 @@ public class CertificateRequest
 
     public void writePemPrivateToFile(String path)
     {
-        try (FileWriter fw = new FileWriter(path);
-             JcaPEMWriter wr = new JcaPEMWriter(fw))
+        try (FileWriter fw = new FileWriter(path); JcaPEMWriter wr = new JcaPEMWriter(fw))
         {
             wr.writeObject(privateKey);
             wr.flush();
@@ -189,8 +186,7 @@ public class CertificateRequest
 
     public String writePemPrivateToString()
     {
-        try (StringWriter sw = new StringWriter();
-             JcaPEMWriter wr = new JcaPEMWriter(sw))
+        try (StringWriter sw = new StringWriter(); JcaPEMWriter wr = new JcaPEMWriter(sw))
         {
             wr.writeObject(privateKey);
             wr.flush();
@@ -224,8 +220,7 @@ public class CertificateRequest
             // PEM public key
             pemPublicFile = new ByteArrayOutputStream();
 
-            try (Writer osw = new OutputStreamWriter(pemPublicFile);
-                 JcaPEMWriter wr = new  JcaPEMWriter(osw))
+            try (Writer osw = new OutputStreamWriter(pemPublicFile); JcaPEMWriter wr = new JcaPEMWriter(osw))
             {
                 wr.writeObject(holder);
                 wr.flush();
@@ -234,8 +229,7 @@ public class CertificateRequest
             // PEM private key
             pemPrivateFile = new ByteArrayOutputStream();
 
-            try (Writer osw = new OutputStreamWriter(pemPrivateFile);
-                 JcaPEMWriter wr = new JcaPEMWriter(osw))
+            try (Writer osw = new OutputStreamWriter(pemPrivateFile); JcaPEMWriter wr = new JcaPEMWriter(osw))
             {
                 wr.writeObject(privateKey);
                 wr.flush();
@@ -329,7 +323,7 @@ public class CertificateRequest
     private void generateX509() throws Exception
     {
         SecureRandom random = new SecureRandom();
-        X500Name dnName = new X500Name(Subject);
+        X500Name dnName = new X500Name(subject);
         Calendar endValidity = Calendar.getInstance();
         endValidity.add(Calendar.YEAR, validityYear);
 
@@ -346,7 +340,7 @@ public class CertificateRequest
         gen.addExtension(Extension.subjectKeyIdentifier, false, x509ExtensionUtils.createSubjectKeyIdentifier(publicKeyInfo));
 
         // EKU
-        gen.addExtension(Extension.extendedKeyUsage, false, new ExtendedKeyUsage(EKU));
+        gen.addExtension(Extension.extendedKeyUsage, false, new ExtendedKeyUsage(eku));
 
         // Basic constraints (is CA?)
         if (authorityCertificate == null)

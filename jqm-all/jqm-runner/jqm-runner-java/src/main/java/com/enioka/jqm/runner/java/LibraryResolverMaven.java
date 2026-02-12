@@ -22,9 +22,9 @@ class LibraryResolverMaven
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(LibraryResolverMaven.class);
 
-    private static List<String> REPO_LIST = null;
-    private static String MAVEN_SETTINGS_CL = null;
-    private static String MAVEN_SETTINGS_FILE = null;
+    private static List<String> repoList = null;
+    private static String mavenSettingsCl = null;
+    private static String mavenSettingsFile = null;
 
     private String[] mavenRepos;
     private String mavenSettingsClPath;
@@ -58,16 +58,16 @@ class LibraryResolverMaven
     ConfigurableMavenResolverSystem getMavenResolver()
     {
         // Retrieve resolver configuration
-        if (REPO_LIST == null)
+        if (repoList == null)
         {
-            REPO_LIST = new ArrayList<>(5);
+            repoList = new ArrayList<>(5);
             for (String gp : mavenRepos)
             {
-                REPO_LIST.add(gp);
+                repoList.add(gp);
             }
 
-            MAVEN_SETTINGS_CL = mavenSettingsClPath;
-            MAVEN_SETTINGS_FILE = mavenSettingsFilePath;
+            mavenSettingsCl = mavenSettingsClPath;
+            mavenSettingsFile = mavenSettingsFilePath;
         }
 
         // Resolver. Sadly Shrinkwrap uses CL hacks and we must take them into account here.
@@ -76,21 +76,21 @@ class LibraryResolverMaven
         ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
 
         // settings.xml?
-        if (MAVEN_SETTINGS_CL != null && MAVEN_SETTINGS_FILE == null)
+        if (mavenSettingsCl != null && mavenSettingsFile == null)
         {
-            jqmlogger.trace("Custom settings file from class-path will be used: " + MAVEN_SETTINGS_CL);
-            resolver.fromClassloaderResource(MAVEN_SETTINGS_CL);
+            jqmlogger.trace("Custom settings file from class-path will be used: " + mavenSettingsCl);
+            resolver.fromClassloaderResource(mavenSettingsCl);
         }
-        if (MAVEN_SETTINGS_FILE != null)
+        if (mavenSettingsFile != null)
         {
-            jqmlogger.trace("Custom settings file from file system will be used: " + MAVEN_SETTINGS_FILE);
-            resolver.fromFile(MAVEN_SETTINGS_FILE);
+            jqmlogger.trace("Custom settings file from file system will be used: " + mavenSettingsFile);
+            resolver.fromFile(mavenSettingsFile);
         }
         Thread.currentThread().setContextClassLoader(currentCl); // only now (needed for CL search)
 
         // Repositories to use.
         boolean withCentral = false;
-        for (String repo : REPO_LIST)
+        for (String repo : repoList)
         {
             if (repo.contains("repo1.maven.org"))
             {
