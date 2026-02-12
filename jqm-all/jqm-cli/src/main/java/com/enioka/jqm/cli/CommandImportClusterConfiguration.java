@@ -7,6 +7,7 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.xml.XmlConfigurationParser;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Import-ClusterConfiguration", commandDescription = "Import cluster configuration, i.e. everything concerning infrastructure.")
 class CommandImportClusterConfiguration extends CommandBase
 {

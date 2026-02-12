@@ -1,22 +1,17 @@
 package com.enioka.jqm.test.helpers;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hsqldb.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An HSQLDB server listening in-memory only.
  */
 public class DebugHsqlDbServer implements Closeable
 {
-    private Logger jqmlogger = LoggerFactory.getLogger(DebugHsqlDbServer.class);
-
     private Server s;
     private String dbName = "testdbengine", dbPath = "mem:testdbengine";
 

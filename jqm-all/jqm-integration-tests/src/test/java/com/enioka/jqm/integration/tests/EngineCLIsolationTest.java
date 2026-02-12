@@ -11,22 +11,22 @@ public class EngineCLIsolationTest extends JqmBaseTest
 {
 
     /**
-     * Create JobDef corresponding to TestCLIsolation.TestSet and submit it to queue
+     * Create JobDef corresponding to testclisolation.TestSet and submit it to queue
      */
     void createSubmitSetJob(String specificIsolationContext)
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestSet", null,
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.testclisolation.TestSet", null,
                 "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false,
                 cnx, specificIsolationContext);
         jqmClient.newJobRequest("TestSet", null).enqueue();
     }
 
     /**
-     * Create JobDef corresponding to TestCLIsolation.TestGet and submit it to queue
+     * Create JobDef corresponding to testclisolation.TestGet and submit it to queue
      */
     void createSubmitGetJob(String specificIsolationContext)
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestGet", null,
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.testclisolation.TestGet", null,
                 "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false,
                 cnx, specificIsolationContext);
         jqmClient.newJobRequest("TestGet", null).enqueue();

@@ -12,10 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.model.updater.DbSchemaManager;
 
-import liquibase.Scope;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
-import liquibase.command.CommandResults;
 import liquibase.command.CommandScope;
 import liquibase.command.core.StatusCommandStep;
 import liquibase.database.Database;
@@ -23,7 +21,6 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.report.UpdateReportParameters;
-import liquibase.resource.ClassLoaderResourceAccessor;
 
 /**
  * Encapsulates the logic to update the database schema using Liquibase.
@@ -51,12 +48,11 @@ public class LiquibaseSchemaManager implements DbSchemaManager
 
     private <T> T updateLiquibaseCommand(Connection connection, String commandName, Function<UpdateReportParameters, T> resultMapper)
     {
-        try (var db =  getLiquibaseDb(connection))
+        try (var db = getLiquibaseDb(connection))
         {
             var commandScope = new CommandScope(commandName) //
                     .addArgumentValue("database", db) //
                     .addArgumentValue("changelogFile", LIQUIBASE_CHANGELOG);
-
 
             var result = commandScope.execute();
 
@@ -89,7 +85,7 @@ public class LiquibaseSchemaManager implements DbSchemaManager
 
     public boolean isUpToDate(Connection connection)
     {
-        try (var db =  getLiquibaseDb(connection))
+        try (var db = getLiquibaseDb(connection))
         {
             var commandScope = new CommandScope("status") //
                     .addArgumentValue("database", db).addArgumentValue("changelogFile", LIQUIBASE_CHANGELOG);

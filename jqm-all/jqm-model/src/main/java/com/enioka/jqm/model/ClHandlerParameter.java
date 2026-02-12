@@ -88,10 +88,10 @@ public class ClHandlerParameter implements Serializable
         this.value = value;
     }
 
-    public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
+    public static Map<String, String> selectMap(DbConn cnx, String queryKey, Object... args)
     {
         Map<String, String> res = new HashMap<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {

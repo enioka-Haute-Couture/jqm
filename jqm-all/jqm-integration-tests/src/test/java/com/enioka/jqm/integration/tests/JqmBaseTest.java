@@ -52,8 +52,6 @@ import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import static com.enioka.jqm.shared.misc.StandaloneHelpers.idSequenceBaseFromIp;
-
 public class JqmBaseTest
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
@@ -157,17 +155,17 @@ public class JqmBaseTest
         System.gc();
     }
 
-    protected void AssumeWindows()
+    protected void assumeWindows()
     {
         Assume.assumeTrue(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    protected void AssumeNotWindows()
+    protected void assumeNotWindows()
     {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    protected void AssumeHsqldb()
+    protected void assumeHsqldb()
     {
         Assume.assumeTrue(s.isHsqldb());
     }

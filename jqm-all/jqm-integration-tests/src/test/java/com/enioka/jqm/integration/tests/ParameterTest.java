@@ -40,7 +40,8 @@ public class ParameterTest extends JqmBaseTest
     @Test
     public void testDefaultParameters() throws Exception
     {
-        JqmSimpleTest.create(cnx, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "argument2").run(this);
+        JqmSimpleTest.create(cnx, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "argument2")
+                .run(this);
     }
 
     @Test

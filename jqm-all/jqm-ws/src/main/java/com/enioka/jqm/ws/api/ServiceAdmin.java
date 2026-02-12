@@ -693,7 +693,7 @@ public class ServiceAdmin
     {
         try (DbConn cnx = Helpers.getDbSession())
         {
-            RUser u = RUser.select_id(cnx, userId);
+            RUser u = RUser.selectId(cnx, userId);
             return JdbcCa.getClientData(cnx, u.getLogin());
         }
         catch (Exception e)
@@ -709,7 +709,8 @@ public class ServiceAdmin
     @Path("node/{nodeName}/log")
     @Produces("application/octet-stream")
     @GET
-    public InputStream SS(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest, @Context HttpServletResponse res)
+    public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest,
+            @Context HttpServletResponse res)
     {
         InputStream fs = Helpers.getClient().getEngineLog(nodeName, latest);
         res.setHeader("Content-Disposition", "attachment; filename=jqm.log");

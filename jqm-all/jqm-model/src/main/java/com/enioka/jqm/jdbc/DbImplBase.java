@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * All the SQL templates used in the application. Templates are as pure ANSI 92 SQL as possible, if not are HSQLDB inspired and pass through a {@link DbAdapter} to run on specific databases.
+ * All the SQL templates used in the application. Templates are as pure ANSI 92 SQL as possible,
+ * if not are HSQLDB inspired and pass through a {@link DbAdapter} to run on specific databases.
  */
+@SuppressWarnings("checkstyle:LineLength")
 class DbImplBase
 {
     /**
@@ -17,7 +19,8 @@ class DbImplBase
      */
     static Map<String, String> queries = new HashMap<>();
 
-    static {
+    static
+    {
         // VERSION
         queries.put("version_insert", "INSERT INTO __T__VERSION(ID, COMPONENT, VERSION_D1, COMPAT_D1, INSTALL_DATE) VALUES(JQM_PK.nextval, 'SCHEMA', ?, ?, CURRENT_TIMESTAMP)");
         queries.put("version_select_latest", "SELECT v1.VERSION_D1, v1.COMPAT_D1 FROM __T__VERSION v1 WHERE v1.ID = (SELECT MAX(v2.ID) AS OID FROM __T__VERSION v2 WHERE v2.COMPONENT='SCHEMA')");
@@ -217,7 +220,7 @@ class DbImplBase
         queries.put("ji_select_instructions_by_node", "SELECT ji.ID, ji.INSTRUCTION FROM __T__JOB_INSTANCE ji WHERE ji.STATUS='RUNNING' AND ji.INSTRUCTION <> 'RUN' AND ji.NODE=?");
 
         queries.put("ji_update_delayed", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE STATUS='SCHEDULED' AND DATE_NOT_BEFORE <= CURRENT_TIMESTAMP");
-        queries.put("ji_select_poll",queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY ji.PRIORITY DESC, ji.INTERNAL_POSITION");
+        queries.put("ji_select_poll", queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY ji.PRIORITY DESC, ji.INTERNAL_POSITION");
         queries.put("ji_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='ATTRIBUTED', NODE=? WHERE STATUS='SUBMITTED' AND ID=?");
 
         // HISTORY
@@ -256,14 +259,14 @@ class DbImplBase
         // RUNTIME PRM
         queries.put("jiprm_insert", "INSERT INTO __T__JOB_INSTANCE_PARAMETER(ID, JOB_INSTANCE, KEYNAME, VALUE) VALUES(JQM_PK.nextval, ?, ?, ?)");
         queries.put("jiprm_delete_all", "DELETE FROM __T__JOB_INSTANCE_PARAMETER ");
-        queries.put("jiprm_delete_by_ji",queries.get("jiprm_delete_all") + " WHERE JOB_INSTANCE=?");
+        queries.put("jiprm_delete_by_ji", queries.get("jiprm_delete_all") + " WHERE JOB_INSTANCE=?");
         queries.put("jiprm_select_by_ji", "SELECT ID, JOB_INSTANCE, KEYNAME, VALUE FROM __T__JOB_INSTANCE_PARAMETER WHERE JOB_INSTANCE=?");
         queries.put("jiprm_select_by_ji_list", "SELECT ID, JOB_INSTANCE, KEYNAME, VALUE FROM __T__JOB_INSTANCE_PARAMETER WHERE JOB_INSTANCE IN(UNNEST(?))");
 
         // MESSAGE
         queries.put("message_insert",  "INSERT INTO __T__MESSAGE(ID, JOB_INSTANCE, TEXT_MESSAGE) VALUES(JQM_PK.nextval, ?, ?)");
         queries.put("message_delete_all", "DELETE FROM __T__MESSAGE");
-        queries.put("message_delete_by_ji",queries.get("message_delete_all") + " WHERE JOB_INSTANCE=?");
+        queries.put("message_delete_by_ji", queries.get("message_delete_all") + " WHERE JOB_INSTANCE=?");
         queries.put("message_select_all", "SELECT ID, JOB_INSTANCE, TEXT_MESSAGE FROM __T__MESSAGE");
         queries.put("message_select_by_ji_list", queries.get("message_select_all") + " WHERE JOB_INSTANCE IN(UNNEST(?))");
         queries.put("message_select_count_all", "SELECT COUNT(1) FROM __T__MESSAGE");

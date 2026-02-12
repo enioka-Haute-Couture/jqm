@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
  * Base class for all CLI commands. Command naming must follow powershell cmdlet conventions (see
  * https://docs.microsoft.com/en-us/powershell/developer/cmdlet/approved-verbs-for-windows-powershell-commands)
  */
+@SuppressWarnings("checkstyle:LineLength")
 public abstract class CommandBase
 {
     protected static Logger jqmlogger = LoggerFactory.getLogger(CommandBase.class);
@@ -22,7 +23,7 @@ public abstract class CommandBase
 
     /**
      * Actually run the command.
-     * 
+     *
      * @return the exit code
      */
     public abstract int doWork();

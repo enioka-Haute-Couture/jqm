@@ -1,4 +1,4 @@
-package com.enioka.jqm.TestCLIsolation;
+package com.enioka.jqm.testclisolation;
 
 public class TestGet
 {

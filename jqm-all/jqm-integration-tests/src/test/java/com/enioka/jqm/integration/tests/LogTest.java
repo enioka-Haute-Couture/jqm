@@ -7,38 +7,45 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 /**
  * All tests directly concerning payload logging.
  */
-public class LogTest extends JqmBaseTest {
+public class LogTest extends JqmBaseTest
+{
     @Before
-    public void beforeTests() {
-        if (Files.exists(Path.of("./target/server/logs"))) {
-            try {
+    public void beforeTests()
+    {
+        if (Files.exists(Path.of("./target/server/logs")))
+        {
+            try
+            {
                 FileUtils.cleanDirectory(new File("./target/server/logs"));
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 throw new RuntimeException("Could not clean log directory", e);
             }
         }
     }
 
     @Test
-    public void testLogPerLaunchJavaRunner() throws IOException {
-        PrintStream out_ini = System.out;
-        PrintStream err_ini = System.err;
+    public void testLogPerLaunchJavaRunner() throws IOException
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream newOut = new PrintStream(byteArrayOutputStream);
@@ -65,17 +72,17 @@ public class LogTest extends JqmBaseTest {
         // check that the alljobslogger do not log into logfile
         Assert.assertFalse(Files.readString(Path.of(filePath), StandardCharsets.UTF_8).contains("alljobslogger"));
 
-        System.setErr(err_ini);
-        System.setOut(out_ini);
+        System.setErr(errIni);
+        System.setOut(outIni);
     }
 
     // @Test
     // logback from test/resources is not use when launching test from jqm-all (CI breaks)
-    public void testBothLogJavaRunner() throws IOException {
+    public void testBothLogJavaRunner() throws IOException
+    {
 
-
-        PrintStream out_ini = System.out;
-        PrintStream err_ini = System.err;
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream newOut = new PrintStream(byteArrayOutputStream);
@@ -83,7 +90,7 @@ public class LogTest extends JqmBaseTest {
 
         GlobalParameter.setParameter(cnx, "logFilePerLaunch", "both");
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-            "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         cnx.commit();
         long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         addAndStartEngine();
@@ -102,14 +109,15 @@ public class LogTest extends JqmBaseTest {
         // check that the alljobslogger log into logfile. In real life, the logger write into another file (see logback configuration)
         Assert.assertTrue(Files.readString(Path.of(filePath), StandardCharsets.UTF_8).contains("alljobslogger"));
 
-        System.setErr(err_ini);
-        System.setOut(out_ini);
+        System.setErr(errIni);
+        System.setOut(outIni);
     }
 
     @Test
-    public void testNoLogJavaRunner() {
-        PrintStream out_ini = System.out;
-        PrintStream err_ini = System.err;
+    public void testNoLogJavaRunner()
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream newOut = new PrintStream(byteArrayOutputStream);
@@ -117,7 +125,7 @@ public class LogTest extends JqmBaseTest {
 
         GlobalParameter.setParameter(cnx, "logFilePerLaunch", "false");
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-            "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         cnx.commit();
         long i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         addAndStartEngine();
@@ -133,29 +141,31 @@ public class LogTest extends JqmBaseTest {
 
         newOut.flush();
 
-        System.setErr(err_ini);
-        System.setOut(out_ini);
+        System.setErr(errIni);
+        System.setOut(outIni);
 
     }
 
     @Test
-    public void testNoLogForShellJob() throws Exception {
-        PrintStream out_ini = System.out;
-        PrintStream err_ini = System.err;
+    public void testNoLogForShellJob() throws Exception
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream newOut = new PrintStream(byteArrayOutputStream);
         System.setOut(newOut);
 
-        try {
+        try
+        {
             final String logTextStdout = "log into stdout";
             final String logTextStderr = "log into stderr";
 
             GlobalParameter.setParameter(cnx, "logFilePerLaunch", "false");
 
             final String shellCommandString = "echo " + logTextStdout + ";echo " + logTextStderr + " >&2";
-            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1", null, "module1",
-                "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
+            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
             cnx.commit();
             long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
             addAndStartEngine();
@@ -177,31 +187,35 @@ public class LogTest extends JqmBaseTest {
             String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
             Assert.assertFalse(outContent.contains("|" + logTextStdout));
             Assert.assertFalse(outContent.contains("|" + logTextStderr));
-        } finally {
-            System.setErr(err_ini);
-            System.setOut(out_ini);
+        }
+        finally
+        {
+            System.setErr(errIni);
+            System.setOut(outIni);
             System.out.write(byteArrayOutputStream.toByteArray());
         }
     }
 
     @Test
-    public void testOnlyFileLogForShellJob() throws Exception {
-        PrintStream out_ini = System.out;
-        PrintStream err_ini = System.err;
+    public void testOnlyFileLogForShellJob() throws Exception
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream newOut = new PrintStream(byteArrayOutputStream);
         System.setOut(newOut);
 
-        try {
+        try
+        {
             final String logTextStdout = "log into stdout";
             final String logTextStderr = "log into stderr";
 
             GlobalParameter.setParameter(cnx, "logFilePerLaunch", "true");
 
             final String shellCommandString = "echo " + logTextStdout + ";echo " + logTextStderr + " >&2";
-            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1", null, "module1",
-                "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
+            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
             cnx.commit();
             long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
             addAndStartEngine();
@@ -229,31 +243,35 @@ public class LogTest extends JqmBaseTest {
             String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
             Assert.assertFalse(outContent.contains("|" + logTextStdout));
             Assert.assertFalse(outContent.contains("|" + logTextStderr));
-        } finally {
-            System.setErr(err_ini);
-            System.setOut(out_ini);
+        }
+        finally
+        {
+            System.setErr(errIni);
+            System.setOut(outIni);
             System.out.write(byteArrayOutputStream.toByteArray());
         }
     }
 
-    //@Test
+    // @Test
     // logback from test/resources is not use when launching test from jqm-all (CI breaks)
-    public void testMultiLogForShellJob() throws Exception {
-        PrintStream out_ini = System.out;
-        PrintStream err_ini = System.err;
+    public void testMultiLogForShellJob() throws Exception
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream newOut = new PrintStream(byteArrayOutputStream);
         System.setOut(newOut);
 
-        try {
+        try
+        {
             final String logTextStdout = "log into stdout";
             final String logTextStderr = "log into stderr";
 
             GlobalParameter.setParameter(cnx, "logFilePerLaunch", "both");
 
             final String shellCommandString = "echo " + logTextStdout + ";echo " + logTextStderr + " >&2";
-            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1", null, "module1",
-                "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
+            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
             cnx.commit();
             long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
             addAndStartEngine();
@@ -282,9 +300,11 @@ public class LogTest extends JqmBaseTest {
             Assert.assertTrue(outContent.contains("|" + logTextStdout));
             Assert.assertTrue(outContent.contains("|" + logTextStderr));
 
-        } finally {
-            System.setErr(err_ini);
-            System.setOut(out_ini);
+        }
+        finally
+        {
+            System.setErr(errIni);
+            System.setOut(outIni);
             System.out.write(byteArrayOutputStream.toByteArray());
         }
     }

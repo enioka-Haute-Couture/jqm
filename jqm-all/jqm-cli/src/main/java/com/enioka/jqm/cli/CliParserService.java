@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.JCommander;
 import com.enioka.jqm.cli.bootstrap.CommandLine;
 import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
-import com.enioka.jqm.model.updater.cli.DbUpdateVerb;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**

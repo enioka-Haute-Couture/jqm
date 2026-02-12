@@ -56,7 +56,7 @@ public class UserManagementRepository
         {
             long userId = cnx.runSelectSingle("user_select_id_by_key", Long.class, login);
             cnx.runUpdate("user_update_enable_by_id", userId);
-            RUser.set_roles(cnx, userId, roles);
+            RUser.setRoles(cnx, userId, roles);
         }
         catch (NoResultException e)
         {

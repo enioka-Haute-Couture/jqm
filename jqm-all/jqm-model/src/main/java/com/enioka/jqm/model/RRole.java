@@ -76,10 +76,10 @@ public class RRole implements Serializable
         this.description = description;
     }
 
-    public static List<RRole> select(DbConn cnx, String query_key, Object... args)
+    public static List<RRole> select(DbConn cnx, String queryKey, Object... args)
     {
         List<RRole> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {

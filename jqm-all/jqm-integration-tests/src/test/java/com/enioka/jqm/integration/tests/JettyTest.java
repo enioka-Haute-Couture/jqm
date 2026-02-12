@@ -44,7 +44,7 @@ public class JettyTest extends JqmBaseTest
 
     private void waitStartup()
     {
-        port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
+        port = Node.selectSingle(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         jqmlogger.info("Jetty port seen by client is {}", port);
     }
 
@@ -91,7 +91,7 @@ public class JettyTest extends JqmBaseTest
 
         var cl = HttpClient.newBuilder().sslContext(sslcontext).build();
 
-        int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
+        int port = Node.selectSingle(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
 
         var uri = new URI("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         HttpRequest rq = HttpRequest.newBuilder(uri).GET().build();
@@ -158,7 +158,7 @@ public class JettyTest extends JqmBaseTest
 
         var cl = HttpClient.newBuilder().sslContext(sslcontext).build();
 
-        int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
+        int port = Node.selectSingle(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
 
         var uri = new URI("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         HttpRequest rq = HttpRequest.newBuilder(uri).GET().build();

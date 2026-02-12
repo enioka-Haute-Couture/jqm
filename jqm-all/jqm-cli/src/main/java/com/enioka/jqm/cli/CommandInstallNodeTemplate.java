@@ -14,6 +14,7 @@ import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Install-NodeTemplate", commandDescription = "Apply a template, i.e. the configuration of a node, to another node.")
 class CommandInstallNodeTemplate extends CommandBase
 {

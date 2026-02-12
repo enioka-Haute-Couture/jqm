@@ -81,10 +81,10 @@ public class PKI implements Serializable
         this.pemCert = pemCert;
     }
 
-    public static List<PKI> select(DbConn cnx, String query_key, Object... args)
+    public static List<PKI> select(DbConn cnx, String queryKey, Object... args)
     {
         List<PKI> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -105,7 +105,7 @@ public class PKI implements Serializable
         return res;
     }
 
-    public static PKI select_key(DbConn cnx, String key)
+    public static PKI selectKey(DbConn cnx, String key)
     {
         List<PKI> pp = select(cnx, "pki_select_by_key", key);
         if (pp.size() == 0)

@@ -39,7 +39,8 @@ public class JobDef implements Serializable
     /**
      * Create a new empty DTO.
      */
-    public JobDef(){}
+    public JobDef()
+    {}
 
     private static final long serialVersionUID = -3276834477433922990L;
 
@@ -69,7 +70,9 @@ public class JobDef implements Serializable
 
     /**
      * See {@link #getId()}
-     * @param id the ID
+     *
+     * @param id
+     *            the ID
      */
     public void setId(long id)
     {
@@ -89,7 +92,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #isRestartable()}
      *
-     * @param canBeRestarted new value
+     * @param canBeRestarted
+     *            new value
      */
     public void setCanBeRestarted(final boolean canBeRestarted)
     {
@@ -110,7 +114,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getApplicationName()}
      *
-     * @param applicationName new value
+     * @param applicationName
+     *            new value
      */
     public void setApplicationName(final String applicationName)
     {
@@ -131,7 +136,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getApplication()}
      *
-     * @param application new value
+     * @param application
+     *            new value
      */
     public void setApplication(final String application)
     {
@@ -152,7 +158,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getModule()}
      *
-     * @param module new value
+     * @param module
+     *            new value
      */
     public void setModule(final String module)
     {
@@ -173,7 +180,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getKeyword1()}
      *
-     * @param keyword1 new value
+     * @param keyword1
+     *            new value
      */
     public void setKeyword1(final String keyword1)
     {
@@ -194,7 +202,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getKeyword2()}
      *
-     * @param keyword2 new value
+     * @param keyword2
+     *            new value
      */
     public void setKeyword2(final String keyword2)
     {
@@ -215,7 +224,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getKeyword3()}
      *
-     * @param keyword3 new value
+     * @param keyword3
+     *            new value
      */
     public void setKeyword3(final String keyword3)
     {
@@ -236,7 +246,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #isHighlander()}
      *
-     * @param highlander new value
+     * @param highlander
+     *            new value
      */
     public void setHighlander(final boolean highlander)
     {
@@ -257,7 +268,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getDefaultQueue()}
      *
-     * @param queue new value
+     * @param queue
+     *            new value
      */
     public void setQueue(final Queue queue)
     {
@@ -279,8 +291,10 @@ public class JobDef implements Serializable
     /**
      * See {@link #getParameters()}
      *
-     * @param key parameter key
-     * @param value parameter value
+     * @param key
+     *            parameter key
+     * @param value
+     *            parameter value
      */
     public void addParameter(String key, String value)
     {
@@ -301,7 +315,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getDescription()}
      *
-     * @param description new value
+     * @param description
+     *            new value
      */
     public void setDescription(String description)
     {
@@ -321,7 +336,8 @@ public class JobDef implements Serializable
     /**
      * See {@link #getSchedules()}
      *
-     * @param s the schedule to add
+     * @param s
+     *            the schedule to add
      */
     public void addSchedule(Schedule s)
     {

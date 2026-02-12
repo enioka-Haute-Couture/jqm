@@ -32,7 +32,8 @@ public class JndiObjectResourceDto implements Serializable
     /**
      * Create a new empty DTO.
      */
-    public JndiObjectResourceDto(){}
+    public JndiObjectResourceDto()
+    {}
 
     private static final long serialVersionUID = -8561440788483188421L;
 
@@ -51,6 +52,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the technical ID.
+     *
      * @return the id
      */
     public Long getId()
@@ -60,7 +62,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the technical ID.
-     * @param id the id to set
+     *
+     * @param id
+     *            the id to set
      */
     public void setId(Long id)
     {
@@ -69,6 +73,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the name of this resource.
+     *
      * @return the name
      */
     public String getName()
@@ -78,7 +83,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the name of this resource.
-     * @param name the name to set
+     *
+     * @param name
+     *            the name to set
      */
     public void setName(String name)
     {
@@ -87,6 +94,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the authentication type.
+     *
      * @return the auth
      */
     public String getAuth()
@@ -96,7 +104,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the authentication type.
-     * @param auth the auth to set
+     *
+     * @param auth
+     *            the auth to set
      */
     public void setAuth(String auth)
     {
@@ -105,6 +115,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the class type of the resource.
+     *
      * @return the type
      */
     public String getType()
@@ -114,7 +125,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the class type of the resource.
-     * @param type the type to set
+     *
+     * @param type
+     *            the type to set
      */
     public void setType(String type)
     {
@@ -123,6 +136,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the factory class name.
+     *
      * @return the factory
      */
     public String getFactory()
@@ -132,7 +146,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the factory class name.
-     * @param factory the factory to set
+     *
+     * @param factory
+     *            the factory to set
      */
     public void setFactory(String factory)
     {
@@ -141,6 +157,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the resource description.
+     *
      * @return the description
      */
     public String getDescription()
@@ -150,7 +167,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the resource description.
-     * @param description the description to set
+     *
+     * @param description
+     *            the description to set
      */
     public void setDescription(String description)
     {
@@ -159,6 +178,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get whether this resource is a singleton.
+     *
      * @return true if singleton
      */
     public Boolean getSingleton()
@@ -168,7 +188,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set whether this resource is a singleton.
-     * @param singleton true if singleton
+     *
+     * @param singleton
+     *            true if singleton
      */
     public void setSingleton(Boolean singleton)
     {
@@ -177,7 +199,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Internal setter for the parameters map.
-     * @param parameters the parameters to set
+     *
+     * @param parameters
+     *            the parameters to set
      */
     void setParameters(Map<String, String> parameters)
     {
@@ -186,8 +210,11 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Add a configuration parameter.
-     * @param key parameter name
-     * @param value parameter value
+     *
+     * @param key
+     *            parameter name
+     * @param value
+     *            parameter value
      */
     public void addParameter(String key, String value)
     {
@@ -196,7 +223,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Remove a configuration parameter.
-     * @param key parameter name to remove
+     *
+     * @param key
+     *            parameter name to remove
      */
     public void removeParameter(String key)
     {
@@ -205,6 +234,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get all configuration parameters.
+     *
      * @return the parameters map
      */
     public Map<String, String> getParameters()
@@ -214,6 +244,7 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Get the template name used for this resource.
+     *
      * @return the template
      */
     public String getTemplate()
@@ -223,7 +254,9 @@ public class JndiObjectResourceDto implements Serializable
 
     /**
      * Set the template name used for this resource.
-     * @param template the template to set
+     *
+     * @param template
+     *            the template to set
      */
     public void setTemplate(String template)
     {

@@ -122,7 +122,7 @@ public class CreationTools
             specificIsolationContext = specificIsolationContext == null ? applicationName : specificIsolationContext;
             try
             {
-                cl = Cl.select_key(cnx, specificIsolationContext);
+                cl = Cl.selectKey(cnx, specificIsolationContext);
                 clId = cl.getId();
             }
             catch (NoResultException e)
@@ -224,11 +224,11 @@ public class CreationTools
         JndiObjectResource.create(cnx, jndiAlias, "com.ibm.mq.jms.MQQueue", "com.ibm.mq.jms.MQQueueFactory", description, false, prms);
     }
 
-    public static void createJndiQcfActiveMQ(DbConn cnx, String jndiAlias, String description, String Url,
+    public static void createJndiQcfActiveMQ(DbConn cnx, String jndiAlias, String description, String url,
             HashMap<String, String> optionalParameters)
     {
         HashMap<String, String> prms = new HashMap<>();
-        prms.put("brokerURL", Url);
+        prms.put("brokerURL", url);
         if (optionalParameters != null)
         {
             prms.putAll(optionalParameters);

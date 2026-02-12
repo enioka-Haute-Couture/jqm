@@ -93,7 +93,7 @@ public class ClHandler implements Serializable
 
     private Map<String, String> getParameters(DbConn cnx)
     {
-        return ClHandlerParameter.select_map(cnx, "cleh_select_all_for_cleh", this.id);
+        return ClHandlerParameter.selectMap(cnx, "cleh_select_all_for_cleh", this.id);
     }
 
     private Map<String, String> prmCache = new HashMap<>();
@@ -127,10 +127,10 @@ public class ClHandler implements Serializable
         return tmp;
     }
 
-    public static List<ClHandler> select(DbConn cnx, String query_key, Object... args)
+    public static List<ClHandler> select(DbConn cnx, String queryKey, Object... args)
     {
         List<ClHandler> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {

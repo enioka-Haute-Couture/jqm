@@ -30,7 +30,8 @@ public class GlobalParameterDto implements Serializable
     /**
      * Create a new empty DTO.
      */
-    public GlobalParameterDto(){}
+    public GlobalParameterDto()
+    {}
 
     private static final long serialVersionUID = -4836332110468430277L;
 
@@ -40,6 +41,7 @@ public class GlobalParameterDto implements Serializable
 
     /**
      * Get the id of the parameter.
+     *
      * @return the id
      */
     public Long getId()
@@ -49,7 +51,9 @@ public class GlobalParameterDto implements Serializable
 
     /**
      * Set the id of the parameter.
-     * @param id the id to set
+     *
+     * @param id
+     *            the id to set
      */
     public void setId(Long id)
     {
@@ -58,6 +62,7 @@ public class GlobalParameterDto implements Serializable
 
     /**
      * Get the key of the parameter.
+     *
      * @return the key
      */
     public String getKey()
@@ -67,7 +72,9 @@ public class GlobalParameterDto implements Serializable
 
     /**
      * Set the key of the parameter.
-     * @param key the key to set
+     *
+     * @param key
+     *            the key to set
      */
     public void setKey(String key)
     {
@@ -76,6 +83,7 @@ public class GlobalParameterDto implements Serializable
 
     /**
      * Get the value of the parameter.
+     *
      * @return the value
      */
     public String getValue()
@@ -85,7 +93,9 @@ public class GlobalParameterDto implements Serializable
 
     /**
      * Set the value of the parameter.
-     * @param value the value to set
+     *
+     * @param value
+     *            the value to set
      */
     public void setValue(String value)
     {

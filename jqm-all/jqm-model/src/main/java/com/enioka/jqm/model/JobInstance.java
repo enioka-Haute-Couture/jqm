@@ -36,6 +36,7 @@ import com.enioka.jqm.jdbc.QueryResult;
  * Persistence class for storing the execution requests. Said otherwise, <strong>this table holds the contents of the execution
  * queues</strong>.
  */
+@SuppressWarnings("checkstyle:MemberName")
 public class JobInstance implements Serializable
 {
     private static final long serialVersionUID = -7710486847228806301L;
@@ -580,7 +581,7 @@ public class JobInstance implements Serializable
     public void loadPrmCache(DbConn cnx)
     {
         prmCache = new HashMap<>();
-        for (Map.Entry<String, String> jp : RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", this.id).entrySet())
+        for (Map.Entry<String, String> jp : RuntimeParameter.selectMap(cnx, "jiprm_select_by_ji", this.id).entrySet())
         {
             prmCache.put(jp.getKey(), jp.getValue());
         }
@@ -638,10 +639,10 @@ public class JobInstance implements Serializable
         return tmp;
     }
 
-    public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
+    public static List<JobInstance> select(DbConn cnx, String queryKey, Object... args)
     {
         List<JobInstance> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -674,7 +675,7 @@ public class JobInstance implements Serializable
         return res;
     }
 
-    public static JobInstance select_id(DbConn cnx, long id)
+    public static JobInstance selectId(DbConn cnx, long id)
     {
         List<JobInstance> res = select(cnx, "ji_select_by_id", id);
         if (res.isEmpty())
@@ -689,7 +690,7 @@ public class JobInstance implements Serializable
         return res.get(0);
     }
 
-    public static void delete_id(DbConn cnx, long id)
+    public static void deleteId(DbConn cnx, long id)
     {
         QueryResult res = cnx.runUpdate("ji_delete_by_id", id);
         if (res.nbUpdated != 1)
@@ -698,12 +699,12 @@ public class JobInstance implements Serializable
         }
     }
 
-    public static long enqueue(DbConn cnx, State status, long queue_id, long job_id, String application, Long parentId, String module,
+    public static long enqueue(DbConn cnx, State status, long queueId, long jobId, String application, Long parentId, String module,
             String keyword1, String keyword2, String keyword3, String sessionId, String traceId, String userName, String email,
             boolean highlander, boolean fromSchedule, Calendar notBefore, int priority, Instruction instruction, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority, instruction, traceId);
+                status, userName, jobId, queueId, highlander, fromSchedule, notBefore, priority, instruction, traceId);
 
         long newId = qr.getGeneratedId();
 

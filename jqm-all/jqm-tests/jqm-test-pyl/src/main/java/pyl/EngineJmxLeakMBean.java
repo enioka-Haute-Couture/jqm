@@ -8,7 +8,7 @@ public interface EngineJmxLeakMBean
 {
     /**
      * Super test
-     * 
+     *
      * @return something
      */
     Integer getOne();

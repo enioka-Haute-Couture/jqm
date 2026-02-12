@@ -63,10 +63,10 @@ class RunningExternalJobInstance implements Runnable
     public void run()
     {
         jqmlogger.debug("Starting external loader for job " + jobId);
-        String java_path = FilenameUtils.concat(System.getProperty("java.home"), "bin/java");
+        String javaPath = FilenameUtils.concat(System.getProperty("java.home"), "bin/java");
         List<String> args = new ArrayList<>();
 
-        args.add(java_path);
+        args.add(javaPath);
         args.addAll(Arrays.asList(opts.split(" ")));
         args.add("-jar");
         args.add(FilenameUtils.concat(rootPath, "jqm.jar"));

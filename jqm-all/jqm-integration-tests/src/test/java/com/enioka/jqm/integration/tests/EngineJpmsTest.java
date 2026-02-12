@@ -6,15 +6,16 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class EngineJpmsTest extends JqmBaseTest {
+public class EngineJpmsTest extends JqmBaseTest
+{
     @Test
     public void testJpmsModuleStartsWithApi()
     {
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.jpms/com.enioka.jqm.tests.jpms.SimpleJpmsPayload", null,
-            "jqm-tests/jqm-test-jpms/target/test.jar", TestHelpers.qVip, -1, "SimpleJpmsPayload", null, null, null, null, null, false,
-            cnx, null, false);
+                "jqm-tests/jqm-test-jpms/target/test.jar", TestHelpers.qVip, -1, "SimpleJpmsPayload", null, null, null, null, null, false,
+                cnx, null, false);
         jqmClient.newJobRequest("SimpleJpmsPayload", null).enqueue();
 
         TestHelpers.waitFor(1, 10000, cnx);
@@ -29,7 +30,7 @@ public class EngineJpmsTest extends JqmBaseTest {
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, -1,
-            "SimpleNonJpmsPayload", null, null, null, null, null, false, cnx, null, false);
+                "SimpleNonJpmsPayload", null, null, null, null, null, false, cnx, null, false);
         jqmClient.newJobRequest("SimpleNonJpmsPayload", null).enqueue();
 
         TestHelpers.waitFor(1, 10000, cnx);
@@ -45,7 +46,7 @@ public class EngineJpmsTest extends JqmBaseTest {
 
         // Note we are using an automatic module name here.
         CreationTools.createJobDef(null, true, "test/pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip,
-            -1, "SimpleNonJpmsPayload", null, null, null, null, null, false, cnx, null, false);
+                -1, "SimpleNonJpmsPayload", null, null, null, null, null, false, cnx, null, false);
         jqmClient.newJobRequest("SimpleNonJpmsPayload", null).enqueue();
 
         TestHelpers.waitFor(1, 10000, cnx);
@@ -78,8 +79,8 @@ public class EngineJpmsTest extends JqmBaseTest {
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.jpms/com.enioka.jqm.tests.jpms.JpmsPayloadWithService", null,
-            "jqm-tests/jqm-test-jpms/target/test.jar", TestHelpers.qVip, -1, "SimpleJpmsPayload", null, null, null, null, null, false,
-            cnx, null, false);
+                "jqm-tests/jqm-test-jpms/target/test.jar", TestHelpers.qVip, -1, "SimpleJpmsPayload", null, null, null, null, null, false,
+                cnx, null, false);
         jqmClient.newJobRequest("SimpleJpmsPayload", null).enqueue();
 
         TestHelpers.waitFor(1, 10000, cnx);

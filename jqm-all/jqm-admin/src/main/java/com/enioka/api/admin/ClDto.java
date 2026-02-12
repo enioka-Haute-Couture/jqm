@@ -20,7 +20,8 @@ public class ClDto implements Serializable
     /**
      * Create a new empty DTO.
      */
-    public ClDto(){}
+    public ClDto()
+    {}
 
     private Long id;
     private String name;
@@ -36,6 +37,7 @@ public class ClDto implements Serializable
 
     /**
      * The id of the classloader.
+     *
      * @return the ID
      */
     public Long getId()
@@ -45,7 +47,9 @@ public class ClDto implements Serializable
 
     /**
      * Set the id of the classloader.
-     * @param id the ID to set
+     *
+     * @param id
+     *            the ID to set
      */
     public void setId(Long id)
     {
@@ -54,6 +58,7 @@ public class ClDto implements Serializable
 
     /**
      * The name of the classloader.
+     *
      * @return the name
      */
     public String getName()
@@ -63,7 +68,9 @@ public class ClDto implements Serializable
 
     /**
      * Set the name of the classloader.
-     * @param name the name to set
+     *
+     * @param name
+     *            the name to set
      */
     public void setName(String name)
     {
@@ -72,6 +79,7 @@ public class ClDto implements Serializable
 
     /**
      * Whether this classloader is child-first or not.
+     *
      * @return true if child-first, false otherwise
      */
     public boolean isChildFirst()
@@ -81,7 +89,9 @@ public class ClDto implements Serializable
 
     /**
      * Set whether this classloader is child-first or not.
-     * @param childFirst true if child-first, false otherwise
+     *
+     * @param childFirst
+     *            true if child-first, false otherwise
      */
     public void setChildFirst(boolean childFirst)
     {
@@ -90,6 +100,7 @@ public class ClDto implements Serializable
 
     /**
      * Get the hidden classes for this classloader.
+     *
      * @return the hidden classes
      */
     public String getHiddenClasses()
@@ -99,7 +110,9 @@ public class ClDto implements Serializable
 
     /**
      * Set the hidden classes for this classloader.
-     * @param hiddenClasses the hidden classes to set
+     *
+     * @param hiddenClasses
+     *            the hidden classes to set
      */
     public void setHiddenClasses(String hiddenClasses)
     {
@@ -108,6 +121,7 @@ public class ClDto implements Serializable
 
     /**
      * Whether tracing is enabled for this classloader.
+     *
      * @return true if tracing is enabled, false otherwise
      */
     public boolean isTracingEnabled()
@@ -117,7 +131,9 @@ public class ClDto implements Serializable
 
     /**
      * Set whether tracing is enabled for this classloader.
-     * @param tracingEnabled true if tracing is enabled, false otherwise
+     *
+     * @param tracingEnabled
+     *            true if tracing is enabled, false otherwise
      */
     public void setTracingEnabled(boolean tracingEnabled)
     {
@@ -126,6 +142,7 @@ public class ClDto implements Serializable
 
     /**
      * Whether this classloader is persistent or not.
+     *
      * @return true if persistent, false otherwise
      */
     public boolean isPersistent()
@@ -135,7 +152,9 @@ public class ClDto implements Serializable
 
     /**
      * Set whether this classloader is persistent or not.
-     * @param persistent true if persistent, false otherwise
+     *
+     * @param persistent
+     *            true if persistent, false otherwise
      */
     public void setPersistent(boolean persistent)
     {
@@ -144,6 +163,7 @@ public class ClDto implements Serializable
 
     /**
      * Get the allowed runners for this classloader.
+     *
      * @return the allowed runners
      */
     public String getAllowedRunners()
@@ -153,7 +173,9 @@ public class ClDto implements Serializable
 
     /**
      * Set the allowed runners for this classloader.
-     * @param allowedRunners the allowed runners to set
+     *
+     * @param allowedRunners
+     *            the allowed runners to set
      */
     public void setAllowedRunners(String allowedRunners)
     {
@@ -162,6 +184,7 @@ public class ClDto implements Serializable
 
     /**
      * Get the handlers for this classloader.
+     *
      * @return the handlers
      */
     public List<ClHandlerDto> getHandlers()
@@ -171,7 +194,9 @@ public class ClDto implements Serializable
 
     /**
      * Set the handlers for this classloader.
-     * @param handlers the handlers to set
+     *
+     * @param handlers
+     *            the handlers to set
      */
     public void setHandlers(List<ClHandlerDto> handlers)
     {

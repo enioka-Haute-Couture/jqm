@@ -37,15 +37,15 @@ public class DbConn implements Closeable
     private static Calendar utcZone = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     private Db parent;
-    Connection _cnx;
-    private boolean transac_open = false;
+    Connection cnx;
+    private boolean transacOpen = false;
     private boolean rollbackOnly = false;
     private List<Statement> toClose = new ArrayList<>();
 
     DbConn(Db parent, Connection cnx)
     {
         this.parent = parent;
-        this._cnx = cnx;
+        this.cnx = cnx;
     }
 
     public void commit()
@@ -56,8 +56,8 @@ public class DbConn implements Closeable
         }
         try
         {
-            _cnx.commit();
-            transac_open = false;
+            cnx.commit();
+            transacOpen = false;
         }
         catch (SQLException e)
         {
@@ -69,8 +69,8 @@ public class DbConn implements Closeable
     {
         try
         {
-            _cnx.rollback();
-            transac_open = false;
+            cnx.rollback();
+            transacOpen = false;
             rollbackOnly = false;
         }
         catch (SQLException e)
@@ -84,28 +84,28 @@ public class DbConn implements Closeable
         rollbackOnly = true;
     }
 
-    private QueryPreparation adapterPreparation(String query_key, boolean forUpdate, Object... params)
+    private QueryPreparation adapterPreparation(String queryKey, boolean forUpdate, Object... params)
     {
         QueryPreparation qp = new QueryPreparation();
         qp.parameters = new ArrayList<>(Arrays.asList(params));
-        qp.queryKey = query_key;
-        qp.sqlText = parent.getQuery(query_key);
+        qp.queryKey = queryKey;
+        qp.sqlText = parent.getQuery(queryKey);
         qp.forUpdate = forUpdate;
 
-        this.parent.getAdapter().beforeUpdate(_cnx, qp);
+        this.parent.getAdapter().beforeUpdate(cnx, qp);
         return qp;
     }
 
-    public QueryResult runUpdate(String query_key, Object... params)
+    public QueryResult runUpdate(String queryKey, Object... params)
     {
-        transac_open = true;
-        QueryPreparation qp = adapterPreparation(query_key, false, params);
+        transacOpen = true;
+        QueryPreparation qp = adapterPreparation(queryKey, false, params);
         try (PreparedStatement ps = prepare(qp))
         {
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
             qr.generatedKey = qp.preGeneratedKey;
-            if (qr.generatedKey == null && query_key.contains("insert") && !query_key.equals("history_insert_with_end_date"))
+            if (qr.generatedKey == null && queryKey.contains("insert") && !queryKey.equals("history_insert_with_end_date"))
             {
                 try (ResultSet gen = ps.getGeneratedKeys())
                 {
@@ -123,7 +123,7 @@ public class DbConn implements Closeable
                 }
             }
 
-            jqmlogger.debug("Updated rows: {}. Key: {}. Generated ID: {}", qr.nbUpdated, query_key, qr.generatedKey);
+            jqmlogger.debug("Updated rows: {}. Key: {}. Generated ID: {}", qr.nbUpdated, queryKey, qr.generatedKey);
             return qr;
         }
         catch (SQLException e)
@@ -132,13 +132,13 @@ public class DbConn implements Closeable
         }
     }
 
-    public void runRawUpdate(String query_sql)
+    public void runRawUpdate(String querySql)
     {
-        transac_open = true;
+        transacOpen = true;
         String sql = null;
-        try (Statement s = _cnx.createStatement())
+        try (Statement s = cnx.createStatement())
         {
-            sql = parent.getAdapter().adaptSql(query_sql);
+            sql = parent.getAdapter().adaptSql(querySql);
             if (sql.trim().isEmpty())
             {
                 return;
@@ -158,7 +158,7 @@ public class DbConn implements Closeable
         QueryPreparation q = new QueryPreparation();
         q.parameters = new ArrayList<>(Arrays.asList(params));
         q.sqlText = this.parent.getAdapter().adaptSql(rawQuery);
-        this.parent.getAdapter().beforeUpdate(_cnx, q);
+        this.parent.getAdapter().beforeUpdate(cnx, q);
 
         try
         {
@@ -175,7 +175,7 @@ public class DbConn implements Closeable
                 }
             }
 
-            ps = _cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ps = cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             toClose.add(ps);
             int i = 0;
             for (Object prm : q.parameters)
@@ -195,22 +195,22 @@ public class DbConn implements Closeable
         }
     }
 
-    public ResultSet runSelect(String query_key, Object... params)
+    public ResultSet runSelect(String queryKey, Object... params)
     {
-        return runSelect(false, query_key, params);
+        return runSelect(false, queryKey, params);
     }
 
-    public ResultSet runSelect(boolean for_update, String query_key, Object... params)
+    public ResultSet runSelect(boolean forUpdate, String queryKey, Object... params)
     {
         PreparedStatement ps = null;
-        QueryPreparation qp = adapterPreparation(query_key, for_update, params);
+        QueryPreparation qp = adapterPreparation(queryKey, forUpdate, params);
         try
         {
             ps = prepare(qp);
             toClose.add(ps);
-            if (for_update)
+            if (forUpdate)
             {
-                transac_open = true;
+                transacOpen = true;
             }
             return ps.executeQuery();
         }
@@ -224,10 +224,10 @@ public class DbConn implements Closeable
         }
     }
 
-    public Map<String, Object> runSelectSingleRow(String query_key, Object... params)
+    public Map<String, Object> runSelectSingleRow(String queryKey, Object... params)
     {
         HashMap<String, Object> res = new HashMap<>();
-        try (ResultSet rs = runSelect(query_key, params))
+        try (ResultSet rs = runSelect(queryKey, params))
         {
             if (!rs.next())
             {
@@ -261,15 +261,15 @@ public class DbConn implements Closeable
         return res;
     }
 
-    public <T> T runSelectSingle(String query_key, Class<T> clazz, Object... params)
+    public <T> T runSelectSingle(String queryKey, Class<T> clazz, Object... params)
     {
-        return runSelectSingle(query_key, 1, clazz, params);
+        return runSelectSingle(queryKey, 1, clazz, params);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T runSelectSingle(String query_key, int column, Class<T> clazz, Object... params)
+    public <T> T runSelectSingle(String queryKey, int column, Class<T> clazz, Object... params)
     {
-        try (ResultSet rs = runSelect(query_key, params))
+        try (ResultSet rs = runSelect(queryKey, params))
         {
             if (rs.getMetaData().getColumnCount() < 1)
             {
@@ -322,16 +322,16 @@ public class DbConn implements Closeable
         }
     }
 
-    public <T> List<T> runSelectColumn(String query_key, Class<T> clazz, Object... params)
+    public <T> List<T> runSelectColumn(String queryKey, Class<T> clazz, Object... params)
     {
-        return runSelectColumn(query_key, 1, clazz, params);
+        return runSelectColumn(queryKey, 1, clazz, params);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> List<T> runSelectColumn(String query_key, int column, Class<T> clazz, Object... params)
+    public <T> List<T> runSelectColumn(String queryKey, int column, Class<T> clazz, Object... params)
     {
         ArrayList<T> resList = new ArrayList<>();
-        try (ResultSet rs = runSelect(query_key, params))
+        try (ResultSet rs = runSelect(queryKey, params))
         {
             if (rs.getMetaData().getColumnCount() < column)
             {
@@ -382,11 +382,11 @@ public class DbConn implements Closeable
      */
     public void close()
     {
-        if (transac_open)
+        if (transacOpen)
         {
             try
             {
-                this._cnx.rollback();
+                this.cnx.rollback();
             }
             catch (Exception e)
             {
@@ -400,8 +400,8 @@ public class DbConn implements Closeable
         }
         toClose.clear();
 
-        closeQuietly(_cnx);
-        _cnx = null;
+        closeQuietly(cnx);
+        cnx = null;
     }
 
     /**
@@ -451,7 +451,7 @@ public class DbConn implements Closeable
     private PreparedStatement prepare(QueryPreparation q)
     {
         PreparedStatement ps = null;
-        if (_cnx == null)
+        if (cnx == null)
         {
             throw new IllegalStateException("Connection does not exist");
         }
@@ -479,11 +479,11 @@ public class DbConn implements Closeable
         {
             if (q.forUpdate)
             {
-                ps = _cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+                ps = cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
             }
             else
             {
-                ps = _cnx.prepareStatement(q.sqlText, this.parent.getAdapter().keyRetrievalColumn());
+                ps = cnx.prepareStatement(q.sqlText, this.parent.getAdapter().keyRetrievalColumn());
             }
         }
         catch (SQLException e)
@@ -534,15 +534,15 @@ public class DbConn implements Closeable
                 }
                 if (vv.get(0) instanceof Integer)
                 {
-                    a = _cnx.createArrayOf("INTEGER", ((List<?>) value).toArray(new Integer[0]));
+                    a = cnx.createArrayOf("INTEGER", ((List<?>) value).toArray(new Integer[0]));
                 }
                 else if (vv.get(0) instanceof String)
                 {
-                    a = _cnx.createArrayOf("VARCHAR", ((List<?>) value).toArray(new String[0]));
+                    a = cnx.createArrayOf("VARCHAR", ((List<?>) value).toArray(new String[0]));
                 }
                 else if (vv.get(0) instanceof Long)
                 {
-                    a = _cnx.createArrayOf("BIGINT", ((List<?>) value).toArray(new Long[0]));
+                    a = cnx.createArrayOf("BIGINT", ((List<?>) value).toArray(new Long[0]));
                 }
                 else
                 {
@@ -552,7 +552,7 @@ public class DbConn implements Closeable
                     {
                         vvv[i++] = o.toString();
                     }
-                    a = _cnx.createArrayOf("VARCHAR", vvv);
+                    a = cnx.createArrayOf("VARCHAR", vvv);
                 }
                 s.setArray(position, a);
             }
@@ -593,7 +593,7 @@ public class DbConn implements Closeable
     {
         try
         {
-            DatabaseMetaData m = this._cnx.getMetaData();
+            DatabaseMetaData m = this.cnx.getMetaData();
             log.info("Database driver {} version {} on database {} version {}.{} (product {}). Adapter is {}.", m.getDriverName(),
                     m.getDriverVersion(), m.getDatabaseProductName(), m.getDatabaseMajorVersion(), m.getDatabaseMinorVersion(),
                     m.getDatabaseProductVersion(), parent.getAdapter().getClass().getName());

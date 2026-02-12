@@ -63,7 +63,9 @@ public final class SimpleApiSecurity
     /**
      * Will create (or recreate) if necessary the temporary login data.<br>
      * Will create its own transaction - therefore the given connection must not have any active transaction.
-     * @param cnx the database connection to use.
+     *
+     * @param cnx
+     *            the database connection to use.
      * @return the login data
      */
     public static Duet getId(DbConn cnx)
@@ -118,7 +120,7 @@ public final class SimpleApiSecurity
                     expiration.add(Calendar.DAY_OF_YEAR, 2);
 
                     long id = RUser.create(cnx, login, hash, saltS, expiration, true, "administrator");
-                    currentUser = RUser.select_id(cnx, id);
+                    currentUser = RUser.selectId(cnx, id);
                     user = currentUser;
 
                     currentLoginData = new Duet();

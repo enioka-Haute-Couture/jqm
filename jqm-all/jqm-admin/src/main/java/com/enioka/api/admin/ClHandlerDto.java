@@ -13,7 +13,8 @@ public class ClHandlerDto implements Serializable
     /**
      * Create a new empty DTO.
      */
-    public ClHandlerDto(){}
+    public ClHandlerDto()
+    {}
 
     private static final long serialVersionUID = 1234567890L;
 
@@ -24,6 +25,7 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Get the ID of the handler.
+     *
      * @return the ID.
      */
     public Long getId()
@@ -33,7 +35,9 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Set the ID of the handler.
-     * @param id the ID to set
+     *
+     * @param id
+     *            the ID to set
      */
     public void setId(Long id)
     {
@@ -42,6 +46,7 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Get the event type handled by this handler.
+     *
      * @return the event type
      */
     public String getEventType()
@@ -51,7 +56,9 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Set the event type handled by this handler.
-     * @param eventType the event type to set
+     *
+     * @param eventType
+     *            the event type to set
      */
     public void setEventType(String eventType)
     {
@@ -60,6 +67,7 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Get the class name of the handler.
+     *
      * @return the class name
      */
     public String getClassName()
@@ -69,7 +77,9 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Set the class name of the handler.
-     * @param className the class name to set
+     *
+     * @param className
+     *            the class name to set
      */
     public void setClassName(String className)
     {
@@ -78,6 +88,7 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Get the class loader this handler belongs to.
+     *
      * @return the class loader
      */
     public String getClassLoader()
@@ -87,7 +98,9 @@ public class ClHandlerDto implements Serializable
 
     /**
      * Set the class loader this handler belongs to.
-     * @param classLoader the class loader to set
+     *
+     * @param classLoader
+     *            the class loader to set
      */
     public void setClassLoader(String classLoader)
     {

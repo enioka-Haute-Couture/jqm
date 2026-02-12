@@ -7,6 +7,7 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.xml.XmlJobDefExporter;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Export-JobDef", commandDescription = "Export all job definitions inside central configuration as a single deployment descriptor.")
 class CommandExportJobDef extends CommandBase
 {

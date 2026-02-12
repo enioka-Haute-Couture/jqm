@@ -10,6 +10,7 @@ import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Start-Single", commandDescription = "Internal JQM use only. Starts an already ATTRIBUTED job instance synchronously.", hidden = true)
 class CommandStartSingle extends CommandBase
 {

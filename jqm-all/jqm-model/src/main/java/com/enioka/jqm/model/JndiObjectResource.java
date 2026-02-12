@@ -282,10 +282,10 @@ public class JndiObjectResource implements Serializable
         return newId;
     }
 
-    public static List<JndiObjectResource> select(DbConn cnx, String query_key, Object... args)
+    public static List<JndiObjectResource> select(DbConn cnx, String queryKey, Object... args)
     {
         List<JndiObjectResource> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -311,7 +311,7 @@ public class JndiObjectResource implements Serializable
         return res;
     }
 
-    public static JndiObjectResource select_alias(DbConn cnx, String alias)
+    public static JndiObjectResource selectAlias(DbConn cnx, String alias)
     {
         List<JndiObjectResource> res = select(cnx, "jndi_select_by_key", alias);
         if (res.isEmpty())

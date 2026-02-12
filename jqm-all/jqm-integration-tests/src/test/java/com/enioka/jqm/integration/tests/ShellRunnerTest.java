@@ -33,7 +33,7 @@ public class ShellRunnerTest extends JqmBaseTest
     @Test
     public void testDefaultShellCommandBasic()
     {
-        AssumeWindows();
+        assumeWindows();
 
         CreationTools.createJobDef("test job", true, "none", new HashMap<>(), "set", TestHelpers.qNormal, 0, "TestApp1", null, "module1",
                 "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
@@ -95,7 +95,7 @@ public class ShellRunnerTest extends JqmBaseTest
     @Test
     public void testPowerShellCommand()
     {
-        AssumeWindows();
+        assumeWindows();
 
         String command1 = "echo 'aa' ; echo 'bb';";
 

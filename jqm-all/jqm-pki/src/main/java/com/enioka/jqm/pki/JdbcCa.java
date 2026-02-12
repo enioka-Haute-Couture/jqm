@@ -38,7 +38,7 @@ import com.enioka.jqm.model.PKI;
 
 /**
  * This class is the link between the X509 methods in CertificateRequest and the database store.
- * 
+ *
  */
 public class JdbcCa
 {
@@ -55,7 +55,7 @@ public class JdbcCa
         PKI pki = null;
         try
         {
-            pki = PKI.select_key(cnx, caAlias);
+            pki = PKI.selectKey(cnx, caAlias);
         }
         catch (NoResultException e)
         {
@@ -66,7 +66,7 @@ public class JdbcCa
             // Store
             PKI.create(cnx, caAlias, cr.writePemPrivateToString(), cr.writePemPublicToString());
             cnx.commit();
-            pki = PKI.select_key(cnx, caAlias);
+            pki = PKI.selectKey(cnx, caAlias);
         }
 
         try

@@ -77,7 +77,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Constructor
-     * 
+     *
      * @param enqueueCallback
      *            enqueue callback
      */
@@ -88,7 +88,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Enqueues the job request using the provided enqueue callback.
-     * 
+     *
      * @return the job ID of the enqueued job
      */
     @Override
@@ -116,7 +116,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Validates that the parameter key and value are within the allowed length limits.
-     * 
+     *
      * @see #addParameter(String, String) addParameter(String key, String value) for a description of the parameters
      *
      * @param key
@@ -381,7 +381,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * After validating the parameters, set them to the job request.
-     * 
+     *
      * @param parameters
      *            dictionary of all parameters.
      * @return this jobRequest
@@ -587,7 +587,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Getter for the run after date.
-     * 
+     *
      * @return the run after date
      */
     public Calendar getRunAfter()
@@ -614,7 +614,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Getter for the recurrence cron expression
-     * 
+     *
      * @see #setRecurrence(String)
      * @return the cron expression for the recurrence
      */
@@ -639,7 +639,7 @@ public class JobRequestBaseImpl implements JobRequest
 
     /**
      * Getter for the start state of the job request
-     * 
+     *
      * @return the start state
      */
     public State getStartState()

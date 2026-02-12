@@ -22,7 +22,7 @@ import com.enioka.jqm.model.Queue;
  */
 public abstract class DbAdapter
 {
-    protected String[] IDS = new String[] { "ID" };
+    protected String[] ids = new String[] { "ID" };
 
     /**
      * Query cache.
@@ -62,7 +62,7 @@ public abstract class DbAdapter
      */
     public String[] keyRetrievalColumn()
     {
-        return IDS;
+        return ids;
     }
 
     /**

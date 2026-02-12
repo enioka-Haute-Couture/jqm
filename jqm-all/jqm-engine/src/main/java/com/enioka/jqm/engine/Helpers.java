@@ -61,7 +61,7 @@ final class Helpers
     private static Logger jqmlogger = LoggerFactory.getLogger(Helpers.class);
 
     // The one and only Database context in the engine.
-    private static Db _db = DbManager.getDb();
+    private static Db db = DbManager.getDb();
 
     private Helpers()
     {
@@ -75,12 +75,12 @@ final class Helpers
      */
     public static DbConn getNewDbSession()
     {
-        return _db.getConn();
+        return db.getConn();
     }
 
     public static boolean isDbInitialized()
     {
-        return _db != null;
+        return db != null;
     }
 
     /**
@@ -89,7 +89,7 @@ final class Helpers
      */
     static void resetDb()
     {
-        _db = null;
+        db = null;
     }
 
     /**
@@ -161,8 +161,8 @@ final class Helpers
         int i = cnx.runSelectSingle("dp_select_count_for_node", Integer.class, nn.getId());
         if (i == 0)
         {
-            jqmlogger.warn(
-                    "This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
+            jqmlogger.warn("This node is not bound to any queue."
+                    + " Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
         }
 
         // Roles

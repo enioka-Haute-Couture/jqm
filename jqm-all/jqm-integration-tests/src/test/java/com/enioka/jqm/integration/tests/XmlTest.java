@@ -69,9 +69,9 @@ public class XmlTest extends JqmBaseTest
             Queue.select(cnx, "q_select_by_key", "VIPQueue");
             Queue.select(cnx, "q_select_by_key", "NormalQueue");
 
-            JobDef jd1 = JobDef.select_key(cnx, "Fibo");
-            JobDef jd2 = JobDef.select_key(cnx, "Geo");
-            JobDef jd3 = JobDef.select_key(cnx, "DateTime");
+            JobDef jd1 = JobDef.selectKey(cnx, "Fibo");
+            JobDef jd2 = JobDef.selectKey(cnx, "Geo");
+            JobDef jd3 = JobDef.selectKey(cnx, "DateTime");
 
             Assert.assertEquals("VIPQueue", jd1.getQueue(cnx).getName());
             Assert.assertEquals("VIPQueue", jd2.getQueue(cnx).getName());
@@ -108,9 +108,9 @@ public class XmlTest extends JqmBaseTest
             Queue.select(cnx, "q_select_by_key", "VIPQueue");
             Queue.select(cnx, "q_select_by_key", "NormalQueue");
 
-            JobDef jd1 = JobDef.select_key(cnx, "Fibo");
-            JobDef jd2 = JobDef.select_key(cnx, "Geo");
-            JobDef jd3 = JobDef.select_key(cnx, "DateTime");
+            JobDef jd1 = JobDef.selectKey(cnx, "Fibo");
+            JobDef jd2 = JobDef.selectKey(cnx, "Geo");
+            JobDef jd3 = JobDef.selectKey(cnx, "DateTime");
 
             Assert.assertEquals("VIPQueue", jd1.getQueue(cnx).getName());
             Assert.assertEquals("VIPQueue", jd2.getQueue(cnx).getName());
@@ -134,7 +134,7 @@ public class XmlTest extends JqmBaseTest
         cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
-        JobDef fibo = JobDef.select_key(cnx, "Fibo");
+        JobDef fibo = JobDef.selectKey(cnx, "Fibo");
 
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", fibo.getApplicationName());
@@ -161,7 +161,7 @@ public class XmlTest extends JqmBaseTest
 
         // Sanity check
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
-        JobDef fibo = JobDef.select_key(cnx, "Fibo");
+        JobDef fibo = JobDef.selectKey(cnx, "Fibo");
 
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", fibo.getApplicationName());
@@ -174,7 +174,7 @@ public class XmlTest extends JqmBaseTest
         cnx.commit();
 
         jd = JobDef.select(cnx, "jd_select_all");
-        fibo = JobDef.select_key(cnx, "Fibo");
+        fibo = JobDef.selectKey(cnx, "Fibo");
 
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", fibo.getApplicationName());
@@ -211,10 +211,10 @@ public class XmlTest extends JqmBaseTest
         JobDef fibo = null;
         try
         {
-            fibo = JobDef.select_key(cnx, "Fibo");
-            JobDef.select_key(cnx, "Geo");
-            JobDef.select_key(cnx, "DateTime");
-            JobDef.select_key(cnx, "DateTime2");
+            fibo = JobDef.selectKey(cnx, "Fibo");
+            JobDef.selectKey(cnx, "Geo");
+            JobDef.selectKey(cnx, "DateTime");
+            JobDef.selectKey(cnx, "DateTime2");
         }
         catch (NoResultException e)
         {
@@ -252,7 +252,7 @@ public class XmlTest extends JqmBaseTest
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());
-        JobDef fibo = JobDef.select_key(cnx, "Fibo");
+        JobDef fibo = JobDef.selectKey(cnx, "Fibo");
         Assert.assertEquals("Fibo", fibo.getApplicationName());
         Assert.assertEquals("1", fibo.getParametersMap(cnx).get("p1"));
 
@@ -261,7 +261,7 @@ public class XmlTest extends JqmBaseTest
         cnx.commit();
 
         jd = JobDef.select(cnx, "jd_select_all");
-        fibo = JobDef.select_key(cnx, "Fibo");
+        fibo = JobDef.selectKey(cnx, "Fibo");
         Assert.assertEquals(2, jd.size());
         Assert.assertNotNull(fibo);
         Assert.assertEquals("Fibo", fibo.getApplicationName());
@@ -281,7 +281,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(2, jd.size());
 
         // Was the queue created (and only once)?
-        Queue q = Queue.select_key(cnx, "NewQueue");
+        Queue q = Queue.selectKey(cnx, "NewQueue");
         Assert.assertEquals("Created from a jobdef import. Description should be set later", q.getDescription());
         cnx.close();
     }
@@ -303,9 +303,9 @@ public class XmlTest extends JqmBaseTest
             Queue.select(cnx, "q_select_by_key", "XmlQueue");
             Queue.select(cnx, "q_select_by_key", "XmlQueue2");
 
-            JobDef jd1 = JobDef.select_key(cnx, "Fibo");
-            JobDef jd2 = JobDef.select_key(cnx, "Geo");
-            JobDef jd3 = JobDef.select_key(cnx, "DateTime");
+            JobDef jd1 = JobDef.selectKey(cnx, "Fibo");
+            JobDef jd2 = JobDef.selectKey(cnx, "Geo");
+            JobDef jd3 = JobDef.selectKey(cnx, "DateTime");
 
             Assert.assertEquals("XmlQueue", jd1.getQueue(cnx).getName());
             Assert.assertEquals("XmlQueue", jd2.getQueue(cnx).getName());

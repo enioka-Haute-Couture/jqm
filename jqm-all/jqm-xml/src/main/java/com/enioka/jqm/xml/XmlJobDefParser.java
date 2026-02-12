@@ -139,7 +139,7 @@ public class XmlJobDefParser
 
                 try
                 {
-                    cl = Cl.select_key(cnx, clName);
+                    cl = Cl.selectKey(cnx, clName);
 
                     // Remove all handlers - we will recreate them.
                     cnx.runUpdate("clehprm_delete_all_for_cl", cl.getId());
@@ -148,7 +148,7 @@ public class XmlJobDefParser
                 catch (NoResultException e)
                 {
                     Cl.create(cnx, clName, false, null, false, true, null);
-                    cl = Cl.select_key(cnx, clName);
+                    cl = Cl.selectKey(cnx, clName);
                 }
 
                 // Basic attributes (with defaults)
@@ -249,7 +249,7 @@ public class XmlJobDefParser
                     String name = jdElement.getElementsByTagName("name").item(0).getTextContent().trim();
                     try
                     {
-                        jd = JobDef.select_key(cnx, name);
+                        jd = JobDef.selectKey(cnx, name);
                     }
                     catch (NoResultException e)
                     {
@@ -272,7 +272,7 @@ public class XmlJobDefParser
                         String qname = jdElement.getElementsByTagName("queue").item(0).getTextContent().trim();
                         try
                         {
-                            queueId = Queue.select_key(cnx, qname).getId();
+                            queueId = Queue.selectKey(cnx, qname).getId();
                         }
                         catch (NoResultException e)
                         {
@@ -303,14 +303,12 @@ public class XmlJobDefParser
                             : "FS"));
 
                     // Simple JD attributes
-                    jd.setCanBeRestarted(
-                            "true".equals(jdElement.getElementsByTagName("canBeRestarted").item(0).getTextContent().trim()) ? true : false);
+                    jd.setCanBeRestarted("true".equals(jdElement.getElementsByTagName("canBeRestarted").item(0).getTextContent().trim()));
                     jd.setJavaClassName(jdElement.getElementsByTagName("javaClassName").item(0).getTextContent().trim());
                     jd.setDescription(jdElement.getElementsByTagName("description").item(0).getTextContent());
                     jd.setApplicationName(name);
                     jd.setModule(jdElement.getElementsByTagName("module").item(0).getTextContent());
-                    jd.setHighlander(
-                            "true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent().trim()) ? true : false);
+                    jd.setHighlander("true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent().trim()));
 
                     // Classifier
                     if (jdElement.getElementsByTagName("application").getLength() > 0)
@@ -378,7 +376,7 @@ public class XmlJobDefParser
                         String clName = jdElement.getElementsByTagName("executionContext").item(0).getTextContent();
                         try
                         {
-                            jd.setClassLoader(Cl.select_key(cnx, clName).getId());
+                            jd.setClassLoader(Cl.selectKey(cnx, clName).getId());
                         }
                         catch (NoResultException e)
                         {

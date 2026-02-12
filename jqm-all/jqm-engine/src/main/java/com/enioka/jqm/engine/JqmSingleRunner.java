@@ -18,7 +18,7 @@ import com.enioka.jqm.model.JobInstance;
 @MetaInfServices(JqmSingleRunnerOperations.class)
 public class JqmSingleRunner implements JqmSingleRunnerOperations
 {
-    private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
+    private static final Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
 
     public JobInstance runAtOnce(long jobInstanceId)
     {
@@ -29,7 +29,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
     {
         jqmlogger.debug("Single runner was asked to start with ID " + jobInstanceId);
         DbConn cnx = Helpers.getNewDbSession();
-        com.enioka.jqm.model.JobInstance jr = com.enioka.jqm.model.JobInstance.select_id(cnx, jobInstanceId);
+        com.enioka.jqm.model.JobInstance jr = com.enioka.jqm.model.JobInstance.selectId(cnx, jobInstanceId);
         cnx.close();
         if (jr == null)
         {
@@ -58,7 +58,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
 
         // Get a copy of the instance, to be sure to get a non detached item.
         DbConn cnx = Helpers.getNewDbSession();
-        job = com.enioka.jqm.model.JobInstance.select_id(cnx, job.getId());
+        job = com.enioka.jqm.model.JobInstance.selectId(cnx, job.getId());
         job.loadPrmCache(cnx);
 
         // Parameters
@@ -130,7 +130,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
                 while (!Thread.interrupted())
                 {
                     cnx = Helpers.getNewDbSession();
-                    com.enioka.jqm.model.JobInstance job = com.enioka.jqm.model.JobInstance.select_id(cnx, jobId);
+                    com.enioka.jqm.model.JobInstance job = com.enioka.jqm.model.JobInstance.selectId(cnx, jobId);
                     cnx.close();
 
                     if (job != null && job.getInstruction().equals(com.enioka.jqm.model.Instruction.KILL))

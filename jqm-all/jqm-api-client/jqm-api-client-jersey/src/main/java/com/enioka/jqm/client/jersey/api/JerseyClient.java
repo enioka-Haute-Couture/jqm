@@ -24,10 +24,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import com.enioka.jqm.client.api.*;
+import com.enioka.jqm.client.api.Deliverable;
+import com.enioka.jqm.client.api.JobDef;
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.JobRequest;
+import com.enioka.jqm.client.api.JqmClient;
+import com.enioka.jqm.client.api.JqmClientException;
+import com.enioka.jqm.client.api.JqmInvalidRequestException;
+import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.client.api.Queue;
+import com.enioka.jqm.client.api.QueueStatus;
+
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -683,8 +696,8 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     {
         try
         {
-            QueryBaseImpl res = target.path("ji/query").request(MediaType.APPLICATION_XML).post(Entity.entity(query, MediaType.APPLICATION_XML),
-                    QueryBaseImpl.class);
+            QueryBaseImpl res = target.path("ji/query").request(MediaType.APPLICATION_XML)
+                    .post(Entity.entity(query, MediaType.APPLICATION_XML), QueryBaseImpl.class);
             query.setResultSize(res.getResultSize());
             query.setResults(res.getResults() != null ? res.getResults() : new ArrayList<>());
             return res.getResults();

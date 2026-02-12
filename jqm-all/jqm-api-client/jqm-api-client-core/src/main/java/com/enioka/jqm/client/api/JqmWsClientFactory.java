@@ -13,11 +13,14 @@ public class JqmWsClientFactory
     /**
      * Default Constructor.
      */
-    public JqmWsClientFactory(){}
+    public JqmWsClientFactory()
+    {}
 
     /**
      * Set the properties to use for the web service client factory.
-     * @param properties the properties to use
+     *
+     * @param properties
+     *            the properties to use
      */
     public static void setProperties(Properties properties)
     {
@@ -26,8 +29,11 @@ public class JqmWsClientFactory
 
     /**
      * Set a single property for the web service client factory.
-     * @param key the property key
-     * @param value the property value
+     *
+     * @param key
+     *            the property key
+     * @param value
+     *            the property value
      */
     public static void setProperty(String key, Object value)
     {
@@ -36,6 +42,7 @@ public class JqmWsClientFactory
 
     /**
      * Get a web service client.
+     *
      * @return a web service client
      */
     public static JqmClient getClient()
@@ -45,9 +52,13 @@ public class JqmWsClientFactory
 
     /**
      * Get a web service client.
-     * @param name name of the client to get
-     * @param p properties to use for the client
-     * @param cached whether to cache the client
+     *
+     * @param name
+     *            name of the client to get
+     * @param p
+     *            properties to use for the client
+     * @param cached
+     *            whether to cache the client
      * @return a web service client
      */
     public static JqmClient getClient(String name, Properties p, boolean cached)

@@ -145,7 +145,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             // Node configuration is in the database
             try
             {
-                node = Node.select_single(cnx, "node_select_by_key", nodeName);
+                node = Node.selectSingle(cnx, "node_select_by_key", nodeName);
             }
             catch (NoResultException e)
             {
@@ -557,9 +557,8 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                         try
                         {
                             History.create(cnx, ji, State.CRASHED, Calendar.getInstance());
-                            Message.create(cnx,
-                                    "Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash",
-                                    ji.getId());
+                            Message.create(cnx, "Job was supposed to be running at server startup -"
+                                    + " usually means it was killed along a server by an admin or a crash", ji.getId());
                         }
                         catch (Exception ex)
                         {

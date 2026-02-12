@@ -24,7 +24,7 @@ public class Db
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(Db.class);
 
-    private DataSource _ds = null;
+    private DataSource ds = null;
     private DbAdapter adapter = null;
     private String product;
     private Properties p = null;
@@ -59,7 +59,7 @@ public class Db
      */
     public Db(DataSource ds, Properties properties)
     {
-        this._ds = ds;
+        this.ds = ds;
         this.p = new Properties();
         if (properties != null)
         {
@@ -146,7 +146,7 @@ public class Db
      */
     public DataSource getDataSource()
     {
-        return _ds;
+        return ds;
     }
 
     /**
@@ -181,7 +181,7 @@ public class Db
     {
         while (true)
         {
-            try (var cnx = this._ds.getConnection())
+            try (var cnx = this.ds.getConnection())
             {
                 if (cnx.isValid(1000))
                 {
@@ -234,7 +234,7 @@ public class Db
         String dbAdaptersProp = p.getProperty("com.enioka.jqm.jdbc.adapters");
         if (dbAdaptersProp == null || dbAdaptersProp.isEmpty())
         {
-            try (var cnx = _ds.getConnection())
+            try (var cnx = ds.getConnection())
             {
                 var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
                 if (dbSchemaManager != null)
@@ -276,7 +276,7 @@ public class Db
      */
     private void selectAdapter(Properties p)
     {
-        try (Connection tmp = _ds.getConnection())
+        try (Connection tmp = ds.getConnection())
         {
             DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
@@ -323,7 +323,7 @@ public class Db
     private void initQueries()
     {
         DbConn cnx = getConn();
-        adapter.prepare(p, cnx._cnx);
+        adapter.prepare(p, cnx.cnx);
         cnx.close();
     }
 
@@ -338,7 +338,7 @@ public class Db
         try
         {
             Thread.interrupted(); // this is VERY sad. Needed for Oracle driver which otherwise fails spectacularly.
-            cnx = _ds.getConnection();
+            cnx = ds.getConnection();
             if (cnx.getAutoCommit())
             {
                 cnx.setAutoCommit(false);
@@ -391,23 +391,23 @@ public class Db
      */
     void close()
     {
-        if (_ds == null)
+        if (ds == null)
         {
             return;
         }
 
         try
         {
-            Method m = _ds.getClass().getMethod("close", boolean.class);
-            m.invoke(_ds, true);
+            Method m = ds.getClass().getMethod("close", boolean.class);
+            m.invoke(ds, true);
             jqmlogger.info("Connection pool was closed with purge");
         }
         catch (NoSuchMethodException e)
         {
             try
             {
-                Method m = _ds.getClass().getMethod("close");
-                m.invoke(_ds);
+                Method m = ds.getClass().getMethod("close");
+                m.invoke(ds);
                 jqmlogger.info("Connection pool was closed without purge");
             }
             catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException |
@@ -420,6 +420,6 @@ public class Db
         {
             // nothing to do - this DS cannot be closed.
         }
-        _ds = null;
+        ds = null;
     }
 }

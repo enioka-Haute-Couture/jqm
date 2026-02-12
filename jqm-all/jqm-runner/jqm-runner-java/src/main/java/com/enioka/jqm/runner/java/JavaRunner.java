@@ -91,7 +91,8 @@ public class JavaRunner implements JobRunner
                 System.setErr(s);
 
                 // Redirect JQM's own logging to the multiplexing stdout.
-                // That way all logging specific to a JobInstance goes to the JobInstance log file and not the main log file. //
+                // That way all logging specific to a JobInstance goes to the JobInstance
+                // log file and not the main log file.
                 // ((ConsoleAppender) root.getAppender("consoleAppender")).setTarget("System.out");
             }
         }
@@ -140,7 +141,8 @@ public class JavaRunner implements JobRunner
                         if (!runnerName.isEmpty() && !availableRunnerNames.contains(runnerName))
                         {
                             jqmlogger.error(
-                                    "Class loader '{}' references a runner '{}' which does not exist. To prevent a failure at runtime install the runner or update the configuration.",
+                                    "Class loader '{}' references a runner '{}' which does not exist. "
+                                            + "To prevent a failure at runtime install the runner or update the configuration.",
                                     cl.getName(), runnerName);
                         }
                     }

@@ -20,7 +20,6 @@ package com.enioka.jqm.runner.api;
 
 /**
  * The KILL JOB JQM exception class.
- * 
  */
 public class JqmKillException extends RuntimeException
 {

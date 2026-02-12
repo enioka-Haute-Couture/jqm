@@ -164,8 +164,8 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 // Cache result (if loaded by ext CL or below)
                 if (!isLoadedByExtClassloader(res))
                 {
-                    jqmlogger.warn(
-                            "A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
+                    jqmlogger.warn("A JNDI resource was defined as singleton but was loaded by a"
+                            + " payload class loader - it won't be cached to avoid class loader leaks");
                 }
                 else
                 {

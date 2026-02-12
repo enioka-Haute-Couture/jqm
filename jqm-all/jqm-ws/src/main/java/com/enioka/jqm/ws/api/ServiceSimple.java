@@ -88,7 +88,7 @@ public class ServiceSimple
             {
                 try
                 {
-                    return Node.select_single(cnx, "node_select_by_id", jqmNodeId);
+                    return Node.selectSingle(cnx, "node_select_by_id", jqmNodeId);
                 }
                 catch (NoResultException e)
                 {
@@ -242,10 +242,10 @@ public class ServiceSimple
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     public String enqueue(@FormParam("applicationname") String applicationName, @FormParam("module") String module,
-                          @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
-                          @FormParam("keyword3") String keyword3, @FormParam("parentid") Long parentId, @FormParam("user") String user,
-                          @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
-                          @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
+            @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
+            @FormParam("keyword3") String keyword3, @FormParam("parentid") Long parentId, @FormParam("user") String user,
+            @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
+            @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
     {
         if (user == null && security != null && security.getUserPrincipal() != null)
         {
@@ -289,7 +289,8 @@ public class ServiceSimple
     @GET
     @Path("localnode/health")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getLocalNodeHealth() throws MalformedObjectNameException, UnknownHostException {
+    public String getLocalNodeHealth() throws MalformedObjectNameException, UnknownHostException
+    {
         // Local service only - not enabled when running on top of Tomcat & co.
         Node n = getLocalNodeIfRunningOnJqm();
         if (n == null)
@@ -334,13 +335,16 @@ public class ServiceSimple
             throw new ErrorDto("JQM node has is not working as expected", "", 11, Status.SERVICE_UNAVAILABLE);
         }
 
-        try (DbConn cnx = DbManager.getDb().getConn()) {
-            final var standaloneMode = Boolean.parseBoolean(
-                GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
+        try (DbConn cnx = DbManager.getDb().getConn())
+        {
+            final var standaloneMode = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "wsStandaloneMode", "false"));
 
-            if (standaloneMode) {
+            if (standaloneMode)
+            {
                 return "Pollers are polling - IP: " + Inet4Address.getLocalHost().getHostAddress();
-            } else {
+            }
+            else
+            {
                 return "Pollers are polling";
             }
         }

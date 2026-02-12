@@ -229,10 +229,10 @@ public class Cl implements Serializable
 
     private List<ClHandler> handlerCache = new ArrayList<>();
 
-    public static List<Cl> select(DbConn cnx, String query_key, Object... args)
+    public static List<Cl> select(DbConn cnx, String queryKey, Object... args)
     {
         List<Cl> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -249,7 +249,7 @@ public class Cl implements Serializable
         return res;
     }
 
-    public static Cl select_key(DbConn cnx, String name)
+    public static Cl selectKey(DbConn cnx, String name)
     {
         List<Cl> res = select(cnx, "cl_select_by_key", name);
         if (res.isEmpty())

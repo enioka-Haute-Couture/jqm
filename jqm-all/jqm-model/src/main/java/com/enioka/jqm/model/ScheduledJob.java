@@ -97,13 +97,13 @@ public class ScheduledJob
         this.priority = priority;
     }
 
-    public static List<ScheduledJob> select(DbConn cnx, String query_key, Object... args)
+    public static List<ScheduledJob> select(DbConn cnx, String queryKey, Object... args)
     {
         List<ScheduledJob> res = new ArrayList<>();
         List<Long> currentIdList = null;
         List<List<Long>> allIdLists = new ArrayList<>();
         ScheduledJob tmp = null;
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -161,7 +161,7 @@ public class ScheduledJob
     }
 
     public static long create(DbConn cnx, String cronExpression, long jobDefId, Long queueId, Integer priority,
-                              Map<String, String> parameterOverloads)
+            Map<String, String> parameterOverloads)
     {
         QueryResult r = cnx.runUpdate("sj_insert", cronExpression, jobDefId, queueId, priority);
 

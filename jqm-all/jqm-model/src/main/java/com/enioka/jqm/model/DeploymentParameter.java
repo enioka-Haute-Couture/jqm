@@ -255,10 +255,10 @@ public class DeploymentParameter
         return create(cnx, true, nodeId, nbThread, pollingInterval, qId);
     }
 
-    public static List<DeploymentParameter> select(DbConn cnx, String query_key, Object... args)
+    public static List<DeploymentParameter> select(DbConn cnx, String queryKey, Object... args)
     {
         List<DeploymentParameter> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
