@@ -7,6 +7,7 @@ import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "New-Node", commandDescription = "Create a new node inside central configuration.")
 class CommandNewNode extends CommandBase
 {

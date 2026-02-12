@@ -84,7 +84,7 @@ final class ResourceParser
         {
             try (DbConn cnx = DbManager.getDb().getConn())
             {
-                resource = JndiObjectResource.select_alias(cnx, alias);
+                resource = JndiObjectResource.selectAlias(cnx, alias);
 
                 JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null,
                         resource.getAuth(), resource.getFactory(), resource.getSingleton());

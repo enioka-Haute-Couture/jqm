@@ -18,12 +18,20 @@
 
 package com.enioka.jqm.model;
 
-import com.enioka.jqm.jdbc.*;
-
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
+import com.enioka.jqm.jdbc.QueryResult;
 
 public class RUser implements Serializable
 {
@@ -172,10 +180,10 @@ public class RUser implements Serializable
         this.lastModified = lastModified;
     }
 
-    public static List<RUser> select(DbConn cnx, String query_key, Object... args)
+    public static List<RUser> select(DbConn cnx, String queryKey, Object... args)
     {
         List<RUser> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -203,29 +211,29 @@ public class RUser implements Serializable
         return res;
     }
 
-    public static void create(DbConn cnx, String login, String password_hash, String password_salt, String... role_names)
+    public static void create(DbConn cnx, String login, String passwordHash, String passwordSalt, String... roleNames)
     {
-        create(cnx, login, password_hash, password_salt, null, false, role_names);
+        create(cnx, login, passwordHash, passwordSalt, null, false, roleNames);
     }
 
-    public static long create(DbConn cnx, String login, String password_hash, String password_salt, Calendar expiration, Boolean internal,
-            String... role_names)
+    public static long create(DbConn cnx, String login, String passwordHash, String passwordSalt, Calendar expiration, Boolean internal,
+            String... roleNames)
     {
-        QueryResult r = cnx.runUpdate("user_insert", null, expiration, null, password_salt, internal, false, login, password_hash);
+        QueryResult r = cnx.runUpdate("user_insert", null, expiration, null, passwordSalt, internal, false, login, passwordHash);
         long newId = r.getGeneratedId();
 
-        for (String s : role_names)
+        for (String s : roleNames)
         {
             cnx.runUpdate("user_add_role_by_name", newId, s);
         }
         return newId;
     }
 
-    public static void set_roles(DbConn cnx, long userId, String... role_names)
+    public static void setRoles(DbConn cnx, long userId, String... roleNames)
     {
         cnx.runUpdate("user_remove_all_roles_by_id", userId);
         Set<String> roles = new HashSet<>();
-        for (String s : role_names)
+        for (String s : roleNames)
         {
             roles.add(s);
         }
@@ -236,7 +244,7 @@ public class RUser implements Serializable
         }
     }
 
-    public static RUser select_id(DbConn cnx, long id)
+    public static RUser selectId(DbConn cnx, long id)
     {
         List<RUser> res = select(cnx, "user_select_by_id", id);
         if (res.isEmpty())

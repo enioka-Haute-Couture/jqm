@@ -195,10 +195,10 @@ public class Queue implements Serializable
         }
     }
 
-    public static List<Queue> select(DbConn cnx, String query_key, Object... args)
+    public static List<Queue> select(DbConn cnx, String queryKey, Object... args)
     {
         List<Queue> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {
@@ -213,7 +213,7 @@ public class Queue implements Serializable
         return res;
     }
 
-    public static Queue select_key(DbConn cnx, String name)
+    public static Queue selectKey(DbConn cnx, String name)
     {
         List<Queue> res = select(cnx, "q_select_by_key", name);
         if (res.isEmpty())

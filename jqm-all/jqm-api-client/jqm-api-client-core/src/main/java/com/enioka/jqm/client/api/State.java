@@ -18,7 +18,8 @@ package com.enioka.jqm.client.api;
 /**
  * The different status a {@link JobInstance} can take.
  */
-public enum State {
+public enum State
+{
     /** The job requests was just created. The {@link JobInstance} is waiting in queue. **/
     SUBMITTED,
     /** An engine has taken the {@link JobInstance} and will soon run it. JobInstance cannot be modified any more. **/

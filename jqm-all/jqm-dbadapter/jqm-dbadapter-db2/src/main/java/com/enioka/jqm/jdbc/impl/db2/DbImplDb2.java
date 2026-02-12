@@ -80,7 +80,7 @@ public class DbImplDb2 extends DbAdapter
 
                     newParams.addAll(vv);
 
-                    String newPrm[] = new String[vv.size()];
+                    String[] newPrm = new String[vv.size()];
                     for (int j = 0; j < vv.size(); j++)
                     {
                         newPrm[j] = "?";

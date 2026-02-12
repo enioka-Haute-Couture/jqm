@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DiscreteResourceManager extends ResourceManagerBase
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(QuantityResourceManager.class);
+    private static final Logger jqmlogger = LoggerFactory.getLogger(DiscreteResourceManager.class);
 
-    private static String PRM_ROOT = "com.enioka.jqm.rm.discrete.";
-    private static String PRM_LIST = "list";
-    private static String PRM_CONSUMPTION = "consumption";
+    private static final String PRM_ROOT = "com.enioka.jqm.rm.discrete.";
+    private static final String PRM_LIST = "list";
+    private static final String PRM_CONSUMPTION = "consumption";
 
     /**
      * The tokens, indexed by name. Boolean is true if available, false if booked.

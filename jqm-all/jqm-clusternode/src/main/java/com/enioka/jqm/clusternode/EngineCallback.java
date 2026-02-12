@@ -62,7 +62,8 @@ public class EngineCallback implements JqmEngineHandler
     @Override
     public void onNodeConfigurationRead(Node node)
     {
-        try (DbConn cnx = DbManager.getDb().getConn()) {
+        try (DbConn cnx = DbManager.getDb().getConn())
+        {
 
             // Main log levels comes from configuration
             CommonService.setLogLevel(node.getRootLogLevel());

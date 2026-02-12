@@ -36,7 +36,8 @@ public class JobDefDto implements Serializable
     /**
      * Create a new empty DTO.
      */
-    public JobDefDto(){}
+    public JobDefDto()
+    {}
 
     private static final long serialVersionUID = 4934352148555212325L;
 
@@ -65,6 +66,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the technical ID.
+     *
      * @return the ID
      */
     public Long getId()
@@ -74,7 +76,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the technical ID.
-     * @param id the ID to set
+     *
+     * @param id
+     *            the ID to set
      */
     public void setId(Long id)
     {
@@ -83,6 +87,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the description of the job definition.
+     *
      * @return the description
      */
     public String getDescription()
@@ -92,7 +97,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the description of the job definition.
-     * @param description the description to set
+     *
+     * @param description
+     *            the description to set
      */
     public void setDescription(String description)
     {
@@ -101,6 +108,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Check if job instances from this definition can be restarted after a failure.
+     *
      * @return true if restartable
      */
     public boolean isCanBeRestarted()
@@ -110,7 +118,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set if job instances from this definition can be restarted after a failure.
-     * @param canBeRestarted true if restartable
+     *
+     * @param canBeRestarted
+     *            true if restartable
      */
     public void setCanBeRestarted(boolean canBeRestarted)
     {
@@ -119,6 +129,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the name of the Java class to execute.
+     *
      * @return the class name
      */
     public String getJavaClassName()
@@ -128,7 +139,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the name of the Java class to execute.
-     * @param javaClassName the class name to set
+     *
+     * @param javaClassName
+     *            the class name to set
      */
     public void setJavaClassName(String javaClassName)
     {
@@ -137,6 +150,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the ID of the default queue for this job.
+     *
      * @return the queue ID
      */
     public Long getQueueId()
@@ -146,7 +160,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the ID of the default queue for this job.
-     * @param queueId the queue ID to set
+     *
+     * @param queueId
+     *            the queue ID to set
      */
     public void setQueueId(Long queueId)
     {
@@ -155,6 +171,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the application name.
+     *
      * @return the application name
      */
     public String getApplicationName()
@@ -164,7 +181,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the application name.
-     * @param applicationName the name to set
+     *
+     * @param applicationName
+     *            the name to set
      */
     public void setApplicationName(String applicationName)
     {
@@ -173,6 +192,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the application.
+     *
      * @return the application
      */
     public String getApplication()
@@ -182,7 +202,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the application.
-     * @param application the application to set
+     *
+     * @param application
+     *            the application to set
      */
     public void setApplication(String application)
     {
@@ -191,6 +213,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the module name.
+     *
      * @return the module
      */
     public String getModule()
@@ -200,7 +223,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the module name.
-     * @param module the module to set
+     *
+     * @param module
+     *            the module to set
      */
     public void setModule(String module)
     {
@@ -209,6 +234,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the first metadata keyword.
+     *
      * @return keyword1
      */
     public String getKeyword1()
@@ -218,7 +244,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the first metadata keyword.
-     * @param keyword1 keyword to set
+     *
+     * @param keyword1
+     *            keyword to set
      */
     public void setKeyword1(String keyword1)
     {
@@ -227,6 +255,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the second metadata keyword.
+     *
      * @return keyword2
      */
     public String getKeyword2()
@@ -236,7 +265,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the second metadata keyword.
-     * @param keyword2 keyword to set
+     *
+     * @param keyword2
+     *            keyword to set
      */
     public void setKeyword2(String keyword2)
     {
@@ -245,6 +276,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the third metadata keyword.
+     *
      * @return keyword3
      */
     public String getKeyword3()
@@ -254,7 +286,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the third metadata keyword.
-     * @param keyword3 keyword to set
+     *
+     * @param keyword3
+     *            keyword to set
      */
     public void setKeyword3(String keyword3)
     {
@@ -263,6 +297,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Check if "Highlander" mode is enabled (only one instance running at a time for this definition).
+     *
      * @return true if highlander
      */
     public boolean isHighlander()
@@ -272,7 +307,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set if "Highlander" mode is enabled.
-     * @param highlander true if highlander
+     *
+     * @param highlander
+     *            true if highlander
      */
     public void setHighlander(boolean highlander)
     {
@@ -281,6 +318,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the path to the JAR file containing the class.
+     *
      * @return the jar path
      */
     public String getJarPath()
@@ -290,7 +328,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the path to the JAR file containing the class.
-     * @param jarPath the path to set
+     *
+     * @param jarPath
+     *            the path to set
      */
     public void setJarPath(String jarPath)
     {
@@ -299,6 +339,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the type of the path.
+     *
      * @return the path type
      */
     public String getPathType()
@@ -308,7 +349,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the type of the path.
-     * @param pathType the type to set
+     *
+     * @param pathType
+     *            the type to set
      */
     public void setPathType(String pathType)
     {
@@ -317,6 +360,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the default parameters for this job definition.
+     *
      * @return the parameters map
      */
     public Map<String, String> getParameters()
@@ -326,7 +370,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the default parameters for this job definition.
-     * @param parameters the map to set
+     *
+     * @param parameters
+     *            the map to set
      */
     public void setParameters(Map<String, String> parameters)
     {
@@ -335,6 +381,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Check if this job definition is enabled and can be launched.
+     *
      * @return true if enabled
      */
     public boolean isEnabled()
@@ -344,7 +391,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set if this job definition is enabled.
-     * @param enabled true if enabled
+     *
+     * @param enabled
+     *            true if enabled
      */
     public void setEnabled(boolean enabled)
     {
@@ -353,6 +402,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the maximum expected runtime in minutes before a warning is triggered.
+     *
      * @return the limit in minutes
      */
     public Integer getReasonableRuntimeLimitMinute()
@@ -362,7 +412,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the maximum expected runtime in minutes before a warning is triggered.
-     * @param reasonableRuntimeLimitMinute the limit to set
+     *
+     * @param reasonableRuntimeLimitMinute
+     *            the limit to set
      */
     public void setReasonableRuntimeLimitMinute(Integer reasonableRuntimeLimitMinute)
     {
@@ -371,6 +423,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the ID of the classloader to use for this job.
+     *
      * @return the classloader ID
      */
     public Long getClassLoaderId()
@@ -380,6 +433,7 @@ public class JobDefDto implements Serializable
 
     /**
      * Get the list of schedules associated with this job.
+     *
      * @return the list of schedules
      */
     public List<ScheduledJob> getSchedules()
@@ -389,7 +443,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the list of schedules associated with this job.
-     * @param schedules the list to set
+     *
+     * @param schedules
+     *            the list to set
      */
     public void setSchedules(List<ScheduledJob> schedules)
     {
@@ -398,7 +454,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Set the ID of the classloader to use for this job.
-     * @param classLoaderId the ID to set
+     *
+     * @param classLoaderId
+     *            the ID to set
      */
     public void setClassLoaderId(Long classLoaderId)
     {
@@ -407,7 +465,9 @@ public class JobDefDto implements Serializable
 
     /**
      * Add a schedule to this job definition.
-     * @param sj the schedule to add
+     *
+     * @param sj
+     *            the schedule to add
      * @return the current DTO for chaining
      */
     public JobDefDto addSchedule(ScheduledJob sj)

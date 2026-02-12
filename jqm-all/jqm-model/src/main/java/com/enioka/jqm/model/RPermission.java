@@ -66,10 +66,10 @@ public class RPermission implements Serializable
         this.role = role;
     }
 
-    public static List<RPermission> select(DbConn cnx, String query_key, Object... args)
+    public static List<RPermission> select(DbConn cnx, String queryKey, Object... args)
     {
         List<RPermission> res = new ArrayList<>();
-        try (ResultSet rs = cnx.runSelect(query_key, args))
+        try (ResultSet rs = cnx.runSelect(queryKey, args))
         {
             while (rs.next())
             {

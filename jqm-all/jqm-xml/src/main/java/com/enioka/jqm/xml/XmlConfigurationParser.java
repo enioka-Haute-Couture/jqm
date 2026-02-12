@@ -139,7 +139,7 @@ public class XmlConfigurationParser
 
                 try
                 {
-                    node = com.enioka.jqm.model.Node.select_single(cnx, "node_select_by_key", nodeName);
+                    node = com.enioka.jqm.model.Node.selectSingle(cnx, "node_select_by_key", nodeName);
                     cnx.runUpdate("node_update_changed_by_id", deliverableDirectory, listenInterface, enabled, jmxRegistryPort,
                             jmxServerPort, adminApi, clientApi, simpleApi, nodeName, webPort, jobDefDirectory, logLevel, false,
                             tmpDirectory, node.getId(), deliverableDirectory, listenInterface, enabled, jmxRegistryPort, jmxServerPort,
@@ -208,7 +208,7 @@ public class XmlConfigurationParser
                 // Merge
                 q.update(cnx);
 
-                long queueId = Queue.select_key(cnx, name).getId();
+                long queueId = Queue.selectKey(cnx, name).getId();
 
                 // Mappings
                 NodeList mList = qElement.getElementsByTagName("mapping");
@@ -228,7 +228,7 @@ public class XmlConfigurationParser
                     boolean enabled = Boolean.parseBoolean(mElement.getElementsByTagName("enabled").item(0).getTextContent().trim());
 
                     // existing mapping?
-                    long nodeId = com.enioka.jqm.model.Node.select_single(cnx, "node_select_by_key", nodeName).getId();
+                    long nodeId = com.enioka.jqm.model.Node.selectSingle(cnx, "node_select_by_key", nodeName).getId();
 
                     DeploymentParameter dp = null;
                     for (DeploymentParameter dpp : mappings)
@@ -290,7 +290,7 @@ public class XmlConfigurationParser
 
                 try
                 {
-                    JndiObjectResource src = JndiObjectResource.select_alias(cnx, alias);
+                    JndiObjectResource src = JndiObjectResource.selectAlias(cnx, alias);
 
                     cnx.runUpdate("jndi_update_changed_by_id", "CONTAINER", description, srcFactory, alias, singleton, null, type,
                             src.getId(), "CONTAINER", description, srcFactory, alias, singleton, null, type);

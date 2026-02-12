@@ -143,8 +143,8 @@ public class DefaultConfigurationService
         if (i == 0L)
         {
             jqmlogger.info("As this node is not bound to any queue, it will be set to poll from the default queue with default parameters");
-            Long default_queue_id = cnx.runSelectSingle("q_select_default", 1, Long.class);
-            DeploymentParameter.create(cnx, nodeId, 5, 1000, default_queue_id);
+            Long defaultQueueId = cnx.runSelectSingle("q_select_default", 1, Long.class);
+            DeploymentParameter.create(cnx, nodeId, 5, 1000, defaultQueueId);
 
             cnx.commit();
         }

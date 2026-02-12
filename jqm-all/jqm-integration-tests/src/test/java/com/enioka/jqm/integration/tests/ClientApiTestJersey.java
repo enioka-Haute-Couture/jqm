@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import com.enioka.jqm.client.api.*;
 import com.enioka.jqm.test.helpers.CreationTools;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.JqmClient;
+import com.enioka.jqm.client.api.JqmClientException;
+import com.enioka.jqm.client.api.JqmInvalidRequestException;
+import com.enioka.jqm.client.api.JqmWsClientFactory;
+import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.repository.UserManagementRepository;
@@ -40,7 +45,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
 
         addAndStartEngine("wsnode");
 
-        n = Node.select_single(cnx, "node_select_by_key", "wsnode");
+        n = Node.selectSingle(cnx, "node_select_by_key", "wsnode");
 
         // Set client properties to use this node.
         p = new Properties();
@@ -92,9 +97,10 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
     }
 
     @Test
-    public void testGetJobsWithQuery(){
+    public void testGetJobsWithQuery()
+    {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42, "jqm-test-em",
-            null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+                null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         Long i = jqmClient.enqueue("jqm-test-em", "test");
         addAndStartEngine();
         TestHelpers.waitFor(1, 5000, cnx);

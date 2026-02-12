@@ -36,7 +36,8 @@ public class Queue implements Serializable
     /**
      * Default constructor.
      */
-    public Queue(){}
+    public Queue()
+    {}
 
     private static final long serialVersionUID = 5730264060976148489L;
 
@@ -46,6 +47,7 @@ public class Queue implements Serializable
 
     /**
      * Each queue has a unique ID
+     *
      * @return the queue ID
      */
     public long getId()
@@ -55,8 +57,10 @@ public class Queue implements Serializable
 
     /**
      * Set the queue ID.
+     *
      * @see #getId()
-     * @param id the queue ID
+     * @param id
+     *            the queue ID
      */
     public void setId(long id)
     {
@@ -65,6 +69,7 @@ public class Queue implements Serializable
 
     /**
      * Name of the queue, usually descriptive.
+     *
      * @return the queue name
      */
     public String getName()
@@ -74,8 +79,10 @@ public class Queue implements Serializable
 
     /**
      * Set the queue name.
+     *
      * @see #getName()
-     * @param name the queue name
+     * @param name
+     *            the queue name
      */
     public void setName(String name)
     {
@@ -84,6 +91,7 @@ public class Queue implements Serializable
 
     /**
      * Queue description.
+     *
      * @return the queue description
      */
     public String getDescription()
@@ -93,8 +101,10 @@ public class Queue implements Serializable
 
     /**
      * Set the queue description.
+     *
      * @see #getDescription()
-     * @param description the queue description
+     * @param description
+     *            the queue description
      */
     public void setDescription(String description)
     {

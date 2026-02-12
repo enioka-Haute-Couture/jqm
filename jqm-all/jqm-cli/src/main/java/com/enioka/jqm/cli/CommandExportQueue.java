@@ -7,6 +7,7 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.xml.XmlQueueExporter;
 
+@SuppressWarnings("checkstyle:LineLength")
 @Parameters(commandNames = "Export-Queue", commandDescription = "Export all queue definitions inside central configuration as a single file.")
 class CommandExportQueue extends CommandBase
 {

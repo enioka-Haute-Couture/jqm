@@ -55,7 +55,7 @@ public class ApiSimpleTest extends JqmBaseTest
 
         addAndStartEngine();
 
-        port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
+        port = Node.selectSingle(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         jqmlogger.info("Jetty port seen by client is {}", port);
     }
 
@@ -66,8 +66,8 @@ public class ApiSimpleTest extends JqmBaseTest
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         var url = "http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji";
-        var postData = List.of( // a form encoded body
-                Map.entry("applicationname", "Marsu-Application"), //
+        // a form encoded body
+        var postData = List.of(Map.entry("applicationname", "Marsu-Application"), //
                 Map.entry("user", "testuser"), //
                 Map.entry("module", "testuser"), //
                 Map.entry("parameterNames", "arg"), //
@@ -116,8 +116,8 @@ public class ApiSimpleTest extends JqmBaseTest
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         var url = "http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji";
-        var postData = List.of( // a form encoded body
-                Map.entry("applicationname", "Marsu-Application"), //
+        // a form encoded body
+        var postData = List.of(Map.entry("applicationname", "Marsu-Application"), //
                 Map.entry("user", "testuser"), //
                 Map.entry("module", "testuser"), //
                 Map.entry("param_1", "arg"), //

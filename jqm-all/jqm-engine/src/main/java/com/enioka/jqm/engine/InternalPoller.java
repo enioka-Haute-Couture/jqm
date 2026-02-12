@@ -97,7 +97,7 @@ class InternalPoller implements Runnable
                 // Check if stop order
                 try
                 {
-                    node = Node.select_single(cnx, "node_select_by_id", node.getId());
+                    node = Node.selectSingle(cnx, "node_select_by_id", node.getId());
                 }
                 catch (NoResultException e)
                 {

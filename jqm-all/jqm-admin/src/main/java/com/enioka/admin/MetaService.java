@@ -3,7 +3,10 @@ package com.enioka.admin;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 import com.enioka.api.admin.ClDto;
 import com.enioka.api.admin.GlobalParameterDto;
@@ -47,7 +50,8 @@ public class MetaService
     /**
      * Default constructor.
      */
-    public MetaService(){}
+    public MetaService()
+    {}
 
     private static Logger jqmlogger = LoggerFactory.getLogger(MetaService.class);
 
@@ -92,7 +96,8 @@ public class MetaService
      * metadata.<br>
      * No commit performed.
      *
-     * @param cnx database session to use.
+     * @param cnx
+     *            database session to use.
      */
     public static void deleteAllTransac(DbConn cnx)
     {
@@ -109,6 +114,7 @@ public class MetaService
 
     /**
      * Get the maven version
+     *
      * @return a VersionDto containing the maven version
      */
     public static VersionDto getVersion()
@@ -126,8 +132,11 @@ public class MetaService
 
     /**
      * Delete a global parameter by its ID
-     * @param cnx the database connection
-     * @param id the ID of the global parameter to delete
+     *
+     * @param cnx
+     *            the database connection
+     * @param id
+     *            the ID of the global parameter to delete
      */
     public static void deleteGlobalParameter(DbConn cnx, Long id)
     {
@@ -141,9 +150,13 @@ public class MetaService
 
     /**
      * Update or insert a global parameter.
-     * @param cnx the database connection
-     * @param dto the global parameter DTO to upsert
-     * @throws IllegalArgumentException if dto is null or key value is null
+     *
+     * @param cnx
+     *            the database connection
+     * @param dto
+     *            the global parameter DTO to upsert
+     * @throws IllegalArgumentException
+     *             if dto is null or key value is null
      */
     public static void upsertGlobalParameter(DbConn cnx, GlobalParameterDto dto)
     {
@@ -169,9 +182,12 @@ public class MetaService
 
     /**
      * Map a ResultSet row to a GlobalParameterDto object.
-     * @param rs the ResultSet to map
+     *
+     * @param rs
+     *            the ResultSet to map
      * @return a GlobalParameterDto object
-     * @throws java.sql.SQLException if an error occurs
+     * @throws java.sql.SQLException
+     *             if an error occurs
      */
     private static GlobalParameterDto mapGlobalParameter(ResultSet rs) throws SQLException
     {
@@ -183,17 +199,23 @@ public class MetaService
     }
 
     /**
-     * Get a global parameter using a query_key and a key.
-     * @param cnx the database connection
-     * @param query_key the SQL query key
-     * @param key the key to search for
+     * Get a global parameter using a queryKey and a key.
+     *
+     * @param cnx
+     *            the database connection
+     * @param queryKey
+     *            the SQL query key
+     * @param key
+     *            the key to search for
      * @return the GlobalParameterDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
-    private static GlobalParameterDto getGlobalParameter(DbConn cnx, String query_key, Object key)
+    private static GlobalParameterDto getGlobalParameter(DbConn cnx, String queryKey, Object key)
     {
-        ResultSet rs = cnx.runSelect(query_key, key);
+        ResultSet rs = cnx.runSelect(queryKey, key);
         try
         {
             if (!rs.next())
@@ -217,11 +239,16 @@ public class MetaService
 
     /**
      * Get a global parameter by its key.
-     * @param cnx the database connection
-     * @param key the key to search for
+     *
+     * @param cnx
+     *            the database connection
+     * @param key
+     *            the key to search for
      * @return the GlobalParameterDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
     public static GlobalParameterDto getGlobalParameter(DbConn cnx, String key)
     {
@@ -230,11 +257,16 @@ public class MetaService
 
     /**
      * Get a global parameter by its ID.
-     * @param cnx the database connection
-     * @param key the ID to search for
+     *
+     * @param cnx
+     *            the database connection
+     * @param key
+     *            the ID to search for
      * @return the GlobalParameterDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
     public static GlobalParameterDto getGlobalParameter(DbConn cnx, Integer key)
     {
@@ -243,7 +275,9 @@ public class MetaService
 
     /**
      * Get all global parameters.
-     * @param cnx the database connection
+     *
+     * @param cnx
+     *            the database connection
      * @return a list of GlobalParameterDto objects
      */
     public static List<GlobalParameterDto> getGlobalParameter(DbConn cnx)
@@ -271,9 +305,13 @@ public class MetaService
 
     /**
      * Delete a JNDI object resource by its ID.
-     * @param cnx the database connection
-     * @param id the ID of the JNDI object resource to delete
-     * @throws JqmAdminApiUserException if the resource does not exist
+     *
+     * @param cnx
+     *            the database connection
+     * @param id
+     *            the ID of the JNDI object resource to delete
+     * @throws JqmAdminApiUserException
+     *             if the resource does not exist
      */
     public static void deleteJndiObjectResource(DbConn cnx, Long id)
     {
@@ -293,8 +331,10 @@ public class MetaService
      * This method only updates (and sets the timestamp for last update) if there are actual modifications done. Modifications are detected
      * by value comparison on all fields (except the ID, but including parameters).
      *
-     * @param cnx database session to use.
-     * @param dto resource to update or insert.
+     * @param cnx
+     *            database session to use.
+     * @param dto
+     *            resource to update or insert.
      */
     public static void upsertJndiObjectResource(DbConn cnx, JndiObjectResourceDto dto)
     {
@@ -366,9 +406,12 @@ public class MetaService
 
     /**
      * Map a ResultSet row to a JndiObjectResourceDto object.
-     * @param rs the ResultSet to map
+     *
+     * @param rs
+     *            the ResultSet to map
      * @return a JndiObjectResourceDto object
-     * @throws java.sql.SQLException if an error occurs
+     * @throws java.sql.SQLException
+     *             if an error occurs
      */
     private static JndiObjectResourceDto mapJndiObjectResource(ResultSet rs) throws SQLException
     {
@@ -387,16 +430,22 @@ public class MetaService
 
     /**
      * Get a unique JNDI object resource using a query key and a key.
-     * @param cnx the database connection
-     * @param query_key the SQL query key
-     * @param key the key to search for
+     *
+     * @param cnx
+     *            the database connection
+     * @param queryKey
+     *            the SQL query key
+     * @param key
+     *            the key to search for
      * @return the JndiObjectResourceDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
-    private static JndiObjectResourceDto getUniqueJndiResource(DbConn cnx, String query_key, Object key)
+    private static JndiObjectResourceDto getUniqueJndiResource(DbConn cnx, String queryKey, Object key)
     {
-        List<JndiObjectResourceDto> res = getJndiObjectResources(cnx, query_key, key);
+        List<JndiObjectResourceDto> res = getJndiObjectResources(cnx, queryKey, key);
         if (res.isEmpty())
         {
             throw new NoResultException("The query returned zero rows when one was expected.");
@@ -411,11 +460,16 @@ public class MetaService
 
     /**
      * Get a JNDI object resource by its key.
-     * @param cnx the database connection
-     * @param key the key to search for
+     *
+     * @param cnx
+     *            the database connection
+     * @param key
+     *            the key to search for
      * @return the JndiObjectResourceDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
     public static JndiObjectResourceDto getJndiObjectResource(DbConn cnx, String key)
     {
@@ -424,11 +478,16 @@ public class MetaService
 
     /**
      * Get a JNDI object resource by its ID.
-     * @param cnx the database connection
-     * @param key the ID to search for
+     *
+     * @param cnx
+     *            the database connection
+     * @param key
+     *            the ID to search for
      * @return the JndiObjectResourceDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
     public static JndiObjectResourceDto getJndiObjectResource(DbConn cnx, Integer key)
     {
@@ -437,7 +496,9 @@ public class MetaService
 
     /**
      * Get all JNDI object resources.
-     * @param cnx the database connection
+     *
+     * @param cnx
+     *            the database connection
      * @return a list of JndiObjectResourceDto objects
      */
     public static List<JndiObjectResourceDto> getJndiObjectResource(DbConn cnx)
@@ -447,14 +508,18 @@ public class MetaService
 
     /**
      * Get JNDI object resources using a query key and parameters.
-     * @param cnx the database connection
-     * @param query_key the SQL query key
-     * @param prms the query parameters
+     *
+     * @param cnx
+     *            the database connection
+     * @param queryKey
+     *            the SQL query key
+     * @param prms
+     *            the query parameters
      * @return a list of JndiObjectResourceDto objects
      */
-    private static List<JndiObjectResourceDto> getJndiObjectResources(DbConn cnx, String query_key, Object... prms)
+    private static List<JndiObjectResourceDto> getJndiObjectResources(DbConn cnx, String queryKey, Object... prms)
     {
-        ResultSet rs = cnx.runSelect(query_key, prms);
+        ResultSet rs = cnx.runSelect(queryKey, prms);
         List<JndiObjectResourceDto> res = new ArrayList<>();
         List<Long> rscIds = new ArrayList<>();
         try
@@ -499,8 +564,11 @@ public class MetaService
 
     /**
      * Synchronize JNDI object resources with the provided list.
-     * @param cnx the database connection
-     * @param dtos the list of JndiObjectResourceDto objects to synchronize
+     *
+     * @param cnx
+     *            the database connection
+     * @param dtos
+     *            the list of JndiObjectResourceDto objects to synchronize
      */
     public static void syncJndiObjectResource(DbConn cnx, List<JndiObjectResourceDto> dtos)
     {
@@ -534,8 +602,11 @@ public class MetaService
 
     /**
      * Map a ResultSet row to a ClDto object.
-     * @param rs the ResultSet to map
-     * @param colShift the column shift
+     *
+     * @param rs
+     *            the ResultSet to map
+     * @param colShift
+     *            the column shift
      * @return a ClDto object
      */
     private static ClDto mapCl(ResultSet rs, int colShift)
@@ -561,7 +632,9 @@ public class MetaService
 
     /**
      * Get all class loaders.
-     * @param cnx the database connection
+     *
+     * @param cnx
+     *            the database connection
      * @return a list of ClDto objects
      */
     public static List<ClDto> getClassLoaders(DbConn cnx)
@@ -585,11 +658,16 @@ public class MetaService
 
     /**
      * Get a class loader by its ID.
-     * @param cnx the database connection
-     * @param id the ID to search for
+     *
+     * @param cnx
+     *            the database connection
+     * @param id
+     *            the ID to search for
      * @return the ClDto object or null if not found
-     * @throws NoResultException if no result is found
-     * @throws NonUniqueResultException if more than one result is found
+     * @throws NoResultException
+     *             if no result is found
+     * @throws NonUniqueResultException
+     *             if more than one result is found
      */
     public static ClDto getClassLoader(DbConn cnx, long id)
     {
@@ -609,9 +687,13 @@ public class MetaService
 
     /**
      * Delete a class loader by its ID.
-     * @param cnx the database connection
-     * @param id the ID of the class loader to delete
-     * @throws JqmAdminApiUserException if the class loader does not exist
+     *
+     * @param cnx
+     *            the database connection
+     * @param id
+     *            the ID of the class loader to delete
+     * @throws JqmAdminApiUserException
+     *             if the class loader does not exist
      */
     public static void deleteClassLoader(DbConn cnx, long id)
     {
@@ -625,8 +707,11 @@ public class MetaService
 
     /**
      * Update or insert a class loader.
-     * @param cnx the database connection
-     * @param dto the ClDto object to update or insert
+     *
+     * @param cnx
+     *            the database connection
+     * @param dto
+     *            the ClDto object to update or insert
      */
     public static void upsertClassLoader(DbConn cnx, ClDto dto)
     {
@@ -664,17 +749,21 @@ public class MetaService
 
     /**
      * Delete a job definition by its ID.
-     * @param cnx the database connection
-     * @param id the ID of the job definition to delete
-     * @throws JqmAdminApiUserException if the job definition has running instances
+     *
+     * @param cnx
+     *            the database connection
+     * @param id
+     *            the ID of the job definition to delete
+     * @throws JqmAdminApiUserException
+     *             if the job definition has running instances
      */
     public static void deleteJobDef(DbConn cnx, Long id)
     {
         int countRunning = cnx.runSelectSingle("ji_select_count_by_jd", Integer.class, id);
         if (countRunning > 0)
         {
-            throw new JqmAdminApiUserException(
-                    "cannot delete a job definition with running instances. Disable it, wait for the end of all running instances, then retry.");
+            throw new JqmAdminApiUserException("cannot delete a job definition with running instances."
+                    + " Disable it, wait for the end of all running instances, then retry.");
         }
 
         cnx.runUpdate("jdprm_delete_all_for_jd", id);
@@ -705,8 +794,11 @@ public class MetaService
 
     /**
      * Map a ResultSet row to a JobDefDto object.
-     * @param rs the ResultSet to map
-     * @param colShift the column shift
+     *
+     * @param rs
+     *            the ResultSet to map
+     * @param colShift
+     *            the column shift
      * @return a JobDefDto object
      */
     private static JobDefDto mapJobDef(ResultSet rs, int colShift)
@@ -984,7 +1076,7 @@ public class MetaService
 
         try
         {
-            Node n = Node.select_single(cnx, "node_select_by_id", id);
+            Node n = Node.selectSingle(cnx, "node_select_by_id", id);
             Calendar limit = Calendar.getInstance();
             limit.add(Calendar.MINUTE, -10);
             if (n.getLastSeenAlive() != null && n.getLastSeenAlive().after(limit))
@@ -1440,12 +1532,12 @@ public class MetaService
         }
     }
 
-    private static List<RRoleDto> getRoles(DbConn cnx, String query_key, int colShift, Object... args)
+    private static List<RRoleDto> getRoles(DbConn cnx, String queryKey, int colShift, Object... args)
     {
         List<RRoleDto> res = new ArrayList<>();
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            ResultSet rs = cnx.runSelect(queryKey, args);
             RRoleDto tmp = null;
             while (rs.next())
             {
@@ -1463,12 +1555,12 @@ public class MetaService
             rs = cnx.runSelect("perm_select_all_in_role_list", ids);
             while (rs.next())
             {
-                long role_id = rs.getLong(3);
+                long roleId = rs.getLong(3);
                 String permName = rs.getString(2);
 
                 for (RRoleDto dto : res)
                 {
-                    if (dto.getId().equals(role_id))
+                    if (dto.getId().equals(roleId))
                     {
                         dto.addPermission(permName);
                     }
@@ -1526,9 +1618,13 @@ public class MetaService
 
     /**
      * Delete an user identified by its id
-     * @param cnx database session to use.
-     * @param id id of the user to delete.
-     * @throws JqmAdminApiUserException If no user with the given id is found.
+     *
+     * @param cnx
+     *            database session to use.
+     * @param id
+     *            id of the user to delete.
+     * @throws JqmAdminApiUserException
+     *             If no user with the given id is found.
      */
     public static void deleteUser(DbConn cnx, Long id)
     {
@@ -1567,18 +1663,23 @@ public class MetaService
 
     /**
      * Retrieve a set of users according to a query.
-     * @param cnx database session to use.
-     * @param query_key query to execute.
-     * @param colShift column shift to apply.
-     * @param params parameters to pass to the query.
+     *
+     * @param cnx
+     *            database session to use.
+     * @param queryKey
+     *            query to execute.
+     * @param colShift
+     *            column shift to apply.
+     * @param params
+     *            parameters to pass to the query.
      * @return a list of users matching the query.
      */
-    private static List<RUserDto> getUsers(DbConn cnx, String query_key, int colShift, Object... params)
+    private static List<RUserDto> getUsers(DbConn cnx, String queryKey, int colShift, Object... params)
     {
         List<RUserDto> res = new ArrayList<>();
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, params);
+            ResultSet rs = cnx.runSelect(queryKey, params);
             RUserDto tmp = null;
             while (rs.next())
             {
@@ -1618,7 +1719,9 @@ public class MetaService
 
     /**
      * Retrieve all users.
-     * @param cnx database session to use.
+     *
+     * @param cnx
+     *            database session to use.
      * @return a list of users.
      */
     public static List<RUserDto> getUsers(DbConn cnx)
@@ -1628,8 +1731,11 @@ public class MetaService
 
     /**
      * Retrieve a user by its ID.
-     * @param cnx database session to use.
-     * @param id ID of the user to retrieve.
+     *
+     * @param cnx
+     *            database session to use.
+     * @param id
+     *            ID of the user to retrieve.
      * @return the user if found, null otherwise.
      */
     public static RUserDto getUser(DbConn cnx, int id)
@@ -1647,9 +1753,13 @@ public class MetaService
 
     /**
      * Change the password of a user identified by its ID.
-     * @param cnx database session to use.
-     * @param userId ID of the user to update.
-     * @param newPassword new password to set.
+     *
+     * @param cnx
+     *            database session to use.
+     * @param userId
+     *            ID of the user to update.
+     * @param newPassword
+     *            new password to set.
      */
     public static void changeUserPassword(DbConn cnx, Long userId, String newPassword)
     {
@@ -1665,9 +1775,13 @@ public class MetaService
 
     /**
      * Change the password of a user identified by its login.
-     * @param cnx database session to use.
-     * @param userLogin login of the user to update.
-     * @param newPassword new password to set.
+     *
+     * @param cnx
+     *            database session to use.
+     * @param userLogin
+     *            login of the user to update.
+     * @param newPassword
+     *            new password to set.
      */
     public static void changeUserPassword(DbConn cnx, String userLogin, String newPassword)
     {
@@ -1681,8 +1795,11 @@ public class MetaService
 
     /**
      * Create or update a new user.
-     * @param cnx database session to use.
-     * @param dto resource to update or insert.
+     *
+     * @param cnx
+     *            database session to use.
+     * @param dto
+     *            resource to update or insert.
      */
     public static void upsertUser(DbConn cnx, RUserDto dto)
     {

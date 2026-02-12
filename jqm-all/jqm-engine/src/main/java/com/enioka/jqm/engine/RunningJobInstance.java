@@ -463,7 +463,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     public String getWebApiLocalUrl(DbConn cnx)
     {
         // Do not use port from engine.getNode, as it may have been set AFTER engine startup.
-        Node node = Node.select_single(cnx, "node_select_by_id", this.engine.getNode().getId());
+        Node node = Node.selectSingle(cnx, "node_select_by_id", this.engine.getNode().getId());
         boolean useSsl = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiSsl", "false"));
         return (useSsl ? "https://localhost:" : "http://localhost:") + node.getPort();
     }
