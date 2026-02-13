@@ -38,6 +38,16 @@ jobs:
             fail-fast: false
             matrix:
                 postgres: [12, 15]
+        services:
+            postgres:
+                image: postgres:${{ matrix.postgres }}
+                env:
+                    POSTGRES_DB: jqm
+                    POSTGRES_USER: jqm
+                    POSTGRES_PASSWORD: jqm
+                ports:
+                    - 5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         steps:
             - uses: actions/checkout@v4
             - name: Set up java
@@ -45,12 +55,6 @@ jobs:
               with:
                   java-version: 21
                   distribution: "zulu"
-            - uses: harmon758/postgresql-action@v1
-              with:
-                  postgresql version: ${{ matrix.postgres }}
-                  postgresql db: "jqm"
-                  postgresql user: "jqm"
-                  postgresql password: "jqm"
             - name: Create empty frontend build directory
               run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
@@ -97,6 +101,17 @@ jobs:
             fail-fast: false
             matrix:
                 mariadb: [10.5]
+        services:
+            mariadb:
+                image: mariadb:${{ matrix.mariadb }}
+                env:
+                    MYSQL_DATABASE: jqm
+                    MYSQL_USER: jqm
+                    MYSQL_PASSWORD: jqm
+                    MYSQL_ROOT_PASSWORD: root
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mariadb-admin ping" --health-interval=10s --health-timeout=5s --health-retries=5
         steps:
             - uses: actions/checkout@v4
             - name: Set up java
@@ -104,12 +119,6 @@ jobs:
               with:
                   java-version: 21
                   distribution: "zulu"
-            - uses: getong/mariadb-action@v1.1
-              with:
-                  mariadb version: ${{matrix.mariadb}}
-                  mysql database: "jqm"
-                  mysql user: "jqm"
-                  mysql password: "jqm"
             - name: Create empty frontend build directory
               run: mkdir -p jqm-ws/src/main/react/build
             - name: Build
