@@ -216,6 +216,11 @@ class DbImplBase
         queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__JOB_INSTANCE ji LEFT JOIN __T__NODE n ON ji.NODE = n.ID WHERE ji.ID=?");
         queries.put("ji_select_instructions_by_node", "SELECT ji.ID, ji.INSTRUCTION FROM __T__JOB_INSTANCE ji WHERE ji.STATUS='RUNNING' AND ji.INSTRUCTION <> 'RUN' AND ji.NODE=?");
 
+        // BULK FILTERING
+        queries.put("ji_select_ids_without_status_in", "SELECT ID FROM __T__JOB_INSTANCE WHERE STATUS <> ? AND ID IN(UNNEST(?))");
+        queries.put("ji_select_ids_with_status_in", "SELECT ID FROM __T__JOB_INSTANCE WHERE STATUS = ? AND ID IN(UNNEST(?))");
+        queries.put("history_select_ids_without_status_in", "SELECT ID FROM __T__HISTORY WHERE STATUS <> ? AND ID IN(UNNEST(?))");
+
         queries.put("ji_update_delayed", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE STATUS='SCHEDULED' AND DATE_NOT_BEFORE <= CURRENT_TIMESTAMP");
         queries.put("ji_select_poll",queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY ji.PRIORITY DESC, ji.INTERNAL_POSITION");
         queries.put("ji_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='ATTRIBUTED', NODE=? WHERE STATUS='SUBMITTED' AND ID=?");
