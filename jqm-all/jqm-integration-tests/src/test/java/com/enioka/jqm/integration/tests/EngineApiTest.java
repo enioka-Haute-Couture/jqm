@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.Message;
 import com.enioka.jqm.client.api.Query.Sort;
 import com.enioka.jqm.client.api.State;
 
@@ -36,18 +37,24 @@ public class EngineApiTest extends JqmBaseTest
 
         Long i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
 
-        List<String> messages = jqmClient.newQuery().setJobInstanceId(i).invoke().get(0).getMessages();
-        for (String msg : messages)
+        List<Message> messages = jqmClient.newQuery().setJobInstanceId(i).invoke().get(0).getMessages();
+
+        Assert.assertEquals(3, messages.size());
+
+        for (Message msg : messages)
         {
-            if (msg.equals("Les marsus sont nos amis, il faut les aimer aussi!"))
+            // Check that creation date is set for all messages
+            Assert.assertNotNull("Message creation date should not be null", msg.getCreationDate());
+
+            if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!"))
             {
                 success = true;
             }
-            if (msg.equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
+            if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
             {
                 success2 = true;
             }
-            if (msg.equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
+            if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
             {
                 success3 = true;
             }
@@ -56,6 +63,13 @@ public class EngineApiTest extends JqmBaseTest
         Assert.assertEquals(true, success);
         Assert.assertEquals(true, success2);
         Assert.assertEquals(true, success3);
+
+        // Verify messages are in chronological order (creation dates should be ascending or equal)
+        for (int k = 1; k < messages.size(); k++)
+        {
+            Assert.assertFalse("Messages should be in chronological order",
+                    messages.get(k).getCreationDate().before(messages.get(k - 1).getCreationDate()));
+        }
     }
 
     @Test
