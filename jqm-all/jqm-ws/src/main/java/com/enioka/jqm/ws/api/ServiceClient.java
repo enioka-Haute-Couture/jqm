@@ -362,7 +362,7 @@ public class ServiceClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @HttpCache("public, max-age=60")
-    public List<String> getJobMessages(@PathParam("jobId") long jobId)
+    public List<Message> getJobMessages(@PathParam("jobId") long jobId)
     {
         return Helpers.getClient().getJobMessages(jobId);
     }

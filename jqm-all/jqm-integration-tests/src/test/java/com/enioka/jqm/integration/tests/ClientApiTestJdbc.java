@@ -29,6 +29,7 @@ import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.jqm.client.api.JobDef;
 import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.Message;
 import com.enioka.jqm.client.api.Query.Sort;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.client.api.Queue;
@@ -126,21 +127,24 @@ public class ClientApiTestJdbc extends JqmBaseTest
 
         Long i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
 
-        List<String> ress = jqmClient.getJobMessages(i);
+        List<Message> ress = jqmClient.getJobMessages(i);
 
         Assert.assertEquals(3, ress.size());
 
         for (int k = 0; k < ress.size(); k++)
         {
-            if (ress.get(k).equals("Les marsus sont nos amis, il faut les aimer aussi!"))
+            // Check that creation date is set for all messages
+            Assert.assertNotNull("Message creation date should not be null", ress.get(k).getCreationDate());
+
+            if (ress.get(k).getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!"))
             {
                 success = true;
             }
-            if (ress.get(k).equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
+            if (ress.get(k).getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
             {
                 success2 = true;
             }
-            if (ress.get(k).equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
+            if (ress.get(k).getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
             {
                 success3 = true;
             }
@@ -149,6 +153,13 @@ public class ClientApiTestJdbc extends JqmBaseTest
         Assert.assertEquals(true, success);
         Assert.assertEquals(true, success2);
         Assert.assertEquals(true, success3);
+
+        // Verify messages are in chronological order (creation dates should be ascending or equal)
+        for (int k = 1; k < ress.size(); k++)
+        {
+            Assert.assertFalse("Messages should be in chronological order",
+                    ress.get(k).getCreationDate().before(ress.get(k - 1).getCreationDate()));
+        }
     }
 
     @Test
@@ -318,9 +329,9 @@ public class ClientApiTestJdbc extends JqmBaseTest
         Assert.assertEquals(0, TestHelpers.getHistoryAllCount(cnx)); // Still running.
 
         // Pause should leave a message.
-        List<String> msgs = jqmClient.getJobMessages(i);
+        List<Message> msgs = jqmClient.getJobMessages(i);
         Assert.assertEquals(1, msgs.size());
-        Assert.assertTrue(msgs.get(0).toLowerCase().contains("pause"));
+        Assert.assertTrue(msgs.get(0).getTextMessage().toLowerCase().contains("pause"));
 
         // Now resume.
         jqmClient.resumeRunningJob(i);

@@ -329,8 +329,9 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         {
             Long id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
-                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getTraceId(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
-                sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), priority, Instruction.RUN, prms);
+                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getTraceId(), runRequest.getUser(),
+                    runRequest.getEmail(), jobDef.isHighlander(), sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(),
+                    priority, Instruction.RUN, prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();
@@ -1321,7 +1322,10 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                     ResultSet msg = cnx.runSelect("message_select_by_ji_list", idsBatch);
                     while (msg.next())
                     {
-                        res.get(msg.getLong(2)).getMessages().add(msg.getString(3));
+                        com.enioka.jqm.client.api.Message message = new com.enioka.jqm.client.api.Message();
+                        message.setTextMessage(msg.getString(3));
+                        message.setCreationDate(cnx.getCal(msg, 4));
+                        res.get(msg.getLong(2)).getMessages().add(message);
                     }
                     msg.close();
                 }
@@ -1383,9 +1387,11 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     @Override
     public com.enioka.jqm.client.api.JobInstance getJob(long idJob)
     {
-        List<com.enioka.jqm.client.api.JobInstance> jobList = this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke();
+        List<com.enioka.jqm.client.api.JobInstance> jobList = this.newQuery().setJobInstanceId(idJob).setQueryHistoryInstances(true)
+                .setQueryLiveInstances(true).invoke();
 
-        if (jobList.isEmpty()){
+        if (jobList.isEmpty())
+        {
             throw new JqmInvalidRequestException("No job with id " + idJob + " found :");
         }
         return jobList.get(0);
@@ -1420,7 +1426,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<String> getJobMessages(long idJob)
+    public List<com.enioka.jqm.client.api.Message> getJobMessages(long idJob)
     {
         return getJob(idJob).getMessages();
     }

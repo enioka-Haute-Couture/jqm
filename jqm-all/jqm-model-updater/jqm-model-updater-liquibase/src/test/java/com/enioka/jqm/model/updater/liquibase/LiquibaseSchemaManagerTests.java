@@ -71,7 +71,7 @@ public class LiquibaseSchemaManagerTests
         var changeSetCount2 = liquibaseHelper.updateSchema(ds.getConnection());
 
         Assert.assertTrue(sql.contains("CREATE TABLE PUBLIC.NODE"));
-        Assert.assertEquals(3, changeSetCount1);
+        Assert.assertEquals(4, changeSetCount1);
         Assert.assertEquals(0, changeSetCount2);
 
         // Is it possible to use a newly created table?
