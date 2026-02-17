@@ -1,0 +1,100 @@
+name: JQM Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_version:
+                description: "Release version (e.g., 3.2.1)"
+                required: true
+                type: string
+            next_version:
+                description: "Next development version (e.g., 3.2.2-SNAPSHOT)"
+                required: true
+                type: string
+
+defaults:
+    run:
+        working-directory: ./jqm-all
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Java
+              uses: actions/setup-java@v4
+              with:
+                  java-version: 21
+                  distribution: "zulu"
+                  server-id: central
+                  server-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+                  server-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+                  gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+                  gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+            - name: Configure Git
+              run: |
+                  git config user.name "GitHub Actions"
+                  git config user.email "actions@github.com"
+
+            - name: Create empty frontend build directory
+              run: mkdir -p jqm-ws/src/main/react/build
+
+            - name: Full build & tests
+              run: mvn clean install -Pbuild-frontend
+
+            - name: Release prepare
+              run: |
+                  mvn release:prepare -B \
+                    -DreleaseVersion=${{ github.event.inputs.release_version }} \
+                    -DdevelopmentVersion=${{ github.event.inputs.next_version }} \
+                    -Darguments='-DskipTests'
+
+            - name: Release perform
+              run: mvn release:perform -Darguments='-Dgpg.keyname=${{ secrets.GPG_KEYNAME }} -Prelease -Pbuild-frontend -DskipTests'
+
+            - name: Get release version
+              id: get_version
+              run: |
+                  VERSION=$(git describe --tags --abbrev=0)
+                  echo "VERSION=${VERSION#jqm-all-}" >> $GITHUB_OUTPUT
+
+            - name: Push tags to GitHub
+              run: |
+                  git push origin --tags
+                  git push origin
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Build and push Docker image
+              working-directory: ./docker
+              run: |
+                  VERSION=${{ steps.get_version.outputs.VERSION }}
+                  MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+
+                  docker build --platform linux/amd64 --rm --pull --provenance=false --sbom=false \
+                    -t enioka/jqm:${VERSION} \
+                    -t enioka/jqm:${MAJOR_VERSION} \
+                    -t enioka/jqm:latest \
+                    -f ./linux/Dockerfile ../
+
+                  docker push enioka/jqm:${VERSION}
+                  docker push enioka/jqm:${MAJOR_VERSION}
+                  docker push enioka/jqm:latest
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: jqm-all-${{ steps.get_version.outputs.VERSION }}
+                  name: JQM ${{ steps.get_version.outputs.VERSION }}
+                  draft: true
+                  files: |
+                      jqm-all/jqm-service/target/jqm-${{ steps.get_version.outputs.VERSION }}.zip
+                      jqm-all/jqm-service/target/jqm-${{ steps.get_version.outputs.VERSION }}.tar.gz
+                  token: ${{ secrets.GITHUB_TOKEN }}
