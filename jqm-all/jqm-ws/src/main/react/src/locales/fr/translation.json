@@ -377,6 +377,12 @@
         "simpleApi": "API simple",
         "clientApi": "API client",
         "adminApi": "API admin",
+        "lastSeenAlive": "Dernière activité",
+        "never": "jamais",
+        "recently": "récemment",
+        "minutesAgo": "il y a {{count}}min",
+        "hoursAgo": "il y a {{count}}h",
+        "daysAgo": "il y a {{count}}j",
         "viewNodeLogs": "Voir les logs du noeud",
         "hints": {
             "name": "Le nom du noeud dans le cluster JQM. Il n'a aucun lien avec le nom d'hôte, les noms DNS, etc. C'est simplement le nom donné en paramètre au noeud lors du démarrage. Il est unique dans tout le cluster. Par défaut, c'est le nom d'hôte du serveur sous Windows, le nom d'utilisateur sous Unix.",
@@ -389,7 +395,8 @@
             "jmxServerPort": "Si 0, le JMX distant est désactivé. Par défaut, c'est 0.",
             "simpleApi": "Si coché, l'API web simple démarrera. Cette API régit les interactions de scripts (demande d'exécution via wget & co, etc.) et la récupération de fichiers (logs, fichiers créés par les exécutions de jobs batch)",
             "clientApi": "Si coché, l'API web client démarrera. Cette API expose l'API JqmClient complète - voir la documentation complète.",
-            "adminApi": "Si coché, l'API web d'administration démarrera. Cette API est uniquement utilisée par cette console d'administration web et est une API interne JQM, pas une API publique. La désactiver désactive cette console web."
+            "adminApi": "Si coché, l'API web d'administration démarrera. Cette API est uniquement utilisée par cette console d'administration web et est une API interne JQM, pas une API publique. La désactiver désactive cette console web.",
+            "lastSeenAlive": "Mis à jour périodiquement par le moteur JQM lorsque le noeud est en cours d'exécution. Les noeuds arrêtés depuis plus de 10 minutes peuvent être supprimés en utilisant le bouton de suppression."
         },
         "documentation": {
             "title": "Documentation des noeuds",
@@ -407,7 +414,8 @@
             "close": "fermer"
         },
         "messages": {
-            "successUpdate": "Noeud {{name}} mis à jour avec succès"
+            "successUpdate": "Noeud {{name}} mis à jour avec succès",
+            "successDelete": "Noeud supprimé avec succès"
         }
     },
     "jobDefinitions": {

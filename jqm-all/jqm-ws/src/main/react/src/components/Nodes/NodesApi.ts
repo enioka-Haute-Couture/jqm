@@ -36,6 +36,18 @@ const useNodesApi = () => {
         [fetchNodes, displaySuccess, displayError, t]
     );
 
+    const deleteNode = useCallback(
+        (nodeId: number) => {
+            return APIService.delete(`${API_URL}/${nodeId}`)
+                .then(() => {
+                    fetchNodes();
+                    displaySuccess(t("nodes.messages.successDelete"));
+                })
+                .catch(displayError);
+        },
+        [fetchNodes, displaySuccess, displayError, t]
+    );
+
     const fetchNodeLogs = useCallback(
         async (nodeName: string, latest: number = 200) => {
             return APIService.get(
@@ -61,6 +73,7 @@ const useNodesApi = () => {
         setNodeLogs,
         fetchNodes,
         updateNode,
+        deleteNode,
         fetchNodeLogs,
     };
 };
