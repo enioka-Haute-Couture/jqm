@@ -122,6 +122,17 @@ public class ServiceAdmin
         }
     }
 
+    @DELETE
+    @Path("node/{id}")
+    public void deleteNode(@PathParam("id") int id)
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            MetaService.deleteNode(cnx, id);
+            cnx.commit();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Queues
     ///////////////////////////////////////////////////////////////////////////

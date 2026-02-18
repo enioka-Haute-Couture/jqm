@@ -377,6 +377,12 @@
         "simpleApi": "Simple API",
         "clientApi": "Client API",
         "adminApi": "Admin API",
+        "lastSeenAlive": "Last seen alive",
+        "never": "never",
+        "recently": "recently",
+        "minutesAgo": "{{count}}min ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
         "viewNodeLogs": "View node logs",
         "hints": {
             "name": "The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the name given as a parameter to the node when starting. It is unique throughout the cluster. Default is server hostname in Windows, user name in Unix.",
@@ -389,7 +395,8 @@
             "jmxServerPort": "If 0, remote JMX is disabled. Default is 0.",
             "simpleApi": "If ticked, the simple web API will start. This API governs script interactions (execution request through wget & co, etc.) and file retrieval (logs, files created by batch jobs executions)",
             "clientApi": "If ticked, the client web API will start. This API exposes the full JqmClient API - see full documentation.",
-            "adminApi": "If ticked, the administration web API will start. This API is only used by this web administration console and is an internal JQM API, not a public one. Disabling it disables this web console."
+            "adminApi": "If ticked, the administration web API will start. This API is only used by this web administration console and is an internal JQM API, not a public one. Disabling it disables this web console.",
+            "lastSeenAlive": "Updated periodically by the JQM engine when the node is running. Nodes that have been stopped for more than 10 minutes can be removed using the delete button."
         },
         "documentation": {
             "title": "Nodes documentation",
@@ -407,7 +414,8 @@
             "close": "close"
         },
         "messages": {
-            "successUpdate": "Successfully updated node {{name}}"
+            "successUpdate": "Successfully updated node {{name}}",
+            "successDelete": "Successfully deleted node"
         }
     },
     "jobDefinitions": {

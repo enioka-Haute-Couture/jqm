@@ -6,6 +6,7 @@ import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useTranslation } from "react-i18next";
+import { differenceInMinutes } from "date-fns";
 import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
 import useNodesApi from "./NodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
@@ -18,6 +19,8 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
+
+const INACTIVE_NODE_THRESHOLD = 10; // in minutes
 
 export const NodesPage: React.FC = () => {
     const { t } = useTranslation();
@@ -39,7 +42,7 @@ export const NodesPage: React.FC = () => {
 
     const { canUserAccess } = useAuth();
 
-    const { nodes, nodeLogs, setNodeLogs, fetchNodes, updateNode, fetchNodeLogs } =
+    const { nodes, nodeLogs, setNodeLogs, fetchNodes, updateNode, fetchNodeLogs, deleteNode } =
         useNodesApi();
 
     useEffect(() => {
@@ -50,16 +53,25 @@ export const NodesPage: React.FC = () => {
         // eslint-disable-next-line
     }, [canUserAccess, t]);
 
+    const handleOnDelete = useCallback(
+        (tableMeta: MUIDataTableMeta) => {
+            const [nodeId] = tableMeta.rowData;
+            deleteNode(nodeId);
+        },
+        [deleteNode]
+    );
+
     const handleOnViewLogs = useCallback(
         async (tableMeta: MUIDataTableMeta) => {
-            fetchNodeLogs(tableMeta.rowData[3]);
+            fetchNodeLogs(tableMeta.rowData[2]);
         },
         [fetchNodeLogs]
     );
 
     const handleOnSave = useCallback(
         (tableMeta: MUIDataTableMeta) => {
-            const [nodeId, stop, lastSeenAlive] = tableMeta.rowData;
+            const [nodeId, stop] = tableMeta.rowData;
+            const lastSeenAlive = tableMeta.rowData[15];
             const { value: name } = nameInputRef.current!;
             const { value: dns } = dnsInputRef.current!;
             const { value: port } = portInputRef.current!;
@@ -96,10 +108,10 @@ export const NodesPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
     const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
-        setEnabled(tableMeta.rowData[12]);
-        setLoapApiSimple(tableMeta.rowData[13]);
-        setLoadApiClient(tableMeta.rowData[14]);
-        setLoadApiAdmin(tableMeta.rowData[15]);
+        setEnabled(tableMeta.rowData[11]);
+        setLoapApiSimple(tableMeta.rowData[12]);
+        setLoadApiClient(tableMeta.rowData[13]);
+        setLoadApiAdmin(tableMeta.rowData[14]);
         setEditingRowId(tableMeta.rowIndex);
     }, []);
 
@@ -116,13 +128,6 @@ export const NodesPage: React.FC = () => {
         {
             name: "stop",
             label: "stop",
-            options: {
-                display: "excluded" as Display,
-            },
-        },
-        {
-            name: "lastSeenAlive",
-            label: "lastSeenAlive",
             options: {
                 display: "excluded" as Display,
             },
@@ -307,28 +312,61 @@ export const NodesPage: React.FC = () => {
             },
         },
         {
+            name: "lastSeenAlive",
+            label: t("nodes.lastSeenAlive"),
+            options: {
+                hint: t("nodes.hints.lastSeenAlive"),
+                filter: false,
+                sort: true,
+                customBodyRender: (value: any) => {
+                    if (!value) {
+                        return <span style={{ color: 'red' }}>{t("nodes.never")}</span>;
+                    }
+
+                    const minutesSinceLastSeen = differenceInMinutes(new Date(), new Date(value));
+
+                    if (minutesSinceLastSeen < INACTIVE_NODE_THRESHOLD) {
+                        return <span style={{ color: 'green' }}>{t("nodes.recently")}</span>;
+                    } else if (minutesSinceLastSeen < 60) {
+                        return <span style={{ color: 'orange' }}>{t("nodes.minutesAgo", { count: minutesSinceLastSeen })}</span>;
+                    } else if (minutesSinceLastSeen < 24 * 60) { // 24h
+                        const hours = Math.floor(minutesSinceLastSeen / 60);
+                        return <span style={{ color: 'orange' }}>{t("nodes.hoursAgo", { count: hours })}</span>;
+                    } else {
+                        const days = Math.floor(minutesSinceLastSeen / 1440);
+                        return <span style={{ color: 'red' }}>{t("nodes.daysAgo", { count: days })}</span>;
+                    }
+                },
+            },
+        },
+        {
             name: "",
             label: t("common.actions"),
             options: {
                 filter: false,
                 sort: false,
-                customBodyRender: renderActionsCell(
-                    handleOnCancel,
-                    handleOnSave,
-                    null,
-                    editingRowId,
-                    handleOnEdit,
-                    canUserAccess(PermissionObjectType.node, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.node, PermissionAction.delete),
-                    [
-                        {
-                            title: t("nodes.viewNodeLogs"),
-                            addIcon: () => <DescriptionIcon />,
-                            action: handleOnViewLogs,
-                        },
-                    ],
-                    t
-                ),
+                customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
+                    const lastSeenAlive = tableMeta.rowData[15];
+                    const shouldShowDelete = !lastSeenAlive || differenceInMinutes(new Date(), new Date(lastSeenAlive)) > INACTIVE_NODE_THRESHOLD;
+
+                    return renderActionsCell(
+                        handleOnCancel,
+                        handleOnSave,
+                        shouldShowDelete ? handleOnDelete : null,
+                        editingRowId,
+                        handleOnEdit,
+                        canUserAccess(PermissionObjectType.node, PermissionAction.update),
+                        canUserAccess(PermissionObjectType.node, PermissionAction.delete),
+                        [
+                            {
+                                title: t("nodes.viewNodeLogs"),
+                                addIcon: () => <DescriptionIcon />,
+                                action: handleOnViewLogs,
+                            },
+                        ],
+                        t
+                    )(value, tableMeta);
+                },
             },
         },
     ];
