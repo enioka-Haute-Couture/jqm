@@ -35,6 +35,7 @@ import javax.management.ObjectName;
 
 import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.engine.api.jmx.QueuePollerMBean;
+import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -317,18 +318,18 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     }
                 }
             }
+            catch (DatabaseUnreachableException e)
+            {
+                jqmlogger.error("connection to database lost - stopping poller");
+                jqmlogger.trace("connection error was:", e.getCause());
+                this.hasStopped = true;
+                this.engine.pollerRestartNeeded(this);
+                break;
+            }
             catch (RuntimeException e)
             {
                 if (!run)
                 {
-                    break;
-                }
-                if (Helpers.testDbFailure(e))
-                {
-                    jqmlogger.error("connection to database lost - stopping poller");
-                    jqmlogger.trace("connection error was:", e.getCause());
-                    this.hasStopped = true;
-                    this.engine.pollerRestartNeeded(this);
                     break;
                 }
                 else
@@ -561,7 +562,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
     public boolean isActuallyPolling()
     {
         // 1000ms is a rough estimate of the time taken to do the actual poll. If it's more, there is a huge issue elsewhere.
-        return (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
+        return this.lastLoop != null
+                && (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
     }
 
     @Override

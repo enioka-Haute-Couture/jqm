@@ -3,6 +3,7 @@ package com.enioka.jqm.jdbc.impl.db2;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,5 +131,62 @@ public class DbImplDb2 extends DbAdapter
         prms.add(stopBefore);
 
         return sql;
+    }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try (PreparedStatement s = cnx
+                .prepareStatement("SELECT APPLICATION_HANDLE FROM SYSIBMADM.APPLICATIONS WHERE APPLICATION_ID = APPLICATION_ID()");
+                ResultSet rs = s.executeQuery())
+        {
+            if (rs.next())
+            {
+                long appHandle = rs.getLong(1);
+                try (PreparedStatement forceStmt = cnx.prepareStatement("CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (" + appHandle + ")')"))
+                {
+                    forceStmt.execute();
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            // Expected - the connection is being killed
+            // As a fallback, try to close the connection forcefully
+            try
+            {
+                cnx.close();
+            }
+            catch (SQLException e2)
+            {
+                // Ignore
+            }
+        }
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        // DB2 specific connection errors
+        if (e.getCause() instanceof SQLException)
+        {
+            SQLException sqlEx = (SQLException) e.getCause();
+            String sqlState = sqlEx.getSQLState();
+            // SQLState 08xxx indicates connection exceptions
+            if (sqlState != null && sqlState.startsWith("08"))
+            {
+                return true;
+            }
+            int errorCode = sqlEx.getErrorCode();
+            // SQL0901: SQL system error
+            // SQL1776: The connection to the database was lost
+            // SQL30081: TCP/IP communication error
+            // SQL30108: Connection failed
+            if (errorCode == -901 || errorCode == -1776 || errorCode == -30081 || errorCode == -30108)
+            {
+                return true;
+            }
+        }
+        return super.testDbUnreachable(e);
     }
 }

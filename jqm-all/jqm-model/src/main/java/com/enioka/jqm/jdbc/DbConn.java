@@ -61,7 +61,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw handleDatabaseException(e, null);
         }
     }
 
@@ -75,7 +75,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw handleDatabaseException(e, null);
         }
     }
 
@@ -128,7 +128,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(qp.sqlText, e);
+            throw handleDatabaseException(e, qp.sqlText);
         }
     }
 
@@ -148,7 +148,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(sql, e);
+            throw handleDatabaseException(e, sql);
         }
     }
 
@@ -187,7 +187,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(q.sqlText, e);
+            throw handleDatabaseException(e, q.sqlText);
         }
         finally
         {
@@ -216,7 +216,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(qp.sqlText, e);
+            throw handleDatabaseException(e, qp.sqlText);
         }
         finally
         {
@@ -256,7 +256,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw handleDatabaseException(e, null);
         }
         return res;
     }
@@ -318,7 +318,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw handleDatabaseException(e, null);
         }
     }
 
@@ -373,7 +373,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw handleDatabaseException(e, null);
         }
     }
 
@@ -488,7 +488,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw handleDatabaseException(e, null);
         }
 
         // Add parameters
@@ -607,5 +607,37 @@ public class DbConn implements Closeable
     public List<JobInstance> poll(Queue queue, int nbSlots)
     {
         return this.parent.getAdapter().poll(this, queue, nbSlots);
+    }
+
+    /**
+     * Helper method to convert SQLException to appropriate DatabaseException type. Checks if the exception indicates database
+     * unreachability and throws DatabaseUnreachableException if so.
+     *
+     * @param e
+     *            the SQLException to convert
+     * @param message
+     *            optional context message
+     * @return DatabaseException (or subclass) to be thrown
+     */
+    private RuntimeException handleDatabaseException(SQLException e, String message)
+    {
+        if (this.parent.getAdapter().testDbUnreachable(e))
+        {
+            if (message != null)
+            {
+                return new DatabaseUnreachableException(message, e);
+            }
+            return new DatabaseUnreachableException(e);
+        }
+        if (message != null)
+        {
+            return new DatabaseException(message, e);
+        }
+        return new DatabaseException(e);
+    }
+
+    public void simulateDisconnection()
+    {
+        this.parent.getAdapter().simulateDisconnection(cnx);
     }
 }

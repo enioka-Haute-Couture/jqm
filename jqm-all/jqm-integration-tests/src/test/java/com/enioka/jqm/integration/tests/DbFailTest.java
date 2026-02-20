@@ -13,22 +13,16 @@ public class DbFailTest extends JqmBaseTest
     @Before
     public void before()
     {
-        // These tests are HSQLDB dependent.
-        assumeHsqldb();
-
-        // TODO: write some tests for PGSQL.
+        // Note: DB2 and Oracle implementations added but need verification in CI
+        // If tests fail, re-enable assumeNotDb2() and assumeNotOracle()
     }
 
     @Test
     public void testDbFailure() throws Exception
     {
         this.addAndStartEngine();
-        jqmlogger.info("Stopping db");
-        s.close();
-        this.sleep(2);
+        this.simulateDbFailure(2);
         jqmlogger.info("Restarting DB");
-        s.start();
-        this.sleep(5);
         Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
@@ -36,18 +30,15 @@ public class DbFailTest extends JqmBaseTest
     public void testDbDoubleFailure() throws Exception
     {
         this.addAndStartEngine();
-        jqmlogger.info("Stopping db");
-        s.close();
-        this.sleep(2);
-        jqmlogger.info("Restarting DB");
-        s.start();
-        this.sleep(5);
-        jqmlogger.info("Stopping db");
-        s.close();
-        this.sleep(2);
-        jqmlogger.info("Restarting DB");
-        s.start();
-        this.sleep(5);
+        this.simulateDbFailure(2);
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
+
+        // cnx was closed in previous simulateDbFailure()
+        cnx = getNewDbSession();
+
+        this.simulateDbFailure(2);
+
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
     @Test
@@ -60,11 +51,11 @@ public class DbFailTest extends JqmBaseTest
         this.addAndStartEngine();
         this.sleep(2); // first poller loop
 
-        jqmlogger.info("Stopping db");
-        s.close();
-        jqmlogger.info("Restarting DB (as soon as possible)");
-        s.start();
+        this.simulateDbFailure(2);
+
         this.sleep(5);
+
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
     // Job ends OK during db failure.
@@ -74,15 +65,11 @@ public class DbFailTest extends JqmBaseTest
         JqmSimpleTest.create(cnx, "pyl.Wait", "jqm-test-pyl-nodep").addRuntimeParameter("p1", "4000").expectOk(0).run(this);
         this.sleep(2);
 
-        jqmlogger.info("Stopping db");
-        s.close();
-        this.sleep(5);
-
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
         Assert.assertEquals(1, TestHelpers.getOkCount(this.getNewDbSession()));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(this.getNewDbSession()));
     }
 
     // Job ends KO during db failure.
@@ -92,12 +79,7 @@ public class DbFailTest extends JqmBaseTest
         JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
         this.sleep(2);
 
-        jqmlogger.info("Stopping db");
-        s.close();
-        this.sleep(5);
-
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
         Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
@@ -125,13 +107,17 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(1);
         jqmlogger.info("Stopping db");
-        simulateDbFailure();
+        this.simulateDbFailure(2);
+
+        // Wait for pollers to recover from DB failure
+        this.sleep(5);
+        Assert.assertTrue("Pollers should recover after DB failure", this.engines.get("localhost").areAllPollersPolling());
 
         TestHelpers.waitFor(1000, 120000, this.getNewDbSession());
 
         // Under extreme load with DB failure, allow a small margin of error to avoid flaky tests
         int okCount = TestHelpers.getOkCount(this.getNewDbSession());
         Assert.assertTrue("Expected ~1000 successful jobs under DB failure, but got " + okCount, okCount >= 998);
-        // Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 }

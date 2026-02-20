@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientException;
 import java.util.List;
 import java.util.Properties;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbAdapter;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
@@ -60,5 +62,30 @@ public class DbImplHsql extends DbAdapter
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
+                && e.getCause().getMessage().equals("connection exception: closed"))
+        {
+            return true;
+        }
+        return super.testDbUnreachable(e);
+    }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try
+        {
+            PreparedStatement s = cnx.prepareStatement("DISCONNECT");
+            s.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
     }
 }

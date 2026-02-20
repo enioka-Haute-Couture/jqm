@@ -19,12 +19,6 @@
 package com.enioka.jqm.engine;
 
 import java.lang.management.ManagementFactory;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
-import java.sql.SQLNonTransientException;
-import java.sql.SQLTransientException;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +39,6 @@ import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.lang.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,22 +291,5 @@ final class Helpers
         {
             jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
         }
-    }
-
-    static boolean testDbFailure(Exception e)
-    {
-        Throwable cause = e.getCause();
-        Throwable rootCause = ExceptionUtils.getRootCause(e);
-
-        return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-                || (rootCause != null && rootCause.getClass().getName().equals("oracle.net.ns.NetException"))
-                || (cause != null && cause.getMessage() != null && cause.getMessage().equals("This connection has been closed"))
-                || (cause instanceof SQLException && e.getMessage() != null
-                        && e.getMessage().equals("Failed to validate a newly established connection."))
-                || (cause instanceof SQLNonTransientException && cause.getMessage() != null
-                        && cause.getMessage().equals("connection exception: closed"));
     }
 }

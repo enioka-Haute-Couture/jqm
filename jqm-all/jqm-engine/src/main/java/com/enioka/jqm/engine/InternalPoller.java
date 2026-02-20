@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -174,20 +175,13 @@ class InternalPoller implements Runnable
 
                 // All engine pollings done!
             }
-            catch (RuntimeException e)
+            catch (DatabaseUnreachableException e)
             {
-                if (Helpers.testDbFailure(e))
-                {
-                    jqmlogger.error("connection to database lost - stopping internal poller");
-                    jqmlogger.trace("connection error was:", e.getCause());
-                    run = false;
-                    this.engine.startDbRestarter();
-                    break;
-                }
-                else
-                {
-                    throw e;
-                }
+                jqmlogger.error("connection to database lost - stopping internal poller");
+                jqmlogger.trace("connection error was:", e.getCause());
+                run = false;
+                this.engine.startDbRestarter();
+                break;
             }
         }
 

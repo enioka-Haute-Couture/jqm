@@ -173,4 +173,78 @@ public class DbImplMySql extends DbAdapter
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
     }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        // For MySQL, we can't use KILL CONNECTION as it damages the connection pool.
+        // Instead, we'll set a very short timeout and then try to execute a long query.
+        // This simulates a network timeout without permanently damaging the pool.
+        try
+        {
+            // Set network timeout to 1ms to force a quick failure
+            cnx.setNetworkTimeout(null, 1);
+            // Try to execute a query that would take longer
+            try (PreparedStatement s = cnx.prepareStatement("SELECT SLEEP(10)"))
+            {
+                s.execute();
+            }
+        }
+        catch (SQLException e)
+        {
+            // Expected - timeout or connection error
+        }
+        finally
+        {
+            // Close the connection to simulate complete disconnection
+            try
+            {
+                cnx.close();
+            }
+            catch (SQLException e)
+            {
+                // Ignore
+            }
+        }
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        // MySQL specific connection errors
+        // Check for com.mysql.cj.jdbc.exceptions.CommunicationsException
+        if (e.getCause() != null && e.getCause().getClass().getName().contains("CommunicationsException"))
+        {
+            return true;
+        }
+
+        // SQLState 08xxx indicates connection exceptions
+        if (e.getCause() instanceof SQLException)
+        {
+            SQLException sqlEx = (SQLException) e.getCause();
+            String sqlState = sqlEx.getSQLState();
+            if (sqlState != null && sqlState.startsWith("08"))
+            {
+                return true;
+            }
+            // Check for MariaDB "Connection is closed" error
+            if (e.getCause() instanceof java.sql.SQLNonTransientConnectionException && e.getCause().getMessage() != null
+                    && e.getCause().getMessage().contains("Connection is closed"))
+            {
+                return true;
+            }
+            // MySQL error codes for connection issues
+            int errorCode = sqlEx.getErrorCode();
+            if (errorCode == 1129 || // Host is blocked
+                    errorCode == 1130 || // Host not allowed to connect
+                    errorCode == 2002 || // Can't connect
+                    errorCode == 2003 || // Can't connect to MySQL server
+                    errorCode == 2006 || // MySQL server has gone away
+                    errorCode == 2013) // Lost connection to MySQL server during query
+            {
+                return true;
+            }
+        }
+        return super.testDbUnreachable(e);
+    }
 }

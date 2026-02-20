@@ -137,4 +137,54 @@ public class DbImplOracle extends DbAdapter
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
     }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try (PreparedStatement s = cnx.prepareStatement("BEGIN DBMS_SESSION.KILL_SESSION(USERENV('SID'), USERENV('SERIAL#')); END;"))
+        {
+            s.execute();
+        }
+        catch (SQLException e)
+        {
+            // Expected - the session is being killed
+            // As a fallback, try to close the connection forcefully
+            try
+            {
+                cnx.close();
+            }
+            catch (SQLException e2)
+            {
+                // Ignore
+            }
+        }
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        // Oracle specific connection errors
+        if (e.getCause() instanceof SQLException)
+        {
+            SQLException sqlEx = (SQLException) e.getCause();
+            int errorCode = sqlEx.getErrorCode();
+            // ORA-00028: your session has been killed
+            // ORA-01012: not logged on
+            // ORA-01033: ORACLE initialization or shutdown in progress
+            // ORA-01034: ORACLE not available
+            // ORA-01089: immediate shutdown in progress
+            // ORA-03113: end-of-file on communication channel
+            // ORA-03114: not connected to ORACLE
+            // ORA-03135: connection lost contact
+            // ORA-12541: TNS:no listener
+            // ORA-17002: IO Exception
+            // ORA-17008: Closed Connection
+            if (errorCode == 28 || errorCode == 1012 || errorCode == 1033 || errorCode == 1034 || errorCode == 1089 || errorCode == 3113
+                    || errorCode == 3114 || errorCode == 3135 || errorCode == 12541 || errorCode == 17002 || errorCode == 17008)
+            {
+                return true;
+            }
+        }
+        return super.testDbUnreachable(e);
+    }
 }

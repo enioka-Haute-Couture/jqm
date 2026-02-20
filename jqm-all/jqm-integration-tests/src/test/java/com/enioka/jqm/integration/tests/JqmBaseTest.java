@@ -254,31 +254,46 @@ public class JqmBaseTest
         }
     }
 
-    protected void simulateDbFailure()
+    protected void simulateDbFailure(int waitTimeBeforeRestart)
     {
-        if (db.getProduct().contains("hsql"))
+        try
         {
-            jqmlogger.info("DB is going down");
-            s.close();
-            jqmlogger.info("DB is now fully down");
+            jqmlogger.info("Send suicide query");
+            cnx.simulateDisconnection();
+            jqmlogger.info("DB connection killed, waiting {} seconds for restart", waitTimeBeforeRestart);
+        }
+        catch (Exception e)
+        {
+            // Nothing to do. Some SGBDR will throw exception because the killing connection was killed.
+        }
+        finally
+        {
+            // Close the connection to let the pool recover
+            if (cnx != null)
+            {
+                try
+                {
+                    cnx.close();
+                }
+                catch (Exception e2)
+                {
+                    // Ignore
+                }
+            }
+        }
+        this.sleep(waitTimeBeforeRestart);
+    }
+
+    protected boolean waitForPollersArePolling()
+    {
+        int remainingAttempt = 10;
+        while (!this.engines.get("localhost").areAllPollersPolling() && remainingAttempt > 0)
+        {
+            remainingAttempt--;
+            jqmlogger.debug("waitFormPollersArePolling countdown : " + remainingAttempt);
             this.sleep(1);
-            jqmlogger.info("Restarting DB");
-            s.start();
         }
-        else if (db.getProduct().contains("postgresql"))
-        {
-            try
-            {
-                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
-                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
-            }
-            catch (Exception e)
-            {
-                // Do nothing - the query is a suicide so it cannot work fully.
-            }
-            cnx.close();
-            cnx = getNewDbSession();
-        }
+        return this.engines.get("localhost").areAllPollersPolling();
     }
 
     protected void displayAllHistoryTable()
@@ -316,5 +331,23 @@ public class JqmBaseTest
     public void testContainerStarts()
     {
         Assert.assertTrue(true);
+    }
+
+    protected void assumeNotDb2()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
+        }
+    }
+
+    protected void assumeNotOracle()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
+        }
     }
 }
