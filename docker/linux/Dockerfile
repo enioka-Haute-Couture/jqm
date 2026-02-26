@@ -47,6 +47,15 @@ WORKDIR /jqm
 # Import initial config
 RUN java -jar jqm.jar Update-Schema; java -jar jqm.jar Import-ClusterConfiguration -f selfConfig.single.xml ;  java -jar jqm.jar New-Node -n ${JQM_NODE_NAME} ; java -jar jqm.jar Import-JobDef -f ./jobs/jqm-demo ; rm -f .\logs\* ; chmod 700 /jqm/bin/*.sh
 
+# Make image rootless-compatible: set group ownership to root (GID=0) and give group permissions
+RUN chgrp -R 0 /jqm && \
+    chmod -R g+rw /jqm && \
+    find /jqm -type d -exec chmod g+x {} \; && \
+    chmod -R g+x /jqm/bin/*.sh
+
+# Run as non-root user (OpenShift will assign arbitrary UID, but user will be in group 0)
+USER 1001
+
 # Run node on startup
 ENTRYPOINT /jqm/bin/node.sh
 
