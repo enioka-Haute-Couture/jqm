@@ -1,6 +1,7 @@
 package com.enioka.jqm.integration.tests;
 
 import java.util.Calendar;
+import java.sql.ResultSet;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
@@ -188,5 +189,27 @@ public class SchedulerTest extends JqmBaseTest
         jqmClient.resumeQueuedJob(i);
         TestHelpers.waitFor(1, 10000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+    }
+
+    @Test
+    public void testCronMasterSlave() throws Exception
+    {
+        addAndStartEngine("localhost");
+        jqmlogger.info("localhost launched");
+
+        ResultSet rs = cnx.runSelect("read_witness_node_id");
+        rs.next();
+        int firstNodeId = Integer.parseInt(rs.getString(1));
+        jqmlogger.info("Current witness node id : {}", rs.getString(1));
+
+        addAndStartEngine("localhost2");
+        jqmlogger.info("localhost2 launched");
+
+        rs = cnx.runSelect("read_witness_node_id");
+        rs.next();
+        int secondNodeId = Integer.parseInt(rs.getString(1));
+        jqmlogger.info("Current witness node id : {}", rs.getString(1));
+
+        Assert.assertEquals(firstNodeId, secondNodeId);
     }
 }
