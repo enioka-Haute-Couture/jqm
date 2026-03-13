@@ -100,8 +100,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             // Use Basic Auth to login and create a new session
             const credentials = btoa(`${username}:${password}`);
+            // Support deployment behind reverse proxy with a path prefix
+            const basePath = (import.meta as any).env.VITE_BASE_PATH || "";
 
-            const result = await fetch(`/ws/admin/me?_=${Date.now()}`, {
+            const result = await fetch(`${basePath}/ws/admin/me?_=${Date.now()}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Basic ${credentials}`,

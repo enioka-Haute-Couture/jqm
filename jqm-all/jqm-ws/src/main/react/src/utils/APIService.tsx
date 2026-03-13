@@ -1,4 +1,6 @@
-const API_URL = "/ws";
+// Support deployment behind reverse proxy with a path prefix
+const BASE_PATH = (import.meta as any).env.VITE_BASE_PATH || "";
+const API_URL = `${BASE_PATH}/ws`;
 
 export default class APIService {
     static isSessionExpired = false;
