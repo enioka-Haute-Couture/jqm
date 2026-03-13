@@ -5,7 +5,7 @@ ARG SKIP_TESTS=true
 
 WORKDIR /jqm-all
 
-RUN apt update && apt install unzip
+RUN apt update && apt install -y unzip libatomic1
 
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
