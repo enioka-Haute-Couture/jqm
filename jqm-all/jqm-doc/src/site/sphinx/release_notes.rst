@@ -1,6 +1,50 @@
 Release notes
 ######################
 
+3.3.0
+*************
+
+Maintenance release, with new features and some fixes after the v3.2 release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* GUI & Web APIs : added bulk actions support (relauch, cancel, kill, pause, resume)
+* GUI: implemented internationalization (i18n) with English and French translations
+* Engine: solved bug in the cron scheduler when using two nodes which could cause jobs to be launched twice
+* GUI: added a button to remove a node that's been inactive for more than 10 minutes
+* Global: added checkstyle to the build, and fixed all checkstyle errors in the codebase
+* Global: fixed CI snapshot publishing and added GitHub Action release
+* Global: fixed all Javadoc warnings and re-enabled DocLint in the build
+
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* GUI & Web APIs: removed HTTP cache on the node API that was breaking frontend display
+* Engine: fixed log level update
+* GUI: improved messages and files display in run details dialog
+* Engine: during startup check that all referenced runners exist
+* Engine: added "Listener refused the connection" to the covered DB failure causes
+* Documentation: added CLI commands examples
+* Documentation: added a note in documentation to forbid user to bundle drivers in payloads
+* Test: added getResource method in JqmAsynchronousTester to retrieve JNDI resources
+* GUI: refresh pages content when user permissions change
+* Global: dissociated frontend build and the Maven build
+* CLI: added -i option to New-Node command to set DNS
+* Packaging: removed useless slf4j-api from the ext folder
+* Engine: added better APM integrability with persisted traceId inside JobInstance
+* Packaging: updated persmissions.sh script to cover the plugins directory
+* Packaging: made linux OCI image rootless
+* GUI: fixed reverse proxy deployment capability
+
 3.2.0
 *************
 
