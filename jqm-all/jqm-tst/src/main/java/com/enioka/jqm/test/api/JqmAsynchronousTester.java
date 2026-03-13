@@ -217,8 +217,6 @@ public interface JqmAsynchronousTester extends AutoCloseable
      * @param jndiName
      *            the JNDI name of the resource
      * @return the resource object cast to the expected type
-     * @throws javax.naming.NamingException
-     *             if the resource cannot be found or accessed
      */
     public <T> T getResource(String jndiName);
 
