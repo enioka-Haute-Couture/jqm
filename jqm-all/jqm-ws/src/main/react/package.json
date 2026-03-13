@@ -74,11 +74,11 @@
     },
     "homepage": ".",
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^8.35.1",
-        "@typescript-eslint/parser": "^8.35.1",
-        "@vitejs/plugin-react": "^4.6.0",
-        "eslint": "^9.30.0",
+        "@typescript-eslint/eslint-plugin": "^8.57.0",
+        "@typescript-eslint/parser": "^8.57.0",
+        "@vitejs/plugin-react": "^6.0.0",
+        "eslint": "^9.39.4",
         "eslint-plugin-import": "^2.32.0",
-        "vite": "^6.4.1"
+        "vite": "^8.0.0"
     }
 }
