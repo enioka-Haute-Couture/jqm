@@ -1,6 +1,24 @@
 Release notes
 ######################
 
+
+3.3.1
+*************
+
+Small maintenance release with one GUI fix after the v3.3.0 release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* GUI: fixed a bug when displaying a DatePicker component due to the MUI library being incompatible with Vite v8.
+
 3.3.0
 *************
 
