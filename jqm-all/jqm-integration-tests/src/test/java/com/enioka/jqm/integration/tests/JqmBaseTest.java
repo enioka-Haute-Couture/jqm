@@ -27,13 +27,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.enioka.jqm.model.updater.DbSchemaManager;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +45,11 @@ import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
 import com.enioka.jqm.test.helpers.TestHelpers;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.DockerClientFactory;
 
 public class JqmBaseTest
 {
@@ -63,6 +62,8 @@ public class JqmBaseTest
     protected DbConn cnx;
 
     protected static DebugHsqlDbServer s;
+
+    protected static JdbcDatabaseContainer<?> dbContainer;
 
     JqmClient jqmClient;
 
@@ -78,15 +79,68 @@ public class JqmBaseTest
     @BeforeClass
     public static void beforeClass()
     {
-        if (s == null)
-        {
-            s = new DebugHsqlDbServer();
-            s.start();
+        String dbType = System.getenv("DB");
 
-            System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
-            ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
-        }
+//        if ("hsqldb".equalsIgnoreCase(dbType) || dbType == null) {
+            if (s == null)
+            {
+                s = new DebugHsqlDbServer();
+                s.start();
+                jqmlogger.info("Started local HSQLDB server.");
+            }
+//        } else {
+//            initTestContainer();
+//        }
+
+        System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
+        ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
     }
+
+//    @AfterClass
+//    public static void afterClass() {
+//        if (dbContainer != null && dbContainer.isRunning()) {
+//            dbContainer.stop();
+//        }
+//        if (s != null) {
+//            s.close();
+//            s = null;
+//        }
+//    }
+
+//    private static void initTestContainer() {
+//        if (dbContainer != null && dbContainer.isRunning()) {
+//            return;
+//        }
+//
+//        String dbType = System.getenv("DB");
+//        String dbVersion = System.getenv("DB_VERSION");
+//
+//        if (dbType == null || dbType.isEmpty()) {
+//            dbType = "postgresql";
+//        }
+//        if (dbVersion == null || dbVersion.isEmpty()) {
+//            dbVersion = "15-alpine";
+//        }
+//
+//        switch (dbType.toLowerCase()) {
+//            case "postgresql":
+//                dbContainer = new PostgreSQLContainer<>("postgres:" + dbVersion);
+//                break;
+//            case "mysql":
+//                dbContainer = new MySQLContainer<>("mysql:" + dbVersion);
+//                break;
+//            case "mariadb":
+//                dbContainer = new MariaDBContainer<>("mariadb:" + dbVersion);
+//                break;
+//            case "hsqldb":
+//                return;
+//            default:
+//                throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
+//        }
+//
+//        dbContainer.start();
+//        jqmlogger.info("Testcontainer started for {} version {}", dbType, dbVersion);
+//    }
 
     @Before
     public void beforeEachTest() throws NamingException, SQLException
@@ -103,6 +157,12 @@ public class JqmBaseTest
             Properties p = new Properties();
             p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
             p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
+//            if (dbContainer != null && dbContainer.isRunning()) {
+//                p.put("com.enioka.jqm.jdbc.url", dbContainer.getJdbcUrl());
+//                p.put("com.enioka.jqm.jdbc.user", dbContainer.getUsername());
+//                p.put("com.enioka.jqm.jdbc.password", dbContainer.getPassword());
+//                p.put("com.enioka.jqm.jdbc.driver", dbContainer.getDriverClassName());
+//            }
             db = DbManager.getDb(p);
             var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
             try (var cnx = db.getDataSource().getConnection())
@@ -254,30 +314,22 @@ public class JqmBaseTest
         }
     }
 
-    protected void simulateDbFailure()
+    protected void simulateDbFailure(int delay)
     {
         if (db.getProduct().contains("hsql"))
         {
             jqmlogger.info("DB is going down");
             s.close();
             jqmlogger.info("DB is now fully down");
-            this.sleep(1);
+            this.sleep(delay);
             jqmlogger.info("Restarting DB");
             s.start();
+            this.sleep(delay);
         }
-        else if (db.getProduct().contains("postgresql"))
+        else
         {
-            try
-            {
-                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
-                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
-            }
-            catch (Exception e)
-            {
-                // Do nothing - the query is a suicide so it cannot work fully.
-            }
-            cnx.close();
-            cnx = getNewDbSession();
+            String containerId = dbContainer.getContainerId();
+            DockerClientFactory.instance().client().restartContainerCmd(containerId).exec();
         }
     }
 
@@ -316,5 +368,23 @@ public class JqmBaseTest
     public void testContainerStarts()
     {
         Assert.assertTrue(true);
+    }
+
+    protected void assumeNotDb2()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
+        }
+    }
+
+    protected void assumeNotOracle()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
+        }
     }
 }
