@@ -27,7 +27,14 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.enioka.jqm.model.updater.DbSchemaManager;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Test;
+import org.junit.Assert;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +81,7 @@ public class JqmBaseTest
     {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
     }
 
     @BeforeClass
@@ -81,66 +89,78 @@ public class JqmBaseTest
     {
         String dbType = System.getenv("DB");
 
-//        if ("hsqldb".equalsIgnoreCase(dbType) || dbType == null) {
+        if ("hsqldb".equalsIgnoreCase(dbType) || dbType == null)
+        {
             if (s == null)
             {
                 s = new DebugHsqlDbServer();
                 s.start();
                 jqmlogger.info("Started local HSQLDB server.");
             }
-//        } else {
-//            initTestContainer();
-//        }
+        }
+        else
+        {
+            initTestContainer();
+        }
 
         System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
     }
 
-//    @AfterClass
-//    public static void afterClass() {
-//        if (dbContainer != null && dbContainer.isRunning()) {
-//            dbContainer.stop();
-//        }
-//        if (s != null) {
-//            s.close();
-//            s = null;
-//        }
-//    }
+    @AfterClass
+    public static void afterClass()
+    {
+        if (dbContainer != null && dbContainer.isRunning())
+        {
+            dbContainer.stop();
+        }
+        if (s != null)
+        {
+            s.close();
+            s = null;
+        }
+    }
 
-//    private static void initTestContainer() {
-//        if (dbContainer != null && dbContainer.isRunning()) {
-//            return;
-//        }
-//
-//        String dbType = System.getenv("DB");
-//        String dbVersion = System.getenv("DB_VERSION");
-//
-//        if (dbType == null || dbType.isEmpty()) {
-//            dbType = "postgresql";
-//        }
-//        if (dbVersion == null || dbVersion.isEmpty()) {
-//            dbVersion = "15-alpine";
-//        }
-//
-//        switch (dbType.toLowerCase()) {
-//            case "postgresql":
-//                dbContainer = new PostgreSQLContainer<>("postgres:" + dbVersion);
-//                break;
-//            case "mysql":
-//                dbContainer = new MySQLContainer<>("mysql:" + dbVersion);
-//                break;
-//            case "mariadb":
-//                dbContainer = new MariaDBContainer<>("mariadb:" + dbVersion);
-//                break;
-//            case "hsqldb":
-//                return;
-//            default:
-//                throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
-//        }
-//
-//        dbContainer.start();
-//        jqmlogger.info("Testcontainer started for {} version {}", dbType, dbVersion);
-//    }
+    private static void initTestContainer()
+    {
+        if (dbContainer != null && dbContainer.isRunning())
+        {
+            return;
+        }
+
+        String dbType = System.getenv("DB");
+        String dbVersion = System.getenv("DB_VERSION");
+
+        if (dbType == null || dbType.isEmpty())
+        {
+            dbType = "postgresql";
+        }
+        if (dbVersion == null || dbVersion.isEmpty())
+        {
+            dbVersion = "15-alpine";
+        }
+
+        jqmlogger.info("Starting testcontainer for {} version {}", dbType, dbVersion);
+        switch (dbType.toLowerCase())
+        {
+        case "postgresql":
+            dbContainer = new PostgreSQLContainer<>("postgres:" + dbVersion);
+            break;
+        case "mysql":
+            dbContainer = new MySQLContainer<>("mysql:" + dbVersion);
+            break;
+        case "mariadb":
+            dbContainer = new MariaDBContainer<>("mariadb:" + dbVersion);
+            break;
+        case "hsqldb":
+            return;
+        default:
+            throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
+        }
+
+        dbContainer.start();
+        jqmlogger.info("Testcontainer started for {} version {}", dbType, dbVersion);
+    }
 
     @Before
     public void beforeEachTest() throws NamingException, SQLException
@@ -148,21 +168,12 @@ public class JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
-        JqmDbClientFactory.reset();
-        jqmClient = JqmDbClientFactory.getClient();
-
         if (db == null)
         {
-            // In all cases load the datasource. (the helper itself will load the property file if any).
             Properties p = new Properties();
             p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
             p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
-//            if (dbContainer != null && dbContainer.isRunning()) {
-//                p.put("com.enioka.jqm.jdbc.url", dbContainer.getJdbcUrl());
-//                p.put("com.enioka.jqm.jdbc.user", dbContainer.getUsername());
-//                p.put("com.enioka.jqm.jdbc.password", dbContainer.getPassword());
-//                p.put("com.enioka.jqm.jdbc.driver", dbContainer.getDriverClassName());
-//            }
+
             db = DbManager.getDb(p);
             var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
             try (var cnx = db.getDataSource().getConnection())
@@ -171,12 +182,15 @@ public class JqmBaseTest
             }
         }
 
+        // Initialisation du client JQM après la base
+        JqmDbClientFactory.reset();
+        jqmClient = JqmDbClientFactory.getClient();
+
         cnx = getNewDbSession();
         TestHelpers.cleanup(cnx);
         TestHelpers.createTestData(cnx);
         cnx.commit();
 
-        // Force JNDI directory loading
         InitialContext.doLookup("string/debug");
     }
 
