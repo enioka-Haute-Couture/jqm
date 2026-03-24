@@ -36,7 +36,8 @@
         "factory": "Factory",
         "singleton": "Singleton",
         "parameters": "Parameters",
-        "clickToEditParameters": "Click to edit parameters",
+        "editParametersTooltip": "Edit parameters",
+        "viewParametersTooltip": "View parameters",
         "documentation": {
             "title": "JNDI Resources documentation",
             "header": "Resources are Java objects which can be requested by jobs through a JNDI lookup.",
@@ -55,8 +56,10 @@
             "name": "Name",
             "value": "Value",
             "addParameter": "Add parameter",
-            "description": "Add new or edit existing parameters",
-            "validate": "Validate"
+            "description": "Add new or edit existing parameters"
+        },
+        "viewParametersDialog": {
+            "title": "Parameters of {{resourceName}}"
         },
         "resourceGroups": {
             "databasePools": "Database Pools",
@@ -136,7 +139,8 @@
         "save": "Save changes",
         "cancelChanges": "Cancel changes",
         "change": "Change",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "validate": "Validate"
     },
     "home": {
         "title": "Welcome to the JQM administration web console",
@@ -193,7 +197,7 @@
         "noMatch": "No roles found",
         "name": "Name*",
         "permissions": "Permissions",
-        "clickToEditPermissions": "Click to edit permissions",
+        "editPermissionsTooltip": "Edit permissions",
         "hints": {
             "name": "Name of the role. Must be unique.",
             "description": "What the role does.",
@@ -209,8 +213,7 @@
             "onObjectType": "On object of type",
             "addPermission": "Add permission",
             "code": "Code",
-            "objectType": "Object type",
-            "validate": "Validate"
+            "objectType": "Object type"
         },
         "permissionActions": {
             "read": "read",
@@ -299,8 +302,8 @@
         "tracingEnabled": "Tracing Enabled",
         "persistent": "Persistent",
         "allowedRunners": "Allowed Runners",
-        "clickToEditHiddenClasses": "Click to edit hidden classes",
-        "clickToEditAllowedRunners": "Click to edit allowed runners",
+        "editHiddenClassesTooltip": "Edit hidden classes",
+        "editAllowedRunnersTooltip": "Edit allowed runners",
         "hints": {
             "name": "The key used to identify the class loader in the deployment descriptor. Unique.",
             "childFirst": "Offer option to have child first class loading. Parent first is the norm in JSE.",
@@ -320,15 +323,13 @@
             "description": "A hidden class is a regexp defining classes never to load from the parent class loader.",
             "regexpLabel": "Regexp*",
             "addButton": "Add",
-            "hiddenClassColumn": "Hidden class",
-            "validate": "Validate"
+            "hiddenClassColumn": "Hidden class"
         },
         "editAllowedRunnersDialog": {
             "title": "Edit allowed runners",
             "runnerLabel": "Runner*",
             "addButton": "Add",
-            "allowedRunnerColumn": "Allowed runner",
-            "validate": "Validate"
+            "allowedRunnerColumn": "Allowed runner"
         },
         "messages": {
             "successCreate": "Successfully created class loader: {{name}}",
@@ -440,12 +441,13 @@
             "enabled": "If disabled, all instances will always succeed instantly",
             "highlander": "If checked, there can never be more than one instance of the Job Definition running at the same time, as well as no more than one waiting in any queue",
             "properties": "Specific properties depending on the job type",
-            "tags": "Optionnal tags for classification and queries"
+            "tags": "Optional tags for classification and queries"
         },
-        "clickToEditProperties": "Click to edit specific properties",
-        "clickToEditTags": "Click to edit tags",
-        "clickToEditParameters": "Click to edit parameters",
-        "clickToEditSchedules": "Click to edit schedules",
+        "editPropertiesTooltip": "Edit specific properties",
+        "editTagsTooltip": "Edit tags",
+        "editParametersTooltip": "Edit parameters",
+        "editSchedulesTooltip": "Edit schedules",
+        "viewSchedulesTooltip": "View schedules",
         "propertiesDisplay": {
             "pathToJar": "Path to the jar file",
             "classToLaunch": "Class to launch",
@@ -474,7 +476,7 @@
         },
         "editTagsDialog": {
             "title": "Edit tags",
-            "description": "Optionnal tags for classification and queries.",
+            "description": "Optional tags for classification and queries.",
             "applicationLabel": "Application",
             "moduleLabel": "Module",
             "keyword1Label": "Keyword 1",
@@ -508,6 +510,15 @@
             "valueColumn": "Value",
             "actionsColumn": "Actions"
         },
+        "editSchedulesParametersDialog": {
+            "title": "Edit parameters",
+            "keyLabel": "Key*",
+            "valueLabel": "Value",
+            "addParameter": "Add parameter",
+            "keyColumn": "Key",
+            "valueColumn": "Value",
+            "actionsColumn": "Actions"
+        },
         "editSchedulesDialog": {
             "title": "Edit schedules",
             "wikipediaHelp": "Wikipedia help on cron",
@@ -518,6 +529,12 @@
             "queueOverrideColumn": "Queue override",
             "parametersColumn": "Parameters",
             "actionsColumn": "Actions"
+        },
+        "viewSchedulesDialog": {
+            "title": "View schedules",
+            "cronExpressionColumn": "Cron expression",
+            "queueOverrideColumn": "Queue override",
+            "parametersColumn": "Parameters"
         },
         "messages": {
             "successCreate": "Successfully created job definition {{name}}",

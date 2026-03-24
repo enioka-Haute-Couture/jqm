@@ -45,7 +45,7 @@ export const EditTagsDialog: React.FC<{
         >
             <DialogTitle id="form-dialog-title">{t("jobDefinitions.editTagsDialog.title")}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
+                <DialogContentText style={{ marginBottom: "8px" }}>
                     {t("jobDefinitions.editTagsDialog.description")}
                 </DialogContentText>
                 <TextField
@@ -123,7 +123,7 @@ export const EditTagsDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("jndi.editParametersDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

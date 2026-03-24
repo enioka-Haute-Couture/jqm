@@ -49,78 +49,76 @@ export const EditHiddenClassesDialog: React.FC<{
         >
             <DialogTitle id="form-dialog-title">{t("classLoaders.editHiddenClassesDialog.title")}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
+                <DialogContentText style={{ marginBottom: "8px" }}>
                     {t("classLoaders.editHiddenClassesDialog.description")}
                 </DialogContentText>
-                <>
-                    <TextField
-                        className={classes.TextField}
-                        label={t("classLoaders.editHiddenClassesDialog.regexpLabel")}
-                        value={newHiddenClass}
-                        onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                            setNewHiddenClass(event.target.value);
-                        }}
-                        fullWidth
-                        variant="standard"
-                    />
+                <TextField
+                    className={classes.TextField}
+                    label={t("classLoaders.editHiddenClassesDialog.regexpLabel")}
+                    value={newHiddenClass}
+                    onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                    ) => {
+                        setNewHiddenClass(event.target.value);
+                    }}
+                    fullWidth
+                    variant="standard"
+                />
 
-                    <Button
-                        variant="contained"
-                        size="small"
-                        style={{ marginBottom: "16px" }}
-                        disabled={
-                            editedHiddenClasses.filter(
-                                (value) => value === newHiddenClass
-                            ).length > 0 || !newHiddenClass
-                        }
-                        onClick={() => {
-                            setEditedHiddenClasses([
-                                ...editedHiddenClasses,
-                                newHiddenClass
-                            ]);
-                        }}
-                        color="primary"
-                    >
-                        {t("classLoaders.editHiddenClassesDialog.addButton")}
-                    </Button>
-                    <TableContainer component={Paper}>
-                        <Table size="small" aria-label="Parameters">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>{t("classLoaders.editHiddenClassesDialog.hiddenClassColumn")}</TableCell>
-                                    <TableCell>{t("common.actions")}</TableCell>
+                <Button
+                    variant="contained"
+                    size="small"
+                    style={{ marginBottom: "16px" }}
+                    disabled={
+                        editedHiddenClasses.filter(
+                            (value) => value === newHiddenClass
+                        ).length > 0 || !newHiddenClass
+                    }
+                    onClick={() => {
+                        setEditedHiddenClasses([
+                            ...editedHiddenClasses,
+                            newHiddenClass
+                        ]);
+                    }}
+                    color="primary"
+                >
+                    {t("classLoaders.editHiddenClassesDialog.addButton")}
+                </Button>
+                <TableContainer component={Paper}>
+                    <Table size="small" aria-label="Parameters">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>{t("classLoaders.editHiddenClassesDialog.hiddenClassColumn")}</TableCell>
+                                <TableCell>{t("common.actions")}</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {editedHiddenClasses.map((value, index) => (
+                                <TableRow key={value}>
+                                    <TableCell component="th" scope="row">
+                                        {value}
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton
+                                            color="default"
+                                            aria-label={"delete"}
+                                            onClick={() => {
+                                                setEditedHiddenClasses(
+                                                    editedHiddenClasses.filter(
+                                                        (_, i) =>
+                                                            i !== index
+                                                    )
+                                                );
+                                            }}
+                                            size="large">
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {editedHiddenClasses.map((value, index) => (
-                                    <TableRow key={value}>
-                                        <TableCell component="th" scope="row">
-                                            {value}
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton
-                                                color="default"
-                                                aria-label={"delete"}
-                                                onClick={() => {
-                                                    setEditedHiddenClasses(
-                                                        editedHiddenClasses.filter(
-                                                            (_, i) =>
-                                                                i !== index
-                                                        )
-                                                    );
-                                                }}
-                                                size="large">
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </DialogContent>
             <DialogActions>
                 <Button
@@ -140,7 +138,7 @@ export const EditHiddenClassesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("classLoaders.editHiddenClassesDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

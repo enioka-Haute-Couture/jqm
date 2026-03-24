@@ -33,7 +33,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
 import cron from 'cron-validate'
 import { useTranslation } from "react-i18next";
-import { EditParametersDialog } from "./EditParametersDialog";
+import { EditSchedulesParametersDialog } from "./EditSchedulesParametersDialog";
 import { JobDefinitionParameter, JobDefinitionSchedule } from "./JobDefinition";
 import { Queue } from "../Queues/Queue";
 
@@ -194,24 +194,9 @@ export const EditSchedulesDialog: React.FC<{
                                         </TableCell>
                                         <TableCell>
                                             <>
-                                                <IconButton
-                                                    color="default"
-                                                    aria-label={"delete"}
-                                                    onClick={() => {
-                                                        setEditedSchedules(
-                                                            editedSchedules.filter(
-                                                                (_, i) =>
-                                                                    i !==
-                                                                    index
-                                                            )
-                                                        );
-                                                    }}
-                                                    size="large">
-                                                    <DeleteIcon />
-                                                </IconButton>
                                                 <Tooltip
                                                     title={
-                                                        t("jobDefinitions.clickToEditParameters")
+                                                        t("jobDefinitions.editParametersTooltip")
                                                     }
                                                 >
                                                     <IconButton
@@ -228,6 +213,21 @@ export const EditSchedulesDialog: React.FC<{
                                                         <SettingsIcon />
                                                     </IconButton>
                                                 </Tooltip>
+                                                <IconButton
+                                                    color="default"
+                                                    aria-label={"delete"}
+                                                    onClick={() => {
+                                                        setEditedSchedules(
+                                                            editedSchedules.filter(
+                                                                (_, i) =>
+                                                                    i !==
+                                                                    index
+                                                            )
+                                                        );
+                                                    }}
+                                                    size="large">
+                                                    <DeleteIcon />
+                                                </IconButton>
                                             </>
                                         </TableCell>
                                     </TableRow>
@@ -255,12 +255,12 @@ export const EditSchedulesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("jndi.editParametersDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>
         {editParametersScheduleId != null && (
-            <EditParametersDialog
+            <EditSchedulesParametersDialog
                 closeDialog={() => setEditParametersScheduleId(null)}
                 parameters={
                     editedSchedules[editParametersScheduleId].parameters

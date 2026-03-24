@@ -130,7 +130,7 @@ const RolesPage: React.FC = () => {
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    t("roles.clickToEditPermissions"),
+                    t("roles.editPermissionsTooltip"),
                     permissions,
                     (value: any[]) => (value as string[]).join(", "),
                     setEditPermissionsRoleId

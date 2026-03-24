@@ -192,7 +192,7 @@ export const EditPermissionsDialog: React.FC<{
         >
             <DialogTitle id="form-dialog-title">{t("roles.editPermissionsDialog.title")}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
+                <DialogContentText style={{ marginBottom: "16px" }}>
                     {t("roles.editPermissionsDialog.description")}
                 </DialogContentText>
                 <PermissionsForm
@@ -218,7 +218,7 @@ export const EditPermissionsDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("roles.editPermissionsDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

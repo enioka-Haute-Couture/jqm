@@ -25,9 +25,10 @@ import {
 import useJobDefinitionsAPI from "./JobDefinitionsAPI";
 import { EditTagsDialog } from "./EditTagsDialog";
 import { EditSpecificPropertiesDialog } from "./EditSpecificPropertiesDialog";
-import { EditParametersDialog } from "./EditParametersDialog";
+import { EditSchedulesParametersDialog } from "./EditSchedulesParametersDialog";
 import { CreateJobDefinitionDialog } from "./CreateJobDefinitionDialog";
 import { EditSchedulesDialog } from "./EditSchedulesDialog";
+import { ViewSchedulesDialog } from "./ViewSchedulesDialog";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { Queue } from "../Queues/Queue";
 import MappingsPage from "../Mappings/MappingsPage";
@@ -73,6 +74,8 @@ export const JobDefinitionsPage: React.FC = () => {
         useState<string | null>(null);
     const [editSchedulesJobDefinitionId, setEditSchedulesJobDefinitionId] =
         useState<string | null>(null);
+    const [viewSchedulesJobDefinition, setViewSchedulesJobDefinition] =
+        useState<{ schedules: Array<JobDefinitionSchedule> } | null>(null);
 
     const {
         jobDefinitions,
@@ -264,7 +267,7 @@ export const JobDefinitionsPage: React.FC = () => {
             label: t("jobDefinitions.description"),
             options: {
                 hint: t("jobDefinitions.hints.description"),
-                filter: true,
+                filter: false,
                 sort: true,
                 customBodyRender: renderInputCell(
                     descriptionInputRef,
@@ -350,7 +353,7 @@ export const JobDefinitionsPage: React.FC = () => {
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    t("jobDefinitions.clickToEditProperties"),
+                    t("jobDefinitions.editPropertiesTooltip"),
                     properties,
                     printJobSpecificProperties,
                     setEditPropertiesJobDefinitionId
@@ -366,7 +369,7 @@ export const JobDefinitionsPage: React.FC = () => {
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    t("jobDefinitions.clickToEditTags"),
+                    t("jobDefinitions.editTagsTooltip"),
                     tags,
                     printJobTags,
                     setEditTagsJobDefinitionId
@@ -381,7 +384,7 @@ export const JobDefinitionsPage: React.FC = () => {
                 sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    t("jobDefinitions.clickToEditParameters"),
+                    t("jobDefinitions.editParametersTooltip"),
                     parameters,
                     printJobParameters,
                     setEditParametersJobDefinitionId
@@ -406,7 +409,7 @@ export const JobDefinitionsPage: React.FC = () => {
                         <Tooltip
                             title={
                                 editingRowId === tableMeta.rowIndex
-                                    ? t("jobDefinitions.clickToEditSchedules")
+                                    ? t("jobDefinitions.editSchedulesTooltip")
                                     : ""
                             }
                         >
@@ -421,7 +424,18 @@ export const JobDefinitionsPage: React.FC = () => {
                             </span>
                         </Tooltip>
                     ) : (
-                        getBadge(rowSchedules.length)
+                        <Tooltip title={t("jobDefinitions.viewSchedulesTooltip")}>
+                            <span
+                                style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    setViewSchedulesJobDefinition({
+                                        schedules: tableMeta.rowData[10],
+                                    });
+                                }}
+                            >
+                                {getBadge(rowSchedules.length)}
+                            </span>
+                        </Tooltip>
                     );
                 },
             },
@@ -531,7 +545,7 @@ export const JobDefinitionsPage: React.FC = () => {
                 />
             )}
             {editParametersJobDefinitionId != null && (
-                <EditParametersDialog
+                <EditSchedulesParametersDialog
                     closeDialog={() => setEditParametersJobDefinitionId(null)}
                     parameters={parameters!!}
                     setParameters={(
@@ -546,6 +560,13 @@ export const JobDefinitionsPage: React.FC = () => {
                     setSchedules={(schedules: Array<JobDefinitionSchedule>) =>
                         setSchedules(schedules)
                     }
+                    queues={queues}
+                />
+            )}
+            {viewSchedulesJobDefinition && (
+                <ViewSchedulesDialog
+                    closeDialog={() => setViewSchedulesJobDefinition(null)}
+                    schedules={viewSchedulesJobDefinition.schedules}
                     queues={queues}
                 />
             )}

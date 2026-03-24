@@ -145,13 +145,11 @@ const ClusterwideParametersPage: React.FC = () => {
                             </IconButton>
                         </Tooltip>
 
-                        <Tooltip title={t("common.add")}>
-                            <CreateParameterDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createParameter={createParameter}
-                            />
-                        </Tooltip>
+                        <CreateParameterDialog
+                            showDialog={showDialog}
+                            closeDialog={() => setShowDialog(false)}
+                            createParameter={createParameter}
+                        />
                     </>
                 }
                 <Tooltip title={t("common.refresh")}>

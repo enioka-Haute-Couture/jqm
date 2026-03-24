@@ -21,12 +21,14 @@ import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
 import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { ViewParametersDialog } from "./ViewParametersDialog";
 
 export const JndiPage: React.FC = () => {
     const { t } = useTranslation();
     const muiTextLabels = useMUIDataTableTextLabels(t("jndi.noMatch"));
     const [showDropDown, setShowDropDown] = useState(false);
-    const [showParameters, setShowParameters] = useState(false);
+    const [showEditParameters, setShowEditParameters] = useState(false);
+    const [viewParametersResource, setViewParametersResource] = useState<JndiResource | null>(null);
     const dropDownMenuPositionRef = useRef(null);
     const [currentSelectedResource, setCurrentSelectedResource] =
         useState<JndiResource | null>(null);
@@ -206,13 +208,13 @@ export const JndiPage: React.FC = () => {
                         <Tooltip
                             title={
                                 editingRowId === tableMeta.rowIndex
-                                    ? t("jndi.clickToEditParameters")
+                                    ? t("jndi.editParametersTooltip")
                                     : ""
                             }
                         >
                             <span
                                 style={{ cursor: "pointer" }}
-                                onClick={() => setShowParameters(true)}
+                                onClick={() => setShowEditParameters(true)}
                             >
                                 {getBadge(
                                     currentSelectedResource
@@ -223,7 +225,25 @@ export const JndiPage: React.FC = () => {
                             </span>
                         </Tooltip>
                     ) : (
-                        getBadge(parameters ? parameters.length : 0)
+                        <Tooltip title={t("jndi.viewParametersTooltip")}>
+                            <span
+                                style={{ cursor: "pointer" }}
+                                onClick={() => setViewParametersResource(
+                                    {
+
+                                        auth: tableMeta.rowData[1],
+                                        name: tableMeta.rowData[2],
+                                        type: tableMeta.rowData[3],
+                                        factory: tableMeta.rowData[4],
+                                        description: tableMeta.rowData[5],
+                                        singleton: tableMeta.rowData[6],
+                                        parameters: tableMeta.rowData[7],
+                                    }
+                                )}
+                            >
+                                {getBadge(parameters ? parameters.length : 0)}
+                            </span>
+                        </Tooltip >
                     );
                 },
             },
@@ -335,14 +355,20 @@ export const JndiPage: React.FC = () => {
                 columns={columns}
                 options={options}
             />
-            {showParameters &&
+            {showEditParameters &&
                 <EditParametersDialog
                     showDialog={true}
                     selectedResource={currentSelectedResource}
                     setSelectedResource={(resource: JndiResource) =>
                         setCurrentSelectedResource(resource)
                     }
-                    closeDialog={() => setShowParameters(false)}
+                    closeDialog={() => setShowEditParameters(false)}
+                />
+            }
+            {viewParametersResource &&
+                <ViewParametersDialog
+                    resource={viewParametersResource}
+                    closeDialog={() => setViewParametersResource(null)}
                 />
             }
         </Container>

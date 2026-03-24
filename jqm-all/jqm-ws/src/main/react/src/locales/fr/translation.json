@@ -36,7 +36,8 @@
         "factory": "Factory",
         "singleton": "Singleton",
         "parameters": "Paramètres",
-        "clickToEditParameters": "Cliquer pour éditer les paramètres",
+        "editParametersTooltip": "Éditer les paramètres",
+        "viewParametersTooltip": "Voir les paramètres",
         "documentation": {
             "title": "Documentation des ressources JNDI",
             "header": "Les ressources sont des objets Java qui peuvent être demandés par les jobs via une recherche JNDI.",
@@ -55,8 +56,10 @@
             "name": "Nom",
             "value": "Valeur",
             "addParameter": "Ajouter un paramètre",
-            "description": "Ajouter de nouveaux paramètres ou modifier les existants",
-            "validate": "Valider"
+            "description": "Ajouter de nouveaux paramètres ou modifier les existants"
+        },
+        "viewParametersDialog": {
+            "title": "Paramètres de {{resourceName}}"
         },
         "resourceGroups": {
             "databasePools": "Pools de bases de données",
@@ -136,7 +139,8 @@
         "save": "Enregistrer les modifications",
         "cancelChanges": "Annuler les modifications",
         "change": "Changer",
-        "confirm": "Confirmer"
+        "confirm": "Confirmer",
+        "validate": "Valider"
     },
     "home": {
         "title": "Bienvenue sur la console d'administration web JQM",
@@ -193,7 +197,7 @@
         "noMatch": "Aucun rôle trouvé",
         "name": "Nom*",
         "permissions": "Permissions",
-        "clickToEditPermissions": "Cliquer pour éditer les permissions",
+        "editPermissionsTooltip": "Éditer les permissions",
         "hints": {
             "name": "Nom du rôle. Doit être unique.",
             "description": "Ce que fait le rôle.",
@@ -209,8 +213,7 @@
             "onObjectType": "Sur un objet de type",
             "addPermission": "Ajouter une permission",
             "code": "Code",
-            "objectType": "Type d'objet",
-            "validate": "Valider"
+            "objectType": "Type d'objet"
         },
         "permissionActions": {
             "read": "lire",
@@ -299,8 +302,8 @@
         "tracingEnabled": "Traçage activé",
         "persistent": "Persistant",
         "allowedRunners": "Exécuteurs autorisés",
-        "clickToEditHiddenClasses": "Cliquer pour modifier les classes cachées",
-        "clickToEditAllowedRunners": "Cliquer pour modifier les exécuteurs autorisés",
+        "editHiddenClassesTooltip": "Modifier les classes cachées",
+        "editAllowedRunnersTooltip": "Modifier les exécuteurs autorisés",
         "hints": {
             "name": "La clé utilisée pour identifier le chargeur de classes dans le descripteur de déploiement. Unique.",
             "childFirst": "Offre l'option d'avoir le chargement de classe enfant en premier. Parent en premier est la norme en JSE.",
@@ -320,15 +323,13 @@
             "description": "Une classe cachée est une regexp définissant les classes à ne jamais charger depuis le chargeur de classes parent.",
             "regexpLabel": "Regexp*",
             "addButton": "Ajouter",
-            "hiddenClassColumn": "Classe cachée",
-            "validate": "Valider"
+            "hiddenClassColumn": "Classe cachée"
         },
         "editAllowedRunnersDialog": {
             "title": "Modifier les exécuteurs autorisés",
             "runnerLabel": "Exécuteur*",
             "addButton": "Ajouter",
-            "allowedRunnerColumn": "Exécuteur autorisé",
-            "validate": "Valider"
+            "allowedRunnerColumn": "Exécuteur autorisé"
         },
         "messages": {
             "successCreate": "Chargeur de classes créé avec succès : {{name}}",
@@ -442,10 +443,11 @@
             "properties": "Propriétés spécifiques selon le type de job",
             "tags": "Tags optionnels pour la classification et les requêtes"
         },
-        "clickToEditProperties": "Cliquer pour modifier les propriétés spécifiques",
-        "clickToEditTags": "Cliquer pour modifier les tags",
-        "clickToEditParameters": "Cliquer pour modifier les paramètres",
-        "clickToEditSchedules": "Cliquer pour modifier les planifications",
+        "editPropertiesTooltip": "Modifier les propriétés spécifiques",
+        "editTagsTooltip": "Modifier les tags",
+        "editParametersTooltip": "Modifier les paramètres",
+        "editSchedulesTooltip": "Modifier les planifications",
+        "viewSchedulesTooltip": "Voir les planifications",
         "propertiesDisplay": {
             "pathToJar": "Chemin vers le fichier jar",
             "classToLaunch": "Classe à lancer",
@@ -508,16 +510,31 @@
             "valueColumn": "Valeur",
             "actionsColumn": "Actions"
         },
+        "editSchedulesParametersDialog": {
+            "title": "Modifier les paramètres",
+            "keyLabel": "Clé*",
+            "valueLabel": "Valeur",
+            "addParameter": "Ajouter un paramètre",
+            "keyColumn": "Clé",
+            "valueColumn": "Valeur",
+            "actionsColumn": "Actions"
+        },
         "editSchedulesDialog": {
             "title": "Modifier les planifications",
             "wikipediaHelp": "Aide Wikipedia sur cron",
             "cronExpressionLabel": "Expression cron*",
-            "queueOverrideLabel": "Surcharge de la file",
+            "queueOverrideLabel": "Surcharge de file",
             "addSchedule": "Ajouter une planification",
             "cronExpressionColumn": "Expression cron",
-            "queueOverrideColumn": "Surcharge de la file",
+            "queueOverrideColumn": "Surcharge de file",
             "parametersColumn": "Paramètres",
             "actionsColumn": "Actions"
+        },
+        "viewSchedulesDialog": {
+            "title": "Voir les planifications",
+            "cronExpressionColumn": "Expression cron",
+            "queueOverrideColumn": "Surcharge de file",
+            "parametersColumn": "Paramètres"
         },
         "messages": {
             "successCreate": "Définition de job {{name}} créée avec succès",
