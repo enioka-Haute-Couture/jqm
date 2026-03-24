@@ -253,7 +253,7 @@ export const EditSpecificPropertiesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("jndi.editParametersDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

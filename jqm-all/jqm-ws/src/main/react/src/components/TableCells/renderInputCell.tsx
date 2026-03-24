@@ -19,7 +19,7 @@ export const renderInputCell =
                 return (
                     <TextField
                         key={`${key}-edit`}
-                        defaultValue={defaultDescription}
+                        defaultValue={defaultDescription ?? ""}
                         inputRef={inputRef}
                         fullWidth
                         margin="normal"
@@ -43,7 +43,7 @@ export const renderInputCell =
 const getTextField = (key: string, value: string, inputType: string) => (
     <TextField
         key={key}
-        value={value}
+        value={value ?? ""}
         fullWidth
         margin="normal"
         InputProps={{ disableUnderline: true }}

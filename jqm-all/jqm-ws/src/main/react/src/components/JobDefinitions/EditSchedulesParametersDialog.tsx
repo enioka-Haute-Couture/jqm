@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-export const EditParametersDialog: React.FC<{
+export const EditSchedulesParametersDialog: React.FC<{
     closeDialog: () => void;
     parameters: Array<JobDefinitionParameter>;
     setParameters: (parameters: Array<JobDefinitionParameter>) => void;
@@ -49,12 +49,12 @@ export const EditParametersDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">{t("jobDefinitions.editParametersDialog.title")}</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("jobDefinitions.editSchedulesParametersDialog.title")}</DialogTitle>
             <DialogContent>
                 <>
                     <TextField
                         className={classes.TextField}
-                        label={t("jobDefinitions.editParametersDialog.keyLabel")}
+                        label={t("jobDefinitions.editSchedulesParametersDialog.keyLabel")}
                         value={key}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
@@ -66,7 +66,7 @@ export const EditParametersDialog: React.FC<{
                     />
                     <TextField
                         className={classes.TextField}
-                        label={t("jobDefinitions.editParametersDialog.valueLabel")}
+                        label={t("jobDefinitions.editSchedulesParametersDialog.valueLabel")}
                         value={value}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
@@ -97,15 +97,15 @@ export const EditParametersDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        {t("jobDefinitions.editParametersDialog.addParameter")}
+                        {t("jobDefinitions.editSchedulesParametersDialog.addParameter")}
                     </Button>
                     <TableContainer component={Paper}>
                         <Table size="small" aria-label="Parameters">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>{t("jobDefinitions.editParametersDialog.keyColumn")}</TableCell>
-                                    <TableCell>{t("jobDefinitions.editParametersDialog.valueColumn")}</TableCell>
-                                    <TableCell>{t("jobDefinitions.editParametersDialog.actionsColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesParametersDialog.keyColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesParametersDialog.valueColumn")}</TableCell>
+                                    <TableCell>{t("jobDefinitions.editSchedulesParametersDialog.actionsColumn")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -156,7 +156,7 @@ export const EditParametersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("jndi.editParametersDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

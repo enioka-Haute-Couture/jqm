@@ -136,7 +136,7 @@ export const EditAllowedRunnersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    {t("classLoaders.editAllowedRunnersDialog.validate")}
+                    {t("common.validate")}
                 </Button>
             </DialogActions>
         </Dialog>

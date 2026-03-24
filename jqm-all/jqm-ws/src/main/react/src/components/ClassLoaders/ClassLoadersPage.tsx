@@ -137,7 +137,7 @@ const ClassLoadersPage: React.FC = () => {
                 sort: true,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    t("classLoaders.clickToEditHiddenClasses"),
+                    t("classLoaders.editHiddenClassesTooltip"),
                     hiddenClasses,
                     (value: string) => value,
                     setEditHiddenClassesClId
@@ -181,7 +181,7 @@ const ClassLoadersPage: React.FC = () => {
                 sort: true,
                 customBodyRender: renderDialogCell(
                     editingRowId,
-                    t("classLoaders.clickToEditAllowedRunners"),
+                    t("classLoaders.editAllowedRunnersTooltip"),
                     allowedRunners,
                     (value: string) => value,
                     setEditAllowedRunnersClId
@@ -229,13 +229,11 @@ const ClassLoadersPage: React.FC = () => {
                                 <AddCircleIcon />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title={t("common.add")}>
-                            <CreateClassLoaderDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createClassLoader={createClassLoader}
-                            />
-                        </Tooltip>
+                        <CreateClassLoaderDialog
+                            showDialog={showDialog}
+                            closeDialog={() => setShowDialog(false)}
+                            createClassLoader={createClassLoader}
+                        />
                     </>}
                 <Tooltip title={t("common.refresh")}>
                     <IconButton

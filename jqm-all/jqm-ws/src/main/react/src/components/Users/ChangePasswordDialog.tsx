@@ -25,7 +25,7 @@ export const ChangePasswordDialog: React.FC<{
         >
             <DialogTitle id="form-dialog-title">{t("users.changePasswordDialog.title")}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
+                <DialogContentText style={{ marginBottom: "8px" }}>
                     {t("users.changePasswordDialog.description")}
                 </DialogContentText>
                 <TextField
