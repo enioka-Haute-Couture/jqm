@@ -15,6 +15,10 @@
  */
 package com.enioka.jqm.integration.tests;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +65,7 @@ import org.testcontainers.DockerClientFactory;
 public class JqmBaseTest
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
+    private static final String TESTCONTAINER_RESOURCE_FILE = "resources-testcontainer.xml";
 
     protected static Db db;
 
@@ -104,6 +109,7 @@ public class JqmBaseTest
         }
 
         System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
+        configureResourceFiles(dbType);
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
     }
 
@@ -144,13 +150,15 @@ public class JqmBaseTest
         switch (dbType.toLowerCase())
         {
         case "postgresql":
-            dbContainer = new PostgreSQLContainer<>("postgres:" + dbVersion);
+            dbContainer = new PostgreSQLContainer<>("postgres:" + dbVersion).withDatabaseName("jqm").withUsername("jqm")
+                    .withPassword("jqm");
             break;
         case "mysql":
-            dbContainer = new MySQLContainer<>("mysql:" + dbVersion);
+            dbContainer = new MySQLContainer<>("mysql:" + dbVersion).withDatabaseName("jqm").withUsername("jqm").withPassword("jqm");
             break;
         case "mariadb":
-            dbContainer = new MariaDBContainer<>("mariadb:" + dbVersion);
+            dbContainer = new MariaDBContainer<>("mariadb:" + dbVersion).withDatabaseName("jqm").withUsername("jqm")
+                    .withPassword("jqm");
             break;
         case "hsqldb":
             return;
@@ -160,6 +168,87 @@ public class JqmBaseTest
 
         dbContainer.start();
         jqmlogger.info("Testcontainer started for {} version {}", dbType, dbVersion);
+    }
+
+    private static void configureResourceFiles(String dbType)
+    {
+        if (dbType == null || "hsqldb".equalsIgnoreCase(dbType))
+        {
+            System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml");
+            return;
+        }
+
+        try
+        {
+            writeTestcontainerResourceFile(dbType.toLowerCase());
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException("Could not write dynamic JNDI resource file for testcontainers", e);
+        }
+
+        System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml," + TESTCONTAINER_RESOURCE_FILE);
+    }
+
+    private static void writeTestcontainerResourceFile(String dbType) throws IOException
+    {
+        if (dbContainer == null || !dbContainer.isRunning())
+        {
+            throw new IllegalStateException("Cannot create dynamic JNDI resources without a running database container");
+        }
+
+        String validationQuery;
+        switch (dbType)
+        {
+        case "postgresql":
+            validationQuery = "SELECT 1";
+            break;
+        case "mysql":
+        case "mariadb":
+            validationQuery = "SELECT version()";
+            break;
+        default:
+            throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
+        }
+
+        String xml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+            "<resources>" +
+            "   <resource" +
+            "       name=\"jdbc/" + dbType + "\"" +
+            "       auth=\"Container\"" +
+            "       type=\"javax.sql.DataSource\"" +
+            "       factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\"" +
+            "       testWhileIdle=\"true\"" +
+            "       testOnBorrow=\"true\"" +
+            "       testOnReturn=\"false\"" +
+            "       validationQuery=\"" + validationQuery + "\"" +
+            "       validationInterval=\"1000\"" +
+            "       timeBetweenEvictionRunsMillis=\"1000\"" +
+            "       maxActive=\"80\"" +
+            "       maxIdle=\"40\"" +
+            "       minIdle=\"3\"" +
+            "       maxWait=\"10000\"" +
+            "       initialSize=\"5\"" +
+            "       removeAbandonedTimeout=\"3600\"" +
+            "       removeAbandoned=\"true\"" +
+            "       logAbandoned=\"true\"" +
+            "       minEvictableIdleTimeMillis=\"60000\"" +
+            "       jmxEnabled=\"true\"" +
+            "       username=\"" + escapeXmlAttribute(dbContainer.getUsername()) + "\"" +
+            "       password=\"" + escapeXmlAttribute(dbContainer.getPassword()) + "\"" +
+            "       url=\"" + escapeXmlAttribute(dbContainer.getJdbcUrl()) + "\"" +
+            "       singleton=\"true\" />" +
+            "</resources>\n";
+
+        Path output = Path.of("target", "test-classes", TESTCONTAINER_RESOURCE_FILE);
+        Files.createDirectories(output.getParent());
+        Files.writeString(output, xml, StandardCharsets.UTF_8);
+    }
+
+    private static String escapeXmlAttribute(String value)
+    {
+        return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     @Before
