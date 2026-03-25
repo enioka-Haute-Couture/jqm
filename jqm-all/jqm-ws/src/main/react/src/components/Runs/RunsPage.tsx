@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
     Button,
+    Checkbox,
     Container,
     Divider,
+    FormControlLabel,
+    FormGroup,
     Grid,
     IconButton,
     Stack,
+    TextField,
     ToggleButton,
     ToggleButtonGroup,
     Tooltip,
@@ -474,16 +478,18 @@ const RunsPage: React.FC = () => {
                     return <>
                         {!queryLiveInstances && canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) && (
                             <Tooltip key={"Relaunch"} title={t("runs.tooltips.relaunch")}>
-                                <IconButton
-                                    color="default"
-                                    aria-label={t("runs.tooltips.relaunch")}
-                                    onClick={() => {
-                                        relaunchJob(jobInstanceId);
-                                    }}
-                                    disabled={status === "CANCELLED"}
-                                    size="small">
-                                    <ReplayIcon />
-                                </IconButton>
+                                <span>
+                                    <IconButton
+                                        color="default"
+                                        aria-label={t("runs.tooltips.relaunch")}
+                                        onClick={() => {
+                                            relaunchJob(jobInstanceId);
+                                        }}
+                                        disabled={status === "CANCELLED"}
+                                        size="small">
+                                        <ReplayIcon />
+                                    </IconButton>
+                                </span>
                             </Tooltip>
                         )}
                         {queryLiveInstances && (
@@ -492,16 +498,18 @@ const RunsPage: React.FC = () => {
                                     (
                                         <>
                                             <Tooltip key={"Kill"} title={t("runs.tooltips.kill")}>
-                                                <IconButton
-                                                    color="default"
-                                                    aria-label={t("runs.tooltips.kill")}
-                                                    onClick={() => {
-                                                        killJob(jobInstanceId);
-                                                    }}
-                                                    disabled={status === "HOLDED"}
-                                                    size="small">
-                                                    <StopIcon />
-                                                </IconButton>
+                                                <span>
+                                                    <IconButton
+                                                        color="default"
+                                                        aria-label={t("runs.tooltips.kill")}
+                                                        onClick={() => {
+                                                            killJob(jobInstanceId);
+                                                        }}
+                                                        disabled={status === "HOLDED"}
+                                                        size="small">
+                                                        <StopIcon />
+                                                    </IconButton>
+                                                </span>
                                             </Tooltip>
                                             {status === "HOLDED" ? (
                                                 <Tooltip
@@ -811,6 +819,49 @@ const RunsPage: React.FC = () => {
                     <ToggleButton value={false}>{t("runs.toolbar.ended")}</ToggleButton>
                     <ToggleButton value={true}>{t("runs.toolbar.active")}</ToggleButton>
                 </ToggleButtonGroup>
+                <FormGroup style={{ display: 'inline' }}>
+                    <FormControlLabel
+                        style={{ margin: 0, }}
+                        sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
+                        control={<Checkbox
+                            checked={filterList[3] ? filterList[3].includes(queryLiveInstances ? "RUNNING" : "CRASHED") : false}
+                            onChange={(_, checked) => {
+                                filterList[3] = checked ? [queryLiveInstances ? "RUNNING" : "CRASHED"] : [];
+                                fetchJobInstances(
+                                    0,
+                                    rowsPerPage,
+                                    sortOrder,
+                                    queryLiveInstances,
+                                    filterList!
+                                );
+                            }}
+                            sx={{ '& .MuiSvgIcon-root': { fontSize: 18 } }}
+
+                        />}
+                        label={queryLiveInstances ? t("runs.filterLabels.runningOnly") : t("runs.filterLabels.crashedOnly")}
+                    />
+                </FormGroup>
+                <TextField
+                    value={filterList[1]?.[0] ?? ''}
+                    onChange={(evnt) => {
+                        if (!evnt.target.value) {
+                            filterList[1] = [];
+                        } else {
+                            filterList[1] = [evnt.target.value];
+                        }
+                        fetchJobInstances(
+                            0,
+                            rowsPerPage,
+                            sortOrder,
+                            queryLiveInstances,
+                            filterList!
+                        );
+                    }}
+                    size="small"
+                    sx={{ display: 'inline-block', marginTop: '4px', marginBottom: 0, marginLeft: "8px" }}
+                    label={t("runs.applicationName")}
+                    variant="outlined"
+                />
                 {canUserAccess(PermissionObjectType.job_instance, PermissionAction.create) &&
                     <Tooltip title={t("runs.tooltips.newLaunch")}>
                         <IconButton

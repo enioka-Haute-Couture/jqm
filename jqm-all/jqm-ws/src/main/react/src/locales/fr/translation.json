@@ -574,7 +574,9 @@
         },
         "filterLabels": {
             "enqueuedAfter": "Mis en file après",
-            "enqueuedBefore": "Mis en file avant"
+            "enqueuedBefore": "Mis en file avant",
+            "runningOnly": "En cours uniquement",
+            "crashedOnly": "Échoués uniquement"
         },
         "tooltips": {
             "relaunch": "Relancer",
