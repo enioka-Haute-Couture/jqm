@@ -557,7 +557,9 @@
         },
         "filterLabels": {
             "enqueuedAfter": "Enqueued after",
-            "enqueuedBefore": "Enqueued before"
+            "enqueuedBefore": "Enqueued before",
+            "runningOnly": "Running only",
+            "crashedOnly": "Crashed only"
         },
         "tooltips": {
             "relaunch": "Relaunch",
