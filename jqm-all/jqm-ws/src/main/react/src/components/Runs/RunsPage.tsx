@@ -256,12 +256,15 @@ const RunsPage: React.FC = () => {
                         if (value === "SUBMITTED") {
                             color = "#ff8c00";
                         }
-                        // Other colors used ?
 
                         return (
                             <Typography
                                 style={{
-                                    color: color,
+                                    display: "inline-block",
+                                    padding: "4px 8px",
+                                    borderRadius: "4px",
+                                    backgroundColor: color,
+                                    color: color ? 'white' : 'black'
                                 }}
                             >
                                 {value}
