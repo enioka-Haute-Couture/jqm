@@ -228,17 +228,16 @@ const RunsPage: React.FC = () => {
                 sort: true,
                 filterList: filterList[3],
                 filterOptions: {
-                    names: [
+                    names: queryLiveInstances ? [
                         "ATTRIBUTED",
-                        "CRASHED",
-                        "CANCELLED",
                         "RUNNING",
-                        "ENDED",
-                        "KILLED",
                         "HOLDED",
                         "SUBMITTED",
                         "SCHEDULED",
-                    ],
+                    ] : ["CRASHED",
+                        "CANCELLED",
+                        "ENDED",
+                        "KILLED",],
                 },
                 customBodyRender: (value: any) => {
                     if (value) {
@@ -795,6 +794,9 @@ const RunsPage: React.FC = () => {
                     exclusive
                     onChange={(_, value) => {
                         if (value !== null) {
+                            // Reset status filter since statuses are different between live and ended job instances
+                            filterList[3] = [];
+
                             fetchJobInstances(
                                 0,
                                 rowsPerPage,
