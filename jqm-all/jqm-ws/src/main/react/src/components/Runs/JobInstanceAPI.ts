@@ -70,8 +70,12 @@ export const useJobInstanceAPI = () => {
                 filterQuery.statuses = [newFilterList[3][0]];
             }
             if (newFilterList[4]?.length > 0) {
-                filterQuery.enqueuedAfter = new Date(newFilterList[4][0]);
-                filterQuery.enqueuedBefore = new Date(newFilterList[4][1]);
+                if (newFilterList[4][0]) {
+                    filterQuery.enqueuedAfter = new Date(newFilterList[4][0]);
+                }
+                if (newFilterList[4][1]) {
+                    filterQuery.enqueuedBefore = new Date(newFilterList[4][1]);
+                }
             }
             if (newFilterList[8]?.length > 0) {
                 filterQuery.user = newFilterList[8][0];

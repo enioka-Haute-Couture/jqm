@@ -37,7 +37,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
-import { DatePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import { format, isValid, parseISO } from "date-fns";
 import { JobInstanceDetailsDialog } from "./JobInstanceDetailsDialog";
 import { LaunchFormDialog } from "./LaunchFormDialog";
@@ -296,10 +296,10 @@ const RunsPage: React.FC = () => {
                         let filterChips = [];
 
                         if (v[0] && isValid(parseISO(v[0]))) {
-                            filterChips.push(`${t("runs.filterLabels.enqueuedAfter")}: ${format(parseISO(v[0]), 'yyyy-MM-dd')}`);
+                            filterChips.push(`${t("runs.filterLabels.enqueuedAfter")}: ${format(parseISO(v[0]), 'yyyy-MM-dd HH:mm')}`);
                         }
                         if (v[1] && isValid(parseISO(v[1]))) {
-                            filterChips.push(`${t("runs.filterLabels.enqueuedBefore")}: ${format(parseISO(v[1]), 'yyyy-MM-dd')}`);
+                            filterChips.push(`${t("runs.filterLabels.enqueuedBefore")}: ${format(parseISO(v[1]), 'yyyy-MM-dd HH:mm')}`);
                         }
                         return filterChips;
                     },
@@ -328,10 +328,10 @@ const RunsPage: React.FC = () => {
                         filterData: MUIDataTableState["filterData"]) => {
 
                         return <Stack direction="row" spacing={2}>
-                            <DatePicker
+                            <DateTimePicker
                                 sx={{ flexGrow: 1 }}
                                 label={t("runs.filterLabels.enqueuedAfter")}
-                                format="dd/MM/yyyy"
+                                format="dd/MM/yyyy HH:mm"
                                 slotProps={{ field: { clearable: true } }}
                                 value={(filterList[index].length === 0 || !filterList[index][0]) ? null : new Date(filterList[index][0])}
                                 onChange={(date) => {
@@ -344,10 +344,10 @@ const RunsPage: React.FC = () => {
                                     }
                                 }}
                             />
-                            <DatePicker
+                            <DateTimePicker
                                 sx={{ flexGrow: 1 }}
                                 label={t("runs.filterLabels.enqueuedBefore")}
-                                format="dd/MM/yyyy"
+                                format="dd/MM/yyyy HH:mm"
                                 slotProps={{ field: { clearable: true } }}
                                 value={(filterList[index].length !== 2 || !filterList[index][1]) ? null : new Date(filterList[index][1])}
                                 onChange={(date) => {
