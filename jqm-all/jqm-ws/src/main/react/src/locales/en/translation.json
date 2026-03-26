@@ -571,7 +571,8 @@
             "logStdout": "Log stdout",
             "logStderr": "Log stderr",
             "newLaunch": "New launch form",
-            "refresh": "Refresh"
+            "refresh": "Refresh",
+            "firstPage": "First page"
         },
         "toolbar": {
             "ended": "Ended",
