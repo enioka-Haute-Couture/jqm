@@ -588,7 +588,8 @@
             "logStdout": "Journal stdout",
             "logStderr": "Journal stderr",
             "newLaunch": "Nouveau formulaire de lancement",
-            "refresh": "Rafraîchir"
+            "refresh": "Rafraîchir",
+            "firstPage": "Première page"
         },
         "toolbar": {
             "ended": "Terminées",

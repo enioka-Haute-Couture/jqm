@@ -9,12 +9,17 @@ import {
     Grid,
     IconButton,
     Stack,
+    TableCell,
+    TableFooter,
+    TableRow,
     TextField,
     ToggleButton,
     ToggleButtonGroup,
     Tooltip,
     Typography,
 } from "@mui/material";
+import MuiTablePagination from "@mui/material/TablePagination";
+
 
 import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { DisplayData, FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
@@ -31,6 +36,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import ReplayIcon from "@mui/icons-material/Replay";
 import FlipCameraAndroidIcon from "@mui/icons-material/FlipCameraAndroid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
 import { DatePicker } from "@mui/x-date-pickers";
 import { format, isValid, parseISO } from "date-fns";
 import { JobInstanceDetailsDialog } from "./JobInstanceDetailsDialog";
@@ -890,6 +896,43 @@ const RunsPage: React.FC = () => {
                 </Tooltip>
             </>;
         },
+        customFooter: (count: number, page: number, rowsPerPage: number, changeRowsPerPage: (page: string | number) => void, changePage: (newPage: number) => void, textLabels: any) => {
+            const footerStyle = {
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '0px 24px 0px 24px'
+            };
+
+            return <TableFooter>
+                <TableRow>
+                    <TableCell style={footerStyle} colSpan={1000}>
+                        <MuiTablePagination
+                            component="div"
+                            count={count}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            labelRowsPerPage={textLabels.rowsPerPage}
+                            labelDisplayedRows={({ from, to, count }) => `${from}-${to} ${textLabels.displayRows} ${count}`}
+                            rowsPerPageOptions={[10, 20, 100]}
+                            onPageChange={(_, newPage) => changePage(newPage)}
+                            onRowsPerPageChange={(event) => changeRowsPerPage(event.target.value)}
+                        />
+                        <Tooltip title={t("runs.tooltips.firstPage")}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                                <IconButton
+                                    onClick={() => changePage(0)}
+                                    disabled={page === 0}
+                                    aria-label={t("runs.tooltips.firstPage")}
+                                    sx={{ color: 'black' }}
+                                >
+                                    <FirstPageIcon />
+                                </IconButton>
+                            </span>
+                        </Tooltip>
+                    </TableCell>
+                </TableRow>
+            </TableFooter>
+        }
     };
 
 
