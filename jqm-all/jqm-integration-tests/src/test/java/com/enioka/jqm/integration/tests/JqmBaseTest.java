@@ -141,22 +141,29 @@ public class JqmBaseTest
         {
             dbType = "postgresql";
         }
-        if (dbVersion == null || dbVersion.isEmpty())
-        {
-            dbVersion = "15-alpine";
-        }
-
         jqmlogger.info("Starting testcontainer for {} version {}", dbType, dbVersion);
         switch (dbType.toLowerCase())
         {
         case "postgresql":
+            if (dbVersion == null || dbVersion.isEmpty())
+            {
+                dbVersion = "15-alpine";
+            }
             dbContainer = new PostgreSQLContainer<>("postgres:" + dbVersion).withDatabaseName("jqm").withUsername("jqm")
                     .withPassword("jqm");
             break;
         case "mysql":
+            if (dbVersion == null || dbVersion.isEmpty())
+            {
+                dbVersion = "8";
+            }
             dbContainer = new MySQLContainer<>("mysql:" + dbVersion).withDatabaseName("jqm").withUsername("jqm").withPassword("jqm");
             break;
         case "mariadb":
+            if (dbVersion == null || dbVersion.isEmpty())
+            {
+                dbVersion = "10";
+            }
             dbContainer = new MariaDBContainer<>("mariadb:" + dbVersion).withDatabaseName("jqm").withUsername("jqm")
                     .withPassword("jqm");
             break;
