@@ -205,13 +205,19 @@ public class JqmBaseTest
         }
 
         String validationQuery;
+        String driverClassName;
         switch (dbType)
         {
         case "postgresql":
             validationQuery = "SELECT 1";
+            driverClassName = "org.postgresql.Driver";
             break;
         case "mysql":
+            driverClassName = "com.mysql.cj.jdbc.Driver";
+            validationQuery = "SELECT version()";
+            break;
         case "mariadb":
+            driverClassName = "org.mariadb.jdbc.Driver";
             validationQuery = "SELECT version()";
             break;
         default:
@@ -227,21 +233,21 @@ public class JqmBaseTest
                 "       type=\"javax.sql.DataSource\"" +
                 "       factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\"" +
                 "       testWhileIdle=\"true\"" +
-                "       testOnBorrow=\"true\"" +
-                "       testOnReturn=\"false\"" +
+                "       testOnBorrow=\"false\"" +
+                "       testOnReturn=\"true\"" +
                 "       validationQuery=\"" + validationQuery + "\"" +
                 "       validationInterval=\"1000\"" +
-                "       timeBetweenEvictionRunsMillis=\"1000\"" +
-                "       maxActive=\"80\"" +
-                "       maxIdle=\"40\"" +
-                "       minIdle=\"3\"" +
-                "       maxWait=\"10000\"" +
+                "       timeBetweenEvictionRunsMillis=\"60000\"" +
+                "       maxActive=\"100\"" +
+                "       minIdle=\"2\"" +
+                "       maxWait=\"30000\"" +
                 "       initialSize=\"5\"" +
                 "       removeAbandonedTimeout=\"3600\"" +
                 "       removeAbandoned=\"true\"" +
                 "       logAbandoned=\"true\"" +
                 "       minEvictableIdleTimeMillis=\"60000\"" +
                 "       jmxEnabled=\"true\"" +
+                "       driverClassName=\"" + driverClassName + "\"" +
                 "       username=\"" + escapeXmlAttribute(dbContainer.getUsername()) + "\"" +
                 "       password=\"" + escapeXmlAttribute(dbContainer.getPassword()) + "\"" +
                 "       url=\"" + escapeXmlAttribute(dbContainer.getJdbcUrl()) + "\"" +
