@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Container, Grid, IconButton, Tooltip } from "@mui/material";
+import { Box, Container, Grid, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import DescriptionIcon from "@mui/icons-material/Description";
+import TerminalIcon from "@mui/icons-material/Terminal";
 import { useTranslation } from "react-i18next";
 import { differenceInMinutes } from "date-fns";
 import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
@@ -39,6 +39,7 @@ export const NodesPage: React.FC = () => {
     const [loadApiClient, setLoadApiClient] = useState<boolean | null>(null);
     const [loapApiSimple, setLoapApiSimple] = useState<boolean | null>(null);
     const [enabled, setEnabled] = useState<boolean | null>(null);
+    const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
     const { canUserAccess } = useAuth();
 
@@ -106,13 +107,24 @@ export const NodesPage: React.FC = () => {
         [updateNode, loadApiAdmin, loadApiClient, loapApiSimple, enabled]
     );
 
-    const handleOnCancel = useCallback(() => setEditingRowId(null), []);
+    const handleOnCancel = useCallback(() => {
+        setEditingRowId(null);
+    }, []);
+
     const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setEnabled(tableMeta.rowData[11]);
         setLoapApiSimple(tableMeta.rowData[12]);
         setLoadApiClient(tableMeta.rowData[13]);
         setLoadApiAdmin(tableMeta.rowData[14]);
         setEditingRowId(tableMeta.rowIndex);
+        // Expand the row when editing to show all editable fields
+        setExpandedRows((prev) => {
+            const current = prev || [];
+            if (!current.includes(tableMeta.rowIndex)) {
+                return [...current, tableMeta.rowIndex];
+            }
+            return current;
+        });
     }, []);
 
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
@@ -181,6 +193,7 @@ export const NodesPage: React.FC = () => {
                 hint: t("nodes.hints.outputDirectory"),
                 filter: true,
                 sort: true,
+                display: false,
                 customBodyRender: renderInputCell(
                     outputDirInputRef,
                     editingRowId,
@@ -195,6 +208,7 @@ export const NodesPage: React.FC = () => {
                 hint: t("nodes.hints.jobRepoDirectory"),
                 filter: true,
                 sort: true,
+                display: false,
                 customBodyRender: renderInputCell(
                     repoDirInputRef,
                     editingRowId,
@@ -208,6 +222,7 @@ export const NodesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                display: false,
                 customBodyRender: renderInputCell(
                     tmpDirInputRef,
                     editingRowId,
@@ -222,6 +237,7 @@ export const NodesPage: React.FC = () => {
                 hint: t("nodes.hints.rootLogLevel"),
                 filter: true,
                 sort: true,
+                display: false,
                 customBodyRender: renderInputCell(
                     logLevelInputRef,
                     editingRowId
@@ -235,6 +251,7 @@ export const NodesPage: React.FC = () => {
                 hint: t("nodes.hints.jmxRegistryPort"),
                 filter: true,
                 sort: true,
+                display: false,
                 customBodyRender: renderInputCell(
                     registryPortInputRef,
                     editingRowId,
@@ -249,6 +266,7 @@ export const NodesPage: React.FC = () => {
                 hint: t("nodes.hints.jmxServerPort"),
                 filter: true,
                 sort: true,
+                display: false,
                 customBodyRender: renderInputCell(
                     serverPortInputRef,
                     editingRowId,
@@ -360,7 +378,7 @@ export const NodesPage: React.FC = () => {
                         [
                             {
                                 title: t("nodes.viewNodeLogs"),
-                                addIcon: () => <DescriptionIcon />,
+                                addIcon: () => <TerminalIcon />,
                                 action: handleOnViewLogs,
                             },
                         ],
@@ -377,6 +395,98 @@ export const NodesPage: React.FC = () => {
         download: false,
         print: false,
         selectableRows: "none" as SelectableRows,
+        expandableRows: true,
+        expandableRowsHeader: true,
+        expandableRowsOnClick: false,
+        rowsExpanded: expandedRows,
+        onRowExpansionChange: (currentRowsExpanded: any, allRowsExpanded: any, rowsExpanded: any) => {
+            const expandedIndices = allRowsExpanded.map((row: any) => row.dataIndex);
+
+            // rows can be edited only when expanded
+            if (editingRowId !== null && !expandedIndices.includes(editingRowId)) {
+                setEditingRowId(null);
+            }
+
+            setExpandedRows(expandedIndices);
+        },
+        renderExpandableRow: (rowData: string[], rowMeta: { dataIndex: number; rowIndex: number }) => {
+            return (
+                <TableRow>
+                    <TableCell colSpan={rowData.length + 1}>
+                        <Table size="small" sx={{ ml: 4, maxWidth: '80%' }}>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell component="th" sx={{ width: '25%' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2">{t("nodes.outputDirectory")}</Typography>
+                                            <Tooltip title={t("nodes.hints.outputDirectory")}>
+                                                <HelpIcon fontSize="small" sx={{ color: 'black' }} />
+                                            </Tooltip>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{rowData[5]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell component="th">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2">{t("nodes.jobRepoDirectory")}</Typography>
+                                            <Tooltip title={t("nodes.hints.jobRepoDirectory")}>
+                                                <HelpIcon fontSize="small" sx={{ color: 'black' }} />
+                                            </Tooltip>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{rowData[6]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell component="th">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2">{t("nodes.tmpDirectory")}</Typography>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{rowData[7]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell component="th">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2">{t("nodes.rootLogLevel")}</Typography>
+                                            <Tooltip title={t("nodes.hints.rootLogLevel")}>
+                                                <HelpIcon fontSize="small" sx={{ color: 'black' }} />
+                                            </Tooltip>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>
+                                        {rowData[8]}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell component="th">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2">{t("nodes.jmxRegistryPort")}</Typography>
+                                            <Tooltip title={t("nodes.hints.jmxRegistryPort")}>
+                                                <HelpIcon fontSize="small" sx={{ color: 'black' }} />
+                                            </Tooltip>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{rowData[9]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell component="th">
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2">{t("nodes.jmxServerPort")}</Typography>
+                                            <Tooltip title={t("nodes.hints.jmxServerPort")}>
+                                                <HelpIcon fontSize="small" sx={{ color: 'black' }} />
+                                            </Tooltip>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{rowData[10]}</TableCell>
+                                </TableRow>
+
+                            </TableBody>
+                        </Table>
+                    </TableCell>
+                </TableRow>
+            );
+        },
         customToolbar: () => {
             return <>
                 <Tooltip title={t("common.refresh")}>
