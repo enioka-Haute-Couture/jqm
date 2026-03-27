@@ -212,34 +212,34 @@ public class JqmBaseTest
         }
 
         String xml =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
-            "<resources>" +
-            "   <resource" +
-            "       name=\"jdbc/" + dbType + "\"" +
-            "       auth=\"Container\"" +
-            "       type=\"javax.sql.DataSource\"" +
-            "       factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\"" +
-            "       testWhileIdle=\"true\"" +
-            "       testOnBorrow=\"true\"" +
-            "       testOnReturn=\"false\"" +
-            "       validationQuery=\"" + validationQuery + "\"" +
-            "       validationInterval=\"1000\"" +
-            "       timeBetweenEvictionRunsMillis=\"1000\"" +
-            "       maxActive=\"80\"" +
-            "       maxIdle=\"40\"" +
-            "       minIdle=\"3\"" +
-            "       maxWait=\"10000\"" +
-            "       initialSize=\"5\"" +
-            "       removeAbandonedTimeout=\"3600\"" +
-            "       removeAbandoned=\"true\"" +
-            "       logAbandoned=\"true\"" +
-            "       minEvictableIdleTimeMillis=\"60000\"" +
-            "       jmxEnabled=\"true\"" +
-            "       username=\"" + escapeXmlAttribute(dbContainer.getUsername()) + "\"" +
-            "       password=\"" + escapeXmlAttribute(dbContainer.getPassword()) + "\"" +
-            "       url=\"" + escapeXmlAttribute(dbContainer.getJdbcUrl()) + "\"" +
-            "       singleton=\"true\" />" +
-            "</resources>\n";
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+                "<resources>" +
+                "   <resource" +
+                "       name=\"jdbc/" + dbType + "\"" +
+                "       auth=\"Container\"" +
+                "       type=\"javax.sql.DataSource\"" +
+                "       factory=\"org.apache.tomcat.jdbc.pool.DataSourceFactory\"" +
+                "       testWhileIdle=\"true\"" +
+                "       testOnBorrow=\"true\"" +
+                "       testOnReturn=\"false\"" +
+                "       validationQuery=\"" + validationQuery + "\"" +
+                "       validationInterval=\"1000\"" +
+                "       timeBetweenEvictionRunsMillis=\"1000\"" +
+                "       maxActive=\"80\"" +
+                "       maxIdle=\"40\"" +
+                "       minIdle=\"3\"" +
+                "       maxWait=\"10000\"" +
+                "       initialSize=\"5\"" +
+                "       removeAbandonedTimeout=\"3600\"" +
+                "       removeAbandoned=\"true\"" +
+                "       logAbandoned=\"true\"" +
+                "       minEvictableIdleTimeMillis=\"60000\"" +
+                "       jmxEnabled=\"true\"" +
+                "       username=\"" + escapeXmlAttribute(dbContainer.getUsername()) + "\"" +
+                "       password=\"" + escapeXmlAttribute(dbContainer.getPassword()) + "\"" +
+                "       url=\"" + escapeXmlAttribute(dbContainer.getJdbcUrl()) + "\"" +
+                "       singleton=\"true\" />" +
+                "</resources>\n";
 
         Path output = Path.of("target", "test-classes", TESTCONTAINER_RESOURCE_FILE);
         Files.createDirectories(output.getParent());
@@ -431,8 +431,14 @@ public class JqmBaseTest
         }
         else
         {
+            jqmlogger.info("DB is going down (pausing container)");
+            jqmlogger.info(dbContainer.getJdbcUrl());
             String containerId = dbContainer.getContainerId();
-            DockerClientFactory.instance().client().restartContainerCmd(containerId).exec();
+            DockerClientFactory.instance().client().pauseContainerCmd(containerId).exec();
+            this.sleep(delay);
+            DockerClientFactory.instance().client().unpauseContainerCmd(containerId).exec();
+            this.sleep(delay);
+            jqmlogger.info("DB is now fully up");
         }
     }
 

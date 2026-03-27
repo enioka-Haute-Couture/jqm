@@ -21,8 +21,8 @@ public class DbFailTest extends JqmBaseTest
     public void testDbFailure() throws Exception
     {
         this.addAndStartEngine();
-        this.simulateDbFailure(2);
         jqmlogger.info("Restarting DB");
+        this.simulateDbFailure(5);
         Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
