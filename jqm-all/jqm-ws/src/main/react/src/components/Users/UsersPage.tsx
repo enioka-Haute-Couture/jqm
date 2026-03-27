@@ -72,34 +72,6 @@ const UsersPage: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canUserAccess, t]);
 
-    const updateRow = useCallback(
-        (id: number) => {
-            if (!editingRowId) {
-                return;
-            }
-            const { value: login } = loginInputRef.current!;
-            const { value: email } = emailInputRef.current!;
-            const { value: fullName } = fullNameInputRef.current!;
-            if (
-                id &&
-                login &&
-                locked != null &&
-                userRoles != null
-            ) {
-                updateUser({
-                    id: id,
-                    login: login,
-                    email: email,
-                    freeText: fullName,
-                    locked: locked,
-                    expirationDate: expirationDate!!,
-                    roles: userRoles!!,
-                }).then(() => setEditingRowId(null));
-            }
-        },
-        [updateUser, editingRowId, locked, expirationDate, userRoles]
-    );
-
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
             const [userId] = tableMeta.rowData;
@@ -111,9 +83,27 @@ const UsersPage: React.FC = () => {
     const handleOnSave = useCallback(
         (tableMeta: MUIDataTableMeta) => {
             const [userId] = tableMeta.rowData;
-            updateRow(userId);
+            const { value: login } = loginInputRef.current!;
+            const { value: email } = emailInputRef.current!;
+            const { value: fullName } = fullNameInputRef.current!;
+            if (
+                userId != null &&
+                login &&
+                locked != null &&
+                userRoles != null
+            ) {
+                updateUser({
+                    id: userId,
+                    login: login,
+                    email: email,
+                    freeText: fullName,
+                    locked: locked,
+                    expirationDate: expirationDate!!,
+                    roles: userRoles!!,
+                }).then(() => setEditingRowId(null));
+            }
         },
-        [updateRow]
+        [updateUser, editingRowId, locked, expirationDate, userRoles]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);

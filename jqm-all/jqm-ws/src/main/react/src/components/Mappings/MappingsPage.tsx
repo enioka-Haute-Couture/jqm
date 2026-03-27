@@ -88,11 +88,11 @@ const MappingsPage: React.FC = () => {
             const nodeName = nodes?.find((x) => x.id === nodeId)?.name;
             const queueName = queues?.find((x) => x.id === queueId)?.name;
             if (
-                mappingId &&
+                mappingId != null &&
                 pollingInterval &&
                 nbThread &&
-                nodeId &&
-                queueId &&
+                nodeId != null &&
+                queueId != null &&
                 queueName &&
                 nodeName
             ) {

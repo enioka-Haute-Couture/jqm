@@ -119,7 +119,7 @@ export const JobDefinitionsPage: React.FC = () => {
             const { value: applicationName } = applicationNameInputRef.current!;
             const { value: description } = descriptionInputRef.current!;
 
-            if (jobDefinitionId && applicationName && queueId) {
+            if (jobDefinitionId != null && applicationName && queueId) {
                 updateJobDefinition({
                     id: jobDefinitionId,
                     applicationName: applicationName,

@@ -63,7 +63,7 @@ const QueuesPage: React.FC = () => {
                 });
                 return;
             }
-            if (queueId && name) {
+            if (queueId != null && name) {
                 updateQueue({
                     id: queueId,
                     name,
