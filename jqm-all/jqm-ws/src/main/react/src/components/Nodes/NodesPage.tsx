@@ -83,7 +83,7 @@ export const NodesPage: React.FC = () => {
             const { value: jmxRegistryPort } = registryPortInputRef.current!;
             const { value: jmxServerPort } = serverPortInputRef.current!;
 
-            if (nodeId && name) {
+            if (nodeId != null && name) {
                 updateNode({
                     id: nodeId,
                     name: name,

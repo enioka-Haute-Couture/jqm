@@ -43,25 +43,6 @@ const RolesPage: React.FC = () => {
         setPageTitle("Roles");
     }, [fetchRoles, canUserAccess]);
 
-    const updateRow = useCallback(
-        (id: number) => {
-            if (!editingRowId) {
-                return;
-            }
-            const { value: name } = nameInputRef.current!;
-            const { value: description } = descriptionInputRef.current!;
-            if (id && name && permissions != null) {
-                updateRole({
-                    id: id,
-                    name: name,
-                    description: description,
-                    permissions: permissions!!,
-                }).then(() => setEditingRowId(null));
-            }
-        },
-        [updateRole, editingRowId, permissions]
-    );
-
     const handleOnDelete = useCallback(
         (tableMeta: MUIDataTableMeta) => {
             const [roleId] = tableMeta.rowData;
@@ -73,9 +54,18 @@ const RolesPage: React.FC = () => {
     const handleOnSave = useCallback(
         (tableMeta: MUIDataTableMeta) => {
             const [roleId] = tableMeta.rowData;
-            updateRow(roleId);
+            const { value: name } = nameInputRef.current!;
+            const { value: description } = descriptionInputRef.current!;
+            if (roleId != null && name && permissions != null) {
+                updateRole({
+                    id: roleId,
+                    name: name,
+                    description: description,
+                    permissions: permissions!!,
+                }).then(() => setEditingRowId(null));
+            }
         },
-        [updateRow]
+        [updateRole, editingRowId, permissions]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);

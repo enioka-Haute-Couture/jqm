@@ -53,7 +53,7 @@ const ClusterwideParametersPage: React.FC = () => {
             const [paramId] = tableMeta.rowData;
             const { value: key } = paramKeyInputRef.current!;
             const { value } = paramValueInputRef.current!;
-            if (paramId && (key || value)) {
+            if (paramId != null && (key || value)) {
                 updateParameter({ id: paramId, key: key, value: value }).then(
                     () => setEditingRowId(null)
                 );
