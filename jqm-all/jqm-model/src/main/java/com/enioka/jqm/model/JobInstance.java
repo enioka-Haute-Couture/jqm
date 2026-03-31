@@ -634,7 +634,7 @@ public class JobInstance implements Serializable
         tmp.q = Queue.map(rs, 24);
         tmp.jd = JobDef.map(rs, 28);
         tmp.n = Node.map(cnx, rs, 47);
-        tmp.traceId = rs.getString(64);
+        tmp.traceId = rs.getString(65);
 
         return tmp;
     }

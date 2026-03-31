@@ -20,6 +20,7 @@
             <deliverableDirectory>./outputfiles</deliverableDirectory>
 
             <logLevel>INFO</logLevel>
+            <template>true</template>
         </node>
 
         <node>
@@ -40,6 +41,7 @@
             <deliverableDirectory>./outputfiles</deliverableDirectory>
 
             <logLevel>INFO</logLevel>
+            <template>true</template>
         </node>
     </nodes>
 

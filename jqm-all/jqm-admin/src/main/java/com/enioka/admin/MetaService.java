@@ -1122,12 +1122,13 @@ public class MetaService
             tmp.setRootLogLevel(rs.getString(13 + colShift));
             tmp.setStop(rs.getBoolean(14 + colShift));
             tmp.setTmpDirectory(rs.getString(15 + colShift));
+            tmp.setTemplate(rs.getBoolean(16 + colShift));
 
             Calendar c = null;
-            if (rs.getTimestamp(16 + colShift) != null)
+            if (rs.getTimestamp(17 + colShift) != null)
             {
                 c = Calendar.getInstance();
-                c.setTimeInMillis(rs.getTimestamp(16 + colShift).getTime());
+                c.setTimeInMillis(rs.getTimestamp(17 + colShift).getTime());
             }
             tmp.setLastSeenAlive(c);
 
@@ -1199,9 +1200,10 @@ public class MetaService
             QueryResult qr = cnx.runUpdate("node_update_changed_by_id", dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(),
                     dto.getJmxRegistryPort(), dto.getJmxServerPort(), dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(),
                     dto.getName(), dto.getPort(), dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory(),
-                    dto.getId(), dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(), dto.getJmxServerPort(),
-                    dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(), dto.getName(), dto.getPort(),
-                    dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory());
+                    dto.getTemplate(), dto.getId(), dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(),
+                    dto.getJmxServerPort(), dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(), dto.getName(),
+                    dto.getPort(), dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory(),
+                    dto.getTemplate());
 
             if (qr.nbUpdated != 1)
             {

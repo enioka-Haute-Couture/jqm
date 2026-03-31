@@ -377,6 +377,7 @@
         "jmxRegistryPort": "Jmx Registry Port**",
         "jmxServerPort": "Jmx Server Port**",
         "enabled": "Enabled",
+        "template": "Template",
         "simpleApi": "Simple API",
         "clientApi": "Client API",
         "adminApi": "Admin API",
@@ -387,6 +388,10 @@
         "hoursAgo": "{{count}}h ago",
         "daysAgo": "{{count}}d ago",
         "viewNodeLogs": "View node logs",
+        "nodes": "Nodes",
+        "templates": "Templates",
+        "markAsTemplate": "Mark as template",
+        "unmarkAsTemplate": "Unmark as template",
         "hints": {
             "name": "The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the name given as a parameter to the node when starting. It is unique throughout the cluster. Default is server hostname in Windows, user name in Unix.",
             "dns": "The web APIs will bind on all interfaces that answer to a reverse DNS call of this name. Default is localhost, i.e. local-only binding.",
@@ -410,7 +415,8 @@
             "paragraph2End": ". Only nodes switched off for more than 10 minutes can be removed.",
             "paragraph3": "Changing fields marked with",
             "paragraph3Marker": "**",
-            "paragraph3End": "(two asterisks) while the node is running requires the node to be restarted for the change to be taken into account. Changes to other fields are automatically applied asynchronously (default is at most after one minute)."
+            "paragraph3End": "(two asterisks) while the node is running requires the node to be restarted for the change to be taken into account. Changes to other fields are automatically applied asynchronously (default is at most after one minute).",
+            "paragraph4": "Templates are blueprint nodes used to create new nodes with predefined characteristics."
         },
         "displayLogsDialog": {
             "title": "Latest logs for node {{nodeName}}",

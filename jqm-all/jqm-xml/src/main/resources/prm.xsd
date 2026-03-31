@@ -57,6 +57,8 @@
 
 				<xs:element name="logLevel" minOccurs="1" maxOccurs="1"
 					type="logLevel"></xs:element>
+				<xs:element name="template" minOccurs="0" maxOccurs="1"
+					type="xs:boolean"></xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

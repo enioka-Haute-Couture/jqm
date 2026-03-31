@@ -377,6 +377,7 @@
         "jmxRegistryPort": "Port de registre JMX**",
         "jmxServerPort": "Port serveur JMX**",
         "enabled": "Activé",
+        "template": "Template",
         "simpleApi": "API simple",
         "clientApi": "API client",
         "adminApi": "API admin",
@@ -387,6 +388,10 @@
         "hoursAgo": "il y a {{count}}h",
         "daysAgo": "il y a {{count}}j",
         "viewNodeLogs": "Voir les logs du noeud",
+        "nodes": "Noeuds",
+        "templates": "Templates",
+        "markAsTemplate": "Marquer comme template",
+        "unmarkAsTemplate": "Démarquer comme template",
         "hints": {
             "name": "Le nom du noeud dans le cluster JQM. Il n'a aucun lien avec le nom d'hôte, les noms DNS, etc. C'est simplement le nom donné en paramètre au noeud lors du démarrage. Il est unique dans tout le cluster. Par défaut, c'est le nom d'hôte du serveur sous Windows, le nom d'utilisateur sous Unix.",
             "dns": "Les API web se lieront à toutes les interfaces qui répondent à un appel DNS inverse de ce nom. Par défaut, c'est localhost, c'est-à-dire une liaison locale uniquement.",
@@ -410,7 +415,8 @@
             "paragraph2End": ". Seuls les noeuds éteints depuis plus de 10 minutes peuvent être supprimés.",
             "paragraph3": "Modifier les champs marqués avec",
             "paragraph3Marker": "**",
-            "paragraph3End": "(deux astérisques) pendant que le noeud est en cours d'exécution nécessite le redémarrage du noeud pour que le changement soit pris en compte. Les modifications des autres champs sont automatiquement appliquées de manière asynchrone (par défaut, au plus tard après une minute)."
+            "paragraph3End": "(deux astérisques) pendant que le noeud est en cours d'exécution nécessite le redémarrage du noeud pour que le changement soit pris en compte. Les modifications des autres champs sont automatiquement appliquées de manière asynchrone (par défaut, au plus tard après une minute).",
+            "paragraph4": "Les templates sont des noeuds modèles utilisés pour créer de nouveaux noeuds avec des caractéristiques prédéfinies."
         },
         "displayLogsDialog": {
             "title": "Derniers logs du noeud {{nodeName}}",
