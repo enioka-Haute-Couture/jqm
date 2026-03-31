@@ -38,6 +38,7 @@ public class NodeDto implements Serializable
     private Boolean stop = false, enabled = true;
     private Boolean loapApiSimple, loadApiClient, loadApiAdmin;
     private Boolean reportsRunning;
+    private Boolean template = false;
 
     public Long getId()
     {
@@ -207,5 +208,15 @@ public class NodeDto implements Serializable
     public void setEnabled(Boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public Boolean getTemplate()
+    {
+        return template;
+    }
+
+    public void setTemplate(Boolean template)
+    {
+        this.template = template;
     }
 }

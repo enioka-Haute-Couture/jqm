@@ -137,18 +137,25 @@ public class XmlConfigurationParser
 
                 String logLevel = nodeElement.getElementsByTagName("logLevel").item(0).getTextContent().trim();
 
+                boolean template = false;
+                if (nodeElement.getElementsByTagName("template").getLength() > 0)
+                {
+                    template = Boolean.parseBoolean(nodeElement.getElementsByTagName("template").item(0).getTextContent().trim());
+                }
+
                 try
                 {
                     node = com.enioka.jqm.model.Node.selectSingle(cnx, "node_select_by_key", nodeName);
                     cnx.runUpdate("node_update_changed_by_id", deliverableDirectory, listenInterface, enabled, jmxRegistryPort,
                             jmxServerPort, adminApi, clientApi, simpleApi, nodeName, webPort, jobDefDirectory, logLevel, false,
-                            tmpDirectory, node.getId(), deliverableDirectory, listenInterface, enabled, jmxRegistryPort, jmxServerPort,
-                            adminApi, clientApi, simpleApi, nodeName, webPort, jobDefDirectory, logLevel, false, tmpDirectory);
+                            tmpDirectory, template, node.getId(), deliverableDirectory, listenInterface, enabled, jmxRegistryPort,
+                            jmxServerPort, adminApi, clientApi, simpleApi, nodeName, webPort, jobDefDirectory, logLevel, false,
+                            tmpDirectory, template);
                 }
                 catch (NoResultException e)
                 {
                     cnx.runUpdate("node_insert", deliverableDirectory, listenInterface, enabled, jmxRegistryPort, jmxServerPort, adminApi,
-                            clientApi, simpleApi, nodeName, webPort, jobDefDirectory, logLevel, false, tmpDirectory);
+                            clientApi, simpleApi, nodeName, webPort, jobDefDirectory, logLevel, false, tmpDirectory, template);
                 }
 
                 jqmlogger.info("Imported node  " + nodeName);

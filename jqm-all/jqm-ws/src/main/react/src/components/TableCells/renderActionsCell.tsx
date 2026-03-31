@@ -7,7 +7,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { MUIDataTableMeta } from "mui-datatables";
 import { TFunction } from "i18next";
 
-export interface extraActionItem {
+export interface ExtraActionItem {
     title: string;
     addIcon: Function;
     action?: Function;
@@ -23,7 +23,7 @@ export const renderActionsCell =
         onEdit: Function,
         canEdit: boolean,
         canDelete: boolean,
-        extraActionItems: extraActionItem[] = [],
+        extraActionItems: ExtraActionItem[] = [],
         t: TFunction
     ) =>
         (value: any, tableMeta: MUIDataTableMeta) => {

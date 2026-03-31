@@ -27,8 +27,8 @@ class DbImplBase
 
         // NODE
         queries.put("node_insert", "INSERT INTO __T__NODE(ID, REPO_DELIVERABLE, DNS, ENABLED, JMX_REGISTRY_PORT, JMX_SERVER_PORT, "
-                + "LOAD_API_ADMIN, LOAD_API_CLIENT, LOAD_API_SIMPLE, NAME, PORT, REPO_JOB_DEF, ROOT_LOG_LEVEL, STOP, REPO_TMP) "
-                + "VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "LOAD_API_ADMIN, LOAD_API_CLIENT, LOAD_API_SIMPLE, NAME, PORT, REPO_JOB_DEF, ROOT_LOG_LEVEL, STOP, REPO_TMP, TEMPLATE) "
+                + "VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("node_delete_all", "DELETE FROM __T__NODE");
         queries.put("node_delete_by_id", "DELETE FROM __T__NODE WHERE ID=?");
         queries.put("node_update_all_enable_ws", "UPDATE __T__NODE SET LOAD_API_SIMPLE=true, LOAD_API_CLIENT=true, LOAD_API_ADMIN=true, DNS='0.0.0.0'");
@@ -43,11 +43,11 @@ class DbImplBase
         queries.put("node_update_stop_by_id", "UPDATE __T__NODE SET STOP=true WHERE ID=?");
         queries.put("node_update_all_log_level", "UPDATE __T__NODE SET ROOT_LOG_LEVEL=?");
         queries.put("node_update_changed_by_id", "UPDATE __T__NODE SET REPO_DELIVERABLE=?, DNS=?, ENABLED=?, JMX_REGISTRY_PORT=?, JMX_SERVER_PORT=?, "
-                + "LOAD_API_ADMIN=?, LOAD_API_CLIENT=?, LOAD_API_SIMPLE=?, NAME=?, PORT=?, REPO_JOB_DEF=?, ROOT_LOG_LEVEL=?, STOP=?, REPO_TMP=? "
+                + "LOAD_API_ADMIN=?, LOAD_API_CLIENT=?, LOAD_API_SIMPLE=?, NAME=?, PORT=?, REPO_JOB_DEF=?, ROOT_LOG_LEVEL=?, STOP=?, REPO_TMP=?, TEMPLATE=? "
                 + "WHERE ID=? AND NOT (REPO_DELIVERABLE=? AND DNS=? AND ENABLED=? AND JMX_REGISTRY_PORT=? AND JMX_SERVER_PORT=? AND "
-                + "LOAD_API_ADMIN=? AND LOAD_API_CLIENT=? AND LOAD_API_SIMPLE=? AND NAME=? AND PORT=? AND REPO_JOB_DEF=? AND ROOT_LOG_LEVEL=? AND STOP=? AND REPO_TMP=?)");
+                + "LOAD_API_ADMIN=? AND LOAD_API_CLIENT=? AND LOAD_API_SIMPLE=? AND NAME=? AND PORT=? AND REPO_JOB_DEF=? AND ROOT_LOG_LEVEL=? AND STOP=? AND REPO_TMP=? AND TEMPLATE=?)");
         queries.put("node_select_all", "SELECT ID, REPO_DELIVERABLE, DNS, ENABLED, JMX_REGISTRY_PORT, JMX_SERVER_PORT, "
-                + "LOAD_API_ADMIN, LOAD_API_CLIENT, LOAD_API_SIMPLE, NAME, PORT, REPO_JOB_DEF, ROOT_LOG_LEVEL, STOP, REPO_TMP, LAST_SEEN_ALIVE "
+                + "LOAD_API_ADMIN, LOAD_API_CLIENT, LOAD_API_SIMPLE, NAME, PORT, REPO_JOB_DEF, ROOT_LOG_LEVEL, STOP, REPO_TMP, TEMPLATE, LAST_SEEN_ALIVE "
                 + "FROM __T__NODE");
         queries.put("node_select_by_key", queries.get("node_select_all") + " WHERE NAME=?");
         queries.put("node_select_by_id", queries.get("node_select_all") + " WHERE ID=?");
@@ -205,7 +205,7 @@ class DbImplBase
                 + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1 AS JD_KW1, jd.KEYWORD2 AS JD_KW2, jd.KEYWORD3 AS JD_KW3, jd.ALERT_AFTER_SECONDS, "
                 + "jd.MODULE AS JD_MODULE, jd.PATH_TYPE, jd.QUEUE AS JD_QUEUE, jd.PRIORITY AS JD_PRIORITY,"
                 + "n.ID AS N_ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED AS N_ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
-                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE, ji.TRACE_ID "
+                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.TEMPLATE, n.LAST_SEEN_ALIVE, ji.TRACE_ID "
                 + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ");
         queries.put("ji_select_by_id", queries.get("ji_select_all") + " WHERE ji.ID=?");
         queries.put("ji_select_by_queue", queries.get("ji_select_all") + " WHERE ji.QUEUE=? ORDER BY INTERNAL_POSITION");

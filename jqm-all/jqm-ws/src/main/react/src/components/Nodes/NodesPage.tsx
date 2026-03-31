@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Container, Grid, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from "@mui/material";
+import { Box, Container, Grid, IconButton, Table, TableBody, TableCell, TableRow, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, FilterType, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import TerminalIcon from "@mui/icons-material/Terminal";
@@ -19,6 +19,9 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
+import { ExtraActionItem } from "../TableCells/renderActionsCell";
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import BookmarkRemove from "@mui/icons-material/BookmarkRemove";
 
 const INACTIVE_NODE_THRESHOLD = 10; // in minutes
 
@@ -39,6 +42,8 @@ export const NodesPage: React.FC = () => {
     const [loadApiClient, setLoadApiClient] = useState<boolean | null>(null);
     const [loapApiSimple, setLoapApiSimple] = useState<boolean | null>(null);
     const [enabled, setEnabled] = useState<boolean | null>(null);
+    const [template, setTemplate] = useState<boolean | null>(null);
+    const [showTemplates, setShowTemplates] = useState<boolean>(false);
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
     const { canUserAccess } = useAuth();
@@ -72,7 +77,7 @@ export const NodesPage: React.FC = () => {
     const handleOnSave = useCallback(
         (tableMeta: MUIDataTableMeta) => {
             const [nodeId, stop] = tableMeta.rowData;
-            const lastSeenAlive = tableMeta.rowData[15];
+            const lastSeenAlive = tableMeta.rowData[16];
             const { value: name } = nameInputRef.current!;
             const { value: dns } = dnsInputRef.current!;
             const { value: port } = portInputRef.current!;
@@ -101,10 +106,11 @@ export const NodesPage: React.FC = () => {
                     loapApiSimple: loapApiSimple!!,
                     stop: stop,
                     enabled: enabled,
+                    template: template,
                 }).then(() => setEditingRowId(null));
             }
         },
-        [updateNode, loadApiAdmin, loadApiClient, loapApiSimple, enabled]
+        [updateNode, loadApiAdmin, loadApiClient, loapApiSimple, enabled, template]
     );
 
     const handleOnCancel = useCallback(() => {
@@ -113,9 +119,10 @@ export const NodesPage: React.FC = () => {
 
     const handleOnEdit = useCallback((tableMeta: MUIDataTableMeta) => {
         setEnabled(tableMeta.rowData[11]);
-        setLoapApiSimple(tableMeta.rowData[12]);
-        setLoadApiClient(tableMeta.rowData[13]);
-        setLoadApiAdmin(tableMeta.rowData[14]);
+        setTemplate(tableMeta.rowData[12]);
+        setLoapApiSimple(tableMeta.rowData[13]);
+        setLoadApiClient(tableMeta.rowData[14]);
+        setLoadApiAdmin(tableMeta.rowData[15]);
         setEditingRowId(tableMeta.rowIndex);
         // Expand the row when editing to show all editable fields
         setExpandedRows((prev) => {
@@ -288,12 +295,31 @@ export const NodesPage: React.FC = () => {
             },
         },
         {
+            name: "template",
+            label: t("nodes.template"),
+            options: {
+                hint: t("nodes.hints.template"),
+                filter: false,
+                display: false,
+                sort: false,
+                customBodyRender: renderBooleanCell(
+                    editingRowId,
+                    template,
+                    setTemplate
+                ),
+            },
+        },
+        {
             name: "loapApiSimple",
             label: t("nodes.simpleApi"),
             options: {
                 hint: t("nodes.hints.simpleApi"),
                 filter: true,
                 sort: true,
+                // TODO: add a common for all boolean columns
+                //    customFilterListOptions: {
+                //     render: (value: any) => value ? t("nodes.templates") : t("nodes.nodes"), //
+                // },
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     loapApiSimple,
@@ -336,6 +362,7 @@ export const NodesPage: React.FC = () => {
                 hint: t("nodes.hints.lastSeenAlive"),
                 filter: false,
                 sort: true,
+                display: !showTemplates,
                 customBodyRender: (value: any) => {
                     if (!value) {
                         return <span style={{ color: 'red' }}>{t("nodes.never")}</span>;
@@ -364,8 +391,69 @@ export const NodesPage: React.FC = () => {
                 filter: false,
                 sort: false,
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
-                    const lastSeenAlive = tableMeta.rowData[15];
+                    const lastSeenAlive = tableMeta.rowData[16];
                     const shouldShowDelete = !lastSeenAlive || differenceInMinutes(new Date(), new Date(lastSeenAlive)) > INACTIVE_NODE_THRESHOLD;
+                    let extraActions: ExtraActionItem[] = [];
+                    if (!showTemplates) {
+                        extraActions = [
+                            {
+                                title: t("nodes.markAsTemplate"),
+                                addIcon: () => <BookmarkAddIcon />,
+                                action: (tableMeta: MUIDataTableMeta) => {
+                                    updateNode({
+                                        id: tableMeta.rowData[0],
+                                        stop: tableMeta.rowData[1],
+                                        name: tableMeta.rowData[2],
+                                        dns: tableMeta.rowData[3],
+                                        port: tableMeta.rowData[4],
+                                        outputDirectory: tableMeta.rowData[5],
+                                        jobRepoDirectory: tableMeta.rowData[6],
+                                        tmpDirectory: tableMeta.rowData[7],
+                                        rootLogLevel: tableMeta.rowData[8],
+                                        jmxRegistryPort: tableMeta.rowData[9],
+                                        jmxServerPort: tableMeta.rowData[10],
+                                        enabled: tableMeta.rowData[11],
+                                        template: true,
+                                        loapApiSimple: tableMeta.rowData[13],
+                                        loadApiClient: tableMeta.rowData[14],
+                                        loadApiAdmin: tableMeta.rowData[15],
+                                        lastSeenAlive: tableMeta.rowData[16],
+                                    })
+                                }
+                            },
+                            {
+                                title: t("nodes.viewNodeLogs"),
+                                addIcon: () => <TerminalIcon />,
+                                action: handleOnViewLogs,
+                            }]
+                    } else {
+                        extraActions = [
+                            {
+                                title: t("nodes.unmarkAsTemplate"),
+                                addIcon: () => <BookmarkRemove />,
+                                action: (tableMeta: MUIDataTableMeta) => {
+                                    updateNode({
+                                        id: tableMeta.rowData[0],
+                                        stop: tableMeta.rowData[1],
+                                        name: tableMeta.rowData[2],
+                                        dns: tableMeta.rowData[3],
+                                        port: tableMeta.rowData[4],
+                                        outputDirectory: tableMeta.rowData[5],
+                                        jobRepoDirectory: tableMeta.rowData[6],
+                                        tmpDirectory: tableMeta.rowData[7],
+                                        rootLogLevel: tableMeta.rowData[8],
+                                        jmxRegistryPort: tableMeta.rowData[9],
+                                        jmxServerPort: tableMeta.rowData[10],
+                                        enabled: tableMeta.rowData[11],
+                                        template: false,
+                                        loapApiSimple: tableMeta.rowData[13],
+                                        loadApiClient: tableMeta.rowData[14],
+                                        loadApiAdmin: tableMeta.rowData[15],
+                                        lastSeenAlive: tableMeta.rowData[16],
+                                    })
+                                }
+                            }]
+                    }
 
                     return renderActionsCell(
                         handleOnCancel,
@@ -374,14 +462,8 @@ export const NodesPage: React.FC = () => {
                         editingRowId,
                         handleOnEdit,
                         canUserAccess(PermissionObjectType.node, PermissionAction.update),
-                        canUserAccess(PermissionObjectType.node, PermissionAction.delete),
-                        [
-                            {
-                                title: t("nodes.viewNodeLogs"),
-                                addIcon: () => <TerminalIcon />,
-                                action: handleOnViewLogs,
-                            },
-                        ],
+                        !showTemplates && canUserAccess(PermissionObjectType.node, PermissionAction.delete),
+                        extraActions,
                         t
                     )(value, tableMeta);
                 },
@@ -489,6 +571,20 @@ export const NodesPage: React.FC = () => {
         },
         customToolbar: () => {
             return <>
+                <ToggleButtonGroup
+                    value={showTemplates ? 'templates' : 'nodes'}
+                    exclusive
+                    onChange={(_, value) => {
+                        if (value !== null) {
+                            setExpandedRows([]);
+                            setShowTemplates(value === 'templates');
+                        }
+                    }}
+                    size="small"
+                >
+                    <ToggleButton value="nodes">{t("nodes.nodes")}</ToggleButton>
+                    <ToggleButton value="templates">{t("nodes.templates")}</ToggleButton>
+                </ToggleButtonGroup>
                 <Tooltip title={t("common.refresh")}>
                     <IconButton
                         color="default"
@@ -526,12 +622,13 @@ export const NodesPage: React.FC = () => {
                 descriptionParagraphs={[
                     t("nodes.documentation.paragraph1"),
                     <>{t("nodes.documentation.paragraph2")} <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>{t("nodes.documentation.paragraph2Command")}</Box>{t("nodes.documentation.paragraph2End")}</>,
-                    <>{t("nodes.documentation.paragraph3")} <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>{t("nodes.documentation.paragraph3Marker")}</Box> {t("nodes.documentation.paragraph3End")}</>
+                    <>{t("nodes.documentation.paragraph3")} <Box component="span" sx={{ fontFamily: 'Monospace', fontWeight: 'bold' }}>{t("nodes.documentation.paragraph3Marker")}</Box> {t("nodes.documentation.paragraph3End")}</>,
+                    t("nodes.documentation.paragraph4")
                 ]}
             />
             <MUIDataTable
                 title={t("nodes.title")}
-                data={nodes}
+                data={nodes.filter(node => node.template === showTemplates)}
                 columns={columns}
                 options={options}
             />
