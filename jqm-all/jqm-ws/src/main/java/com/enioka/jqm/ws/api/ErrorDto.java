@@ -17,6 +17,7 @@ package com.enioka.jqm.ws.api;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -28,6 +29,8 @@ public class ErrorDto extends RuntimeException
 
     private String userReadableMessage, developerMessage, stacktrace;
     private Integer errorCode;
+    private String userMessageKey;
+    private Map<String, Object> userMessageParams;
 
     public Status httpStatus;
 
@@ -102,5 +105,25 @@ public class ErrorDto extends RuntimeException
     public void setStacktrace(String stacktrace)
     {
         this.stacktrace = stacktrace;
+    }
+
+    public String getUserMessageKey()
+    {
+        return userMessageKey;
+    }
+
+    public void setUserMessageKey(String userMessageKey)
+    {
+        this.userMessageKey = userMessageKey;
+    }
+
+    public Map<String, Object> getUserMessageParams()
+    {
+        return userMessageParams;
+    }
+
+    public void setUserMessageParams(Map<String, Object> userMessageParams)
+    {
+        this.userMessageParams = userMessageParams;
     }
 }
