@@ -27,14 +27,13 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.enioka.jqm.model.updater.DbSchemaManager;
-import org.junit.AfterClass;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Assume;
 import org.junit.Test;
-import org.junit.Assert;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +73,6 @@ public class JqmBaseTest
     {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
-
     }
 
     @BeforeClass
@@ -96,15 +94,7 @@ public class JqmBaseTest
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
     }
 
-    @AfterClass
-    public static void afterClass()
-    {
-        if (s != null)
-        {
-            s.close();
-            s = null;
-        }
-    }
+
 
     protected void configureDefaultResourceFiles()
     {
@@ -113,7 +103,7 @@ public class JqmBaseTest
 
     protected void prepareDatabaseEnvironment() throws NamingException
     {
-        configureDefaultResourceFiles();
+        // For overrides
     }
 
     protected void cleanupDatabaseEnvironment()
@@ -127,14 +117,15 @@ public class JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
-        prepareDatabaseEnvironment();
+        JqmDbClientFactory.reset();
+        jqmClient = JqmDbClientFactory.getClient();
 
         if (db == null)
         {
+            // In all cases load the datasource. (the helper itself will load the property file if any).
             Properties p = new Properties();
             p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
             p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
-
             db = DbManager.getDb(p);
             var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
             try (var cnx = db.getDataSource().getConnection())
@@ -143,15 +134,12 @@ public class JqmBaseTest
             }
         }
 
-        // Initialisation du client JQM après la base
-        JqmDbClientFactory.reset();
-        jqmClient = JqmDbClientFactory.getClient();
-
         cnx = getNewDbSession();
         TestHelpers.cleanup(cnx);
         TestHelpers.createTestData(cnx);
         cnx.commit();
 
+        // Force JNDI directory loading
         InitialContext.doLookup("string/debug");
     }
 
@@ -180,7 +168,6 @@ public class JqmBaseTest
         {
             // jqmlogger.warn("Could not purge test JNDI context", e);
         }
-        cleanupDatabaseEnvironment();
 
         // Java 6 GC being rather inefficient, we must run it multiple times to correctly collect Jetty-created class loaders and avoid
         // permgen issues
@@ -300,11 +287,20 @@ public class JqmBaseTest
             this.sleep(delay);
             jqmlogger.info("Restarting DB");
             s.start();
-            this.sleep(delay);
         }
-        else
+        else if (db.getProduct().contains("postgresql"))
         {
-            throw new IllegalStateException("simulateDbFailure is only implemented for HSQLDB in JqmBaseTest");
+            try
+            {
+                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
+                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
+            }
+            catch (Exception e)
+            {
+                // Do nothing - the query is a suicide so it cannot work fully.
+            }
+            cnx.close();
+            cnx = getNewDbSession();
         }
     }
 
@@ -343,23 +339,5 @@ public class JqmBaseTest
     public void testContainerStarts()
     {
         Assert.assertTrue(true);
-    }
-
-    protected void assumeNotDb2()
-    {
-        String dbName = System.getenv("DB");
-        if (dbName != null)
-        {
-            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
-        }
-    }
-
-    protected void assumeNotOracle()
-    {
-        String dbName = System.getenv("DB");
-        if (dbName != null)
-        {
-            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
-        }
     }
 }

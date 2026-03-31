@@ -4,13 +4,26 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.enioka.jqm.client.api.JqmDbClientFactory;
+import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
+import com.enioka.jqm.model.updater.DbSchemaManager;
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
+import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
+import com.enioka.jqm.test.helpers.TestHelpers;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
@@ -23,6 +36,49 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
     private static final String RESOURCE_FILE_PREFIX = "resources-testcontainer-";
 
     protected JdbcDatabaseContainer<?> dedicatedDbContainer;
+
+    @Before
+    @Override
+    public void beforeEachTest() throws NamingException, SQLException
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test " + testName.getMethodName());
+
+        prepareDatabaseEnvironment();
+
+        if (db == null)
+        {
+            // In all cases load the datasource. (the helper itself will load the property file if any).
+            Properties p = new Properties();
+            p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
+            p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
+
+            db = DbManager.getDb(p);
+            var dbSchemaManager = ServiceLoaderHelper.getService(ServiceLoader.load(DbSchemaManager.class));
+            try (var cnx = db.getDataSource().getConnection())
+            {
+                dbSchemaManager.updateSchema(cnx);
+            }
+        }
+
+        // Initialisation du client JQM après la base
+        JqmDbClientFactory.reset();
+        jqmClient = JqmDbClientFactory.getClient();
+
+        cnx = getNewDbSession();
+        TestHelpers.cleanup(cnx);
+        TestHelpers.createTestData(cnx);
+        cnx.commit();
+
+        InitialContext.doLookup("string/debug");
+    }
+
+    @After
+    @Override
+    public void afterEachTest()
+    {
+        cleanupDatabaseEnvironment();
+    }
 
     @Override
     protected void prepareDatabaseEnvironment() throws NamingException

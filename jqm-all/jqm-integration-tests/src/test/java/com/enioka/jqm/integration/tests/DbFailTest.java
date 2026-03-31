@@ -10,12 +10,12 @@ import org.junit.Test;
 
 public class DbFailTest extends JqmPerTestContainerBase
 {
-    @Before
-    public void before()
-    {
-        assumeNotDb2();
-        assumeNotOracle();
-    }
+//    @Before
+//    public void before()
+//    {
+//        assumeNotDb2();
+//        assumeNotOracle();
+//    }
 
     @Test
     public void testDbFailure() throws Exception
