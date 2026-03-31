@@ -13,9 +13,30 @@ export const useNotificationService = () => {
     const displayError = useCallback(
         (reason: any) => {
 
-            let message = reason?.details?.userReadableMessage ?
-                reason.details.userReadableMessage :
-                t("errors.genericError")
+            let message: string;
+
+            // Use translation of userMessageKey if it exists, otherwise fallback to userReadableMessage or generic error
+            if (reason?.details?.userMessageKey) {
+                const key = `errors.api.${reason.details.userMessageKey}`;
+                const rawParams = reason.details.userMessageParams || {};
+
+                const params = Array.isArray(rawParams)
+                    ? rawParams.reduce((acc: any, item: any) => {
+                        acc[item.key] = item.value;
+                        return acc;
+                    }, {})
+                    : rawParams;
+
+                const translated = t(key, params) as string;
+
+                if (translated !== key) {
+                    message = translated;
+                } else {
+                    message = reason.details.userReadableMessage || t("errors.genericError");
+                }
+            } else {
+                message = reason?.details?.userReadableMessage || t("errors.genericError");
+            }
 
             // make sure the letter starts with a capital letter
             message = message.charAt(0).toUpperCase() + message.slice(1);

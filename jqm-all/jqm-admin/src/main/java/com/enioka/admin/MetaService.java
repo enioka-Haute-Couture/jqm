@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -144,7 +145,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -320,7 +323,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -355,7 +360,7 @@ public class MetaService
 
                 if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
                 {
-                    throw new JqmAdminApiUserException("Cannot update resource, JNDI alias already used.");
+                    throw new JqmAdminApiUserException("jndiAliasAlreadyUsed", "Cannot update resource, JNDI alias already used.", null);
                 }
                 else
                 {
@@ -675,7 +680,9 @@ public class MetaService
         {
             if (!rs.next())
             {
-                throw new JqmAdminApiUserException("no result");
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", id);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
             }
             return mapCl(rs, 0);
         }
@@ -701,7 +708,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -734,7 +743,9 @@ public class MetaService
 
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
             {
-                throw new JqmAdminApiUserException("Name " + dto.getName() + " already used.");
+                Map<String, Object> params = new HashMap<>();
+                params.put("name", dto.getName());
+                throw new JqmAdminApiUserException("nameAlreadyUsed", "Name " + dto.getName() + " already used.", params);
             }
             else
             {
@@ -762,8 +773,8 @@ public class MetaService
         int countRunning = cnx.runSelectSingle("ji_select_count_by_jd", Integer.class, id);
         if (countRunning > 0)
         {
-            throw new JqmAdminApiUserException("cannot delete a job definition with running instances."
-                    + " Disable it, wait for the end of all running instances, then retry.");
+            throw new JqmAdminApiUserException("jobDefHasRunningInstances", "cannot delete a job definition with running instances."
+                    + " Disable it, wait for the end of all running instances, then retry.", null);
         }
 
         cnx.runUpdate("jdprm_delete_all_for_jd", id);
@@ -774,7 +785,9 @@ public class MetaService
             if (qr.nbUpdated != 1)
             {
                 cnx.setRollbackOnly();
-                throw new JqmAdminApiUserException("no item with ID " + id);
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", id);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
             }
 
         }
@@ -782,8 +795,8 @@ public class MetaService
         {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
             {
-                throw new JqmAdminApiUserException(
-                        "Cannot delete a job definition with active schedules, remove them first then try again.");
+                throw new JqmAdminApiUserException("jobDefHasActiveSchedules",
+                        "Cannot delete a job definition with active schedules, remove them first then try again.", null);
             }
             else
             {
@@ -938,7 +951,9 @@ public class MetaService
 
             if (!rs.next())
             {
-                throw new JqmAdminApiUserException("no result");
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", id);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
             }
 
             JobDefDto tmp = mapJobDef(rs, 0);
@@ -1019,7 +1034,10 @@ public class MetaService
                         }
                         if (existing == null)
                         {
-                            throw new JqmAdminApiUserException("Trying to update a scheduled job which does not exist - id " + sj.getId());
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("id", sj.getId());
+                            throw new JqmAdminApiUserException("scheduledJobNotFound",
+                                    "Trying to update a scheduled job which does not exist - id " + sj.getId(), params);
                         }
 
                         // Parameter update?
@@ -1070,8 +1088,9 @@ public class MetaService
         if (countRunning > 0)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException(
-                    "cannot delete a node with running instances. Disable it, wait for the end of all running instances, then retry.");
+            throw new JqmAdminApiUserException("nodeHasRunningJobs",
+                    "cannot delete a node with running instances. Disable it, wait for the end of all running instances, then retry.",
+                    null);
         }
 
         try
@@ -1082,13 +1101,15 @@ public class MetaService
             if (n.getLastSeenAlive() != null && n.getLastSeenAlive().after(limit))
             {
                 cnx.setRollbackOnly();
-                throw new JqmAdminApiUserException(
-                        "Can only remove a node either properly shut down or that has crashed more than 10 minutes ago.");
+                throw new JqmAdminApiUserException("nodeRecentlyActive",
+                        "Can only remove a node either properly shut down or that has crashed more than 10 minutes ago.", null);
             }
         }
         catch (NoResultException e)
         {
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
 
         cnx.runUpdate("dp_delete_for_node", id);
@@ -1096,7 +1117,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1164,7 +1187,9 @@ public class MetaService
         {
             if (!rs.next())
             {
-                throw new JqmAdminApiUserException("no result");
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", id);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
             }
 
             return mapNode(rs, 0);
@@ -1181,7 +1206,9 @@ public class MetaService
         {
             if (!rs.next())
             {
-                throw new JqmAdminApiUserException("no result");
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", nodeName);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + nodeName, params);
             }
 
             return mapNode(rs, 0);
@@ -1226,8 +1253,9 @@ public class MetaService
         if (countRunning > 0)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException(
-                    "cannot delete a queue with running instances. Disable it, wait for the end of all running instances, then retry.");
+            throw new JqmAdminApiUserException("queueHasRunningInstances",
+                    "cannot delete a queue with running instances. Disable it, wait for the end of all running instances, then retry.",
+                    null);
         }
 
         cnx.runUpdate("dp_delete_for_queue", id);
@@ -1235,7 +1263,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1283,7 +1313,9 @@ public class MetaService
         {
             if (!rs.next())
             {
-                throw new JqmAdminApiUserException("no result");
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", id);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
             }
 
             return mapQueue(rs, 0);
@@ -1304,7 +1336,7 @@ public class MetaService
                 rs = cnx.runSelect("q_select_default");
                 if (rs.next())
                 {
-                    throw new JqmAdminApiUserException("there is already a default queue");
+                    throw new JqmAdminApiUserException("defaultQueueAlreadyExists", "there is already a default queue", null);
                 }
             }
 
@@ -1326,7 +1358,9 @@ public class MetaService
         {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
             {
-                throw new JqmAdminApiUserException("Name " + dto.getName() + " already used.");
+                Map<String, Object> params = new HashMap<>();
+                params.put("name", dto.getName());
+                throw new JqmAdminApiUserException("nameAlreadyUsed", "Name " + dto.getName() + " already used.", params);
             }
             else
             {
@@ -1345,7 +1379,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1400,7 +1436,9 @@ public class MetaService
             rs = cnx.runSelect("dp_select_with_names_by_id", id);
             if (!rs.next())
             {
-                throw new JqmAdminApiUserException("no result");
+                Map<String, Object> params = new HashMap<>();
+                params.put("id", id);
+                throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
             }
             rs.close();
             return mapQueueMapping(rs, 0);
@@ -1450,7 +1488,7 @@ public class MetaService
         {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
             {
-                throw new JqmAdminApiUserException("Cannot map node and a queue which are already mapped.");
+                throw new JqmAdminApiUserException("mappingAlreadyExists", "Cannot map node and a queue which are already mapped.", null);
             }
             else
             {
@@ -1501,8 +1539,10 @@ public class MetaService
             if (userUsingRole > 0)
             {
                 cnx.setRollbackOnly();
-                throw new JqmAdminApiUserException(
-                        "cannot delete a role currently attributed to a user. Remove role attribution of use force parameter.");
+                Map<String, Object> params = new HashMap<>();
+                params.put("count", userUsingRole);
+                throw new JqmAdminApiUserException("roleHasActiveUsers",
+                        "Cannot delete role: " + userUsingRole + " user(s) still assigned to it", params);
             }
         }
 
@@ -1512,7 +1552,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1591,7 +1633,9 @@ public class MetaService
         }
         else
         {
-            throw new JqmAdminApiUserException("no result");
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1634,7 +1678,9 @@ public class MetaService
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
-            throw new JqmAdminApiUserException("no item with ID " + id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1749,7 +1795,9 @@ public class MetaService
         }
         else
         {
-            throw new JqmAdminApiUserException("no result");
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            throw new JqmAdminApiUserException("itemNotFound", "no item with ID " + id, params);
         }
     }
 
@@ -1771,7 +1819,7 @@ public class MetaService
         QueryResult qr = cnx.runUpdate("user_update_password_by_id", hash, salt.toHex(), userId);
         if (qr.nbUpdated == 0)
         {
-            throw new JqmAdminApiUserException("user with this ID does not exist");
+            throw new JqmAdminApiUserException("userNotFound", "user with this ID does not exist", null);
         }
     }
 
@@ -1790,7 +1838,10 @@ public class MetaService
         List<RUserDto> dtos = getUsers(cnx, "user_select_by_key", 0, userLogin);
         if (dtos.size() == 0)
         {
-            throw new JqmAdminApiUserException("Cannot update the password of a user which does not exist - given login was " + userLogin);
+            Map<String, Object> params = new HashMap<>();
+            params.put("login", userLogin);
+            throw new JqmAdminApiUserException("userPasswordUpdateFailed",
+                    "Cannot update the password of a user which does not exist - given login was " + userLogin, params);
         }
         changeUserPassword(cnx, dtos.get(0).getId(), newPassword);
     }
