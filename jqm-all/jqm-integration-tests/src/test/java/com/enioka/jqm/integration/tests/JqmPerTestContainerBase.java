@@ -13,17 +13,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.enioka.jqm.client.api.JqmDbClientFactory;
-import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
-import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
-import com.enioka.jqm.jndi.api.JqmJndiContextControlService;
 import com.enioka.jqm.model.updater.DbSchemaManager;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
-import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
 import com.enioka.jqm.test.helpers.TestHelpers;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;

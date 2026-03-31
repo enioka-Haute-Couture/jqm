@@ -1,11 +1,8 @@
 package com.enioka.jqm.integration.tests;
 
-import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class DbFailTest extends JqmPerTestContainerBase
