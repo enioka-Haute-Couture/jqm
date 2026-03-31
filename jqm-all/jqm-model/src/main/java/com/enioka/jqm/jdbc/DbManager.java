@@ -82,6 +82,21 @@ public final class DbManager
     }
 
     /**
+     * Tests may need to rebuild the database pool against a different JNDI resource.
+     */
+    public static void reset()
+    {
+        synchronized (DbManager.class)
+        {
+            if (db != null)
+            {
+                db.close();
+                db = null;
+            }
+        }
+    }
+
+    /**
      * Helper method to load the standard JQM property files from class path.
      *
      * @return a Properties object, which may be empty but not null.
