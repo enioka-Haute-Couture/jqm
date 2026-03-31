@@ -1506,6 +1506,8 @@ public class MetaService
             }
         }
 
+        cnx.runUpdate("perm_delete_for_role", id);
+
         QueryResult qr = cnx.runUpdate("role_delete_by_id", id);
         if (qr.nbUpdated != 1)
         {
