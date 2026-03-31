@@ -287,6 +287,9 @@ public class JqmBaseTest
             this.sleep(delay);
             jqmlogger.info("Restarting DB");
             s.start();
+            this.sleep(delay);
+            jqmlogger.info("DB is now fully up");
+
         }
         else if (db.getProduct().contains("postgresql"))
         {

@@ -72,6 +72,7 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
     @Override
     public void afterEachTest()
     {
+        super.afterEachTest();
         cleanupDatabaseEnvironment();
     }
 
