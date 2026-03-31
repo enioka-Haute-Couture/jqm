@@ -87,18 +87,15 @@ public class JqmBaseTest
                 s = new DebugHsqlDbServer();
                 s.start();
                 jqmlogger.info("Started local HSQLDB server.");
+                System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
+                ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
             }
         }
-
-        System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
-        ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
     }
-
-
 
     protected void configureDefaultResourceFiles()
     {
-        System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml");
+        // For overrides
     }
 
     protected void prepareDatabaseEnvironment() throws NamingException

@@ -130,6 +130,12 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
     }
 
     @Override
+    protected void configureDefaultResourceFiles()
+    {
+        System.setProperty("com.enioka.jqm.resourceFiles", "resources.xml");
+    }
+
+    @Override
     protected void simulateDbFailure(int delay)
     {
         if (db.getProduct().contains("hsql"))
