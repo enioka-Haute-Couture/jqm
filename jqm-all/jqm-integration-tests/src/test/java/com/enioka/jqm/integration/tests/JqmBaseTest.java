@@ -78,18 +78,13 @@ public class JqmBaseTest
     @BeforeClass
     public static void beforeClass()
     {
-        String dbType = System.getenv("DB");
-
-        if ("hsqldb".equalsIgnoreCase(dbType) || dbType == null)
+        if (s == null)
         {
-            if (s == null)
-            {
-                s = new DebugHsqlDbServer();
-                s.start();
-                jqmlogger.info("Started local HSQLDB server.");
-                System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
-                ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
-            }
+            s = new DebugHsqlDbServer();
+            s.start();
+
+            System.setProperty("com.enioka.jqm.alternateJqmRoot", "./target/server");
+            ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
         }
     }
 
