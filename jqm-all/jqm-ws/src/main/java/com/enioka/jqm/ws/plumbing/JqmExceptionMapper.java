@@ -15,7 +15,7 @@
  */
 package com.enioka.jqm.ws.plumbing;
 
-
+import com.enioka.admin.JqmAdminApiUserException;
 import com.enioka.jqm.ws.api.ErrorDto;
 
 import jakarta.ws.rs.core.Context;
@@ -34,6 +34,15 @@ public class JqmExceptionMapper<T extends Exception> implements ExceptionMapper<
     public Response toResponse(T exception)
     {
         ErrorDto d = new ErrorDto(exception.getMessage(), 10, exception, Status.BAD_REQUEST);
+
+        // Propagate i18n message key and parameters if the exception is an API user exception
+        if (exception instanceof JqmAdminApiUserException)
+        {
+            JqmAdminApiUserException adminException = (JqmAdminApiUserException) exception;
+            d.setUserMessageKey(adminException.getUserMessageKey());
+            d.setUserMessageParams(adminException.getUserMessageParams());
+        }
+
         MediaType type = headers.getMediaType();
         if (type != MediaType.APPLICATION_JSON_TYPE && type != MediaType.APPLICATION_XML_TYPE)
         {

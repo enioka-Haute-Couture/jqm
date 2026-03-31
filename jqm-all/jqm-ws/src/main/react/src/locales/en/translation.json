@@ -257,7 +257,23 @@
     },
     "errors": {
         "genericError": "An error occurred, please contact support support@enioka.com for help",
-        "dismiss": "Dismiss"
+        "dismiss": "Dismiss",
+        "api": {
+            "itemNotFound": "Item with ID {{id}} not found",
+            "jndiAliasAlreadyUsed": "Cannot update resource, JNDI alias already used",
+            "nameAlreadyUsed": "Name {{name}} already used",
+            "jobDefHasRunningInstances": "Cannot delete a job definition with running instances. Disable it, wait for the end of all running instances, then retry.",
+            "jobDefHasActiveSchedules": "Cannot delete a job definition with active schedules, remove them first then try again",
+            "defaultQueueAlreadyExists": "There is already a default queue",
+            "mappingAlreadyExists": "Cannot map node and a queue which are already mapped",
+            "roleHasActiveUsers": "Cannot delete role: {{count}} user(s) still assigned to it",
+            "userNotFound": "User with this ID does not exist",
+            "userPasswordUpdateFailed": "Cannot update the password of a user which does not exist - given login was {{login}}",
+            "scheduledJobNotFound": "Trying to update a scheduled job which does not exist - id {{id}}",
+            "nodeHasRunningJobs": "cannot delete a node with running instances. Disable it, wait for the end of all running instances, then retry.",
+            "nodeRecentlyActive": "Can only remove a node either properly shut down or that has crashed more than 10 minutes ago",
+            "queueHasRunningInstances": "Cannot delete a queue with running instances. Disable it, wait for the end of all running instances, then retry"
+        }
     },
     "users": {
         "title": "Users",

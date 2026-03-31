@@ -257,7 +257,23 @@
     },
     "errors": {
         "genericError": "Une erreur s'est produite, veuillez contacter le support support@enioka.com pour obtenir de l'aide",
-        "dismiss": "Fermer"
+        "dismiss": "Fermer",
+        "api": {
+            "itemNotFound": "Élément avec l'ID {{id}} non trouvé",
+            "jndiAliasAlreadyUsed": "Impossible de mettre à jour la ressource, l'alias JNDI est déjà utilisé",
+            "nameAlreadyUsed": "Le nom {{name}} est déjà utilisé",
+            "jobDefHasRunningInstances": "Impossible de supprimer une définition de job avec des instances en cours d'exécution. Désactivez-la, attendez la fin de toutes les instances en cours, puis réessayez.",
+            "jobDefHasActiveSchedules": "Impossible de supprimer une définition de job avec des planifications actives, supprimez-les d'abord puis réessayez",
+            "defaultQueueAlreadyExists": "Il existe déjà une file d'attente par défaut",
+            "mappingAlreadyExists": "Impossible de mapper un noeud et une file d'attente qui sont déjà mappés",
+            "roleHasActiveUsers": "Impossible de supprimer le rôle : {{count}} utilisateur(s) y sont encore affecté(s)",
+            "userNotFound": "L'utilisateur avec cet ID n'existe pas",
+            "userPasswordUpdateFailed": "Impossible de mettre à jour le mot de passe d'un utilisateur qui n'existe pas - login fourni : {{login}}",
+            "scheduledJobNotFound": "Tentative de mise à jour d'un job planifié qui n'existe pas - id {{id}}",
+            "nodeHasRunningJobs": "Impossible de supprimer un noeud avec des instances en cours d'exécution. Désactivez-le, attendez la fin de toutes les instances en cours, puis réessayez.",
+            "nodeRecentlyActive": "Seul un noeud correctement arrêté ou qui a planté il y a plus de 10 minutes peut être supprimé",
+            "queueHasRunningInstances": "Impossible de supprimer une file avec des instances en cours. Désactivez-la, attendez la fin de toutes les instances en cours, puis réessayez"
+        }
     },
     "users": {
         "title": "Utilisateurs",
