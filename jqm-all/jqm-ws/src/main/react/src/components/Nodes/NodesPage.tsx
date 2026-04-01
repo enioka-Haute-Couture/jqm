@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Container, Grid, IconButton, Table, TableBody, TableCell, TableRow, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, FilterType, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, FilterType, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import TerminalIcon from "@mui/icons-material/Terminal";
 import { useTranslation } from "react-i18next";
 import { differenceInMinutes } from "date-fns";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import useNodesApi from "./NodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
 import {
@@ -136,11 +136,14 @@ export const NodesPage: React.FC = () => {
 
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                sort: false,
+                filter: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -148,6 +151,9 @@ export const NodesPage: React.FC = () => {
             name: "stop",
             label: "stop",
             options: {
+                sort: false,
+                filter: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -156,8 +162,7 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.name"),
             options: {
                 hint: t("nodes.hints.name"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.name")),
                 customBodyRender: renderInputCell(
                     nameInputRef,
                     editingRowId,
@@ -170,8 +175,7 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.dns"),
             options: {
                 hint: t("nodes.hints.dns"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.dns")),
                 customBodyRender: renderInputCell(
                     dnsInputRef,
                     editingRowId,
@@ -184,8 +188,7 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.httpPort"),
             options: {
                 hint: t("nodes.hints.httpPort"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.httpPort")),
                 customBodyRender: renderInputCell(
                     portInputRef,
                     editingRowId,
@@ -198,9 +201,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.outputDirectory"),
             options: {
                 hint: t("nodes.hints.outputDirectory"),
-                filter: true,
-                sort: true,
                 display: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.outputDirectory")),
                 customBodyRender: renderInputCell(
                     outputDirInputRef,
                     editingRowId,
@@ -213,9 +215,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.jobRepoDirectory"),
             options: {
                 hint: t("nodes.hints.jobRepoDirectory"),
-                filter: true,
-                sort: true,
                 display: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.jobRepoDirectory")),
                 customBodyRender: renderInputCell(
                     repoDirInputRef,
                     editingRowId,
@@ -227,9 +228,8 @@ export const NodesPage: React.FC = () => {
             name: "tmpDirectory",
             label: t("nodes.tmpDirectory"),
             options: {
-                filter: true,
-                sort: true,
                 display: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.tmpDirectory")),
                 customBodyRender: renderInputCell(
                     tmpDirInputRef,
                     editingRowId,
@@ -242,9 +242,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.rootLogLevel"),
             options: {
                 hint: t("nodes.hints.rootLogLevel"),
-                filter: true,
-                sort: true,
                 display: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.rootLogLevel")),
                 customBodyRender: renderInputCell(
                     logLevelInputRef,
                     editingRowId
@@ -256,9 +255,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.jmxRegistryPort"),
             options: {
                 hint: t("nodes.hints.jmxRegistryPort"),
-                filter: true,
-                sort: true,
                 display: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.jmxRegistryPort")),
                 customBodyRender: renderInputCell(
                     registryPortInputRef,
                     editingRowId,
@@ -271,9 +269,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.jmxServerPort"),
             options: {
                 hint: t("nodes.hints.jmxServerPort"),
-                filter: true,
-                sort: true,
                 display: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.jmxServerPort")),
                 customBodyRender: renderInputCell(
                     serverPortInputRef,
                     editingRowId,
@@ -285,8 +282,8 @@ export const NodesPage: React.FC = () => {
             name: "enabled",
             label: t("nodes.enabled"),
             options: {
-                filter: true,
-                sort: true,
+                searchable: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.enabled")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     enabled,
@@ -302,6 +299,7 @@ export const NodesPage: React.FC = () => {
                 filter: false,
                 display: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     template,
@@ -314,12 +312,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.simpleApi"),
             options: {
                 hint: t("nodes.hints.simpleApi"),
-                filter: true,
-                sort: true,
-                // TODO: add a common for all boolean columns
-                //    customFilterListOptions: {
-                //     render: (value: any) => value ? t("nodes.templates") : t("nodes.nodes"), //
-                // },
+                searchable: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.simpleApi")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     loapApiSimple,
@@ -332,8 +326,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.clientApi"),
             options: {
                 hint: t("nodes.hints.clientApi"),
-                filter: true,
-                sort: true,
+                searchable: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.clientApi")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     loadApiClient,
@@ -346,8 +340,8 @@ export const NodesPage: React.FC = () => {
             label: t("nodes.adminApi"),
             options: {
                 hint: t("nodes.hints.adminApi"),
-                filter: true,
-                sort: true,
+                searchable: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("nodes.adminApi")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     loadApiAdmin,
@@ -361,7 +355,7 @@ export const NodesPage: React.FC = () => {
             options: {
                 hint: t("nodes.hints.lastSeenAlive"),
                 filter: false,
-                sort: true,
+                searchable: false,
                 display: !showTemplates,
                 customBodyRender: (value: any) => {
                     if (!value) {
@@ -390,6 +384,7 @@ export const NodesPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const lastSeenAlive = tableMeta.rowData[16];
                     const shouldShowDelete = !lastSeenAlive || differenceInMinutes(new Date(), new Date(lastSeenAlive)) > INACTIVE_NODE_THRESHOLD;
@@ -476,6 +471,7 @@ export const NodesPage: React.FC = () => {
         textLabels: muiTableTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: "none" as SelectableRows,
         expandableRows: true,
         expandableRowsHeader: true,

@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useTranslation } from "react-i18next";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import GetAppIcon from '@mui/icons-material/GetApp';
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
@@ -120,6 +120,9 @@ const UsersPage: React.FC = () => {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded",
             },
         },
@@ -128,8 +131,7 @@ const UsersPage: React.FC = () => {
             label: t("users.login"),
             options: {
                 hint: t("users.hints.login"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("users.login")),
                 customBodyRender: renderInputCell(
                     loginInputRef,
                     editingRowId,
@@ -142,8 +144,7 @@ const UsersPage: React.FC = () => {
             label: t("users.email"),
             options: {
                 hint: t("users.hints.email"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("users.email")),
                 customBodyRender: renderInputCell(
                     emailInputRef,
                     editingRowId,
@@ -157,8 +158,7 @@ const UsersPage: React.FC = () => {
             label: t("users.fullName"),
             options: {
                 hint: t("users.hints.fullName"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("users.fullName")),
                 customBodyRender: renderInputCell(
                     fullNameInputRef,
                     editingRowId,
@@ -171,8 +171,7 @@ const UsersPage: React.FC = () => {
             name: "locked",
             label: t("users.locked"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("users.locked")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     locked,
@@ -184,8 +183,8 @@ const UsersPage: React.FC = () => {
             name: "expirationDate",
             label: t("users.expirationDate"),
             options: {
-                filter: true,
-                sort: true,
+                filter: false,
+                searchable: false,
                 customBodyRender: renderDateCell(
                     editingRowId,
                     expirationDate,
@@ -222,6 +221,7 @@ const UsersPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -259,6 +259,7 @@ const UsersPage: React.FC = () => {
         textLabels: muiTableTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.user, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>

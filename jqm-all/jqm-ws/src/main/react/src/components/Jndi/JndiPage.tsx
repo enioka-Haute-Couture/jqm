@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Badge, Box, Container, Grid, IconButton, Tooltip } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -20,7 +20,7 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import { ViewParametersDialog } from "./ViewParametersDialog";
 
 export const JndiPage: React.FC = () => {
@@ -110,17 +110,23 @@ export const JndiPage: React.FC = () => {
 
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
         {
             name: "auth",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -129,8 +135,7 @@ export const JndiPage: React.FC = () => {
             label: t("jndi.jndiAlias"),
             options: {
                 hint: t("jndi.hints.jndiAlias"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jndi.jndiAlias")),
                 customBodyRender: renderInputCell(
                     selectedNameRef,
                     editingRowId
@@ -142,8 +147,7 @@ export const JndiPage: React.FC = () => {
             label: t("jndi.type"),
             options: {
                 hint: t("jndi.hints.type"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jndi.type")),
                 customBodyRender: renderInputCell(
                     selectedTypeRef,
                     editingRowId
@@ -155,8 +159,7 @@ export const JndiPage: React.FC = () => {
             label: t("jndi.factory"),
             options: {
                 hint: t("jndi.hints.factory"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jndi.factory")),
                 customBodyRender: renderInputCell(
                     selectedFactoryRef,
                     editingRowId
@@ -168,8 +171,7 @@ export const JndiPage: React.FC = () => {
             label: t("common.description"),
             options: {
                 hint: t("jndi.hints.description"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("common.description")),
                 customBodyRender: renderInputCell(
                     selectedDescriptionRef,
                     editingRowId
@@ -180,9 +182,9 @@ export const JndiPage: React.FC = () => {
             name: "singleton",
             label: t("jndi.singleton"),
             options: {
+                searchable: false,
                 hint: t("jndi.hints.singleton"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jndi.singleton")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     isSingleton,
@@ -194,8 +196,9 @@ export const JndiPage: React.FC = () => {
             name: "parameters",
             label: t("jndi.parameters"),
             options: {
-                filter: true,
+                filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const parameters = tableMeta.rowData[7];
                     const getBadge = (count: number) => (
@@ -254,6 +257,7 @@ export const JndiPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -274,6 +278,7 @@ export const JndiPage: React.FC = () => {
         textLabels: muiTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>

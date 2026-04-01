@@ -7,7 +7,7 @@ import {
     Tooltip,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -28,7 +28,7 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 
 const MappingsPage: React.FC = () => {
     const { t } = useTranslation();
@@ -122,11 +122,14 @@ const MappingsPage: React.FC = () => {
 
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -135,8 +138,14 @@ const MappingsPage: React.FC = () => {
             label: t("mappings.node"),
             options: {
                 hint: t("mappings.hints.node"),
-                filter: false,
                 sort: false,
+                searchable: false,
+                filterOptions: {
+                    renderValue: (value: any) => nodes?.find((x) => x.id === value)?.name || value
+                },
+                customFilterListOptions: {
+                    render: (value: any) => `${t("mappings.node")}: ${nodes?.find((x) => x.id === value)?.name || value}`,
+                },
                 customBodyRender: renderArrayCell(
                     editingRowId,
                     nodes
@@ -159,8 +168,14 @@ const MappingsPage: React.FC = () => {
             label: t("mappings.queue"),
             options: {
                 hint: t("mappings.hints.queue"),
-                filter: false,
                 sort: false,
+                searchable: false,
+                filterOptions: {
+                    renderValue: (value: any) => queues?.find((x) => x.id === value)?.name || value
+                },
+                customFilterListOptions: {
+                    render: (value: any) => `${t("mappings.queue")}: ${queues?.find((x) => x.id === value)?.name || value}`,
+                },
                 customBodyRender: renderArrayCell(
                     editingRowId,
                     queues
@@ -183,8 +198,7 @@ const MappingsPage: React.FC = () => {
             label: t("mappings.pollingInterval"),
             options: {
                 hint: t("mappings.hints.pollingInterval"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("mappings.pollingInterval")),
                 customBodyRender: renderInputCell(
                     pollingIntervalInputRef,
                     editingRowId,
@@ -198,8 +212,7 @@ const MappingsPage: React.FC = () => {
             label: t("mappings.maxConcurrentInstances"),
             options: {
                 hint: t("mappings.hints.maxConcurrentInstances"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("mappings.maxConcurrentInstances")),
                 customBodyRender: renderInputCell(
                     nbThreadInputRef,
                     editingRowId,
@@ -212,8 +225,8 @@ const MappingsPage: React.FC = () => {
             name: "enabled",
             label: t("mappings.enabled"),
             options: {
-                filter: true,
-                sort: true,
+                searchable: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("mappings.enabled")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     enabled,
@@ -227,6 +240,7 @@ const MappingsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -247,6 +261,7 @@ const MappingsPage: React.FC = () => {
         textLabels: muiTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.qmapping, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
