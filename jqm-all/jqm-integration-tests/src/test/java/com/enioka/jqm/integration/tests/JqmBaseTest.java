@@ -190,6 +190,11 @@ public class JqmBaseTest
         String dbType = System.getenv("DB");
         Assume.assumeFalse(dbType != null && dbType.equalsIgnoreCase("db2"));
     }
+    protected void assumeNotOracle()
+    {
+        String dbType = System.getenv("DB");
+        Assume.assumeFalse(dbType != null && dbType.equalsIgnoreCase("oracle"));
+    }
 
     protected void assumeJavaVersionStrictlyGreaterThan(double version)
     {

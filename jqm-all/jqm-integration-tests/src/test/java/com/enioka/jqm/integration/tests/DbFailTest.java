@@ -13,6 +13,7 @@ public class DbFailTest extends JqmPerTestContainerBase
     protected void prepareDatabaseEnvironment() throws NamingException
     {
         assumeNotDb2();
+        assumeNotOracle();
         super.prepareDatabaseEnvironment();
     }
 

@@ -24,7 +24,6 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.oracle.OracleContainer;
 
 public abstract class JqmPerTestContainerBase extends JqmBaseTest
 {
@@ -185,12 +184,6 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
                 dbVersion = "10";
             }
             return new MariaDBContainer<>("mariadb:" + dbVersion).withDatabaseName("jqm").withUsername("jqm").withPassword("jqm");
-        case "oracle":
-            if (dbVersion == null || dbVersion.isEmpty())
-            {
-                dbVersion = "21-slim";
-            }
-            return new OracleContainer("gvenzl/oracle-free:" + dbVersion).withUsername("jqm").withPassword("jqm");
         default:
             throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
         }
