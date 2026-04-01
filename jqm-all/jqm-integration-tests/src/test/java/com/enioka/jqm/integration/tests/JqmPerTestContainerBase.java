@@ -209,7 +209,6 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
     private void resetDatabaseState() throws NamingException
     {
         JqmDbClientFactory.reset();
-        DbManager.reset();
         db = null;
         InitialContext.doLookup("internal://reset");
     }

@@ -3,16 +3,19 @@ package com.enioka.jqm.integration.tests;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class DbFailTest extends JqmPerTestContainerBase
 {
-//    @Before
-//    public void before()
-//    {
-//        assumeNotDb2();
-//        assumeNotOracle();
-//    }
+    @Before
+    public void before()
+    {
+        // These tests are HSQLDB dependent.
+        assumeHsqldb();
+
+        // TODO: write some tests for PGSQL.
+    }
 
     @Test
     public void testDbFailure() throws Exception
