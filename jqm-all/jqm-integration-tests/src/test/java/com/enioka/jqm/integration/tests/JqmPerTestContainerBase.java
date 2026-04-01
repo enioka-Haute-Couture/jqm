@@ -24,7 +24,6 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.Db2Container;
 import org.testcontainers.oracle.OracleContainer;
 
 public abstract class JqmPerTestContainerBase extends JqmBaseTest
@@ -127,7 +126,10 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
         }
         finally
         {
-            TEST_INFRA_LOCK.unlock();
+            if (TEST_INFRA_LOCK.isHeldByCurrentThread())
+            {
+                TEST_INFRA_LOCK.unlock();
+            }
         }
     }
 
@@ -183,18 +185,12 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
                 dbVersion = "10";
             }
             return new MariaDBContainer<>("mariadb:" + dbVersion).withDatabaseName("jqm").withUsername("jqm").withPassword("jqm");
-        case "db2":
-            if (dbVersion == null || dbVersion.isEmpty())
-            {
-                dbVersion = "11.5";
-            }
-            return new Db2Container("ibmcom/db2:" + dbVersion).withDatabaseName("jqm").withUsername("jqm").withPassword("jqm");
         case "oracle":
             if (dbVersion == null || dbVersion.isEmpty())
             {
                 dbVersion = "21-slim";
             }
-            return new OracleContainer("gvenzl/oracle-xe:" + dbVersion).withUsername("jqm").withPassword("jqm");
+            return new OracleContainer("gvenzl/oracle-free:" + dbVersion).withUsername("jqm").withPassword("jqm");
         default:
             throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
         }

@@ -185,6 +185,12 @@ public class JqmBaseTest
         Assume.assumeTrue(s.isHsqldb());
     }
 
+    protected void assumeNotDb2()
+    {
+        String dbType = System.getenv("DB");
+        Assume.assumeFalse(dbType != null && dbType.equalsIgnoreCase("db2"));
+    }
+
     protected void assumeJavaVersionStrictlyGreaterThan(double version)
     {
         Assume.assumeTrue(getJavaVersion() > version);

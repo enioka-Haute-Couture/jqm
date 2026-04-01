@@ -251,20 +251,6 @@
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>db2</artifactId>
-            <version>1.21.4</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ibm.db2</groupId>
-            <artifactId>jcc</artifactId>
-            <version>12.1.4.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testcontainers</groupId>
             <artifactId>oracle-free</artifactId>
             <version>1.21.4</version>
             <scope>test</scope>

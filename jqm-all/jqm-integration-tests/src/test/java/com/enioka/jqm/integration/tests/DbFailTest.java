@@ -2,19 +2,18 @@ package com.enioka.jqm.integration.tests;
 
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+import javax.naming.NamingException;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class DbFailTest extends JqmPerTestContainerBase
 {
-    @Before
-    public void before()
+    @Override
+    protected void prepareDatabaseEnvironment() throws NamingException
     {
-        // These tests are HSQLDB dependent.
-        assumeHsqldb();
-
-        // TODO: write some tests for PGSQL.
+        assumeNotDb2();
+        super.prepareDatabaseEnvironment();
     }
 
     @Test
