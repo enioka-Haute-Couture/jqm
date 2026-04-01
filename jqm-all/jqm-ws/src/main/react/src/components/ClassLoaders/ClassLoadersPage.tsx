@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useTranslation } from "react-i18next";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import { useClassLoaderAPI } from "./ClassLoaderAPI";
 import { CreateClassLoaderDialog } from "./CreateClassLoaderDialog";
 import { EditHiddenClassesDialog } from "./EditHiddenClassesDialog";
@@ -92,11 +92,14 @@ const ClassLoadersPage: React.FC = () => {
     }, []);
 
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -105,8 +108,7 @@ const ClassLoadersPage: React.FC = () => {
             label: t("classLoaders.name"),
             options: {
                 hint: t("classLoaders.hints.name"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("classLoaders.name")),
                 customBodyRender: renderInputCell(
                     nameInputRef,
                     editingRowId,
@@ -118,9 +120,9 @@ const ClassLoadersPage: React.FC = () => {
             name: "childFirst",
             label: t("classLoaders.childFirst"),
             options: {
+                searchable: false,
                 hint: t("classLoaders.hints.childFirst"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("classLoaders.childFirst")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     childFirst,
@@ -132,9 +134,9 @@ const ClassLoadersPage: React.FC = () => {
             name: "hiddenClasses",
             label: t("classLoaders.hiddenClasses"),
             options: {
+                filter: false,
+                sort: false,
                 hint: t("classLoaders.hints.hiddenClasses"),
-                filter: true,
-                sort: true,
                 customBodyRender: renderDialogCell(
                     editingRowId,
                     t("classLoaders.editHiddenClassesTooltip"),
@@ -148,9 +150,9 @@ const ClassLoadersPage: React.FC = () => {
             name: "tracingEnabled",
             label: t("classLoaders.tracingEnabled"),
             options: {
+                searchable: false,
                 hint: t("classLoaders.hints.tracingEnabled"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("classLoaders.tracingEnabled")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     tracingEnabled,
@@ -162,9 +164,9 @@ const ClassLoadersPage: React.FC = () => {
             name: "persistent",
             label: t("classLoaders.persistent"),
             options: {
+                searchable: false,
                 hint: t("classLoaders.hints.persistent"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("classLoaders.persistent")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     persistent,
@@ -177,8 +179,8 @@ const ClassLoadersPage: React.FC = () => {
             label: t("classLoaders.allowedRunners"),
             options: {
                 hint: t("classLoaders.hints.allowedRunners"),
-                filter: true,
-                sort: true,
+                filter: false,
+                sort: false,
                 customBodyRender: renderDialogCell(
                     editingRowId,
                     t("classLoaders.editAllowedRunnersTooltip"),
@@ -194,6 +196,7 @@ const ClassLoadersPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -214,6 +217,7 @@ const ClassLoadersPage: React.FC = () => {
         textLabels: muiTableTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.cl, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>

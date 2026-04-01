@@ -18,7 +18,7 @@ import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 
 const RolesPage: React.FC = () => {
     const { t } = useTranslation();
@@ -80,6 +80,9 @@ const RolesPage: React.FC = () => {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded",
             },
         },
@@ -88,8 +91,7 @@ const RolesPage: React.FC = () => {
             label: t("roles.name"),
             options: {
                 hint: t("roles.hints.name"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("roles.name")),
                 customBodyRender: renderInputCell(
                     nameInputRef,
                     editingRowId,
@@ -102,8 +104,7 @@ const RolesPage: React.FC = () => {
             label: t("common.description"),
             options: {
                 hint: t("roles.hints.description"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("common.description")),
                 customBodyRender: renderInputCell(
                     descriptionInputRef,
                     editingRowId,
@@ -133,6 +134,7 @@ const RolesPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -153,6 +155,7 @@ const RolesPage: React.FC = () => {
         textLabels: muiTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.role, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>

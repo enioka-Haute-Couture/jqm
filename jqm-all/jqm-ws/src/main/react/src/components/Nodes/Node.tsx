@@ -15,4 +15,5 @@ export interface Node {
     loapApiSimple: boolean;
     stop: boolean | null;
     enabled: boolean | null;
+    template: boolean | null;
 }
