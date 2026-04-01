@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useTranslation } from "react-i18next";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import { CreateParameterDialog } from "./CreateParameterDialog";
 import useParametersApi from "./ParametersApi";
 import { renderActionsCell, renderInputCell } from "../TableCells";
@@ -70,11 +70,14 @@ const ClusterwideParametersPage: React.FC = () => {
 
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -83,8 +86,7 @@ const ClusterwideParametersPage: React.FC = () => {
             label: t("clusterParameters.key"),
             options: {
                 hint: t("clusterParameters.hints.key"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("clusterParameters.key")),
                 customBodyRender: renderInputCell(
                     paramKeyInputRef,
                     editingRowId
@@ -96,8 +98,7 @@ const ClusterwideParametersPage: React.FC = () => {
             label: t("clusterParameters.value"),
             options: {
                 hint: t("clusterParameters.hints.value"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("clusterParameters.value")),
                 customBodyRender: renderInputCell(
                     paramValueInputRef,
                     editingRowId
@@ -110,6 +111,7 @@ const ClusterwideParametersPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -130,6 +132,7 @@ const ClusterwideParametersPage: React.FC = () => {
         textLabels: muiTableTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.prm, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>

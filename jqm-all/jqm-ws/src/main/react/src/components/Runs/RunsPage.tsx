@@ -22,7 +22,7 @@ import MuiTablePagination from "@mui/material/TablePagination";
 
 
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { DisplayData, FilterType, MUIDataTableColumn, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
+import MUIDataTable, { DisplayData, FilterType, MUIDataTableColumn, MUIDataTableColumnDef, MUIDataTableMeta, MUIDataTableState, SelectableRows } from "mui-datatables";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
@@ -48,7 +48,7 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
 import { useTranslation } from "react-i18next";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import { ConfirmationDialog } from "../ConfirmationDialog";
 
 export type LOG_TYPE =
@@ -197,13 +197,12 @@ const RunsPage: React.FC = () => {
         setShowBulkSwitchQueue(false);
     };
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: t("runs.id"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.id")),
                 filterList: filterList[0],
                 filterType: "textField" as FilterType,
             },
@@ -212,8 +211,7 @@ const RunsPage: React.FC = () => {
             name: "applicationName",
             label: t("runs.applicationName"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.applicationName")),
                 filterList: filterList[1],
                 filterType: "textField" as FilterType,
             },
@@ -222,8 +220,7 @@ const RunsPage: React.FC = () => {
             name: "queueName",
             label: t("runs.queueName"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.queueName")),
                 filterList: filterList[2],
                 filterOptions: {
                     names: queues?.map((queue) => queue.name),
@@ -234,8 +231,7 @@ const RunsPage: React.FC = () => {
             name: "state",
             label: t("runs.state"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.state")),
                 filterList: filterList[3],
                 filterOptions: {
                     names: queryLiveInstances ? [
@@ -287,8 +283,6 @@ const RunsPage: React.FC = () => {
             name: "enqueueDate",
             label: t("runs.enqueueDate"),
             options: {
-                filter: true,
-                sort: true,
                 filterList: filterList[4],
                 filterType: "custom" as FilterType,
                 customFilterListOptions: {
@@ -375,7 +369,7 @@ const RunsPage: React.FC = () => {
             label: t("runs.beganRunningDate"),
             options: {
                 filter: false,
-                sort: true,
+                searchable: false,
                 customBodyRender: (value: any) => {
                     if (value) {
                         return new Date(value).toLocaleString();
@@ -388,7 +382,7 @@ const RunsPage: React.FC = () => {
             label: t("runs.endDate"),
             options: {
                 filter: false,
-                sort: true,
+                searchable: false,
                 customBodyRender: (value: any) => {
                     if (!queryLiveInstances && value) {
                         return new Date(value).toLocaleString();
@@ -402,6 +396,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: (_value: any, tableMeta: MUIDataTableMeta) => {
                     const beganRunningDate = tableMeta.rowData[5];
                     let duration: number;
@@ -436,8 +431,7 @@ const RunsPage: React.FC = () => {
             name: "user",
             label: t("runs.user"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.user")),
                 filterList: filterList[8],
                 filterType: "textField" as FilterType,
             },
@@ -446,8 +440,7 @@ const RunsPage: React.FC = () => {
             name: "parent",
             label: t("runs.parent"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.parent")),
                 filterList: filterList[9],
                 filterType: "textField" as FilterType,
             },
@@ -458,6 +451,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
             },
         },
 
@@ -465,8 +459,7 @@ const RunsPage: React.FC = () => {
             name: "sessionID",
             label: t("runs.sessionID"),
             options: {
-                filter: true,
-                sort: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("runs.sessionID")),
                 filterList: filterList[11],
                 filterType: "textField" as FilterType,
             },
@@ -477,6 +470,7 @@ const RunsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: (_value: any, tableMeta: MUIDataTableMeta) => {
                     const jobInstanceId = tableMeta.rowData[0];
                     const status = tableMeta.rowData[3];

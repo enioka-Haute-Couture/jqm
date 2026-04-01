@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { MUIDataTableColumn } from "mui-datatables";
+import {
+    MUIDataTableColumn,
+    MUIDataTableCustomFilterListOptions,
+} from "mui-datatables";
 
 export const useMUIDataTableTextLabels = (customNoMatch?: string) => {
     const { t } = useTranslation();
@@ -42,3 +45,9 @@ export const useMUIDataTableTextLabels = (customNoMatch?: string) => {
         },
     };
 };
+
+export const showColumnLabelFilterListOptions: (
+    label: string
+) => MUIDataTableCustomFilterListOptions = (label) => ({
+    render: (value: any) => `${label}: ${value}`,
+});

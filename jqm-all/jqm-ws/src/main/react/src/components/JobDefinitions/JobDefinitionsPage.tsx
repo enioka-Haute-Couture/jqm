@@ -8,13 +8,13 @@ import {
     Tooltip,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import { Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useTranslation } from "react-i18next";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 import {
     JobDefinitionParameter,
     JobDefinitionSchedule,
@@ -240,11 +240,14 @@ export const JobDefinitionsPage: React.FC = () => {
             .join(", ");
     };
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -253,8 +256,7 @@ export const JobDefinitionsPage: React.FC = () => {
             label: t("jobDefinitions.applicationName"),
             options: {
                 hint: t("jobDefinitions.hints.applicationName"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jobDefinitions.applicationName")),
                 customBodyRender: renderInputCell(
                     applicationNameInputRef,
                     editingRowId,
@@ -267,8 +269,7 @@ export const JobDefinitionsPage: React.FC = () => {
             label: t("jobDefinitions.description"),
             options: {
                 hint: t("jobDefinitions.hints.description"),
-                filter: false,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jobDefinitions.description")),
                 customBodyRender: renderInputCell(
                     descriptionInputRef,
                     editingRowId,
@@ -281,8 +282,14 @@ export const JobDefinitionsPage: React.FC = () => {
             label: t("jobDefinitions.defaultQueue"),
             options: {
                 hint: t("jobDefinitions.hints.defaultQueue"),
-                filter: false,
                 sort: false,
+                searchable: false,
+                filterOptions: {
+                    renderValue: (value: any) => queues?.find((x) => x.id === value)?.name || value
+                },
+                customFilterListOptions: {
+                    render: (value: any) => `${t("jobDefinitions.defaultQueue")}: ${queues?.find((x) => x.id === value)?.name || value}`,
+                },
                 customBodyRender: renderArrayCell(
                     editingRowId,
                     queues
@@ -305,8 +312,7 @@ export const JobDefinitionsPage: React.FC = () => {
             label: t("jobDefinitions.enabled"),
             options: {
                 hint: t("jobDefinitions.hints.enabled"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jobDefinitions.enabled")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     enabled,
@@ -319,8 +325,7 @@ export const JobDefinitionsPage: React.FC = () => {
             label: t("jobDefinitions.highlander"),
             options: {
                 hint: t("jobDefinitions.hints.highlander"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jobDefinitions.highlander")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     highlander,
@@ -332,8 +337,7 @@ export const JobDefinitionsPage: React.FC = () => {
             name: "jobType",
             label: t("jobDefinitions.jobType"),
             options: {
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("jobDefinitions.jobType")),
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => (
                     <Typography
                         style={{ fontSize: "0.875rem", paddingTop: "5px" }}
@@ -397,6 +401,7 @@ export const JobDefinitionsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: (value: any, tableMeta: MUIDataTableMeta) => {
                     const rowSchedules = tableMeta.rowData[10];
                     const getBadge = (count: number) => (
@@ -446,6 +451,7 @@ export const JobDefinitionsPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -466,6 +472,7 @@ export const JobDefinitionsPage: React.FC = () => {
         textLabels: muiTableTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.jd, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>

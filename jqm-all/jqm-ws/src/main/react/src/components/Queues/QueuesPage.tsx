@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import MUIDataTable, { Display, MUIDataTableMeta, SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, MUIDataTableColumnDef, MUIDataTableMeta, SelectableRows } from "mui-datatables";
 import HelpIcon from "@mui/icons-material/Help";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -18,7 +18,7 @@ import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/Aut
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { HelpDialog } from "../HelpDialog";
 import { setPageTitle } from "../../utils/title";
-import { useMUIDataTableTextLabels } from "../../utils/useMUIDataTableTextLabels";
+import { showColumnLabelFilterListOptions, useMUIDataTableTextLabels } from "../../utils/muiDataTable";
 
 const QueuesPage: React.FC = () => {
     const { t } = useTranslation();
@@ -83,11 +83,14 @@ const QueuesPage: React.FC = () => {
 
     const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
             options: {
+                filter: false,
+                sort: false,
+                searchable: false,
                 display: "excluded" as Display,
             },
         },
@@ -96,8 +99,7 @@ const QueuesPage: React.FC = () => {
             label: t("queues.name"),
             options: {
                 hint: t("queues.hints.name"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("queues.name")),
                 customBodyRender: renderInputCell(
                     queueNameInputRef,
                     editingRowId
@@ -109,8 +111,7 @@ const QueuesPage: React.FC = () => {
             label: t("queues.description"),
             options: {
                 hint: t("queues.hints.description"),
-                filter: true,
-                sort: true,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("queues.description")),
                 customBodyRender: renderInputCell(
                     descriptionInputRef,
                     editingRowId
@@ -122,8 +123,8 @@ const QueuesPage: React.FC = () => {
             label: t("queues.isDefault"),
             options: {
                 hint: t("queues.hints.isDefault"),
-                filter: true,
-                sort: true,
+                searchable: false,
+                customFilterListOptions: showColumnLabelFilterListOptions(t("queues.isDefault")),
                 customBodyRender: renderBooleanCell(
                     editingRowId,
                     defaultQueue,
@@ -137,6 +138,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
+                searchable: false,
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
@@ -157,6 +159,7 @@ const QueuesPage: React.FC = () => {
         textLabels: muiTextLabels,
         download: false,
         print: false,
+        viewColumns: false,
         selectableRows: (canUserAccess(PermissionObjectType.queue, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
