@@ -78,6 +78,12 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         }
     }
 
+    @Override
+    public void addURL(URL url)
+    {
+        super.addURL(url);
+    }
+
     /**
      * Everything here can run without the database.
      *

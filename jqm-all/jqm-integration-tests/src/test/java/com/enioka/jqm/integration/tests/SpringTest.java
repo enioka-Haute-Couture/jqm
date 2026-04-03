@@ -1,7 +1,13 @@
 package com.enioka.jqm.integration.tests;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.ClEvent;
+import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 import com.enioka.jqm.xml.JqmXmlException;
@@ -9,7 +15,6 @@ import com.enioka.jqm.xml.XmlJobDefParser;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,8 +32,6 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSimpleSingleLaunch()
     {
-        this.assumeJavaVersionStrictlyLowerThan(1.9); // The tested version of Spring is not really compatible with Java 9+.
-
         CreationTools.createDatabaseProp("jdbc/spring_ds", "org.h2.Driver", "jdbc:h2:./target/TEST.db;DB_CLOSE_ON_EXIT=FALSE", "sa", "sa",
                 cnx, "SELECT 1", null, true);
         CreationTools.createJobDef(null, true, "com.enioka.jqm.test.spring1.Application", null,
@@ -56,10 +59,6 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSpringRunner()
     {
-        String ver = System.getProperty("java.version");
-        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
-        Assume.assumeTrue(javaVersion < 1.9); // The tested version of Spring is not really compatible with Java 9+.
-
         try
         {
             XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmlspring.xml", cnx);
@@ -78,6 +77,38 @@ public class SpringTest extends JqmBaseTest
 
         TestHelpers.waitFor(3, 10000, cnx);
         Assert.assertEquals(3, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+    }
+
+    /**
+     * Verifies that the extraClasspathDirs handler parameter adds the given directory to the Spring context class loader, making resources
+     * placed there visible to the running job.
+     */
+    @Test
+    public void testSpringRunnerWithExtraClasspathDirs() throws Exception
+    {
+        // Create a temporary directory that will be added to the Spring context class loader and place a test file in it
+        File extraDir = new File("./target/extra-classpath-test-dir");
+        extraDir.mkdirs();
+        FileUtils.write(new File(extraDir, "extra-classpath-test.txt"), "test resource", StandardCharsets.US_ASCII);
+
+        Map<String, String> handlerParams = new HashMap<>();
+        handlerParams.put("additionalScan", "com.enioka.jqm.spring3");
+        handlerParams.put("extraClasspathDirs", extraDir.getAbsolutePath());
+
+        Long clId = Cl.create(cnx, "ExtraClasspathSpringContext", false, null, false, true,
+                "com.enioka.jqm.runner.spring.AnnotationSpringRunner");
+        ClHandler.create(cnx, ClEvent.JI_STARTING, "com.enioka.jqm.handler.AnnotationSpringContextBootstrapHandler", clId, handlerParams);
+        cnx.commit();
+
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.spring3.job.Job3", null, "jqm-tests/jqm-test-spring-3/target/test.jar",
+                TestHelpers.qVip, -1, "TestSpring3", null, null, null, null, null, false, cnx, "ExtraClasspathSpringContext");
+
+        addAndStartEngine();
+        jqmClient.newJobRequest("TestSpring3", null).enqueue();
+
+        TestHelpers.waitFor(1, 10000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 }

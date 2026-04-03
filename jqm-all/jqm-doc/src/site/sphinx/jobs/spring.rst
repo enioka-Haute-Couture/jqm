@@ -153,6 +153,10 @@ It is necessary to add the handler and runner to the execution context inside th
                             <key>additionalScan</key>
                             <value>com.compagny.project</value>
                         </parameter>
+                        <parameter>
+                            <key>extraClasspathDirs</key>
+                            <value>/absolute/path/to/extra/dir</value>
+                        </parameter>
                     </parameters>
                 </handler>
             </eventHandlers>
@@ -166,6 +170,7 @@ The handler will intercept the "job instance is starting" event and initialize i
 * contextDisplayName: name of the context in the logs
 * contextId: id of the context bean
 * allowCircularReferences: if "true", the context will allow circular references.
+* extraClasspathDirs: a comma-separated list of absolute directory paths to add to the Spring context class loader.
 
 
 If no parameters are given, the job class (the first one to run) itself will be added to the Spring context, so if it is a @Configuration it will be enabled.
