@@ -1,5 +1,7 @@
 package com.enioka.jqm.handler;
 
+import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,6 +163,32 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
                     // def.setFactoryBeanName("jobManagerProvider");
                     // def.setFactoryMethodName("getObject");
                     // ctx.registerBeanDefinition("jobManager", def);
+
+                    if (handlerParameters.containsKey("extraClasspathDirs"))
+                    {
+                        ClassLoader cl = AnnotationSpringContextBootstrapHandler.class.getClassLoader();
+                        try
+                        {
+                            Method addUrl = cl.getClass().getMethod("addURL", java.net.URL.class);
+                            for (String dir : handlerParameters.get("extraClasspathDirs").split(","))
+                            {
+                                File f = new File(dir.trim());
+                                if (!f.isDirectory())
+                                {
+                                    throw new RuntimeException("extraClasspathDirs entry is not a directory: " + dir.trim());
+                                }
+                                addUrl.invoke(cl, f.toURI().toURL());
+                            }
+                        }
+                        catch (RuntimeException e)
+                        {
+                            throw e;
+                        }
+                        catch (Exception e)
+                        {
+                            throw new RuntimeException("Could not add extra classpath directories to the context class loader", e);
+                        }
+                    }
 
                     // Go: this initializes the context
                     ctx.refresh();
