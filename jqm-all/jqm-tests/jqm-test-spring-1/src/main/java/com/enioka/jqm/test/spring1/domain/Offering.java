@@ -18,7 +18,7 @@ public class Offering implements Serializable
     @Column(columnDefinition = "decimal")
     private Long offeringNumber;
 
-    @Column(name = "OfferingType_Code", length = 1, columnDefinition = "char")
+    @Column(name = "OfferingType_Code", length = 50)
     private String offeringTypeCode;
 
     //// etc columns
