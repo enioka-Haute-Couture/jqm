@@ -287,7 +287,7 @@ export const JndiPage: React.FC = () => {
                         <Tooltip title={t("jndi.createNewResource")}>
                             <IconButton
                                 color="default"
-                                aria-label={"Create new JNDI resource"}
+                                aria-label={"add"}
                                 onClick={() => setShowDropDown(true)}
                                 size="large">
                                 <AddCircleIcon
