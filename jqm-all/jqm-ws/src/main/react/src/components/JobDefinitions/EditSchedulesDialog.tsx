@@ -87,12 +87,13 @@ export const EditSchedulesDialog: React.FC<{
                         value={cronExpression}
                         error={cronExpressionValidationErrors != null}
                         helperText={<List dense>
-                            {cronExpressionValidationErrors?.map((error: string) => (
-                                <ListItem>
+                            {cronExpressionValidationErrors?.map((error: string, index: number) => (
+                                <ListItem key={index}>
                                     <ListItemText primary={error} />
                                 </ListItem>
                             ))}
                         </List>}
+                        FormHelperTextProps={{ component: "div" } as any}
                         onChange={(
                             event: React.ChangeEvent<HTMLInputElement>
                         ) => {

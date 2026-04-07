@@ -34,7 +34,7 @@ export const SwitchJobQueueDialog: React.FC<{
     switchJobQueue: (queueId: number) => void;
 }> = ({ closeDialog, jobId, queues, switchJobQueue }) => {
     const { t } = useTranslation();
-    const [queueId, setQueueId] = useState<number | undefined>();
+    const [queueId, setQueueId] = useState<number | "">("");
 
     const classes = useStyles();
 
@@ -55,7 +55,7 @@ export const SwitchJobQueueDialog: React.FC<{
                         fullWidth
                         value={queueId}
                         onChange={
-                            (event: SelectChangeEvent<number>, child: ReactNode) => {
+                            (event: SelectChangeEvent<number | "">, child: ReactNode) => {
                                 setQueueId(event.target.value as number);
                             }}
                         input={<Input />}
@@ -80,10 +80,10 @@ export const SwitchJobQueueDialog: React.FC<{
                     variant="contained"
                     size="small"
                     color="primary"
-                    disabled={!queueId}
+                    disabled={queueId === ""}
                     style={{ margin: "8px" }}
                     onClick={() => {
-                        switchJobQueue(queueId!);
+                        switchJobQueue(queueId as number);
                         closeDialog();
                     }}
                 >

@@ -25,12 +25,12 @@ If the web console port is different from `59977`, **set the environment variabl
 
 ## Start
 
-* Use `yarn install` to install dependencies
-* Use `yarn start`to start development server
+- Use `yarn install` to install dependencies
+- Use `yarn start`to start development server
 
 ## Troubleshooting
 
-* If you get a white screen check the API calls being made ; 504 HTTP errors indicate the proxy is not properly configured ([see API proxy configuration](#api-proxy-configuration))
+- If you get a white screen check the API calls being made ; 504 HTTP errors indicate the proxy is not properly configured ([see API proxy configuration](#api-proxy-configuration))
 
 ## Reverse Proxy Deployment
 
@@ -45,3 +45,9 @@ The frontend is not built by default to speed things up.
 During development after making changes to the React app, include them in the build by running `yarn build` before `mvn package`.
 
 For production builds use the `-Pbuild-frontend` option with `mvn package`.
+
+## Tests
+
+- `yarn test` to run tests
+- `yarn test:watch` to run tests and watch for files changes
+- `yarn test:coverage` runs tests and show the current coverage

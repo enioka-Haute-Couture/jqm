@@ -25,13 +25,11 @@ export const EditTagsDialog: React.FC<{
     setTags: (tags: JobDefinitionTags) => void;
 }> = ({ closeDialog, tags, setTags }) => {
     const { t } = useTranslation();
-    const [application, setApplication] = useState<string | undefined>(
-        tags.application
-    );
-    const [module, setModule] = useState<string | undefined>(tags.module);
-    const [keyword1, setKeyword1] = useState<string | undefined>(tags.keyword1);
-    const [keyword2, setKeyword2] = useState<string | undefined>(tags.keyword2);
-    const [keyword3, setKeyword3] = useState<string | undefined>(tags.keyword3);
+    const [application, setApplication] = useState<string>(tags.application ?? "");
+    const [module, setModule] = useState<string>(tags.module ?? "");
+    const [keyword1, setKeyword1] = useState<string>(tags.keyword1 ?? "");
+    const [keyword2, setKeyword2] = useState<string>(tags.keyword2 ?? "");
+    const [keyword3, setKeyword3] = useState<string>(tags.keyword3 ?? "");
 
     const classes = useStyles();
 
