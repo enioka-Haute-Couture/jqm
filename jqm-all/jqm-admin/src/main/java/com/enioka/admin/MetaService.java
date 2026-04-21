@@ -627,6 +627,7 @@ public class MetaService
             res.setTracingEnabled(rs.getBoolean(colShift + 5));
             res.setPersistent(rs.getBoolean(colShift + 6));
             res.setAllowedRunners(rs.getString(colShift + 7));
+            res.setExtraClasspathDirs(rs.getString(colShift + 8));
             return res;
         }
         catch (SQLException e)
@@ -704,6 +705,9 @@ public class MetaService
      */
     public static void deleteClassLoader(DbConn cnx, long id)
     {
+        // Delete the asscociated handlers
+        cnx.runUpdate("clehprm_delete_all_for_cl", id);
+        cnx.runUpdate("cleh_delete_all_for_cl", id);
         QueryResult qr = cnx.runUpdate("cl_delete_by_id", id);
         if (qr.nbUpdated != 1)
         {
@@ -729,12 +733,12 @@ public class MetaService
             if (dto.getId() != null)
             {
                 cnx.runUpdate("cl_update_all_fields_by_id", dto.getName(), dto.isChildFirst(), dto.getHiddenClasses(),
-                        dto.isTracingEnabled(), dto.isPersistent(), dto.getAllowedRunners(), dto.getId());
+                        dto.isTracingEnabled(), dto.isPersistent(), dto.getAllowedRunners(), dto.getExtraClasspathDirs(), dto.getId());
             }
             else
             {
                 Cl.create(cnx, dto.getName(), dto.isChildFirst(), dto.getHiddenClasses(), dto.isTracingEnabled(), dto.isPersistent(),
-                        dto.getAllowedRunners());
+                        dto.getAllowedRunners(), dto.getExtraClasspathDirs());
 
             }
         }

@@ -193,6 +193,20 @@ public class ClassloaderManager
         // Remember to also add the jar file itself... as CL can be shared, there is no telling if it already present or not.
         jobClassLoader.extendUrls(jarFile.toURI().toURL(), classpath);
 
+        // Add any extra classpath directories
+        if (cldef != null && cldef.getExtraClasspathDirs() != null && !cldef.getExtraClasspathDirs().isEmpty())
+        {
+            for (String dir : cldef.getExtraClasspathDirs().split(","))
+            {
+                File extraDir = new File(dir.trim());
+                if (!extraDir.isDirectory())
+                {
+                    throw new JqmPayloadException("extraClasspathDirs entry is not a directory: " + dir.trim());
+                }
+                jobClassLoader.extendUrls(extraDir.toURI().toURL(), null);
+            }
+        }
+
         // Some debug display
         jqmlogger.trace("CL URLs:");
         for (URL url : jobClassLoader.getURLs())

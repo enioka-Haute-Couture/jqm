@@ -27,21 +27,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-export const EditHiddenClassesDialog: React.FC<{
+export const EditExtraClasspathDirsDialog: React.FC<{
     closeDialog: () => void;
-    hiddenClasses: string[];
-    setHiddenClasses: (hiddenClasses: string[]) => void;
-}> = ({ closeDialog, hiddenClasses, setHiddenClasses }) => {
+    extraClasspathDirs: string[];
+    setExtraClasspathDirs: (extraClasspathDirs: string[]) => void;
+}> = ({ closeDialog, extraClasspathDirs, setExtraClasspathDirs }) => {
     const { t } = useTranslation();
     const classes = useStyles();
 
-    const [editedHiddenClasses, setEditedHiddenClasses] =
-        useState<string[]>(hiddenClasses);
+    const [editedExtraClasspathDirs, setEditedExtraClasspathDirs] =
+        useState<string[]>(extraClasspathDirs);
 
-    const [newHiddenClass, setNewHiddenClass] = useState<string>("");
+    const [newExtraClasspathDir, setNewExtraClasspathDir] = useState<string>("");
 
-    const wouldExceedMaxStringLength = (classes_: string[], newClass: string) =>
-        [...classes_, newClass].join(",").length > 1024;
+    const wouldExceedMaxStringLength = (dirs: string[], newDir: string) =>
+        [...dirs, newDir].join(",").length > 1024;
 
     return (
         <Dialog
@@ -51,25 +51,25 @@ export const EditHiddenClassesDialog: React.FC<{
             fullWidth
             maxWidth={"md"}
         >
-            <DialogTitle id="form-dialog-title">{t("classLoaders.editHiddenClassesDialog.title")}</DialogTitle>
+            <DialogTitle id="form-dialog-title">{t("classLoaders.editExtraClasspathDirsDialog.title")}</DialogTitle>
             <DialogContent>
                 <DialogContentText style={{ marginBottom: "8px" }}>
-                    {t("classLoaders.editHiddenClassesDialog.description")}
+                    {t("classLoaders.editExtraClasspathDirsDialog.description")}
                 </DialogContentText>
                 <TextField
                     className={classes.TextField}
-                    label={t("classLoaders.editHiddenClassesDialog.regexpLabel")}
-                    value={newHiddenClass}
+                    label={t("classLoaders.editExtraClasspathDirsDialog.dirLabel")}
+                    value={newExtraClasspathDir}
                     onChange={(
                         event: React.ChangeEvent<HTMLInputElement>
                     ) => {
-                        setNewHiddenClass(event.target.value);
+                        setNewExtraClasspathDir(event.target.value);
                     }}
                     fullWidth
                     variant="standard"
-                    error={wouldExceedMaxStringLength(editedHiddenClasses, newHiddenClass)}
+                    error={wouldExceedMaxStringLength(editedExtraClasspathDirs, newExtraClasspathDir)}
                     helperText={
-                        wouldExceedMaxStringLength(editedHiddenClasses, newHiddenClass)
+                        wouldExceedMaxStringLength(editedExtraClasspathDirs, newExtraClasspathDir)
                             ? t("errors.maxStringLengthExceeded", { length: 1024 })
                             : undefined
                     }
@@ -80,30 +80,30 @@ export const EditHiddenClassesDialog: React.FC<{
                     size="small"
                     style={{ marginBottom: "16px" }}
                     disabled={
-                        editedHiddenClasses.filter(
-                            (value) => value === newHiddenClass
-                        ).length > 0 || !newHiddenClass || wouldExceedMaxStringLength(editedHiddenClasses, newHiddenClass)
+                        editedExtraClasspathDirs.filter(
+                            (value) => value === newExtraClasspathDir
+                        ).length > 0 || !newExtraClasspathDir || wouldExceedMaxStringLength(editedExtraClasspathDirs, newExtraClasspathDir)
                     }
                     onClick={() => {
-                        setEditedHiddenClasses([
-                            ...editedHiddenClasses,
-                            newHiddenClass
+                        setEditedExtraClasspathDirs([
+                            ...editedExtraClasspathDirs,
+                            newExtraClasspathDir
                         ]);
                     }}
                     color="primary"
                 >
-                    {t("classLoaders.editHiddenClassesDialog.addButton")}
+                    {t("classLoaders.editExtraClasspathDirsDialog.addButton")}
                 </Button>
                 <TableContainer component={Paper}>
                     <Table size="small" aria-label="Parameters">
                         <TableHead>
                             <TableRow>
-                                <TableCell>{t("classLoaders.editHiddenClassesDialog.hiddenClassColumn")}</TableCell>
+                                <TableCell>{t("classLoaders.editExtraClasspathDirsDialog.dirColumn")}</TableCell>
                                 <TableCell>{t("common.actions")}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {editedHiddenClasses.map((value, index) => (
+                            {editedExtraClasspathDirs.map((value, index) => (
                                 <TableRow key={value}>
                                     <TableCell component="th" scope="row">
                                         {value}
@@ -113,8 +113,8 @@ export const EditHiddenClassesDialog: React.FC<{
                                             color="default"
                                             aria-label={"delete"}
                                             onClick={() => {
-                                                setEditedHiddenClasses(
-                                                    editedHiddenClasses.filter(
+                                                setEditedExtraClasspathDirs(
+                                                    editedExtraClasspathDirs.filter(
                                                         (_, i) =>
                                                             i !== index
                                                     )
@@ -143,7 +143,7 @@ export const EditHiddenClassesDialog: React.FC<{
                     size="small"
                     style={{ margin: "8px" }}
                     onClick={() => {
-                        setHiddenClasses(editedHiddenClasses);
+                        setExtraClasspathDirs(editedExtraClasspathDirs);
                         closeDialog();
                     }}
                     color="primary"

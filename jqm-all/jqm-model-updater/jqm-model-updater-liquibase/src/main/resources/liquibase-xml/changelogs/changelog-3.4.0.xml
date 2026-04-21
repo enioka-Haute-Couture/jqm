@@ -16,4 +16,12 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="pna" id="5">
+        <addColumn tableName="CL">
+            <column name="EXTRA_CLASSPATH_DIRS" type="VARCHAR(1024)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

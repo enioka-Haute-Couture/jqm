@@ -258,6 +258,7 @@
     "errors": {
         "genericError": "An error occurred, please contact support support@enioka.com for help",
         "dismiss": "Dismiss",
+        "maxStringLengthExceeded": "The total length of all values cannot exceed {{length}} characters",
         "api": {
             "itemNotFound": "Item with ID {{id}} not found",
             "jndiAliasAlreadyUsed": "Cannot update resource, JNDI alias already used",
@@ -318,15 +319,18 @@
         "tracingEnabled": "Tracing Enabled",
         "persistent": "Persistent",
         "allowedRunners": "Allowed Runners",
+        "extraClasspathDirs": "Extra classpath directories",
         "editHiddenClassesTooltip": "Edit hidden classes",
         "editAllowedRunnersTooltip": "Edit allowed runners",
+        "editExtraClasspathDirsTooltip": "Edit extra classpath directories",
         "hints": {
             "name": "The key used to identify the class loader in the deployment descriptor. Unique.",
             "childFirst": "Offer option to have child first class loading. Parent first is the norm in JSE.",
             "hiddenClasses": "Offer possibility to hide Java classes from jobs. One or more regex defining classes never to load from the parent class loader.",
             "tracingEnabled": "Activate listing all class loaded inside the job log",
             "persistent": "When false, the class loader is transient: it is created to run a new job instance and is thrown out when the job instance ends. When true, it is not thrown out at the end and will be reused by all job instances created from the different job definitions using this class loader (therefore, multiple job definitions can share the same static context).",
-            "allowedRunners": "The different runners that are active in this context. If not set, the global parameter job_runners is used instead."
+            "allowedRunners": "The different runners that are active in this context. If not set, the global parameter job_runners is used instead.",
+            "extraClasspathDirs": "Directory paths to add to the classpath of the class loader. This is useful to include properties files or other resources that are not bundled inside the job jar or its libraries."
         },
         "createClassLoaderDialog": {
             "title": "Create class loader",
@@ -346,6 +350,13 @@
             "runnerLabel": "Runner*",
             "addButton": "Add",
             "allowedRunnerColumn": "Allowed runner"
+        },
+        "editExtraClasspathDirsDialog": {
+            "title": "Edit extra classpath directories",
+            "description": "An extra classpath directory is an absolute path to a directory whose contents are added to the class loader.",
+            "dirLabel": "Directory path*",
+            "addButton": "Add",
+            "dirColumn": "Directory"
         },
         "messages": {
             "successCreate": "Successfully created class loader: {{name}}",

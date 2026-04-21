@@ -142,6 +142,7 @@ It is necessary to add the handler and runner to the execution context inside th
             <hiddenJavaClasses></hiddenJavaClasses>
             <tracingEnabled>false</tracingEnabled>
             <persistent>true</persistent>
+            <extraClasspathDirs>/absolute/path/to/extra/dir,/another/dir</extraClasspathDirs>
 
             <runners>com.enioka.jqm.runner.spring.AnnotationSpringRunner</runners>
             <eventHandlers>

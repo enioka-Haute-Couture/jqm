@@ -9,6 +9,7 @@ export const mockClassLoaders = [
         tracingEnabled: false,
         persistent: false,
         allowedRunners: "BasicRunner",
+        extraClasspathDirs: "/another/dir",
     },
 ];
 
