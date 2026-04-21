@@ -60,6 +60,15 @@ describe("ClassLoadersPage", () => {
         await user.click(runnersDeleteButtons[1]);
         await user.click(screen.getByRole("button", { name: "Validate" }));
 
+        // Open edit extra classpath dirs dialog and add then remove an extra classpath dir
+        await user.click(screen.getByText("/another/dir"));
+        await screen.findByRole("heading", { name: "Edit extra classpath directories" });
+        await user.type(screen.getByLabelText("Directory path*"), "/new/dir");
+        await user.click(screen.getByRole("button", { name: "Add" }));
+        const dirsDeleteButtons = await screen.findAllByRole("button", { name: "delete" });
+        await user.click(dirsDeleteButtons[1]);
+        await user.click(screen.getByRole("button", { name: "Validate" }));
+
         const saveButton = await screen.findByRole("button", { name: "save" });
         await user.click(saveButton);
 

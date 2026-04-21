@@ -10,11 +10,13 @@ import { useClassLoaderAPI } from "./ClassLoaderAPI";
 import { CreateClassLoaderDialog } from "./CreateClassLoaderDialog";
 import { EditHiddenClassesDialog } from "./EditHiddenClassesDialog";
 import { EditAllowedRunnersDialog } from "./EditAllowedRunnersDialog";
+import { EditExtraClasspathDirsDialog } from "./EditExtraClasspathDirsDialog";
 import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
 import AccessForbiddenPage from "../AccessForbiddenPage";
 import { setPageTitle } from "../../utils/title";
 import { renderActionsCell, renderBooleanCell, renderInputCell } from "../TableCells";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
+import { set } from "date-fns";
 
 const ClassLoadersPage: React.FC = () => {
     const { t } = useTranslation();
@@ -26,6 +28,9 @@ const ClassLoadersPage: React.FC = () => {
     const [editAllowedRunnersClId, setEditAllowedRunnersClId] = useState<
         string | null
     >(null);
+    const [editExtraClasspathDirsClId, setEditExtraClasspathDirsClId] = useState<
+        string | null
+    >(null);
 
 
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -35,6 +40,7 @@ const ClassLoadersPage: React.FC = () => {
     const [tracingEnabled, setTracingEnabled] = useState<boolean>(false);
     const [persistent, setPersistent] = useState<boolean>(false);
     const [allowedRunners, setAllowedRunners] = useState<string>("");
+    const [extraClasspathDirs, setExtraClasspathDirs] = useState<string>("");
 
     const nameInputRef = useRef(null);
 
@@ -75,10 +81,11 @@ const ClassLoadersPage: React.FC = () => {
                     tracingEnabled,
                     persistent,
                     allowedRunners,
+                    extraClasspathDirs
                 }).then(() => setEditingRowId(null));
             }
         },
-        [childFirst, hiddenClasses, persistent, tracingEnabled, updateClassLoader, allowedRunners]
+        [childFirst, hiddenClasses, persistent, tracingEnabled, updateClassLoader, allowedRunners, extraClasspathDirs]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
@@ -89,6 +96,7 @@ const ClassLoadersPage: React.FC = () => {
         setTracingEnabled(tableMeta.rowData[4]);
         setPersistent(tableMeta.rowData[5]);
         setAllowedRunners(tableMeta.rowData[6]);
+        setExtraClasspathDirs(tableMeta.rowData[7]);
     }, []);
 
 
@@ -187,6 +195,22 @@ const ClassLoadersPage: React.FC = () => {
                     allowedRunners,
                     (value: string) => value,
                     setEditAllowedRunnersClId
+                ),
+            },
+        },
+        {
+            name: "extraClasspathDirs",
+            label: t("classLoaders.extraClasspathDirs"),
+            options: {
+                filter: false,
+                sort: false,
+                hint: t("classLoaders.hints.extraClasspathDirs"),
+                customBodyRender: renderDialogCell(
+                    editingRowId,
+                    t("classLoaders.editExtraClasspathDirsTooltip"),
+                    extraClasspathDirs,
+                    (value: string) => value,
+                    setEditExtraClasspathDirsClId
                 ),
             },
         },
@@ -291,6 +315,15 @@ const ClassLoadersPage: React.FC = () => {
                     allowedRunners={allowedRunners ? allowedRunners.split(',') : []}
                     setAllowedRunners={(allowedRunners: string[]) =>
                         setAllowedRunners(allowedRunners.join(','))
+                    }
+                />
+            )}
+            {editExtraClasspathDirsClId !== null && (
+                <EditExtraClasspathDirsDialog
+                    closeDialog={() => setEditExtraClasspathDirsClId(null)}
+                    extraClasspathDirs={extraClasspathDirs ? extraClasspathDirs.split(',') : []}
+                    setExtraClasspathDirs={(dirs: string[]) =>
+                        setExtraClasspathDirs(dirs.join(','))
                     }
                 />
             )}

@@ -70,6 +70,7 @@
                 <xs:element name="tracingEnabled" type="xs:boolean" minOccurs="0" maxOccurs="1" />
                 <xs:element name="persistent" type="xs:boolean" minOccurs="0" maxOccurs="1" />
                 <xs:element name="runners" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <xs:element name="extraClasspathDirs" type="xs:string" minOccurs="0" maxOccurs="1" />
                 
                 <xs:element name="eventHandlers">
 	                <xs:complexType>

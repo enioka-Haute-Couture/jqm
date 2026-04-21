@@ -156,7 +156,7 @@
         "mappings": "Mappages",
         "jndiResources": "Ressources JNDI",
         "clusterWideParams": "Paramètres de cluster",
-        "classLoaders": "Chargeurs de classes",
+        "classLoaders": "Class loaders",
         "jobDefinitions": "Définitions des jobs",
         "users": "Utilisateurs",
         "roles": "Rôles",
@@ -258,6 +258,7 @@
     "errors": {
         "genericError": "Une erreur s'est produite, veuillez contacter le support support@enioka.com pour obtenir de l'aide",
         "dismiss": "Fermer",
+        "maxStringLengthExceeded": "La longueur totale de toutes les valeurs ne peut pas dépasser {{length}} caractères",
         "api": {
             "itemNotFound": "Élément avec l'ID {{id}} non trouvé",
             "jndiAliasAlreadyUsed": "Impossible de mettre à jour la ressource, l'alias JNDI est déjà utilisé",
@@ -310,33 +311,36 @@
         }
     },
     "classLoaders": {
-        "title": "Chargeurs de classes",
-        "noMatch": "Aucun chargeur de classes trouvé",
+        "title": "Class loaders",
+        "noMatch": "Aucun class loader trouvé",
         "name": "Nom*",
         "childFirst": "Enfant en premier",
         "hiddenClasses": "Classes cachées",
         "tracingEnabled": "Traçage activé",
         "persistent": "Persistant",
         "allowedRunners": "Exécuteurs autorisés",
+        "extraClasspathDirs": "Répertoires de classpath supplémentaires",
         "editHiddenClassesTooltip": "Modifier les classes cachées",
         "editAllowedRunnersTooltip": "Modifier les exécuteurs autorisés",
+        "editExtraClasspathDirsTooltip": "Modifier les répertoires de classpath supplémentaires",
         "hints": {
-            "name": "La clé utilisée pour identifier le chargeur de classes dans le descripteur de déploiement. Unique.",
+            "name": "La clé utilisée pour identifier le class loader dans le descripteur de déploiement. Unique.",
             "childFirst": "Offre l'option d'avoir le chargement de classe enfant en premier. Parent en premier est la norme en JSE.",
-            "hiddenClasses": "Offre la possibilité de cacher des classes Java des jobs. Une ou plusieurs regex définissant les classes à ne jamais charger depuis le chargeur de classes parent.",
+            "hiddenClasses": "Offre la possibilité de cacher des classes Java des jobs. Une ou plusieurs regex définissant les classes à ne jamais charger depuis le class loader parent.",
             "tracingEnabled": "Active l'affichage de toutes les classes chargées dans le journal du job",
-            "persistent": "Lorsque faux, le chargeur de classes est transitoire : il est créé pour exécuter une nouvelle instance de job et est supprimé lorsque l'instance de job se termine. Lorsque vrai, il n'est pas supprimé à la fin et sera réutilisé par toutes les instances de job créées à partir des différentes définitions de job utilisant ce chargeur de classes (par conséquent, plusieurs définitions de job peuvent partager le même contexte statique).",
-            "allowedRunners": "Les différents exécuteurs actifs dans ce contexte. Si non défini, le paramètre global job_runners est utilisé à la place."
+            "persistent": "Lorsque faux, le class loader est transitoire : il est créé pour exécuter une nouvelle instance de job et est supprimé lorsque l'instance de job se termine. Lorsque vrai, il n'est pas supprimé à la fin et sera réutilisé par toutes les instances de job créées à partir des différentes définitions de job utilisant ce class loader (par conséquent, plusieurs définitions de job peuvent partager le même contexte statique).",
+            "allowedRunners": "Les différents exécuteurs actifs dans ce contexte. Si non défini, le paramètre global job_runners est utilisé à la place.",
+            "extraClasspathDirs": "Chemins de répertoires à ajouter au classpath du class loader. Utile pour inclure des fichiers de propriétés ou d'autres ressources qui ne sont pas inclus dans le jar du job ou ses bibliothèques."
         },
         "createClassLoaderDialog": {
-            "title": "Créer un chargeur de classes",
+            "title": "Créer un class loader",
             "childFirstLabel": "Chargement de classe enfant en premier",
             "tracingEnabledLabel": "Traçage activé",
             "persistentLabel": "Persistant"
         },
         "editHiddenClassesDialog": {
             "title": "Modifier les classes cachées",
-            "description": "Une classe cachée est une regexp définissant les classes à ne jamais charger depuis le chargeur de classes parent.",
+            "description": "Une classe cachée est une regexp définissant les classes à ne jamais charger depuis le class loader parent.",
             "regexpLabel": "Regexp*",
             "addButton": "Ajouter",
             "hiddenClassColumn": "Classe cachée"
@@ -347,11 +351,18 @@
             "addButton": "Ajouter",
             "allowedRunnerColumn": "Exécuteur autorisé"
         },
+        "editExtraClasspathDirsDialog": {
+            "title": "Modifier les répertoires de classpath supplémentaires",
+            "description": "Un répertoire de classpath supplémentaire est un chemin absolu vers un répertoire dont le contenu est ajouté au class loader.",
+            "dirLabel": "Chemin du répertoire*",
+            "addButton": "Ajouter",
+            "dirColumn": "Répertoire"
+        },
         "messages": {
-            "successCreate": "Chargeur de classes créé avec succès : {{name}}",
-            "successDelete_one": "Chargeur de classes supprimé avec succès",
-            "successDelete_other": "Chargeurs de classes supprimés avec succès",
-            "successSave": "Chargeur de classes enregistré avec succès"
+            "successCreate": "Class loader créé avec succès : {{name}}",
+            "successDelete_one": "Class loader supprimé avec succès",
+            "successDelete_other": "Class loaders supprimés avec succès",
+            "successSave": "Class loader enregistré avec succès"
         }
     },
     "clusterParameters": {
@@ -473,7 +484,7 @@
         "propertiesDisplay": {
             "pathToJar": "Chemin vers le fichier jar",
             "classToLaunch": "Classe à lancer",
-            "classLoader": "Chargeur de classes",
+            "classLoader": "Class loader",
             "shell": "Shell",
             "powershell": "Powershell",
             "defaultOsShell": "Shell par défaut de l'OS",
@@ -511,8 +522,8 @@
             "pathToJarHelper": "Le chemin relatif vers le jar contenant la classe à exécuter. Il est relatif au paramètre 'répertoire contenant les jars' des différents nœuds.",
             "classToLaunchLabel": "Classe à lancer*",
             "classToLaunchHelper": "Le nom pleinement qualifié de la classe à exécuter. (elle doit soit avoir une fonction main, soit implémenter Runnable, soit hériter de JobBase).",
-            "classLoaderLabel": "Chargeur de classes",
-            "classLoaderHelper": "Le chargeur de classes utilisé par le job.",
+            "classLoaderLabel": "Class loader",
+            "classLoaderHelper": "Le class loader utilisé par le job.",
             "classLoaderDefault": "Par défaut",
             "pathToExecutableLabel": "Chemin vers l'exécutable*",
             "pathToExecutableHelper": "Le chemin actuel est le répertoire de job du nœud. Ne pas ajouter de paramètres ici, juste un chemin. Le processus est lancé avec la valeur des paramètres fournis, triés par clé. La clé n'est utilisée que pour le tri.",

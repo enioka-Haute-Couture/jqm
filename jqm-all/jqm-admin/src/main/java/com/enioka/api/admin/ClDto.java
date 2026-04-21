@@ -30,6 +30,7 @@ public class ClDto implements Serializable
     private boolean tracingEnabled;
     private boolean persistent;
     private String allowedRunners;
+    private String extraClasspathDirs;
 
     @XmlElementWrapper(name = "handlers")
     @XmlElement(name = "handler")
@@ -201,5 +202,26 @@ public class ClDto implements Serializable
     public void setHandlers(List<ClHandlerDto> handlers)
     {
         this.handlers = handlers;
+    }
+
+    /**
+     * Get the extra classpath directories for this classloader.
+     *
+     * @return the extra classpath directories
+     */
+    public String getExtraClasspathDirs()
+    {
+        return extraClasspathDirs;
+    }
+
+    /**
+     * Set the extra classpath directories for this classloader.
+     *
+     * @param extraClasspathDirs
+     *            the extra classpath directories to set
+     */
+    public void setExtraClasspathDirs(String extraClasspathDirs)
+    {
+        this.extraClasspathDirs = extraClasspathDirs;
     }
 }

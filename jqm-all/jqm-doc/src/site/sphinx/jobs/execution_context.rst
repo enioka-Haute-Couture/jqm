@@ -54,6 +54,8 @@ Here is a full example, explained below::
 
 		<runners>com.enioka.jqm.tools.LegacyRunner,com.enioka.jqm.tools.MainRunner,com.enioka.jqm.tools.RunnableRunner</runners>
 
+		<extraClasspathDirs>/absolute/path/to/extra/dir,/another/dir</extraClasspathDirs>
+
 		<eventHandlers>
 			<handler>
 				<className>com.enioka.handlers.filterOne</className>
@@ -132,6 +134,14 @@ To debug "why isn't my library loaded" issues, you can enable a trace by setting
 The trace is written in the log (and stdout if active).
 
 Default is "false" - meaning disabled.
+
+Extra classpath directories
+++++++++++++++++++++++++++++
+
+It is possible to add extra directories to the classpath of the class loader. This is useful to include properties files or other resources
+that are not bundled inside the job jar or its libraries. The value is a comma-separated list of absolute paths to directories.
+
+Default is no extra directories.
 
 Context persistence
 +++++++++++++++++++++++++

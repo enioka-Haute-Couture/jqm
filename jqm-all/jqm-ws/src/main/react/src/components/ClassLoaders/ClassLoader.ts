@@ -6,4 +6,5 @@ export interface ClassLoader {
     tracingEnabled: boolean;
     persistent: boolean;
     allowedRunners: string;
+    extraClasspathDirs: string;
 }

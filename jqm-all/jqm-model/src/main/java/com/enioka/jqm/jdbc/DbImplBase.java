@@ -89,11 +89,11 @@ class DbImplBase
         queries.put("dp_select_with_names_by_node_id", queries.get("dp_select_all_with_names") + " WHERE dp.NODE=?");
 
         // CL
-        queries.put("cl_insert", "INSERT INTO __T__CL(ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS) VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?)");
+        queries.put("cl_insert", "INSERT INTO __T__CL(ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS, EXTRA_CLASSPATH_DIRS) VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("cl_delete_all", "DELETE FROM __T__CL");
         queries.put("cl_delete_by_id", "DELETE FROM __T__CL WHERE ID=?");
-        queries.put("cl_update_all_fields_by_id", "UPDATE __T__CL SET NAME=?, CHILD_FIRST=?, HIDDEN_CLASSES=?, TRACING=?, PERSISTENT=?, ALLOWED_RUNNERS=? WHERE ID=?");
-        queries.put("cl_select_all", "SELECT ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS FROM __T__CL ");
+        queries.put("cl_update_all_fields_by_id", "UPDATE __T__CL SET NAME=?, CHILD_FIRST=?, HIDDEN_CLASSES=?, TRACING=?, PERSISTENT=?, ALLOWED_RUNNERS=?, EXTRA_CLASSPATH_DIRS=? WHERE ID=?");
+        queries.put("cl_select_all", "SELECT ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS, EXTRA_CLASSPATH_DIRS FROM __T__CL ");
         queries.put("cl_select_by_id", queries.get("cl_select_all") + " WHERE ID=?");
         queries.put("cl_select_by_key", queries.get("cl_select_all") + " WHERE NAME=?");
 

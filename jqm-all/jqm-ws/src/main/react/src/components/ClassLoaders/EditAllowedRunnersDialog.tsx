@@ -38,6 +38,10 @@ export const EditAllowedRunnersDialog: React.FC<{
         useState<string[]>(allowedRunners);
 
     const [newAllowedRunner, setNewAllowedRunner] = useState<string>("");
+
+    const wouldExceedMaxStringLength = (runners: string[], newRunner: string) =>
+        [...runners, newRunner].join(",").length > 1024;
+
     return (
         <Dialog
             open={true}
@@ -60,6 +64,12 @@ export const EditAllowedRunnersDialog: React.FC<{
                         }}
                         fullWidth
                         variant="standard"
+                        error={wouldExceedMaxStringLength(editedAllowedRunners, newAllowedRunner)}
+                        helperText={
+                            wouldExceedMaxStringLength(editedAllowedRunners, newAllowedRunner)
+                                ? t("errors.maxStringLengthExceeded", { length: 1024 })
+                                : undefined
+                        }
                     />
 
                     <Button
@@ -69,7 +79,7 @@ export const EditAllowedRunnersDialog: React.FC<{
                         disabled={
                             editedAllowedRunners.filter(
                                 (value) => value === newAllowedRunner
-                            ).length > 0 || !newAllowedRunner
+                            ).length > 0 || !newAllowedRunner || wouldExceedMaxStringLength(editedAllowedRunners, newAllowedRunner)
                         }
                         onClick={() => {
                             setEditedAllowedRunners([

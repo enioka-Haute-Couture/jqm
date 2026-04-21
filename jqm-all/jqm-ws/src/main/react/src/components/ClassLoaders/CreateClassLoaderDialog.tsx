@@ -9,6 +9,9 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { ClassLoader } from "./ClassLoader";
+import { EditHiddenClassesDialog } from "./EditHiddenClassesDialog";
+import { EditAllowedRunnersDialog } from "./EditAllowedRunnersDialog";
+import { EditExtraClasspathDirsDialog } from "./EditExtraClasspathDirsDialog";
 
 const useStyles = makeStyles((theme: Theme) => ({
     TextField: {
@@ -36,6 +39,10 @@ export const CreateClassLoaderDialog: React.FC<{
     const [tracingEnabled, setTracingEnabled] = useState<boolean>(false);
     const [persistent, setPersistent] = useState<boolean>(false);
     const [allowedRunners, setAllowedRunners] = useState<string>("");
+    const [extraClasspathDirs, setExtraClasspathDirs] = useState<string>("");
+    const [showHiddenClassesDialog, setShowHiddenClassesDialog] = useState<boolean>(false);
+    const [showAllowedRunnersDialog, setShowAllowedRunnersDialog] = useState<boolean>(false);
+    const [showExtraClasspathDirsDialog, setShowExtraClasspathDirsDialog] = useState<boolean>(false);
 
     const classes = useStyles();
     return (
@@ -78,11 +85,11 @@ export const CreateClassLoaderDialog: React.FC<{
                     className={classes.TextField}
                     label={t("classLoaders.hiddenClasses")}
                     value={hiddenClasses}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setHiddenClasses(event.target.value);
-                    }}
+                    onClick={() => setShowHiddenClassesDialog(true)}
+                    inputProps={{ readOnly: true, style: { cursor: "pointer" } }}
                     fullWidth
                     variant="standard"
+                    helperText={t("classLoaders.hints.hiddenClasses")}
                 />
                 <FormGroup className={classes.Switch}>
 
@@ -124,11 +131,21 @@ export const CreateClassLoaderDialog: React.FC<{
                     className={classes.TextField}
                     label={t("classLoaders.allowedRunners")}
                     value={allowedRunners}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setAllowedRunners(event.target.value);
-                    }}
+                    onClick={() => setShowAllowedRunnersDialog(true)}
+                    inputProps={{ readOnly: true, style: { cursor: "pointer" } }}
                     fullWidth
                     variant="standard"
+                    helperText={t("classLoaders.hints.allowedRunners")}
+                />
+                <TextField
+                    className={classes.TextField}
+                    label={t("classLoaders.extraClasspathDirs")}
+                    value={extraClasspathDirs}
+                    onClick={() => setShowExtraClasspathDirsDialog(true)}
+                    inputProps={{ readOnly: true, style: { cursor: "pointer" } }}
+                    fullWidth
+                    variant="standard"
+                    helperText={t("classLoaders.hints.extraClasspathDirs")}
                 />
             </DialogContent>
             <DialogActions>
@@ -153,6 +170,7 @@ export const CreateClassLoaderDialog: React.FC<{
                             tracingEnabled: tracingEnabled,
                             persistent: persistent,
                             allowedRunners: allowedRunners,
+                            extraClasspathDirs: extraClasspathDirs,
                         });
                         closeDialog();
                         setName("");
@@ -161,6 +179,27 @@ export const CreateClassLoaderDialog: React.FC<{
                     {t("common.create")}
                 </Button>
             </DialogActions>
+            {showHiddenClassesDialog && (
+                <EditHiddenClassesDialog
+                    closeDialog={() => setShowHiddenClassesDialog(false)}
+                    hiddenClasses={hiddenClasses ? hiddenClasses.split(",") : []}
+                    setHiddenClasses={(values: string[]) => setHiddenClasses(values.join(","))}
+                />
+            )}
+            {showAllowedRunnersDialog && (
+                <EditAllowedRunnersDialog
+                    closeDialog={() => setShowAllowedRunnersDialog(false)}
+                    allowedRunners={allowedRunners ? allowedRunners.split(",") : []}
+                    setAllowedRunners={(values: string[]) => setAllowedRunners(values.join(","))}
+                />
+            )}
+            {showExtraClasspathDirsDialog && (
+                <EditExtraClasspathDirsDialog
+                    closeDialog={() => setShowExtraClasspathDirsDialog(false)}
+                    extraClasspathDirs={extraClasspathDirs ? extraClasspathDirs.split(",") : []}
+                    setExtraClasspathDirs={(values: string[]) => setExtraClasspathDirs(values.join(","))}
+                />
+            )}
         </Dialog>
     );
 };

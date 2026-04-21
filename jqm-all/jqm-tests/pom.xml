@@ -29,6 +29,7 @@
         <module>jqm-test-pyl-nodep</module>
         <module>jqm-test-spring-1</module>
         <module>jqm-test-spring-2</module>
+        <module>jqm-test-spring-3</module>
     </modules>
 
     <properties>
