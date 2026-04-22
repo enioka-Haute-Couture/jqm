@@ -1,6 +1,37 @@
 Release notes
 ######################
 
+3.4.0
+*************
+
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+There are two database modifications in this release: a column was added to the ``NODE`` table and a column was added to the ``CL`` table. Migration is applied when running ``jqm(.sh|.ps1) createnode`` or the ``Update-Schema`` command.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Engine: added class loader attribute extraClasspathDirs to specify extra directories to add to classpath
+* Global: added frontend tests
+* GUI: improved nodes page layout with the use of exandable rows
+* GUI: now allow in-table dialogs to be opened even outside edition mode
+* GUI: distinguish templates from nodes in the nodes page
+* GUI: in runs page improved status visibility in table
+* GUI: in runs page added filtering shortcuts in toolbar
+* GUI: in runs page added a button in table footer to go back to the first page
+* GUI: in runs page now allow filtering by date and time instead of date only
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* GUI: fixed role deletion when it contained permissions
+* GUI: fixed a bug when saving first row in users or roles page
+* GUI: API exception messages are now translated
+* GUI: in runs page only show statuses related to the selected tab
 
 3.3.1
 *************
@@ -29,7 +60,7 @@ Upgrade notes
 
 No API breaking changes.
 
-No database modification in this release - upgrade can be done by simply replacing engine files.
+There is one database modification in this release: a column was added to the ``JOB_INSTANCE`` table. Migration is applied when running ``jqm(.sh|.ps1) createnode`` or the ``Update-Schema`` command.
 
 Major changes
 ++++++++++++++++++++++++++++
