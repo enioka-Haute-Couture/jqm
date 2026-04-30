@@ -29,8 +29,8 @@ JQM also ships with a built-in web administration console that provides a straig
 * defining jobs and managing their class loaders
 * administering users, roles, JNDI resources, and cluster-wide parameters
 
-![Runs page](.github/images/runs.jpg)
-![Job definitions page](.github/images/job_definitions.jpg)
+![Runs page](.github/images/runs.png)
+![Job definitions page](.github/images/job_definitions.png)
 
 There are many use cases for JQM. Common real-world examples include:
 
