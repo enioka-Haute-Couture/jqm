@@ -45,6 +45,7 @@ Java batch packaging: just use your own
 Administration is a breathe:
 
 * Both command line and web-based graphic user interface for administration
+* React-based web administration console included out of the box, requiring no additional installation
 * Can run in Docker environments with provided images optimized for development usage as well as scale-out production scenarios (Swarm, Kubernetes...)
 * Can run as a Windows service or a Linux /etc/init.d script
 * Fully ready to run out of the box without complicated configuration
@@ -58,3 +59,19 @@ Administration is a breathe:
 * Can be fully monitored through JMX - which make it compatible with most monitoring systems out of the box (a Zabbix template is provided)
 * Authentication and permissions handling is fully in-box, including an optional PKI to create
   client certificates.
+
+Web administration console
+##############################
+
+JQM also ships with a built-in web administration console that provides a straightforward way to manage all aspects of the engine:
+
+* monitoring and acting on job executions in real time or browsing history
+* configuring nodes, queues, and their mappings
+* defining jobs and managing their class loaders
+* administering users, roles, JNDI resources, and cluster-wide parameters
+
+.. image:: /media/runs.jpg
+   :alt: Runs page to monitor and control live and historical job executions
+
+.. image:: /media/job_definitions.jpg
+   :alt: Job definitions page to configure jobs
