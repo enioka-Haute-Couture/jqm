@@ -635,6 +635,7 @@ public class ServiceClient
     @Path("ji/{jobId}/files/{name}")
     @POST
     @Consumes("*/*")
+    @Produces({ "text/plain" })
     public long addJobFile(@PathParam("jobId") long jobId, @PathParam("name") String name, InputStream file)
     {
         if (jqmNodeId == null)

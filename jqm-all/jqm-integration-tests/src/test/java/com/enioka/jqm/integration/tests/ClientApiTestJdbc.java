@@ -555,7 +555,8 @@ public class ClientApiTestJdbc extends JqmBaseTest
 
         // Add an input file
         InputStream is = new ByteArrayInputStream(String.valueOf("Hello, World!").getBytes());
-        jqmClient.addJobFile(i, "SuperFile", is);
+        var id = jqmClient.addJobFile(i, "SuperFile", is);
+        Assert.assertTrue(id > 0);
 
         // Check file was created
         expectedFile.canRead();
