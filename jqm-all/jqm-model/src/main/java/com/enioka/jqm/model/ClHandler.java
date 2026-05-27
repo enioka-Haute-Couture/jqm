@@ -118,7 +118,7 @@ public class ClHandler implements Serializable
             tmp.id = rs.getLong(1 + colShift);
             tmp.eventType = ClEvent.valueOf(rs.getString(2 + colShift));
             tmp.className = rs.getString(3 + colShift);
-            tmp.classLoader = rs.getInt(4 + colShift);
+            tmp.classLoader = rs.getLong(4 + colShift);
         }
         catch (SQLException e)
         {
