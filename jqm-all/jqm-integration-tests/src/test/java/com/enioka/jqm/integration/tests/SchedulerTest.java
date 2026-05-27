@@ -199,7 +199,7 @@ public class SchedulerTest extends JqmBaseTest
 
         ResultSet rs = cnx.runSelect("read_witness_node_id");
         rs.next();
-        int firstNodeId = Integer.parseInt(rs.getString(1));
+        long firstNodeId = Long.parseLong(rs.getString(1));
         jqmlogger.info("Current witness node id : {}", rs.getString(1));
 
         addAndStartEngine("localhost2");
@@ -207,7 +207,7 @@ public class SchedulerTest extends JqmBaseTest
 
         rs = cnx.runSelect("read_witness_node_id");
         rs.next();
-        int secondNodeId = Integer.parseInt(rs.getString(1));
+        long secondNodeId = Long.parseLong(rs.getString(1));
         jqmlogger.info("Current witness node id : {}", rs.getString(1));
 
         Assert.assertEquals(firstNodeId, secondNodeId);
