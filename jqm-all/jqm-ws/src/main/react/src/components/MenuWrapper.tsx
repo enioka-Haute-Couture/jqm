@@ -217,7 +217,7 @@ export default function MenuWrapper(props: any) {
                             open={openUserMenu}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={() => { logout(); handleClose(); }} component="a" href="/auth/logout">{t("menu.logout")}</MenuItem>
+                            <MenuItem onClick={() => { logout(); handleClose(); }} component="a" href="auth/logout">{t("menu.logout")}</MenuItem>
                         </Menu>
                     </div>
 

@@ -1,5 +1,5 @@
 // Support deployment behind reverse proxy with a path prefix
-const BASE_PATH = (import.meta as any).env.VITE_BASE_PATH || "";
+const BASE_PATH = document.querySelector('base')?.getAttribute('href')?.replace(/\/$/, '') ?? '';
 const API_URL = `${BASE_PATH}/ws`;
 
 export default class APIService {
