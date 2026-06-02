@@ -60,7 +60,7 @@ Administration is a breathe:
   client certificates.
 
 Web administration console
-##############################
+****************************
 
 JQM also ships with a built-in web administration console that provides a straightforward way to manage all aspects of the engine:
 

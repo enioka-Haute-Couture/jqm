@@ -19,6 +19,5 @@ export default defineConfig({
         outDir: "build",
         sourcemap: true,
     },
-    // Support deployment behind reverse proxy with a path prefix
-    base: process.env.VITE_BASE_PATH || "./",
+    base: "./",
 });
