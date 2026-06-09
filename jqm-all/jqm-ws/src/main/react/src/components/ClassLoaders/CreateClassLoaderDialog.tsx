@@ -12,6 +12,7 @@ import { ClassLoader } from "./ClassLoader";
 import { EditHiddenClassesDialog } from "./EditHiddenClassesDialog";
 import { EditAllowedRunnersDialog } from "./EditAllowedRunnersDialog";
 import { EditExtraClasspathDirsDialog } from "./EditExtraClasspathDirsDialog";
+import { EditExcludedClassPrefixesDialog } from "./EditExcludedClassPrefixesDialog";
 
 const useStyles = makeStyles((theme: Theme) => ({
     TextField: {
@@ -40,9 +41,11 @@ export const CreateClassLoaderDialog: React.FC<{
     const [persistent, setPersistent] = useState<boolean>(false);
     const [allowedRunners, setAllowedRunners] = useState<string>("");
     const [extraClasspathDirs, setExtraClasspathDirs] = useState<string>("");
+    const [excludedClassPrefixes, setExcludedClassPrefixes] = useState<string>("");
     const [showHiddenClassesDialog, setShowHiddenClassesDialog] = useState<boolean>(false);
     const [showAllowedRunnersDialog, setShowAllowedRunnersDialog] = useState<boolean>(false);
     const [showExtraClasspathDirsDialog, setShowExtraClasspathDirsDialog] = useState<boolean>(false);
+    const [showExcludedClassPrefixesDialog, setShowExcludedClassPrefixesDialog] = useState<boolean>(false);
 
     const classes = useStyles();
     return (
@@ -129,6 +132,16 @@ export const CreateClassLoaderDialog: React.FC<{
                 </FormGroup>
                 <TextField
                     className={classes.TextField}
+                    label={t("classLoaders.excludedClassPrefixes")}
+                    value={excludedClassPrefixes}
+                    onClick={() => setShowExcludedClassPrefixesDialog(true)}
+                    inputProps={{ readOnly: true, style: { cursor: "pointer" } }}
+                    fullWidth
+                    variant="standard"
+                    helperText={t("classLoaders.hints.excludedClassPrefixes")}
+                />
+                <TextField
+                    className={classes.TextField}
                     label={t("classLoaders.allowedRunners")}
                     value={allowedRunners}
                     onClick={() => setShowAllowedRunnersDialog(true)}
@@ -171,6 +184,7 @@ export const CreateClassLoaderDialog: React.FC<{
                             persistent: persistent,
                             allowedRunners: allowedRunners,
                             extraClasspathDirs: extraClasspathDirs,
+                            excludedClassPrefixes: excludedClassPrefixes,
                         });
                         closeDialog();
                         setName("");
@@ -198,6 +212,13 @@ export const CreateClassLoaderDialog: React.FC<{
                     closeDialog={() => setShowExtraClasspathDirsDialog(false)}
                     extraClasspathDirs={extraClasspathDirs ? extraClasspathDirs.split(",") : []}
                     setExtraClasspathDirs={(values: string[]) => setExtraClasspathDirs(values.join(","))}
+                />
+            )}
+            {showExcludedClassPrefixesDialog && (
+                <EditExcludedClassPrefixesDialog
+                    closeDialog={() => setShowExcludedClassPrefixesDialog(false)}
+                    excludedClassPrefixes={excludedClassPrefixes ? excludedClassPrefixes.split(",") : []}
+                    setExcludedClassPrefixes={(values: string[]) => setExcludedClassPrefixes(values.join(","))}
                 />
             )}
         </Dialog>

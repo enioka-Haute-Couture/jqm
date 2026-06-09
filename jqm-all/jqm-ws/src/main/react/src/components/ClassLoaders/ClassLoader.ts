@@ -7,4 +7,5 @@ export interface ClassLoader {
     persistent: boolean;
     allowedRunners: string;
     extraClasspathDirs: string;
+    excludedClassPrefixes: string;
 }

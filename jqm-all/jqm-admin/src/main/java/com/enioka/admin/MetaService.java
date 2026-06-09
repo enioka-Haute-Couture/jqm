@@ -739,6 +739,7 @@ public class MetaService
             res.setPersistent(rs.getBoolean(colShift + 6));
             res.setAllowedRunners(rs.getString(colShift + 7));
             res.setExtraClasspathDirs(rs.getString(colShift + 8));
+            res.setExcludedClassPrefixes(rs.getString(colShift + 9));
             return res;
         }
         catch (SQLException e)
@@ -844,12 +845,13 @@ public class MetaService
             if (dto.getId() != null)
             {
                 cnx.runUpdate("cl_update_all_fields_by_id", dto.getName(), dto.isChildFirst(), dto.getHiddenClasses(),
-                        dto.isTracingEnabled(), dto.isPersistent(), dto.getAllowedRunners(), dto.getExtraClasspathDirs(), dto.getId());
+                        dto.isTracingEnabled(), dto.isPersistent(), dto.getAllowedRunners(), dto.getExtraClasspathDirs(),
+                        dto.getExcludedClassPrefixes(), dto.getId());
             }
             else
             {
                 Cl.create(cnx, dto.getName(), dto.isChildFirst(), dto.getHiddenClasses(), dto.isTracingEnabled(), dto.isPersistent(),
-                        dto.getAllowedRunners(), dto.getExtraClasspathDirs());
+                        dto.getAllowedRunners(), dto.getExtraClasspathDirs(), dto.getExcludedClassPrefixes());
 
             }
         }

@@ -143,6 +143,8 @@ It is necessary to add the handler and runner to the execution context inside th
             <tracingEnabled>false</tracingEnabled>
             <persistent>true</persistent>
             <extraClasspathDirs>/absolute/path/to/extra/dir,/another/dir</extraClasspathDirs>
+            <excludedClassPrefixes>com.example, com.example2</excludedClassPrefixes>
+
 
             <runners>com.enioka.jqm.runner.spring.AnnotationSpringRunner</runners>
             <eventHandlers>

@@ -97,7 +97,7 @@ public class SpringTest extends JqmBaseTest
         handlerParams.put("additionalScan", "com.enioka.jqm.spring3");
 
         Long clId = Cl.create(cnx, "ExtraClasspathSpringContext", false, null, false, true,
-                "com.enioka.jqm.runner.spring.AnnotationSpringRunner", extraDir.getAbsolutePath());
+                "com.enioka.jqm.runner.spring.AnnotationSpringRunner", extraDir.getAbsolutePath(), null);
         ClHandler.create(cnx, ClEvent.JI_STARTING, "com.enioka.jqm.handler.AnnotationSpringContextBootstrapHandler", clId, handlerParams);
         cnx.commit();
 

@@ -69,6 +69,16 @@ describe("ClassLoadersPage", () => {
         await user.click(dirsDeleteButtons[1]);
         await user.click(screen.getByRole("button", { name: "Validate" }));
 
+        // Open edit excluded class prefixes dialog and add then remove an excluded class prefix
+        await user.click(screen.getByText("com.example.Excluded"));
+        await screen.findByRole("heading", { name: "Edit excluded class prefixes" });
+        await user.type(screen.getByLabelText("Prefix*"), "com.example");
+        await user.click(screen.getByRole("button", { name: "Add" }));
+        const prefixesDeleteButtons = await screen.findAllByRole("button", { name: "delete" });
+        await user.click(prefixesDeleteButtons[1]);
+        await user.click(screen.getByRole("button", { name: "Validate" }));
+
+
         const saveButton = await screen.findByRole("button", { name: "save" });
         await user.click(saveButton);
 

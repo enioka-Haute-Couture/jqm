@@ -10,6 +10,7 @@ export const mockClassLoaders = [
         persistent: false,
         allowedRunners: "BasicRunner",
         extraClasspathDirs: "/another/dir",
+        excludedClassPrefixes: "com.example.Excluded",
     },
 ];
 
