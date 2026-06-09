@@ -17,6 +17,7 @@ import { setPageTitle } from "../../utils/title";
 import { renderActionsCell, renderBooleanCell, renderInputCell } from "../TableCells";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { set } from "date-fns";
+import {EditExcludedClassPrefixesDialog} from "./EditExcludedClassPrefixesDialog";
 
 const ClassLoadersPage: React.FC = () => {
     const { t } = useTranslation();
@@ -31,6 +32,9 @@ const ClassLoadersPage: React.FC = () => {
     const [editExtraClasspathDirsClId, setEditExtraClasspathDirsClId] = useState<
         string | null
     >(null);
+    const [editExcludedClassPrefixesClId, setEditExcludedClassPrefixesClId] = useState<
+        string | null
+    >(null);
 
 
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -41,6 +45,7 @@ const ClassLoadersPage: React.FC = () => {
     const [persistent, setPersistent] = useState<boolean>(false);
     const [allowedRunners, setAllowedRunners] = useState<string>("");
     const [extraClasspathDirs, setExtraClasspathDirs] = useState<string>("");
+    const [excludedClassPrefixes, setExcludedClassPrefixes] = useState<string>("");
 
     const nameInputRef = useRef(null);
 
@@ -81,11 +86,12 @@ const ClassLoadersPage: React.FC = () => {
                     tracingEnabled,
                     persistent,
                     allowedRunners,
-                    extraClasspathDirs
+                    extraClasspathDirs,
+                    excludedClassPrefixes,
                 }).then(() => setEditingRowId(null));
             }
         },
-        [childFirst, hiddenClasses, persistent, tracingEnabled, updateClassLoader, allowedRunners, extraClasspathDirs]
+        [childFirst, hiddenClasses, persistent, tracingEnabled, updateClassLoader, allowedRunners, extraClasspathDirs, excludedClassPrefixes]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
@@ -97,6 +103,7 @@ const ClassLoadersPage: React.FC = () => {
         setPersistent(tableMeta.rowData[5]);
         setAllowedRunners(tableMeta.rowData[6]);
         setExtraClasspathDirs(tableMeta.rowData[7]);
+        setExcludedClassPrefixes(tableMeta.rowData[8]);
     }, []);
 
 
@@ -215,6 +222,22 @@ const ClassLoadersPage: React.FC = () => {
             },
         },
         {
+          name: "excludedClassPrefixes",
+          label: t("classLoaders.excludedClassPrefixes"),
+          options: {
+              filter: false,
+              sort: false,
+              hint: t("classLoaders.hints.excludedClassPrefixes"),
+              customBodyRender: renderDialogCell(
+                  editingRowId,
+                  t("classLoaders.editExcludedClassPrefixesTooltip"),
+                  excludedClassPrefixes,
+                  (value: string) => value,
+                  setEditExcludedClassPrefixesClId
+              ),
+          }
+        },
+        {
             name: "",
             label: t("common.actions"),
             options: {
@@ -324,6 +347,15 @@ const ClassLoadersPage: React.FC = () => {
                     extraClasspathDirs={extraClasspathDirs ? extraClasspathDirs.split(',') : []}
                     setExtraClasspathDirs={(dirs: string[]) =>
                         setExtraClasspathDirs(dirs.join(','))
+                    }
+                />
+            )}
+            {editExcludedClassPrefixesClId !== null && (
+                <EditExcludedClassPrefixesDialog
+                    closeDialog={() => setEditExcludedClassPrefixesClId(null)}
+                    excludedClassPrefixes={excludedClassPrefixes ? excludedClassPrefixes.split(',') : []}
+                    setExcludedClassPrefixes={(prefixes: string[]) =>
+                        setExcludedClassPrefixes(prefixes.join(','))
                     }
                 />
             )}

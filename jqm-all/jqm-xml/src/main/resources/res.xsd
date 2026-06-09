@@ -13,7 +13,7 @@
 			<xs:sequence>
 				<xs:element name="path" type="xs:string" />
 				<xs:element name="filePath" type="xs:string" minOccurs="0" maxOccurs="1"/>  <!-- Deprecated -->
-				<xs:element name="pathType" type="pathTypes" minOccurs="0" maxOccurs="1" />                
+				<xs:element name="pathType" type="pathTypes" minOccurs="0" maxOccurs="1" />
                 <xs:element name="jobdefinitions">
                     <xs:complexType>
                         <xs:sequence>
@@ -24,7 +24,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-    
+
     <xs:simpleType name="pathTypes">
         <xs:restriction base="xs:string">
             <xs:enumeration value="FS" />
@@ -35,7 +35,7 @@
             <xs:enumeration value="DIRECTEXECUTABLE" />
         </xs:restriction>
     </xs:simpleType>
-	
+
 	<xs:element name="jobDefinition">
 		<xs:complexType>
 			<xs:sequence>
@@ -60,7 +60,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	
+
 	<xs:element name="context">
 		<xs:complexType>
 			<xs:sequence>
@@ -71,7 +71,8 @@
                 <xs:element name="persistent" type="xs:boolean" minOccurs="0" maxOccurs="1" />
                 <xs:element name="runners" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="extraClasspathDirs" type="xs:string" minOccurs="0" maxOccurs="1" />
-                
+                <xs:element name="excludedClassPrefixes" type="xs:string" minOccurs="0" maxOccurs="1" />
+
                 <xs:element name="eventHandlers">
 	                <xs:complexType>
 		                <xs:sequence>
@@ -90,13 +91,13 @@
 			<xs:element ref="parameters" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:simpleType name="contextHandlerType" final="restriction" >
     	<xs:restriction base="xs:string">
 	        <xs:enumeration value="JI_STARTING" />
 	    </xs:restriction>
 	</xs:simpleType>
-	
+
 	<xs:element name="parameters">
 		<xs:complexType>
 			<xs:sequence>

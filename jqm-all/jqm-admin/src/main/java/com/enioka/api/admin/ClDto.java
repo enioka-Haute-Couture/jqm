@@ -31,6 +31,7 @@ public class ClDto implements Serializable
     private boolean persistent;
     private String allowedRunners;
     private String extraClasspathDirs;
+    private String excludedClassPrefixes;
 
     @XmlElementWrapper(name = "handlers")
     @XmlElement(name = "handler")
@@ -223,5 +224,26 @@ public class ClDto implements Serializable
     public void setExtraClasspathDirs(String extraClasspathDirs)
     {
         this.extraClasspathDirs = extraClasspathDirs;
+    }
+
+
+    /**
+     * Get the comma-separated excluded class prefixes for this classloader.
+     *
+     * @return the excluded class prefixes
+     */
+    public String getExcludedClassPrefixes()
+    {
+        return excludedClassPrefixes;
+    }
+
+    /**
+     * Set the comma-separated excluded class prefixes for this classloader.
+     *
+     * @param excludedClassPrefixes the excluded class prefixes to set
+     */
+    public void setExcludedClassPrefixes(String excludedClassPrefixes)
+    {
+        this.excludedClassPrefixes = excludedClassPrefixes;
     }
 }

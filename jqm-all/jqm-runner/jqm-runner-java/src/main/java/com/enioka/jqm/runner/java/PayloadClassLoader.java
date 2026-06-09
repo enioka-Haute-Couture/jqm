@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +47,8 @@ import com.enioka.jqm.runner.java.api.jndi.JavaPayloadClassLoader;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class PayloadClassLoader extends URLClassLoader implements JavaPayloadClassLoader
 {
+    private List<String> excludedClassPrefixes = new ArrayList<>();
+
     private static Logger jqmlogger = LoggerFactory.getLogger(PayloadClassLoader.class);
 
     private boolean childFirstClassLoader = false;
@@ -60,7 +63,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
 
     private boolean mayBeShared = false;
 
-    PayloadClassLoader(ClassLoader parent)
+    public PayloadClassLoader(ClassLoader parent)
     {
         super(new URL[0], parent);
     }
@@ -290,6 +293,14 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
                 return c;
             }
 
+            for (String prefix : excludedClassPrefixes)
+            {
+                if (name.startsWith(prefix))
+                {
+                    return ClassLoader.getSystemClassLoader().loadClass(name);
+                }
+            }
+
             if (childFirstClassLoader)
             {
                 // Look here first if requested (not the default)
@@ -344,6 +355,21 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
     public void setChildFirstClassLoader(boolean childFirstClassLoader)
     {
         this.childFirstClassLoader = childFirstClassLoader;
+    }
+
+    public void setExcludedClassPrefixes(String excludedClassPrefixes)
+    {
+        this.excludedClassPrefixes.clear();
+
+        if (excludedClassPrefixes == null || excludedClassPrefixes.isBlank())
+        {
+            return;
+        }
+
+        Arrays.stream(excludedClassPrefixes.split(","))
+                .map(String::trim)
+                .filter(prefix -> !prefix.isEmpty())
+                .forEach(this.excludedClassPrefixes::add);
     }
 
     public ArrayList<Pattern> gethiddenJavaClassesPatterns()

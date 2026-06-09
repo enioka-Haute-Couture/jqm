@@ -55,6 +55,7 @@ Here is a full example, explained below::
 		<runners>com.enioka.jqm.tools.LegacyRunner,com.enioka.jqm.tools.MainRunner,com.enioka.jqm.tools.RunnableRunner</runners>
 
 		<extraClasspathDirs>/absolute/path/to/extra/dir,/another/dir</extraClasspathDirs>
+        <excludedClassPrefixes>com.example, com.example2</excludedClassPrefixes>
 
 		<eventHandlers>
 			<handler>
@@ -142,6 +143,12 @@ It is possible to add extra directories to the classpath of the class loader. Th
 that are not bundled inside the job jar or its libraries. The value is a comma-separated list of absolute paths to directories.
 
 Default is no extra directories.
+
+Excluded Class Prefixes
++++++++++++++++++++++++++
+
+The classes whose prefixes are in this comma-separated list will not be loaded by the JQM Class Loader, but by the system class loader.
+Can be useful to use JQM with some APM.
 
 Context persistence
 +++++++++++++++++++++++++

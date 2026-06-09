@@ -332,9 +332,11 @@
         "persistent": "Persistant",
         "allowedRunners": "Exécuteurs autorisés",
         "extraClasspathDirs": "Répertoires de classpath supplémentaires",
+        "excludedClassPrefixes": "Prefixes des classes exclus",
         "editHiddenClassesTooltip": "Modifier les classes cachées",
         "editAllowedRunnersTooltip": "Modifier les exécuteurs autorisés",
         "editExtraClasspathDirsTooltip": "Modifier les répertoires de classpath supplémentaires",
+        "editExcludedClassPrefixesTooltip": "Éditer les prefixes exclus",
         "hints": {
             "name": "La clé utilisée pour identifier le class loader dans le descripteur de déploiement. Unique.",
             "childFirst": "Offre l'option d'avoir le chargement de classe enfant en premier. Parent en premier est la norme en JSE.",
@@ -342,7 +344,8 @@
             "tracingEnabled": "Active l'affichage de toutes les classes chargées dans le journal du job",
             "persistent": "Lorsque faux, le class loader est transitoire : il est créé pour exécuter une nouvelle instance de job et est supprimé lorsque l'instance de job se termine. Lorsque vrai, il n'est pas supprimé à la fin et sera réutilisé par toutes les instances de job créées à partir des différentes définitions de job utilisant ce class loader (par conséquent, plusieurs définitions de job peuvent partager le même contexte statique).",
             "allowedRunners": "Les différents exécuteurs actifs dans ce contexte. Si non défini, le paramètre global job_runners est utilisé à la place.",
-            "extraClasspathDirs": "Chemins de répertoires à ajouter au classpath du class loader. Utile pour inclure des fichiers de propriétés ou d'autres ressources qui ne sont pas inclus dans le jar du job ou ses bibliothèques."
+            "extraClasspathDirs": "Chemins de répertoires à ajouter au classpath du class loader. Utile pour inclure des fichiers de propriétés ou d'autres ressources qui ne sont pas inclus dans le jar du job ou ses bibliothèques.",
+            "excludedClassPrefixes": "Les classes dont le préfixe est exclu ne seront pas chargées par le class loader de JQM."
         },
         "createClassLoaderDialog": {
             "title": "Créer un class loader",
@@ -369,6 +372,13 @@
             "dirLabel": "Chemin du répertoire*",
             "addButton": "Ajouter",
             "dirColumn": "Répertoire"
+        },
+        "editExcludedClassPrefixesDialog": {
+            "title": "Éditer les préfixes des classes exclues",
+            "description": "Un préfixe de classe exclue est un préfixe d'un nom de classe qui ne sera jamais chargées par le class loader JQM.",
+            "prefixLabel": "Préfixe*",
+            "addButton": "Ajouter",
+            "prefixColumn": "Préfixe"
         },
         "messages": {
             "successCreate": "Class loader créé avec succès : {{name}}",

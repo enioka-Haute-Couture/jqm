@@ -125,6 +125,7 @@ public class ClassloaderManager
                             jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
                             jobClassLoader.setTracing(cldef.isTracingEnabled());
                             jobClassLoader.setChildFirstClassLoader(cldef.isChildFirst());
+                            jobClassLoader.setExcludedClassPrefixes(cldef.getExcludedClassPrefixes());
 
                             persistentClassLoaders.put(cldef.getId(), jobClassLoader);
                         }
@@ -140,6 +141,7 @@ public class ClassloaderManager
                 jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
                 jobClassLoader.setTracing(cldef.isTracingEnabled());
                 jobClassLoader.setChildFirstClassLoader(cldef.isChildFirst());
+                jobClassLoader.setExcludedClassPrefixes(cldef.getExcludedClassPrefixes());
             }
             // END SPECIFIC CL OPTIONS
             ////////////////////////////////////

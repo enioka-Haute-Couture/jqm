@@ -200,6 +200,14 @@ public class XmlJobDefParser
                 {
                     cl.setExtraClasspathDirs(null);
                 }
+                if (clElement.getElementsByTagName("excludedClassPrefixes").getLength() > 0)
+                {
+                    cl.setExcludedClassPrefixes(clElement.getElementsByTagName("excludedClassPrefixes").item(0).getTextContent().trim());
+                }
+                else
+                {
+                    cl.setExcludedClassPrefixes(null);
+                }
                 cl.update(cnx);
 
                 if (clElement.getElementsByTagName("eventHandlers").getLength() > 0)
