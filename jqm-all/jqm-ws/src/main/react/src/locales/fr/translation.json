@@ -147,7 +147,19 @@
         "helpText": "Sur chaque onglet, cliquez sur l'icône point d'interrogation pour obtenir de l'aide contextuelle.",
         "documentationText": "Vous trouverez davantage de références dans la",
         "documentationLink": "documentation en ligne complète",
-        "documentationSuffix": "pour la branche de développement (en anglais)."
+        "documentationSuffix": "pour la branche de développement (en anglais).",
+        "usageStats": {
+            "activeNodes": "Noeuds actifs",
+            "queues": "Files d'attente",
+            "submittedJobs": "Jobs en attente",
+            "runningJobs": "Jobs en exécution",
+            "pausedJobs": "Jobs en pause"
+        },
+        "historyChart": {
+            "title": "Jobs récemment terminés",
+            "last1h": "Dernière heure",
+            "last24h": "Dernières 24h"
+        }
     },
     "menu": {
         "home": "Accueil",
@@ -594,17 +606,6 @@
         "progress": "Progression",
         "sessionID": "ID de session",
         "actions": "Actions",
-        "statuses": {
-            "ATTRIBUTED": "Attribué",
-            "CRASHED": "Échoué",
-            "CANCELLED": "Annulé",
-            "RUNNING": "En cours",
-            "ENDED": "Terminé",
-            "KILLED": "Tué",
-            "HOLDED": "En pause",
-            "SUBMITTED": "Soumis",
-            "SCHEDULED": "Planifié"
-        },
         "filterLabels": {
             "enqueuedAfter": "Mis en file après",
             "enqueuedBefore": "Mis en file avant",

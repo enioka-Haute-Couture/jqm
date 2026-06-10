@@ -31,6 +31,13 @@ public class DbImplOracle extends DbAdapter
     {
         super.prepare(p, cnx);
 
+        queries.put("history_select_end_status_by_period",
+                this.adaptSql("SELECT SLOT_INDEX, STATUS, COUNT(1) FROM (" + "SELECT FLOOR((" + "EXTRACT(DAY FROM DIFF) * 86400 + "
+                        + "EXTRACT(HOUR FROM DIFF) * 3600 + " + "EXTRACT(MINUTE FROM DIFF) * 60 + " + "EXTRACT(SECOND FROM DIFF)"
+                        + ") / SLOT_SEC) AS SLOT_INDEX, STATUS "
+                        + "FROM (SELECT (DATE_END - CAST(? AS TIMESTAMP)) AS DIFF, STATUS, ? AS SLOT_SEC "
+                        + "FROM __T__HISTORY WHERE DATE_END >= ?) t1" + ") t GROUP BY SLOT_INDEX, STATUS ORDER BY SLOT_INDEX"));
+
         // In some driver versions, trace is enabled by default!
         System.setProperty("oracle.jdbc.Trace", "false");
 

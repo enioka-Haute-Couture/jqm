@@ -22,6 +22,11 @@ public class DbImplDb2 extends DbAdapter
     {
         super.prepare(p, cnx);
 
+        queries.put("history_select_end_status_by_period",
+                this.adaptSql("SELECT SLOT_INDEX, STATUS, COUNT(1) FROM ("
+                + "SELECT INT(TIMESTAMPDIFF(2, CHAR(DATE_END - CAST(? AS TIMESTAMP))) / ?) AS SLOT_INDEX, STATUS "
+                        + "FROM __T__HISTORY WHERE DATE_END >= ?" + ") t GROUP BY SLOT_INDEX, STATUS ORDER BY SLOT_INDEX"));
+
         // Simpler polling query, as DB2 has a very weird locking model.
         queries.put("ji_update_poll", this.adaptSql(
                 "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "

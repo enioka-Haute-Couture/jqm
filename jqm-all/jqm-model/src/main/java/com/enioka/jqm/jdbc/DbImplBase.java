@@ -23,7 +23,16 @@ class DbImplBase
     {
         // VERSION
         queries.put("version_insert", "INSERT INTO __T__VERSION(ID, COMPONENT, VERSION_D1, COMPAT_D1, INSTALL_DATE) VALUES(JQM_PK.nextval, 'SCHEMA', ?, ?, CURRENT_TIMESTAMP)");
-        queries.put("version_select_latest", "SELECT v1.VERSION_D1, v1.COMPAT_D1 FROM __T__VERSION v1 WHERE v1.ID = (SELECT MAX(v2.ID) AS OID FROM __T__VERSION v2 WHERE v2.COMPONENT='SCHEMA')");
+        queries.put("version_select_latest",
+                "SELECT v1.VERSION_D1, v1.COMPAT_D1 FROM __T__VERSION v1 WHERE v1.ID = (SELECT MAX(v2.ID) AS OID FROM __T__VERSION v2 WHERE v2.COMPONENT='SCHEMA')");
+
+        // USAGE STATS
+        queries.put("stats_usage", "SELECT "
+                + "(SELECT COUNT(1) FROM __T__NODE WHERE ENABLED=true AND STOP=false AND TEMPLATE=false) AS ACTIVE_NODES, "
+                + "(SELECT COUNT(1) FROM __T__QUEUE) AS QUEUES, "
+                + "(SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE STATUS='HOLDED') AS PAUSED_JOBS, "
+                + "(SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE STATUS='SUBMITTED') AS SUBMITTED_JOBS, "
+                + "(SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE STATUS='RUNNING') AS RUNNING_JOBS FROM (VALUES(0))");
 
         // NODE
         queries.put("node_insert", "INSERT INTO __T__NODE(ID, REPO_DELIVERABLE, DNS, ENABLED, JMX_REGISTRY_PORT, JMX_SERVER_PORT, "
@@ -247,6 +256,11 @@ class DbImplBase
         queries.put("history_select_reenqueue_by_id", "SELECT JD_APPLICATION, JD_KEY, EMAIL, INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, PARENT, SESSION_KEY, USERNAME, STATUS FROM __T__HISTORY WHERE ID=?");
         queries.put("history_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__HISTORY h LEFT JOIN __T__NODE n ON h.NODE = n.ID WHERE h.ID=?");
         queries.put("history_select_state_by_id", "SELECT STATUS FROM __T__HISTORY WHERE ID=?");
+        queries.put("history_select_end_status_by_period",
+                "SELECT SLOT_INDEX, STATUS, COUNT(1) FROM ("
+                        + "SELECT FLOOR(DATEDIFF('SECOND', ?, DATE_END) / ?) AS SLOT_INDEX, STATUS "
+                        + "FROM __T__HISTORY WHERE DATE_END >= ?"
+                        + ") t GROUP BY SLOT_INDEX, STATUS ORDER BY SLOT_INDEX");
 
         // DELIVERABLE
         queries.put("deliverable_insert",  "INSERT INTO __T__DELIVERABLE(ID, FILE_FAMILY, PATH, JOB_INSTANCE, ORIGINAL_FILE_NAME, RANDOM_ID) VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?)");

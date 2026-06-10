@@ -23,6 +23,11 @@ public class DbImplPg extends DbAdapter
     {
         super.prepare(p, cnx);
 
+        queries.put("history_select_end_status_by_period",
+                this.adaptSql("SELECT SLOT_INDEX, STATUS, COUNT(1) FROM ("
+                        + "SELECT FLOOR(EXTRACT(EPOCH FROM (DATE_END - ?)) / ?) AS SLOT_INDEX, STATUS "
+                        + "FROM __T__HISTORY WHERE DATE_END >= ?" + ") t GROUP BY SLOT_INDEX, STATUS ORDER BY SLOT_INDEX"));
+
         // We do NOT want to use paginateQuery on each poll query as we want polling to be as painless as possible, so we pre-paginate it.
         queries.put("ji_select_poll", queries.get("ji_select_poll") + " LIMIT ?");
     }
@@ -39,8 +44,8 @@ public class DbImplPg extends DbAdapter
                 .replace(" REAL", " DOUBLE PRECISION").replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000")
                 .replace("IN(UNNEST(?))", "=ANY(?)").replace("CURRENT_TIMESTAMP - 1 MINUTE", "CURRENT_TIMESTAMP - INTERVAL '1 MINUTES'")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(CURRENT_TIMESTAMP - (? || ' SECONDS')::interval)")
-                .replace("FROM (VALUES(0))", "")
-                .replace("CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'").replace("__T__", this.tablePrefix);
+                .replace("FROM (VALUES(0))", "").replace("CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'")
+                .replace("__T__", this.tablePrefix);
     }
 
     @Override
