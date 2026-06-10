@@ -41,7 +41,7 @@ const UsersPage: React.FC = () => {
     const [expirationDate, setExpirationDate] = useState<Date | null>(null);
     const [userRoles, setUserRoles] = useState<number[] | null>(null);
     const [changePasswordUserId, setChangePasswordUserId] = useState<
-        string | null
+        number | null
     >(null);
     const {
         users,
@@ -316,7 +316,7 @@ const UsersPage: React.FC = () => {
                 {changePasswordUserId !== null && (
                     <ChangePasswordDialog
                         closeDialog={() => setChangePasswordUserId(null)}
-                        changePassword={changePassword(changePasswordUserId)}
+                        changePassword={changePassword(users?.find(user => user.id === changePasswordUserId)!)}
                     />
                 )}
                 {showCreateDialog && (
