@@ -77,8 +77,9 @@ export const useUserAPI = () => {
     );
 
     const changePassword = useCallback(
-        (userId: string) => async (password: string) => {
-            return APIService.put(`${API_URL}/${userId}`, {
+        (user: User) => async (password: string) => {
+            return APIService.put(`${API_URL}/${user.id}`, {
+                ...user,
                 newPassword: password,
             })
                 .then(() => {
