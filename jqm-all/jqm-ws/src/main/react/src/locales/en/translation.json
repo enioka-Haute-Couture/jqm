@@ -147,7 +147,19 @@
         "helpText": "On each tab, click the question mark icon for contextual help.",
         "documentationText": "Further reference can be found in the",
         "documentationLink": "full online documentation",
-        "documentationSuffix": "for the development branch."
+        "documentationSuffix": "for the development branch.",
+        "usageStats": {
+            "activeNodes": "Active nodes",
+            "queues": "Queues",
+            "submittedJobs": "Submitted jobs",
+            "runningJobs": "Running jobs",
+            "pausedJobs": "Paused jobs"
+        },
+        "historyChart": {
+            "title": "Recently completed jobs",
+            "last1h": "Last hour",
+            "last24h": "Last 24h"
+        }
     },
     "menu": {
         "home": "Home",
@@ -594,17 +606,6 @@
         "progress": "Progress",
         "sessionID": "Session ID",
         "actions": "Actions",
-        "statuses": {
-            "ATTRIBUTED": "Attributed",
-            "CRASHED": "Crashed",
-            "CANCELLED": "Cancelled",
-            "RUNNING": "Running",
-            "ENDED": "Ended",
-            "KILLED": "Killed",
-            "HOLDED": "Paused",
-            "SUBMITTED": "Submitted",
-            "SCHEDULED": "Scheduled"
-        },
         "filterLabels": {
             "enqueuedAfter": "Enqueued after",
             "enqueuedBefore": "Enqueued before",

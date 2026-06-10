@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.ClDto;
 import com.enioka.api.admin.GlobalParameterDto;
+import com.enioka.api.admin.HistorySlotDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.NodeDto;
@@ -34,6 +35,7 @@ import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
+import com.enioka.api.admin.UsageStatsDto;
 import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.client.api.JqmClientException;
 import com.enioka.jqm.jdbc.DbConn;
@@ -80,6 +82,31 @@ public class ServiceAdmin
     public VersionDto getVersion()
     {
         return MetaService.getVersion();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Usage stats
+    ///////////////////////////////////////////////////////////////////////////
+    @GET
+    @Path("stats/usage")
+    @Produces(MediaType.APPLICATION_JSON)
+    public UsageStatsDto getUsageStats()
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            return MetaService.getUsageStats(cnx);
+        }
+    }
+
+    @GET
+    @Path("stats/history")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<HistorySlotDto> getHistoryStats(@QueryParam("hours") int hours)
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            return MetaService.getHistoryStats(cnx, hours);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

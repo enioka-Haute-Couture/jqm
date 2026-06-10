@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.enioka.api.admin.ClDto;
 import com.enioka.api.admin.GlobalParameterDto;
+import com.enioka.api.admin.HistorySlotDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.NodeDto;
@@ -18,6 +19,7 @@ import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
+import com.enioka.api.admin.UsageStatsDto;
 import com.enioka.api.admin.VersionDto;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
@@ -125,6 +127,115 @@ public class MetaService
         VersionDto res = new VersionDto();
         res.setMavenVersion(version);
         return res;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Usage stats
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Get usage statitics such as number of active nodes, queues, state of job instances, etc.
+     *
+     * @return a UsageStatsDto containing the usage statistics
+     */
+    public static UsageStatsDto getUsageStats(DbConn cnx)
+    {
+
+        ResultSet rs = cnx.runSelect("stats_usage");
+        try
+        {
+            if (!rs.next())
+            {
+                throw new NoResultException("The query returned zero rows when one was expected.");
+            }
+            UsageStatsDto res = new UsageStatsDto();
+            res.setActiveNodes(rs.getInt(1));
+            res.setQueues(rs.getInt(2));
+            res.setPausedJobs(rs.getInt(3));
+            res.setSubmittedJobs(rs.getInt(4));
+            res.setRunningJobs(rs.getInt(5));
+
+            rs.close();
+            return res;
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException("An error occurred while querying the database", e);
+        }
+    }
+
+    /**
+     * Get history statistics bucketed by time slot for the last N hours.
+     *
+     * @param cnx
+     *            the database connection
+     * @param hours
+     *            number of hours to look back (1 or 24)
+     * @return a list of HistorySlotDto objects, one per time slot
+     */
+    public static List<HistorySlotDto> getHistoryStats(DbConn cnx, int hours)
+    {
+        if (hours != 1 && hours != 24)
+        {
+            throw new IllegalArgumentException("hours must be 1 or 24");
+        }
+
+        int slotCount = hours == 1 ? 12 : 24;
+        long slotDurationMs = (hours * 3600_000L) / slotCount;
+        int slotDurationSeconds = (int) (slotDurationMs / 1000L);
+
+        Calendar since = Calendar.getInstance();
+        since.add(Calendar.HOUR, -hours);
+
+        // Result list with empty slots
+        List<HistorySlotDto> slots = new ArrayList<>(slotCount);
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        for (int i = 0; i < slotCount; i++)
+        {
+            HistorySlotDto slot = new HistorySlotDto();
+            Calendar slotStart = (Calendar) since.clone();
+            slotStart.add(Calendar.MILLISECOND, (int) (i * slotDurationMs));
+            slot.setSlotStart(sdf.format(slotStart.getTime()));
+            slots.add(slot);
+        }
+
+        ResultSet rs = cnx.runSelect("history_select_end_status_by_period", since, slotDurationSeconds, since);
+        try
+        {
+            while (rs.next())
+            {
+                int slotIndex = rs.getInt(1);
+                String status = rs.getString(2);
+                int count = rs.getInt(3);
+                if (slotIndex < 0 || slotIndex >= slotCount)
+                {
+                    continue;
+                }
+                HistorySlotDto slot = slots.get(slotIndex);
+                if ("ENDED".equals(status))
+                {
+                    slot.setEnded(slot.getEnded() + count);
+                }
+                else if ("CRASHED".equals(status))
+                {
+                    slot.setCrashed(slot.getCrashed() + count);
+                }
+                else if ("KILLED".equals(status))
+                {
+                    slot.setKilled(slot.getKilled() + count);
+                }
+                else if ("CANCELLED".equals(status))
+                {
+                    slot.setCancelled(slot.getCancelled() + count);
+                }
+            }
+            rs.close();
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException("An error occurred while querying the database", e);
+        }
+        return slots;
     }
 
     ///////////////////////////////////////////////////////////////////////////

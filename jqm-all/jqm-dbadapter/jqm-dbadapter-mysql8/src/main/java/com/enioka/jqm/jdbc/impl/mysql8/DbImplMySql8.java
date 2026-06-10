@@ -28,6 +28,11 @@ public class DbImplMySql8 extends DbAdapter
     {
         super.prepare(p, cnx);
 
+        queries.put("history_select_end_status_by_period",
+                this.adaptSql("SELECT SLOT_INDEX, STATUS, COUNT(1) FROM ("
+                        + "SELECT FLOOR(TIMESTAMPDIFF(SECOND, ?, DATE_END) / ?) AS SLOT_INDEX, STATUS "
+                        + "FROM __T__HISTORY WHERE DATE_END >= ?" + ") t GROUP BY SLOT_INDEX, STATUS ORDER BY SLOT_INDEX"));
+
         // We do NOT want to use paginateQuery on each poll query as we want polling to be as painless as possible, so we pre-paginate it.
         queries.put("ji_select_poll", queries.get("ji_select_poll") + " LIMIT ?");
     }

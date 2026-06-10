@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.enioka.api.admin.RUserDto;
 import com.icegreen.greenmail.junit4.GreenMailRule;
@@ -29,6 +31,7 @@ import jakarta.mail.Store;
 
 import com.enioka.admin.JqmAdminApiUserException;
 import com.enioka.admin.MetaService;
+import com.enioka.api.admin.HistorySlotDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.QueueDto;
 import com.enioka.jqm.engine.api.exceptions.JqmInitErrorTooSoon;
@@ -250,6 +253,53 @@ public class MiscTest extends JqmBaseTest
                         .invoke().size());
         Assert.assertEquals(5, jqmClient.newQuery().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.client.api.State.SUBMITTED).invoke().size());
+    }
+
+    @Test
+    public void testHistoryStatsAggregationQuery()
+    {
+        JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
+
+        Calendar since24 = Calendar.getInstance();
+        since24.add(Calendar.HOUR, -24);
+
+        List<HistorySlotDto> stats = MetaService.getHistoryStats(cnx, 24);
+
+        Assert.assertEquals(24, stats.size());
+        for (HistorySlotDto slot : stats)
+        {
+            Assert.assertNotNull(slot.getSlotStart());
+            Assert.assertTrue(slot.getEnded() >= 0);
+            Assert.assertTrue(slot.getCrashed() >= 0);
+            Assert.assertTrue(slot.getKilled() >= 0);
+            Assert.assertTrue(slot.getCancelled() >= 0);
+        }
+
+        int endedInStats = stats.stream().mapToInt(HistorySlotDto::getEnded).sum();
+        int crashedInStats = stats.stream().mapToInt(HistorySlotDto::getCrashed).sum();
+        int killedInStats = stats.stream().mapToInt(HistorySlotDto::getKilled).sum();
+        int cancelledInStats = stats.stream().mapToInt(HistorySlotDto::getCancelled).sum();
+
+        Assert.assertEquals(countHistoryStatusSince(since24, "ENDED"), endedInStats);
+        Assert.assertEquals(countHistoryStatusSince(since24, "CRASHED"), crashedInStats);
+        Assert.assertEquals(countHistoryStatusSince(since24, "KILLED"), killedInStats);
+        Assert.assertEquals(countHistoryStatusSince(since24, "CANCELLED"), cancelledInStats);
+    }
+
+    private int countHistoryStatusSince(Calendar since, String status)
+    {
+        try (ResultSet rs = cnx.runRawSelect("SELECT COUNT(1) FROM __T__HISTORY WHERE DATE_END >= ? AND STATUS=?", since, status))
+        {
+            if (!rs.next())
+            {
+                return 0;
+            }
+            return rs.getInt(1);
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
