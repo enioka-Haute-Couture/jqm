@@ -57,8 +57,8 @@ RUN chgrp -R 0 /jqm && \
 USER 1001
 
 # Run node on startup
-ENTRYPOINT /jqm/bin/node.sh
+ENTRYPOINT ["/jqm/bin/node.sh"]
 
 # Healthcheck is equivalent to calling Node.AllPollersPolling
 HEALTHCHECK --interval=30s --start-period=91s --retries=2 --timeout=10s CMD curl --connect-timeout 2 -q --http1.1 -4 -s -S  ${JQM_HEALTHCHECK_URL}
-STOPSIGNAL SIGINT
+STOPSIGNAL SIGTERM
