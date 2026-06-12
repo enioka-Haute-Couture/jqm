@@ -14,8 +14,8 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
 /**
- * Patches the <base> tag in index.html at application startup to the value in envrionment variable JQM_BASE_PATH to support deployment
- * behind a reverse proxy with a path prefix.
+ * Patches the base tag in index.html at application startup to the value in envrionment variable JQM_BASE_PATH to support deployment behind
+ * a reverse proxy with a path prefix.
  *
  * If the variable is absent no patching is done.
  */
