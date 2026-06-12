@@ -88,6 +88,21 @@ public class JqmBaseTest
         }
     }
 
+    protected void configureDefaultResourceFiles()
+    {
+        // For overrides
+    }
+
+    protected void prepareDatabaseEnvironment() throws NamingException
+    {
+        // For overrides
+    }
+
+    protected void cleanupDatabaseEnvironment()
+    {
+        // For overrides.
+    }
+
     @Before
     public void beforeEachTest() throws NamingException, SQLException
     {
@@ -168,6 +183,17 @@ public class JqmBaseTest
     protected void assumeHsqldb()
     {
         Assume.assumeTrue(s.isHsqldb());
+    }
+
+    protected void assumeNotDb2()
+    {
+        String dbType = System.getenv("DB");
+        Assume.assumeFalse(dbType != null && dbType.equalsIgnoreCase("db2"));
+    }
+    protected void assumeNotOracle()
+    {
+        String dbType = System.getenv("DB");
+        Assume.assumeFalse(dbType != null && dbType.equalsIgnoreCase("oracle"));
     }
 
     protected void assumeJavaVersionStrictlyGreaterThan(double version)
@@ -254,16 +280,19 @@ public class JqmBaseTest
         }
     }
 
-    protected void simulateDbFailure()
+    protected void simulateDbFailure(int delay)
     {
         if (db.getProduct().contains("hsql"))
         {
             jqmlogger.info("DB is going down");
             s.close();
             jqmlogger.info("DB is now fully down");
-            this.sleep(1);
+            this.sleep(delay);
             jqmlogger.info("Restarting DB");
             s.start();
+            this.sleep(delay);
+            jqmlogger.info("DB is now fully up");
+
         }
         else if (db.getProduct().contains("postgresql"))
         {
