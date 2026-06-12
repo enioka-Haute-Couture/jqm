@@ -1,9 +1,37 @@
 Release notes
 ######################
 
+3.5.0
+*************
+
+Maintenance release, with new features and some fixes after the v3.4 release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+There are two database modifications in this release: an index on the ``HISTORY`` table was added and a column was added to the ``CL`` table. Migration is applied when running ``jqm(.sh|.ps1) createnode`` or the ``Update-Schema`` command.
+
+Majors changes
+++++++++++++++++++++++++++++
+
+* GUI: added dashboards in the home page showing usage stats and a history graph of job runs in the last 24 hours/last hour
+* GUI: allow UI to work behind a reverse proxy by patching index.html base tag with an env var (previous implementations were not satisfactory)
+* Engine: added class loader attribute excludedClassPrefixes to specify class prefixes that will not be loaded by the JQM Class Loader, but by the system class loader, which can be useful to use JQM with some APM
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Global: added GUI screenshots in README and documentation
+* Packaging: JQM now stops gracefully when ran in Docker
+* GUI: fixed password change in users page
+* Web APIs: fixed wrong MIME/Media type for the add job file API
+
 3.4.0
 *************
 
+Maintenance release, with new features and some fixes after the v3.3 release.
 
 Upgrade notes
 +++++++++++++++++++
