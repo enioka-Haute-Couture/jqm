@@ -1,5 +1,6 @@
 package com.enioka.jqm.integration.tests;
 
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -24,12 +25,14 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.oracle.OracleContainer;
 
 public abstract class JqmPerTestContainerBase extends JqmBaseTest
 {
     private static final ReentrantLock TEST_INFRA_LOCK = new ReentrantLock();
     private static final int FIXED_DB_HOST_PORT = 18532;
     private static final String FIXED_PORT_RESOURCE_FILE = "resources-dbfail.xml";
+    private static final String ORACLE_FIXED_JDBC_URL = "jdbc:oracle:thin:@localhost:" + FIXED_DB_HOST_PORT + "/jqm";
 
     protected JdbcDatabaseContainer<?> dedicatedDbContainer;
 
@@ -160,6 +163,7 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
         jqmlogger.info("DB container {} is going up", containerId);
         DockerClientFactory.instance().client().startContainerCmd(containerId).exec();
         this.sleep(delay);
+        waitForDedicatedDb();
         jqmlogger.info("DB is now fully up");
     }
 
@@ -200,9 +204,49 @@ public abstract class JqmPerTestContainerBase extends JqmBaseTest
                     new HostConfig().withPortBindings(
                         new PortBinding(Ports.Binding.bindPort(FIXED_DB_HOST_PORT),
                                 new ExposedPort(3306)))));
+        case "oracle":
+            if (dbVersion == null || dbVersion.isEmpty())
+            {
+                dbVersion = "slim";
+            }
+            return new OracleContainer("gvenzl/oracle-free:slim-faststart")
+                .withDatabaseName("jqm").withUsername("jqm").withPassword("jqm")
+                .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                    new HostConfig().withPortBindings(
+                        new PortBinding(Ports.Binding.bindPort(FIXED_DB_HOST_PORT),
+                                new ExposedPort(1521)))));
         default:
             throw new IllegalArgumentException("Unsupported database type provided: " + dbType);
         }
+    }
+
+    private void waitForDedicatedDb()
+    {
+        long deadline = System.currentTimeMillis() + 120_000;
+        SQLException lastFailure = null;
+        while (System.currentTimeMillis() < deadline)
+        {
+            try (var ignored = DriverManager.getConnection(getDedicatedJdbcUrl(), dedicatedDbContainer.getUsername(),
+                    dedicatedDbContainer.getPassword()))
+            {
+                return;
+            }
+            catch (SQLException e)
+            {
+                lastFailure = e;
+                sleepms(1000);
+            }
+        }
+        throw new IllegalStateException("Dedicated DB container did not accept JDBC connections after restart", lastFailure);
+    }
+
+    private String getDedicatedJdbcUrl()
+    {
+        if (db != null && db.getProduct().contains("oracle"))
+        {
+            return ORACLE_FIXED_JDBC_URL;
+        }
+        return dedicatedDbContainer.getJdbcUrl();
     }
 
     private void resetDatabaseState() throws NamingException

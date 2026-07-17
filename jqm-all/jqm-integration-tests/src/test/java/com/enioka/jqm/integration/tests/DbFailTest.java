@@ -15,7 +15,6 @@ public class DbFailTest extends JqmPerTestContainerBase
     protected void prepareDatabaseEnvironment() throws NamingException
     {
         assumeNotDb2();
-        assumeNotOracle();
         super.prepareDatabaseEnvironment();
     }
 
@@ -32,7 +31,7 @@ public class DbFailTest extends JqmPerTestContainerBase
     public void testDbDoubleFailure() throws Exception
     {
         this.addAndStartEngine();
-        this.simulateDbFailure(2);
+        this.simulateDbFailure(20);
         Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
 
         // cnx was closed in previous simulateDbFailure()
@@ -75,17 +74,35 @@ public class DbFailTest extends JqmPerTestContainerBase
     }
 
     // Job ends KO during db failure.
-//    @Test
-//    public void testDbFailureWithRunningJobKo() throws Exception
-//    {
-//        JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
-//        jqmlogger.info("waiting");
-//        this.sleep(2);
-//        this.simulateDbFailure(20);
-//
-//        TestHelpers.waitFor(1, 10000, this.getNewDbSession());
-//        Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
-//    }
+    @Test
+    public void testDbFailureWithRunningJobKo() throws Exception
+    {
+        JqmSimpleTest.create(cnx, "pyl.WaitThenFail", "jqm-test-pyl-nodep").addRuntimeParameter("p1", "5000").expectOk(0).run(this);
+
+        jqmlogger.info("waiting for job to be running");
+        TestHelpers.waitForRunning(1, 10000, this.getNewDbSession());
+        Assert.assertEquals(1, TestHelpers.getQueueRunningCount(this.getNewDbSession()));
+        Assert.assertEquals(0, TestHelpers.getHistoryAllCount(this.getNewDbSession()));
+
+        this.simulateDbFailure(20);
+
+        long deadline = System.currentTimeMillis() + 60000;
+        int okCount = 0;
+        int nonOkCount = 0;
+        while (System.currentTimeMillis() < deadline)
+        {
+            okCount = TestHelpers.getOkCount(this.getNewDbSession());
+            nonOkCount = TestHelpers.getNonOkCount(this.getNewDbSession());
+            if (okCount + nonOkCount >= 1)
+            {
+                break;
+            }
+            this.sleep(1);
+        }
+
+        Assert.assertEquals(0, okCount);
+        Assert.assertEquals(1, nonOkCount);
+    }
 
     // Many jobs starting & running during failure
     @Test
