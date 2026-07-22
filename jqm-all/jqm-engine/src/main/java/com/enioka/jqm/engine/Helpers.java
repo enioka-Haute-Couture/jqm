@@ -18,12 +18,14 @@
 
 package com.enioka.jqm.engine;
 
+import java.io.EOFException;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.sql.SQLNonTransientException;
+import java.sql.SQLRecoverableException;
 import java.sql.SQLTransientException;
 import java.util.List;
 import java.util.UUID;
@@ -307,13 +309,31 @@ final class Helpers
 
         return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SQLRecoverableException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
                 || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, EOFException.class) != -1)
                 || (rootCause != null && rootCause.getClass().getName().equals("oracle.net.ns.NetException"))
-                || (cause != null && cause.getMessage() != null && cause.getMessage().equals("This connection has been closed"))
+                || containsDbFailureMessage(e, "No more data to read from socket")
+                || containsDbFailureMessage(e, "This connection has been closed")
+                || containsDbFailureMessage(e, "terminating connection due to unexpected postmaster exit")
+                || containsDbFailureMessage(e, "An I/O error occurred while sending to the backend")
                 || (cause instanceof SQLException && e.getMessage() != null
                         && e.getMessage().equals("Failed to validate a newly established connection."))
                 || (cause instanceof SQLNonTransientException && cause.getMessage() != null
                         && cause.getMessage().equals("connection exception: closed"));
+    }
+
+    private static boolean containsDbFailureMessage(Throwable e, String message)
+    {
+        for (Object throwable : ExceptionUtils.getThrowableList(e))
+        {
+            Throwable t = (Throwable) throwable;
+            if (t.getMessage() != null && t.getMessage().contains(message))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
