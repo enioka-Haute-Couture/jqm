@@ -182,9 +182,11 @@ All objects are serialized to XML by default or to JSON if required. The service
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /user/{uname}/ji      | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all waiting or running job instances for a user           |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
-| /jd                   | GET    |                       | List\<JobDef\>      | application/xml     | getActiveJobs        | List all job definitions                                       |
+| /jd                   | GET    |                       | List\<JobDef\>      | application/xml     | getJobDefinitions    | List all job definitions                                       |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
-| /jd/{appName}         | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all job definitions  for a given application              |
+| /jd/{appName}         | GET    |                       | List\<JobDef\>      | application/xml     | getJobDefinitions    | List all job definitions for a given application               |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /jd/name/{jdName}     | GET    |                       | JobDef              | application/xml     | getJobDefinition     | Details of a job definition for a given name                   |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /jr                   | GET    |                       | JobRequest          | application/xml     | N/A                  | Returns an empty JobRequest. Usefull for scripts.              |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
