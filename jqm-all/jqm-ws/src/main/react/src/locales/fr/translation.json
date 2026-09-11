@@ -709,7 +709,8 @@
             "buttonClose": "Fermer",
             "buttonDownload": "Télécharger",
             "buttonSeeRaw": "Voir brut",
-            "buttonCopy": "Copier"
+            "buttonCopy": "Copier",
+            "stickToBottom": "Rester en bas"
         },
         "launchDialog": {
             "title": "Nouveau lancement",
