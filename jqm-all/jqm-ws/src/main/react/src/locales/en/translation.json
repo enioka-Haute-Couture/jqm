@@ -709,7 +709,8 @@
             "buttonClose": "Close",
             "buttonDownload": "Download",
             "buttonSeeRaw": "See Raw",
-            "buttonCopy": "Copy"
+            "buttonCopy": "Copy",
+            "stickToBottom": "Stick to bottom"
         },
         "launchDialog": {
             "title": "New launch",

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
+    Box,
     Button,
+    Checkbox,
+    FormControlLabel,
     Grid,
     Paper,
     Table,
@@ -49,9 +52,36 @@ export const JobInstanceDetailsDialog: React.FC<{
     const [showMessages, setShowMessages] = useState<boolean>(false);
     const [showFiles, setShowFiles] = useState<boolean>(false);
     const [logs, setLogs] = useState<String | null>(null);
+    const [stickToBottom, setStickToBottom] = useState<boolean>(true);
     const { canUserAccess } = useAuth();
     const [files, setFiles] = useState<JobInstanceFile[] | null>(null);
     const [logType, setLogType] = useState<LOG_TYPE>(displayedLogType);
+    const logsContainerRef = React.useRef<HTMLDivElement | null>(null);
+    const isAutoScrollingRef = React.useRef<boolean>(false);
+
+    const scrollLogsToBottom = () => {
+        if (logsContainerRef.current) {
+            isAutoScrollingRef.current = true;
+            logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
+            window.requestAnimationFrame(() => {
+                isAutoScrollingRef.current = false;
+            });
+        }
+    };
+
+    const handleLogsScroll = () => {
+        if (!stickToBottom || isAutoScrollingRef.current || !logsContainerRef.current) {
+            return;
+        }
+
+        const container = logsContainerRef.current;
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+        // When user scrolls away from the bottom, stop automatic scrolling.
+        if (distanceFromBottom > 2) {
+            setStickToBottom(false);
+        }
+    };
 
     useEffect(() => {
         // fetch files details
@@ -111,6 +141,12 @@ export const JobInstanceDetailsDialog: React.FC<{
             }
         }
     }, [fetchLogsStderr, fetchLogsStdout, logs, jobInstance.id, jobInstance.state, logType]);
+
+    useEffect(() => {
+        if (logs !== null && stickToBottom && logsContainerRef.current) {
+            scrollLogsToBottom();
+        }
+    }, [logs, stickToBottom]);
 
     return (
         <>
@@ -668,6 +704,12 @@ export const JobInstanceDetailsDialog: React.FC<{
                     onClose={() => {
                         setLogs(null);
                         setLogType("NONE");
+                        setStickToBottom(true);
+                    }}
+                    TransitionProps={{
+                        onEntered: () => {
+                            scrollLogsToBottom();
+                        },
                     }}
                     aria-labelledby="form-dialog-title"
                     fullWidth
@@ -675,9 +717,20 @@ export const JobInstanceDetailsDialog: React.FC<{
                 >
                     <DialogTitle>{t("runs.detailsDialog.logsDialogTitle", { id: jobInstance.id, logType: logType.toLowerCase() })}</DialogTitle>
                     <DialogContent>
-                        <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
+                        <Box ref={logsContainerRef} onScroll={handleLogsScroll} sx={{ maxHeight: "70vh", overflowY: "auto" }}>
+                            <Typography sx={{ fontFamily: 'Monospace', fontSize: "small", whiteSpace: "pre-wrap" }}>{logs}</Typography>
+                        </Box>
                     </DialogContent>
                     <DialogActions>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={stickToBottom}
+                                    onChange={(event) => setStickToBottom(event.target.checked)}
+                                />
+                            }
+                            label={t("runs.detailsDialog.stickToBottom")}
+                        />
                         <Button
                             size="small"
                             style={{ margin: "8px" }}
@@ -727,6 +780,7 @@ export const JobInstanceDetailsDialog: React.FC<{
                             onClick={() => {
                                 setLogs(null);
                                 setLogType("NONE");
+                                setStickToBottom(true);
                             }}
                             style={{ margin: "8px" }}
                         >
