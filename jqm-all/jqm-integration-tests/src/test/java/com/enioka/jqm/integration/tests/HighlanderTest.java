@@ -29,12 +29,130 @@ import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.client.api.Query.Sort;
 import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.model.DeploymentParameter;
+
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class HighlanderTest extends JqmBaseTest
 {
+    @Test
+    public void testHighlanderParentEnqueueCanTriggerNonUniqueResultBug() throws Exception
+    {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("delay_ms", "200");
+        HashMap<String, String> parentParameters = new HashMap<String, String>();
+        parentParameters.put("burst", "1");
+
+        // Child job is Highlander: it is the one repeatedly enqueued by parent jobs.
+        CreationTools.createJobDef(null, true, "pyl.Wait", parameters, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        // Parent job payload enqueues MarsuApplication through the engine API.
+        CreationTools.createJobDef(null, true, "pyl.EnqueueMarsuApplication", parentParameters, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "TestLaunchParentJob", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        // Reproduce reported behavior: start with a single slot, then increase while jobs are in flight.
+        cnx.runUpdate("dp_update_threads_by_id", 1, TestHelpers.dpVip.getId());
+        cnx.runUpdate("dp_update_interval_by_id", 10000, TestHelpers.dpVip.getId());
+        cnx.commit();
+        addAndStartEngine();
+
+        final int parentEnqueueLoops = 250;
+        for (int i = 0; i < parentEnqueueLoops; i++)
+        {
+            jqmClient.newJobRequest("TestLaunchParentJob", "TestUser").enqueue();
+        }
+
+        // Wait until at least one child is visible before changing queue mapping.
+        int childrenBeforeSwitch = 0;
+        long switchDeadline = System.currentTimeMillis() + 30000;
+        while (System.currentTimeMillis() < switchDeadline)
+        {
+            childrenBeforeSwitch = jqmClient.newQuery().setApplicationName("MarsuApplication").setQueryHistoryInstances(true)
+                    .setQueryLiveInstances(true).invoke().size();
+            if (childrenBeforeSwitch > 0)
+            {
+                break;
+            }
+            sleepms(100);
+        }
+        Assert.assertTrue("No child job visible before mapping switch", childrenBeforeSwitch > 0);
+
+        // Trigger point from the original report.
+        cnx.runUpdate("dp_update_threads_by_id", 5, TestHelpers.dpVip.getId());
+        cnx.commit();
+        jqmlogger.info("Changed VIPQueue mapping from 1 to 5 threads during run");
+
+        // Wait for parent launchers to leave the live queue before querying history. This avoids hammering
+        // history queries while jobs are still being executed.
+        int liveParents = Integer.MAX_VALUE;
+        long deadline = System.currentTimeMillis() + 120000;
+        while (System.currentTimeMillis() < deadline)
+        {
+            liveParents = jqmClient.newQuery().setApplicationName("TestLaunchParentJob").setQueryHistoryInstances(false)
+                    .setQueryLiveInstances(true).invoke().size();
+            if (liveParents == 0)
+            {
+                break;
+            }
+            sleepms(200);
+        }
+        Assert.assertEquals("Timed out waiting for parent jobs to leave live queue", 0, liveParents);
+
+        List<com.enioka.jqm.client.api.JobInstance> children = jqmClient.newQuery().setApplicationName("MarsuApplication")
+                .setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke();
+        Assert.assertTrue("Expected at least one MarsuApplication child job", children.size() > 0);
+
+        HashMap<State, Integer> childStatusCounts = new HashMap<>();
+        int crashedChildren = 0;
+        String sampleChildCrashMessage = null;
+        for (com.enioka.jqm.client.api.JobInstance ji : children)
+        {
+            Integer current = childStatusCounts.get(ji.getState());
+            childStatusCounts.put(ji.getState(), current == null ? 1 : current + 1);
+
+            if (ji.getState() == State.CRASHED)
+            {
+                crashedChildren++;
+                if (sampleChildCrashMessage == null && ji.getMessages() != null && ji.getMessages().size() > 0)
+                {
+                    sampleChildCrashMessage = ji.getMessages().get(0);
+                }
+            }
+        }
+        jqmlogger.info("Child MarsuApplication stats: total=" + children.size() + ", byStatus=" + childStatusCounts + ", crashedChildren="
+                + crashedChildren + (sampleChildCrashMessage != null ? ", sampleCrashMessage=" + sampleChildCrashMessage : ""));
+
+        List<com.enioka.jqm.client.api.JobInstance> parents = jqmClient.newQuery().setApplicationName("TestLaunchParentJob")
+                .setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke();
+        boolean hasNonUnique = false;
+        int crashedParents = 0;
+        for (com.enioka.jqm.client.api.JobInstance ji : parents)
+        {
+            if (ji.getState() == State.CRASHED)
+            {
+                crashedParents++;
+                for (String msg : ji.getMessages())
+                {
+                    if (msg.contains("NonUniqueResultException"))
+                    {
+                        hasNonUnique = true;
+                        break;
+                    }
+                }
+            }
+            if (hasNonUnique)
+            {
+                break;
+            }
+        }
+
+        Assert.assertTrue("Expected at least one crashed parent job with NonUniqueResultException in messages after 1->5 mapping switch. "
+                + "childrenBeforeSwitch=" + childrenBeforeSwitch + ", parentCount=" + parents.size() + ", crashedParents=" + crashedParents,
+                hasNonUnique);
+    }
+
     @Test
     public void testHighlanderMultiNode() throws Exception
     {
@@ -192,4 +310,21 @@ public class HighlanderTest extends JqmBaseTest
         jqmClient.killJob(i3);
         TestHelpers.waitFor(2, 20000, cnx);
     }
+
+    // @Test
+    // public void testHighlanderEnqueueWithSubmittedInstancesDoesNotFail() throws Exception
+    // {
+    // CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+    // "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+    // JobDef jd = JobDef.selectKey(cnx, "MarsuApplication");
+
+    // JobInstance.enqueue(cnx, com.enioka.jqm.model.State.SUBMITTED, TestHelpers.qVip.longValue(), jd.getId(), null, null, null, null,
+    // null, null, null, null, null, null, true, false, null, 42, Instruction.RUN, null);
+    // JobInstance.enqueue(cnx, com.enioka.jqm.model.State.SUBMITTED, TestHelpers.qVip.longValue(), jd.getId(), null, null, null, null,
+    // null, null, null, null, null, null, true, false, null, 42, Instruction.RUN, null);
+    // cnx.commit();
+
+    // jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+    // }
 }
