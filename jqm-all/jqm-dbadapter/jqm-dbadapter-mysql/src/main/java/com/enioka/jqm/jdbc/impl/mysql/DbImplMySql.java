@@ -39,6 +39,9 @@ public class DbImplMySql extends DbAdapter
 
         sequenceSqlRetrieval = adaptSql("SELECT next FROM __T__JQM_SEQUENCE WHERE name = ?");
         sequenceSql = adaptSql("UPDATE __T__JQM_SEQUENCE SET next = next + 1 WHERE name = ?");
+
+        // Sad: MySQL needs this inside the SQL text in addition to standard JDBC flags...
+        queries.put("jd_select_by_id_lock", queries.get("jd_select_by_id_lock") + " FOR UPDATE");
     }
 
     @Override

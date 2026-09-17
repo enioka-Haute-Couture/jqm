@@ -434,6 +434,18 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         // Now we need to actually synchronize through the database to avoid double posting
         // TODO: use a dedicated table, not the JobDef one. Will avoid locking the configuration.
         ResultSet rs = cnx.runSelect(true, "jd_select_by_id_lock", jd.getId());
+        try
+        {
+            // Some drivers (notably DB2) only acquire update locks on fetch.
+            if (!rs.next())
+            {
+                throw new JqmClientException("No JobDef with ID " + jd.getId());
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new JqmClientException("Could not lock JobDef row for highlander mode", e);
+        }
 
         // Now we have a lock, just retry - some other client may have created a job instance recently.
         try
@@ -453,7 +465,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jqmlogger.warn("Issue when closing a ResultSet. Transaction or session leak is possible.", e);
         }
 
-        jqmlogger.trace("Highlander mode analysis is done: nor existing JO, must create a new one. Lock is hold.");
+        jqmlogger.trace("Highlander mode analysis is done: no existing JI, must create a new one. Lock is hold.");
         return rs;
     }
 
