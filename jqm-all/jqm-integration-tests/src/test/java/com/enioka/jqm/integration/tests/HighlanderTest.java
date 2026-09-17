@@ -29,12 +29,57 @@ import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.client.api.Query.Sort;
 import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.model.DeploymentParameter;
+
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class HighlanderTest extends JqmBaseTest
 {
+    @Test
+    public void testHighlanderParentEnqueueDoesNotTriggerNonUniqueResult() throws Exception
+    {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("delay_ms", "200");
+
+        // Child job is highlander
+        CreationTools.createJobDef(null, true, "pyl.Wait", parameters, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        // Parent job enqueues child job once, not highlander
+        CreationTools.createJobDef(null, true, "pyl.EnqueueMarsuApplication", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "TestLaunchParentJob", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        addAndStartEngine();
+
+        final int parentEnqueueLoops = 50;
+        for (int i = 0; i < parentEnqueueLoops; i++)
+        {
+            jqmClient.newJobRequest("TestLaunchParentJob", "TestUser").enqueue();
+        }
+
+        int liveParents = Integer.MAX_VALUE;
+        long deadline = System.currentTimeMillis() + 15000;
+        while (System.currentTimeMillis() < deadline)
+        {
+            liveParents = jqmClient.newQuery().setApplicationName("TestLaunchParentJob").setQueryHistoryInstances(false)
+                    .setQueryLiveInstances(true).invoke().size();
+            if (liveParents == 0)
+            {
+                break;
+            }
+            sleepms(200);
+        }
+        Assert.assertEquals("Timed out waiting for parent jobs to leave live queue", 0, liveParents);
+
+        List<com.enioka.jqm.client.api.JobInstance> parents = jqmClient.newQuery().setApplicationName("TestLaunchParentJob")
+                .setQueryHistoryInstances(true).setQueryLiveInstances(true).invoke();
+        for (com.enioka.jqm.client.api.JobInstance ji : parents)
+        {
+            Assert.assertTrue("Expected job to be successful", ji.getState() != State.CRASHED);
+        }
+    }
+
     @Test
     public void testHighlanderMultiNode() throws Exception
     {

@@ -30,6 +30,9 @@ public class DbImplPg extends DbAdapter
 
         // We do NOT want to use paginateQuery on each poll query as we want polling to be as painless as possible, so we pre-paginate it.
         queries.put("ji_select_poll", queries.get("ji_select_poll") + " LIMIT ?");
+
+        // Sad: PostgreSQL needs this inside the SQL text in addition to standard JDBC flags...
+        queries.put("jd_select_by_id_lock", queries.get("jd_select_by_id_lock") + " FOR UPDATE");
     }
 
     public DbImplPg()

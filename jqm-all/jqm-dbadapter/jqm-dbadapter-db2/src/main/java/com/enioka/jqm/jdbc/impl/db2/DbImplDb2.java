@@ -24,7 +24,7 @@ public class DbImplDb2 extends DbAdapter
 
         queries.put("history_select_end_status_by_period",
                 this.adaptSql("SELECT SLOT_INDEX, STATUS, COUNT(1) FROM ("
-                + "SELECT INT(TIMESTAMPDIFF(2, CHAR(DATE_END - CAST(? AS TIMESTAMP))) / ?) AS SLOT_INDEX, STATUS "
+                        + "SELECT INT(TIMESTAMPDIFF(2, CHAR(DATE_END - CAST(? AS TIMESTAMP))) / ?) AS SLOT_INDEX, STATUS "
                         + "FROM __T__HISTORY WHERE DATE_END >= ?" + ") t GROUP BY SLOT_INDEX, STATUS ORDER BY SLOT_INDEX"));
 
         // Simpler polling query, as DB2 has a very weird locking model.
@@ -32,6 +32,9 @@ public class DbImplDb2 extends DbAdapter
                 "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                         + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
                         + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FETCH FIRST ? ROWS ONLY)"));
+
+        // Sad: DB2 needs this inside the SQL text in addition to standard JDBC flags...
+        queries.put("jd_select_by_id_lock", queries.get("jd_select_by_id_lock") + " FOR UPDATE WITH RS USE AND KEEP UPDATE LOCKS");
     }
 
     @Override
