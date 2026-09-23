@@ -1,6 +1,25 @@
 Release notes
 ######################
 
+3.5.1
+*************
+
+Small maintenance release with minor fixes after the v3.5.0 release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: fixed highlander mode when running under particularly high load conditions for PostgreSQL, MySQL, and DB2
+* GUI: added "stick to bottom" toggle in job log viewer
+* Documentation: corrected WS documentation of the /jd endpoint
+
 3.5.0
 *************
 
