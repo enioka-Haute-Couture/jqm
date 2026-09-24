@@ -58,6 +58,8 @@ The specific parameters are:
 +----------------------------------+------------+----------------------------------------------+------------------------------------+
 | com.enioka.jqm.ws.password       | if login   |                                              | password                           |
 +----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.enableCookies  |            | Enable session cookie reuse (default: true)  | false                              |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
 | com.enioka.jqm.ws.keystoreFile   | if CSA     | Store for client certificates authentication | ./conf/client.pfx                  |
 +----------------------------------+------------+----------------------------------------------+------------------------------------+
 | com.enioka.jqm.ws.keystoreType   |            | Type of the previous store                   | PKCS12                             |
@@ -78,6 +80,19 @@ and can be set:
 	p.put("com.enioka.jqm.ws.url", "http://localhost:9999/marsu/ws");
 	JqmClientFactory.setProperties(p);
 * through a system parameter (-Dcom.enioka.jqm.ws.url=http://...)
+
+Session Cookie Behavior
+++++++++++++++++++++++++++++
+
+When ``com.enioka.jqm.ws.enableCookies`` is enabled (default), the client authenticates once to establish a session and reuses
+the JSESSIONID cookie for subsequent requests, resulting in ~10x better performance by avoiding repeated password hashing.
+
+**If the server session expires or the server restarts, subsequent requests will fail** with a ``JqmClientException`` caused by HTTP 401 Unauthorized.
+In this case, create a new client instance to re-authenticate, or set ``com.enioka.jqm.ws.enableCookies=false`` to use stateless
+Basic Authentication on every request (slower but immune to session timeouts).
+
+If using multiple JQM WS nodes behind load balancing, **be cautious that sessions are server-specific**.
+Configure your load balancer appropriately or dedicate a single node for web services to avoid session issues (see service side section below).
 
 Interrogating the service directly
 ++++++++++++++++++++++++++++++++++++++++
