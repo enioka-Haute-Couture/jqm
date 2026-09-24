@@ -34,7 +34,9 @@ public class KillMe implements Runnable
             }
             catch (InterruptedException e)
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Job interrupted", e);
+//                e.printStackTrace();
             }
             jm.sendProgress(i);
             i++;
