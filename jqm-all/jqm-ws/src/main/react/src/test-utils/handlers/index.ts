@@ -8,6 +8,7 @@ import { nodeHandlers } from "./nodes";
 import { queueHandlers } from "./queues";
 import { roleHandlers } from "./roles";
 import { runsHandlers } from "./runs";
+import { statsHandlers } from "./stats";
 import { userHandlers } from "./users";
 
 export const handlers = [
@@ -22,4 +23,5 @@ export const handlers = [
     ...clusterParameterHandlers,
     ...jobDefinitionHandlers,
     ...runsHandlers,
+    ...statsHandlers,
 ];
