@@ -1,8 +1,18 @@
 import { http, HttpResponse } from "msw";
 
 export const mockParameters = [
-    { id: 1, key: "logFilePerLaunch", value: "true" },
-    { id: 2, key: "internalPollingPeriodMs", value: "60000" },
+    {
+        id: 1,
+        key: "logFilePerLaunch",
+        value: "true",
+        lastModified: "2026-01-15T10:30:00.000Z",
+    },
+    {
+        id: 2,
+        key: "internalPollingPeriodMs",
+        value: "60000",
+        lastModified: null,
+    },
 ];
 
 export const clusterParameterHandlers = [

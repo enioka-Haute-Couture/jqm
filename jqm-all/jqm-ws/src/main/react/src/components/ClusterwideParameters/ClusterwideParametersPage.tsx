@@ -106,6 +106,16 @@ const ClusterwideParametersPage: React.FC = () => {
             },
         },
         {
+            name: "lastModified",
+            label: t("clusterParameters.lastModified"),
+            options: {
+                hint: t("clusterParameters.hints.lastModified"),
+                filter: false,
+                searchable: false,
+                customBodyRender: (value: any) => (value ? new Date(value).toLocaleString() : ""),
+            },
+        },
+        {
             name: "",
             label: t("common.actions"),
             options: {

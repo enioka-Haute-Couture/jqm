@@ -392,9 +392,11 @@
         "noMatch": "No parameters found",
         "key": "Key",
         "value": "Value",
+        "lastModified": "Last modified",
         "hints": {
             "key": "The parameter key. Not necessarily unique.",
-            "value": "The value of the parameter"
+            "value": "The value of the parameter",
+            "lastModified": "Date of the latest change of this parameter"
         },
         "documentation": {
             "title": "Cluster-wide parameters documentation",

@@ -309,6 +309,12 @@ public class MetaService
         res.setId(rs.getLong(1));
         res.setKey(rs.getString(2));
         res.setValue(rs.getString(3));
+        if (rs.getTimestamp(4) != null)
+        {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(rs.getTimestamp(4).getTime());
+            res.setLastModified(c);
+        }
         return res;
     }
 
