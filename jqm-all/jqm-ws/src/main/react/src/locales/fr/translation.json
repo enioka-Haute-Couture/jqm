@@ -392,9 +392,11 @@
         "noMatch": "Aucun paramètre trouvé",
         "key": "Clé",
         "value": "Valeur",
+        "lastModified": "Dernière modification",
         "hints": {
             "key": "La clé du paramètre. Pas nécessairement unique.",
-            "value": "La valeur du paramètre"
+            "value": "La valeur du paramètre",
+            "lastModified": "Date de la dernière modification de ce paramètre"
         },
         "documentation": {
             "title": "Documentation des paramètres de cluster",

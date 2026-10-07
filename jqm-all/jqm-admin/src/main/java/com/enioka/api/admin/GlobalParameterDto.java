@@ -16,6 +16,7 @@
 package com.enioka.api.admin;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
 
@@ -38,6 +39,7 @@ public class GlobalParameterDto implements Serializable
     private Long id;
     private String key;
     private String value;
+    private Calendar lastModified;
 
     /**
      * Get the id of the parameter.
@@ -100,5 +102,26 @@ public class GlobalParameterDto implements Serializable
     public void setValue(String value)
     {
         this.value = value;
+    }
+
+    /**
+     * Get the last modified timestamp of the parameter.
+     *
+     * @return the last modified timestamp
+     */
+    public Calendar getLastModified()
+    {
+        return lastModified;
+    }
+
+    /**
+     * Set the last modified timestamp of the parameter.
+     *
+     * @param lastModified
+     *            the last modified timestamp to set
+     */
+    public void setLastModified(Calendar lastModified)
+    {
+        this.lastModified = lastModified;
     }
 }
