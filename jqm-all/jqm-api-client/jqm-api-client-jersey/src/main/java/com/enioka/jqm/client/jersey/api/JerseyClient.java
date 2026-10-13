@@ -67,6 +67,8 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     private Properties p;
     private Client client;
     private WebTarget target;
+    private boolean cookiesEnabled;
+    private CookieManagementFilter cookieFilter;
 
     ///////////////////////////////////////////////////////////////////////
     // Construction/Connection
@@ -238,11 +240,29 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
             client = bld.build();
         }
 
+        ///////////////////////////////////////
+        // Authentication and session management
+        this.cookiesEnabled = !"false".equalsIgnoreCase(this.p.getProperty("com.enioka.jqm.ws.enableCookies"));
+
         // Basic Authentication (only allowed when no client certificate is given)
-        if (this.p.containsKey("com.enioka.jqm.ws.login") && this.p.containsKey("com.enioka.jqm.ws.password")
-                && !this.p.containsKey("com.enioka.jqm.ws.keystoreFile"))
+        boolean hasCredentials = this.p.containsKey("com.enioka.jqm.ws.login") && this.p.containsKey("com.enioka.jqm.ws.password")
+                && !this.p.containsKey("com.enioka.jqm.ws.keystoreFile");
+
+        if (hasCredentials)
         {
             jqmlogger.info("A login/password pair was specified and will be used");
+        }
+
+        if (this.cookiesEnabled && hasCredentials)
+        {
+            jqmlogger.info("Session-based authentication enabled, will authenticate once and reuse session cookie");
+
+            this.cookieFilter = new CookieManagementFilter();
+            client.register(this.cookieFilter);
+        }
+        else if (hasCredentials)
+        {
+            jqmlogger.info("Cookie management disabled, will use Basic Authentication on every request");
             client.register(new HttpBasicAuthenticationFeature(this.p.getProperty("com.enioka.jqm.ws.login"),
                     this.p.getProperty("com.enioka.jqm.ws.password")));
         }
@@ -252,6 +272,38 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
         String url = this.p.getProperty("com.enioka.jqm.ws.url", "http://localhost:1789/ws/client");
         jqmlogger.info("JAX-RS client was created. The following root service URL will be used: " + url);
         this.target = client.target(url);
+
+        // If using session-based auth, establish session now with an initial login request
+        if (this.cookiesEnabled && hasCredentials)
+        {
+            try
+            {
+                jqmlogger.info("Establishing session by authenticating to /admin/me");
+
+                String credentials = this.p.getProperty("com.enioka.jqm.ws.login") + ":" + this.p.getProperty("com.enioka.jqm.ws.password");
+                String encodedCredentials = java.util.Base64.getEncoder().encodeToString(credentials.getBytes("UTF-8"));
+
+                // Call /admin/me to establish session and set JSESSIONID cookie
+                String baseWsUrl = url.replaceAll("/client$", "");
+                jakarta.ws.rs.core.Response response = client.target(baseWsUrl + "/admin/me").request(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Basic " + encodedCredentials).get();
+
+                if (response.getStatus() == 200)
+                {
+                    jqmlogger.info("Session established successfully, subsequent requests will use JSESSIONID cookie");
+                }
+                else
+                {
+                    jqmlogger.warn("Failed to establish session (status {}). Will retry on first actual request.", response.getStatus());
+                }
+                response.close();
+            }
+            catch (Exception e)
+            {
+                jqmlogger.warn("Failed to establish session during initialization: {}. Will retry on first actual request.",
+                        e.getMessage());
+            }
+        }
     }
 
     @Override
