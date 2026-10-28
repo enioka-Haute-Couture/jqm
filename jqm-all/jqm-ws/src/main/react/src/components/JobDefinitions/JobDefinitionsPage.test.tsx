@@ -21,7 +21,16 @@ describe("JobDefinitionsPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of job definitions", async () => {
+    it("renders the list of job definitions with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["jd:read", "queue:read"],
+                })
+            )
+        );
+
         renderWithProviders(<JobDefinitionsPage />);
 
         await screen.findByDisplayValue("DemoFibo1");

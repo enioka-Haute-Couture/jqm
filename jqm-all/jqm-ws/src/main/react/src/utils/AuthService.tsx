@@ -14,7 +14,6 @@ export enum PermissionObjectType {
     qmapping = "qmapping",
     jndi = "jndi",
     prm = "prm",
-    cl = "cl",
     jd = "jd",
     user = "user",
     role = "role",

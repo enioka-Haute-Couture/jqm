@@ -21,7 +21,16 @@ describe("JndiPage", () => {
     });
 
 
-    it("renders the list of JNDI resources", async () => {
+    it("renders the list of JNDI resources with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["jndi:read"],
+                })
+            )
+        );
+
         renderWithProviders(<JndiPage />);
 
         await screen.findByDisplayValue("mail/default");

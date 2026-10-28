@@ -308,7 +308,7 @@ export default function MenuWrapper(props: any) {
                             <ListItemText primary={t("menu.clusterWideParams")} />
                         </ListItem>
                     )}
-                    {canUserAccess(PermissionObjectType.cl, PermissionAction.read) && (
+                    {canUserAccess(PermissionObjectType.jd, PermissionAction.read) && (
                         <ListItem
                             button
                             key={"classLoaders"}

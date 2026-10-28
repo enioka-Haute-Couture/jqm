@@ -20,7 +20,16 @@ describe("MappingsPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of mappings", async () => {
+    it("renders the list of mappings with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["qmapping:read", "queue:read", "node:read"],
+                })
+            )
+        );
+
         renderWithProviders(<MappingsPage />);
 
         await screen.findByText("Node1");

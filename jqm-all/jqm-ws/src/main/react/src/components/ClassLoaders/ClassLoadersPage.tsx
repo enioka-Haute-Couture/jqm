@@ -17,7 +17,7 @@ import { setPageTitle } from "../../utils/title";
 import { renderActionsCell, renderBooleanCell, renderInputCell } from "../TableCells";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
 import { set } from "date-fns";
-import {EditExcludedClassPrefixesDialog} from "./EditExcludedClassPrefixesDialog";
+import { EditExcludedClassPrefixesDialog } from "./EditExcludedClassPrefixesDialog";
 
 const ClassLoadersPage: React.FC = () => {
     const { t } = useTranslation();
@@ -55,7 +55,7 @@ const ClassLoadersPage: React.FC = () => {
     const { canUserAccess } = useAuth();
 
     useEffect(() => {
-        if (canUserAccess(PermissionObjectType.cl, PermissionAction.read)) {
+        if (canUserAccess(PermissionObjectType.jd, PermissionAction.read)) {
             fetchClassLoaders();
         }
         setPageTitle(t("classLoaders.title"));
@@ -222,20 +222,20 @@ const ClassLoadersPage: React.FC = () => {
             },
         },
         {
-          name: "excludedClassPrefixes",
-          label: t("classLoaders.excludedClassPrefixes"),
-          options: {
-              filter: false,
-              sort: false,
-              hint: t("classLoaders.hints.excludedClassPrefixes"),
-              customBodyRender: renderDialogCell(
-                  editingRowId,
-                  t("classLoaders.editExcludedClassPrefixesTooltip"),
-                  excludedClassPrefixes,
-                  (value: string) => value,
-                  setEditExcludedClassPrefixesClId
-              ),
-          }
+            name: "excludedClassPrefixes",
+            label: t("classLoaders.excludedClassPrefixes"),
+            options: {
+                filter: false,
+                sort: false,
+                hint: t("classLoaders.hints.excludedClassPrefixes"),
+                customBodyRender: renderDialogCell(
+                    editingRowId,
+                    t("classLoaders.editExcludedClassPrefixesTooltip"),
+                    excludedClassPrefixes,
+                    (value: string) => value,
+                    setEditExcludedClassPrefixesClId
+                ),
+            }
         },
         {
             name: "",
@@ -250,8 +250,8 @@ const ClassLoadersPage: React.FC = () => {
                     handleOnDelete,
                     editingRowId,
                     handleOnEdit,
-                    canUserAccess(PermissionObjectType.queue, PermissionAction.update),
-                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete),
+                    canUserAccess(PermissionObjectType.jd, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.jd, PermissionAction.delete),
                     [],
                     t
                 ),
@@ -265,10 +265,10 @@ const ClassLoadersPage: React.FC = () => {
         download: false,
         print: false,
         viewColumns: false,
-        selectableRows: (canUserAccess(PermissionObjectType.cl, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
+        selectableRows: (canUserAccess(PermissionObjectType.jd, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return <>
-                {canUserAccess(PermissionObjectType.cl, PermissionAction.create) &&
+                {canUserAccess(PermissionObjectType.jd, PermissionAction.create) &&
                     <>
                         <Tooltip title={t("common.add")}>
 
@@ -310,7 +310,7 @@ const ClassLoadersPage: React.FC = () => {
         },
     };
 
-    if (!canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
+    if (!canUserAccess(PermissionObjectType.jd, PermissionAction.read)) {
         return <AccessForbiddenPage />
     }
 

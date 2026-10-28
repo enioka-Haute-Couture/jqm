@@ -21,7 +21,16 @@ describe("RunsPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of job instances", async () => {
+    it("renders the list of job instances with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["job_instance:read", "queue:read"],
+                })
+            )
+        );
+
         renderWithProviders(<RunsPage />);
 
         await screen.findByText("SampleJob");

@@ -20,7 +20,16 @@ describe("ClassLoadersPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of class loaders", async () => {
+    it("renders the list of class loaders with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["jd:read"],
+                })
+            )
+        );
+
         renderWithProviders(<ClassLoadersPage />);
 
         await screen.findByDisplayValue("DefaultClassLoader");
@@ -137,7 +146,7 @@ describe("ClassLoadersPage", () => {
     it("hides action buttons for user with only read permission", async () => {
         server.use(
             http.get("/ws/admin/me", () =>
-                HttpResponse.json({ login: "readonly", permissions: ["cl:read", "queue:read"] })
+                HttpResponse.json({ login: "readonly", permissions: ["jd:read"] })
             )
         );
 

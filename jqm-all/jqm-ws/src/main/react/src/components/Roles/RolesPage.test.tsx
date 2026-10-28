@@ -20,7 +20,16 @@ describe("RolesPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of roles", async () => {
+    it("renders the list of roles with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["role:read"],
+                })
+            )
+        );
+
         renderWithProviders(<RolesPage />);
 
         await screen.findByDisplayValue("administrator");

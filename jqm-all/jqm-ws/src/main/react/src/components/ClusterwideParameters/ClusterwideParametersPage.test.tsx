@@ -20,7 +20,16 @@ describe("ClusterwideParametersPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of parameters", async () => {
+    it("renders the list of parameters with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["prm:read"],
+                })
+            )
+        );
+
         renderWithProviders(<ClusterwideParametersPage />);
 
         await screen.findByDisplayValue("logFilePerLaunch");
