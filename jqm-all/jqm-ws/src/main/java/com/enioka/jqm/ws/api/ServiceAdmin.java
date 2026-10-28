@@ -691,7 +691,7 @@ public class ServiceAdmin
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("me")
-    @HttpCache("private, max-age=36000")
+    @HttpCache("no-store")
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
         List<String> res = new ArrayList<>();

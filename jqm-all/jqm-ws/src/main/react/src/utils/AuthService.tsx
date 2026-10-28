@@ -83,7 +83,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const getProfile = async () => {
         try {
-            const result = await APIService.get("/admin/me");
+            // Bypass any browser-cached profile from a previous user
+            const result = await APIService.get("/admin/me", { headers: { "Cache-Control": "no-cache" } });
             setAuthState({ userLogin: result.login, userPermissions: result.permissions, status: "LOGGED_IN" });
         } catch (e) {
             setAuthState({ status: "LOGGED_OUT" });
