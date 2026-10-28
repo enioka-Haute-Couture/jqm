@@ -94,6 +94,9 @@ export default class APIService {
             if (res.status === 200 || res.status === 201) {
                 return jsonResponse ? await res.json() : await res.text();
             }
+            if (res.status === 204) {
+                return null;
+            }
             return init.method !== "GET";
         }
 

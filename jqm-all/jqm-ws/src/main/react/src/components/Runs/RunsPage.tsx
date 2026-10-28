@@ -87,8 +87,8 @@ const RunsPage: React.FC = () => {
         fetchLogsStderr,
         fetchFiles,
         fetchFileContent,
-        parameters,
-        fetchParameters,
+        logFilePerLaunch,
+        fetchLogFilePerLaunch,
     } = useJobInstanceAPI();
 
     const { jobDefinitions, fetchJobDefinitions } = useJobDefinitionsAPI();
@@ -96,7 +96,6 @@ const RunsPage: React.FC = () => {
     const { canUserAccess } = useAuth();
 
     const canSeeIndividualLogs = () => {
-        const logFilePerLaunch = parameters?.find(p => p.key === 'logFilePerLaunch')?.value;
         if (logFilePerLaunch !== undefined && logFilePerLaunch === "false") {
             return false;
         }
@@ -113,8 +112,7 @@ const RunsPage: React.FC = () => {
             filterList!
         );
         fetchQueues();
-        fetchParameters();
-
+        fetchLogFilePerLaunch();
     }
 
     const [displayedLogType, setLogType] = useState<LOG_TYPE>("NONE");
@@ -935,7 +933,7 @@ const RunsPage: React.FC = () => {
         return <AccessForbiddenPage />
     }
 
-    return jobInstances && queues && parameters ? (
+    return jobInstances && queues && logFilePerLaunch !== undefined ? (
         <Container maxWidth={false}>
             <MUIDataTable
                 title={t("runs.tableTitle")}

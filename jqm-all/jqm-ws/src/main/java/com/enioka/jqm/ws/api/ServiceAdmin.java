@@ -400,6 +400,19 @@ public class ServiceAdmin
         }
     }
 
+    @GET
+    @Path("prm/logfileperlaunch")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public String getGlobalParameterLogFilePerLaunch()
+    {
+        try (DbConn cnx = Helpers.getDbSession())
+        {
+            return MetaService.getGlobalParameter(cnx).stream().filter(p -> "logFilePerLaunch".equals(p.getKey())).findFirst()
+                    .map(GlobalParameterDto::getValue).orElse(null);
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////
     /// ClassLoader
     /////////////////////////////////////////////////////////////////////////

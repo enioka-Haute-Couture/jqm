@@ -21,7 +21,16 @@ describe("NodesPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of nodes", async () => {
+    it("renders the list of nodes with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["node:read"],
+                })
+            )
+        );
+
         renderWithProviders(<NodesPage />);
 
         await screen.findByDisplayValue("Node1");

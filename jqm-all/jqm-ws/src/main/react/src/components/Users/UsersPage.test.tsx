@@ -20,7 +20,16 @@ describe("UsersPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of users", async () => {
+    it("renders the list of users with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["user:read", "role:read"],
+                })
+            )
+        );
+
         renderWithProviders(<UsersPage />);
 
         await screen.findByDisplayValue("root");

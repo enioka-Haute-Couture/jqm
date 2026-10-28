@@ -42,11 +42,10 @@ export const useJobInstanceAPI = () => {
     } = useRunsPagination();
 
     const [jobInstances, setJobInstances] = useState<JobInstance[] | null>();
+    const [logFilePerLaunch, setLogFilePerLaunch] = useState<string | null>();
     const [count, setCount] = useState<number>(0);
 
     const { queues, fetchQueues } = useQueueAPI();
-
-    const { parameters, fetchParameters } = useParametersApi();
 
     const buildFilterQuery = useCallback(
         (newFilterList: string[][]) => {
@@ -620,6 +619,14 @@ export const useJobInstanceAPI = () => {
         [displayError]
     );
 
+    const fetchLogFilePerLaunch = useCallback(async () => {
+        return APIService.get("/admin/prm/logfileperlaunch", {}, false)
+            .then((value) => {
+                setLogFilePerLaunch(value);
+            })
+            .catch(displayError);
+    }, [displayError]);
+
     return {
         count,
         page,
@@ -647,8 +654,8 @@ export const useJobInstanceAPI = () => {
         fetchLogsStderr,
         fetchFiles,
         fetchFileContent,
-        parameters,
-        fetchParameters,
+        logFilePerLaunch,
+        fetchLogFilePerLaunch,
     };
 };
 

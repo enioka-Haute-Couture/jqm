@@ -20,7 +20,16 @@ describe("QueuesPage", () => {
         await screen.findByText("You don't have permission to access this page.");
     });
 
-    it("renders the list of queues", async () => {
+    it("renders the list of queues with minimum permissions", async () => {
+        server.use(
+            http.get("/ws/admin/me", () =>
+                HttpResponse.json({
+                    login: "readonly",
+                    permissions: ["queue:read"],
+                })
+            )
+        );
+
         renderWithProviders(<QueuesPage />);
 
         await screen.findByDisplayValue("DefaultQueue");

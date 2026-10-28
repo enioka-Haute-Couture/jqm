@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import APIService from "../utils/APIService";
 import { useNotificationService } from "../utils/NotificationService";
 import { setPageTitle } from "../utils/title";
+import { PermissionAction, PermissionObjectType, useAuth } from "../utils/AuthService";
 
 interface UsageStats {
     activeNodes: number;
@@ -50,6 +51,8 @@ const HomePage: React.FC = () => {
     const [historySlots, setHistorySlots] = useState<HistorySlot[]>([]);
     const [period, setPeriod] = useState<1 | 24>(24);
 
+    const { canUserAccess } = useAuth();
+
     const fetchDashboardData = useCallback(
         async () => {
             try {
@@ -67,16 +70,18 @@ const HomePage: React.FC = () => {
     );
 
     useEffect(() => {
-        fetchDashboardData();
-
-        let timer = window.setInterval(() => {
+        if (canUserAccess(PermissionObjectType.job_instance, PermissionAction.read)) {
             fetchDashboardData();
-        }, 10_000);
 
-        return () => {
-            if (timer !== null) clearInterval(timer);
-        };
-    }, [fetchDashboardData]);
+            let timer = window.setInterval(() => {
+                fetchDashboardData();
+            }, 10_000);
+
+            return () => {
+                if (timer !== null) clearInterval(timer);
+            };
+        }
+    }, [fetchDashboardData, canUserAccess]);
 
     useEffect(() => {
         APIService.get("/admin/version").then((data) => {

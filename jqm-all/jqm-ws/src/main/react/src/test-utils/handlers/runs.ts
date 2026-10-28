@@ -74,4 +74,5 @@ export const runsHandlers = [
             applicationName: body.applicationName,
         });
     }),
+    http.get("/ws/admin/prm/logfileperlaunch", () => HttpResponse.text("true")),
 ];
