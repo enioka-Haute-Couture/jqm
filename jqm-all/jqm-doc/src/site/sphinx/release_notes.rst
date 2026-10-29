@@ -1,6 +1,26 @@
 Release notes
 ######################
 
+3.5.2
+*************
+
+Small maintenance release with minor fixes after the v3.5.1 release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* GUI: now update last modified date of a global parameter when changed from the API and displays it in the gui
+* GUI: make sure the current user is not cached to prevent inconsistent UI when switching roles
+* GUI: fixed permissions related issues in home, classloader, jobdefinition and runs pages
+* GUI: in runs page add filtering on began running date
+
 3.5.1
 *************
 
