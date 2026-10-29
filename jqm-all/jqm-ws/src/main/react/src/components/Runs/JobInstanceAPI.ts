@@ -17,6 +17,8 @@ interface JobInstanceFilters {
     nodeName?: string;
     enqueuedAfter?: Date;
     enqueuedBefore?: Date;
+    beganRunningAfter?: Date;
+    beganRunningBefore?: Date;
     parentId?: string;
     queueId?: number;
     sessionId?: string;
@@ -74,6 +76,18 @@ export const useJobInstanceAPI = () => {
                 }
                 if (newFilterList[4][1]) {
                     filterQuery.enqueuedBefore = new Date(newFilterList[4][1]);
+                }
+            }
+            if (newFilterList[5]?.length > 0) {
+                if (newFilterList[5][0]) {
+                    filterQuery.beganRunningAfter = new Date(
+                        newFilterList[5][0]
+                    );
+                }
+                if (newFilterList[5][1]) {
+                    filterQuery.beganRunningBefore = new Date(
+                        newFilterList[5][1]
+                    );
                 }
             }
             if (newFilterList[8]?.length > 0) {
