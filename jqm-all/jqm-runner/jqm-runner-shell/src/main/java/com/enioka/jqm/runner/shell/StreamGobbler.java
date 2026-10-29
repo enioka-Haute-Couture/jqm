@@ -26,6 +26,7 @@ class StreamGobbler extends Thread
     Semaphore end = new Semaphore(0);
     String threadName;
     boolean useCommonLogFile = false;
+    OutputStream commonOutputStream = null;
 
     private StreamGobbler(InputStream is, OutputStream os)
     {
@@ -51,6 +52,11 @@ class StreamGobbler extends Thread
         res.stdout.useCommonLogFile = alsoWriteToCommonLog;
         res.stderr = new StreamGobbler(p.getErrorStream(), err);
         res.stderr.useCommonLogFile = alsoWriteToCommonLog;
+        if (alsoWriteToCommonLog)
+        {
+            res.stdout.commonOutputStream = System.out;
+            res.stderr.commonOutputStream = System.err;
+        }
         res.stdout.start();
         res.stderr.start();
         return res;
@@ -72,6 +78,11 @@ class StreamGobbler extends Thread
                 if (useCommonLogFile)
                 {
                     alljobslogger.info(line);
+                    if (commonOutputStream != null)
+                    {
+                        commonOutputStream.write((line + "\n").getBytes());
+                        commonOutputStream.flush();
+                    }
                 }
             }
 

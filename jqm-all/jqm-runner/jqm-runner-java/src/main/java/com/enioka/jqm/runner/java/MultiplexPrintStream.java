@@ -145,6 +145,12 @@ class MultiplexPrintStream extends PrintStream
 
             if (useCommonLogFile && textOut != original)
             {
+                this.original.write(s);
+                if (newLine)
+                {
+                    this.original.newLine();
+                }
+                this.original.flush();
                 alljobslogger.info(s + (newLine ? ls : ""));
             }
         }

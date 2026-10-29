@@ -76,7 +76,7 @@ public class LogTest extends JqmBaseTest
         System.setOut(outIni);
     }
 
-    // @Test
+    @Test
     // logback from test/resources is not use when launching test from jqm-all (CI breaks)
     public void testBothLogJavaRunner() throws IOException
     {
@@ -106,8 +106,15 @@ public class LogTest extends JqmBaseTest
 
         newOut.flush();
 
-        // check that the alljobslogger log into logfile. In real life, the logger write into another file (see logback configuration)
-        Assert.assertTrue(Files.readString(Path.of(filePath), StandardCharsets.UTF_8).contains("alljobslogger"));
+        // In "both" mode, output goes to both the per-job log file and the node's stdout.
+        // The per-job log file contains the job's stdout output.
+        String fileContent = Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
+        Assert.assertTrue(fileContent.contains("Date GENERATED:"));
+
+        // The node's stdout contains the job's output via the alljobslogger SLF4J logger,
+        // which is formatted by logback with "|" delimiters.
+        String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
+        Assert.assertTrue(outContent.contains("Date GENERATED:"));
 
         System.setErr(errIni);
         System.setOut(outIni);
@@ -299,6 +306,67 @@ public class LogTest extends JqmBaseTest
             String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
             Assert.assertTrue(outContent.contains("|" + logTextStdout));
             Assert.assertTrue(outContent.contains("|" + logTextStderr));
+
+        }
+        finally
+        {
+            System.setErr(errIni);
+            System.setOut(outIni);
+            System.out.write(byteArrayOutputStream.toByteArray());
+        }
+    }
+
+    @Test
+    public void testBothLogForShellJob() throws Exception
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(byteArrayOutputStream);
+        System.setOut(newOut);
+
+        try
+        {
+            final String logTextStdout = "log into stdout";
+            final String logTextStderr = "log into stderr";
+
+            GlobalParameter.setParameter(cnx, "logFilePerLaunch", "both");
+
+            final String shellCommandString = "echo " + logTextStdout + ";echo " + logTextStderr + " >&2";
+            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), shellCommandString, TestHelpers.qNormal, 0, "TestApp1",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
+            cnx.commit();
+            long i = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
+            addAndStartEngine();
+            TestHelpers.waitFor(1, 20000, cnx);
+
+            // Verify the per-job log files exist and contain the correct output.
+            String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
+            File f = new File(FilenameUtils.concat("./target/server/logs", fileName));
+
+            Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+            Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+            Assert.assertTrue(f.exists());
+
+            String content = FileUtils.readFileToString(f, "UTF-8");
+            Assert.assertEquals(logTextStdout, content.trim());
+
+            String fileNameErr = StringUtils.leftPad("" + i, 10, "0") + ".stderr.log";
+            File fErr = new File(FilenameUtils.concat("./target/server/logs", fileNameErr));
+            Assert.assertTrue(fErr.exists());
+
+            String contentErr = FileUtils.readFileToString(fErr, "UTF-8");
+            Assert.assertEquals(logTextStderr, contentErr.trim());
+
+            newOut.flush();
+
+            // In "both" mode, the raw output is also written directly to the node's stdout
+            // (System.out/System.err) by StreamGobbler, bypassing the logback alljobslogger.
+            // This check works on CI because it does not depend on logback configuration.
+            String outContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
+            Assert.assertTrue(outContent.contains(logTextStdout));
+            Assert.assertTrue(outContent.contains(logTextStderr));
 
         }
         finally
