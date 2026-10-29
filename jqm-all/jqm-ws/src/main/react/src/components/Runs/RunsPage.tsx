@@ -57,6 +57,87 @@ export type LOG_TYPE =
     "NONE"
     ;
 
+function dateRangeFilters(
+    filterIndex: number,
+    afterLabelKey: string,
+    beforeLabelKey: string
+) {
+    return (t: any, filterList: string[][]) => ({
+        filterList: filterList[filterIndex],
+        filterType: "custom" as FilterType,
+        customFilterListOptions: {
+            render: (v: any) => {
+                let filterChips = [];
+                if (v[0] && isValid(parseISO(v[0]))) {
+                    filterChips.push(`${t(afterLabelKey)}: ${format(parseISO(v[0]), 'yyyy-MM-dd HH:mm')}`);
+                }
+                if (v[1] && isValid(parseISO(v[1]))) {
+                    filterChips.push(`${t(beforeLabelKey)}: ${format(parseISO(v[1]), 'yyyy-MM-dd HH:mm')}`);
+                }
+                return filterChips;
+            },
+            update: (
+                fl: MUIDataTableState["filterList"],
+                filterPos: number,
+                index: number,
+            ) => {
+                if (filterPos === 0) {
+                    fl[index] = ['', fl[index][1]]
+                }
+                if (filterPos === 1 || filterPos === -1) {
+                    fl[index] = [fl[index][0]]
+                }
+                return fl;
+            }
+        },
+        filterOptions: {
+            names: [],
+            fullWidth: true,
+            display: (fl: MUIDataTableState["filterList"],
+                onChange: (val: string | string[], index: number, column: MUIDataTableColumn) => void,
+                index: number,
+                column: MUIDataTableColumn,
+                filterData: MUIDataTableState["filterData"]) => {
+
+                return <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
+                    <DateTimePicker
+                        sx={{ minWidth: 0, flex: '1 1 0' }}
+                        label={t(afterLabelKey)}
+                        format="dd/MM/yyyy HH:mm"
+                        slotProps={{ field: { clearable: true } }}
+                        value={(fl[index].length === 0 || !fl[index][0]) ? null : new Date(fl[index][0])}
+                        onChange={(date) => {
+                            if (date && isValid(new Date(date))) {
+                                fl[index][0] = new Date(date).toISOString()
+                                onChange(fl[index], filterIndex, column);
+                            } else {
+                                fl[index] = ['', fl[index][1]]
+                                onChange(fl[index], filterIndex, column);
+                            }
+                        }}
+                    />
+                    <DateTimePicker
+                        sx={{ minWidth: 0, flex: '1 1 0' }}
+                        label={t(beforeLabelKey)}
+                        format="dd/MM/yyyy HH:mm"
+                        slotProps={{ field: { clearable: true } }}
+                        value={(fl[index].length !== 2 || !fl[index][1]) ? null : new Date(fl[index][1])}
+                        onChange={(date) => {
+                            if (date && isValid(new Date(date))) {
+                                fl[index][1] = new Date(date).toISOString()
+                                onChange(fl[index], filterIndex, column);
+                            } else {
+                                fl[index] = [fl[index][0]]
+                                onChange(fl[index], filterIndex, column);
+                            }
+                        }}
+                    />
+                </Stack>
+            }
+        },
+    });
+}
+
 const RunsPage: React.FC = () => {
     const { t } = useTranslation();
     const muiTableTextLabels = useMUIDataTableTextLabels(t("runs.noMatch"));
@@ -281,80 +362,7 @@ const RunsPage: React.FC = () => {
             name: "enqueueDate",
             label: t("runs.enqueueDate"),
             options: {
-                filterList: filterList[4],
-                filterType: "custom" as FilterType,
-                customFilterListOptions: {
-                    render: (v: any) => {
-                        let filterChips = [];
-
-                        if (v[0] && isValid(parseISO(v[0]))) {
-                            filterChips.push(`${t("runs.filterLabels.enqueuedAfter")}: ${format(parseISO(v[0]), 'yyyy-MM-dd HH:mm')}`);
-                        }
-                        if (v[1] && isValid(parseISO(v[1]))) {
-                            filterChips.push(`${t("runs.filterLabels.enqueuedBefore")}: ${format(parseISO(v[1]), 'yyyy-MM-dd HH:mm')}`);
-                        }
-                        return filterChips;
-                    },
-                    update: (
-                        filterList: MUIDataTableState["filterList"],
-                        filterPos: number,
-                        index: number,
-                    ) => {
-                        if (filterPos === 0) {
-                            filterList[index] = ['', filterList[index][1]]
-                        }
-                        if (filterPos === 1 || filterPos === -1) {
-                            filterList[index] = [filterList[index][0]]
-                        }
-                        return filterList;
-                    }
-                },
-                filterOptions: {
-                    names: [],
-                    fullWidth: true,
-
-                    display: (filterList: MUIDataTableState["filterList"],
-                        onChange: (val: string | string[], index: number, column: MUIDataTableColumn) => void,
-                        index: number,
-                        column: MUIDataTableColumn,
-                        filterData: MUIDataTableState["filterData"]) => {
-
-                        return <Stack direction="row" spacing={2}>
-                            <DateTimePicker
-                                sx={{ flexGrow: 1 }}
-                                label={t("runs.filterLabels.enqueuedAfter")}
-                                format="dd/MM/yyyy HH:mm"
-                                slotProps={{ field: { clearable: true } }}
-                                value={(filterList[index].length === 0 || !filterList[index][0]) ? null : new Date(filterList[index][0])}
-                                onChange={(date) => {
-                                    if (date && isValid(new Date(date))) {
-                                        filterList[index][0] = new Date(date).toISOString()
-                                        onChange(filterList[index], 4, column);
-                                    } else {
-                                        filterList[index] = ['', filterList[index][1]]
-                                        onChange(filterList[index], 4, column);
-                                    }
-                                }}
-                            />
-                            <DateTimePicker
-                                sx={{ flexGrow: 1 }}
-                                label={t("runs.filterLabels.enqueuedBefore")}
-                                format="dd/MM/yyyy HH:mm"
-                                slotProps={{ field: { clearable: true } }}
-                                value={(filterList[index].length !== 2 || !filterList[index][1]) ? null : new Date(filterList[index][1])}
-                                onChange={(date) => {
-                                    if (date && isValid(new Date(date))) {
-                                        filterList[index][1] = new Date(date).toISOString()
-                                        onChange(filterList[index], 4, column);
-                                    } else {
-                                        filterList[index] = [filterList[index][0]]
-                                        onChange(filterList[index], 4, column);
-                                    }
-                                }}
-                            />
-                        </Stack>
-                    }
-                },
+                ...dateRangeFilters(4, "runs.filterLabels.enqueuedAfter", "runs.filterLabels.enqueuedBefore")(t, filterList),
                 customBodyRender: (value: any) => {
                     if (value) {
                         return new Date(value).toLocaleString();
@@ -366,8 +374,7 @@ const RunsPage: React.FC = () => {
             name: "beganRunningDate",
             label: t("runs.beganRunningDate"),
             options: {
-                filter: false,
-                searchable: false,
+                ...dateRangeFilters(5, "runs.filterLabels.beganRunningAfter", "runs.filterLabels.beganRunningBefore")(t, filterList),
                 customBodyRender: (value: any) => {
                     if (value) {
                         return new Date(value).toLocaleString();

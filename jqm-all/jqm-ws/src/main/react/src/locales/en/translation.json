@@ -621,6 +621,8 @@
         "filterLabels": {
             "enqueuedAfter": "Enqueued after",
             "enqueuedBefore": "Enqueued before",
+            "beganRunningAfter": "Began after",
+            "beganRunningBefore": "Began before",
             "runningOnly": "Running only",
             "crashedOnly": "Crashed only"
         },
