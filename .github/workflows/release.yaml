@@ -55,9 +55,11 @@ jobs:
 
             - name: Release prepare
               run: |
+                  RELEASE_VERSION=${{ github.event.inputs.release_version }}
+                  NEXT_VERSION=${{ github.event.inputs.next_version }}
                   mvn release:prepare -B \
-                    -DreleaseVersion=${{ github.event.inputs.release_version }} \
-                    -DdevelopmentVersion=${{ github.event.inputs.next_version }} \
+                    -DreleaseVersion=$RELEASE_VERSION \
+                    -DdevelopmentVersion=$NEXT_VERSION \
                     -Darguments='-DskipTests'
               env:
                   MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
