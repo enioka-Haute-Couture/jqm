@@ -52,6 +52,10 @@
 
     <globalParameters>
         <parameter>
+            <key>jobExceptionLogLevel</key>
+            <value>ERROR</value>
+        </parameter>
+        <parameter>
             <key>wsStandaloneMode</key>
             <value>true</value>
         </parameter>

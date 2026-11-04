@@ -150,7 +150,8 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
         }
         catch (Exception e)
         {
-            jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
+            jqmlogger.atLevel(engineCallback.getJobExceptionLogLevel()).setCause(e)
+                    .log("Job instance " + job.getId() + " has crashed. Exception was:");
             return State.CRASHED;
         }
         finally

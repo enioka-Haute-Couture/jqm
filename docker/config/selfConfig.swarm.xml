@@ -69,6 +69,10 @@
 
     <globalParameters>
         <parameter>
+            <key>jobExceptionLogLevel</key>
+            <value>ERROR</value>
+        </parameter>
+        <parameter>
             <key>logFilePerLaunch</key>
             <value>true</value>
         </parameter>
@@ -78,7 +82,8 @@
         </parameter>
         <parameter>
             <key>mavenRepo</key>
-            <value>http://repo1.maven.org/maven2/,https://oss.sonatype.org/content/repositories/snapshots/</value>
+            <value>
+                http://repo1.maven.org/maven2/,https://oss.sonatype.org/content/repositories/snapshots/</value>
         </parameter>
         <parameter>
             <key>deleteStoppedNodes</key>
