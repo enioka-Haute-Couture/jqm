@@ -10,6 +10,10 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <url>http://jqm.readthedocs.org</url>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <build>
         <testResources>
             <testResource>
@@ -83,4 +87,3 @@
 
     </dependencies>
 </project>
-

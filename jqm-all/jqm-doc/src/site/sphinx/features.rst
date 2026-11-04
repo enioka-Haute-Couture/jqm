@@ -26,8 +26,8 @@ Optional rich Java integration:
 * Jobs can be tested as if they were running inside a JQM node thanks to a test library which can be
   used in JUnit tests.
 * Can easily report an advancement status to users or administrators
-* All JQM artifacts (optional libraries developers may want to use in some cases) are published on Maven Central and therefore easily
-  integrate with most build systems
+* JQM libraries, excluding test artifacts, are published on Maven Central and therefore easily
+  integrate with most build systems. Standalone distribution archives are available from GitHub Releases.
 
 Interacting with batch jobs is simple:
 

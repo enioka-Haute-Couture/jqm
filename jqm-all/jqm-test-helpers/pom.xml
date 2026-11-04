@@ -13,6 +13,7 @@
 
     <properties>
         <sonar.skip>true</sonar.skip>
+        <skipPublishing>true</skipPublishing>
     </properties>
 
     <dependencies>

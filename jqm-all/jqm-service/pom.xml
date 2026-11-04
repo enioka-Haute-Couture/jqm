@@ -12,6 +12,10 @@
     <url>http://jqm.readthedocs.org</url>
     <description>The main JQM standalone distribution</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <build>
         <plugins>
 

@@ -54,6 +54,8 @@ Maven Central Repository validation
 
 After the automated workflow completes, go to https://central.sonatype.com/ and publish the release.
 
+.. note:: Distribution archives (zip/tar.gz) and test artifacts are not published to Maven Central.
+
 Documentation
 +++++++++++++++
 
