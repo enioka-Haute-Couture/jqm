@@ -3,12 +3,23 @@ package com.enioka.jqm.runner.api;
 import java.util.Map;
 
 import com.enioka.jqm.jdbc.DbConn;
+import org.slf4j.event.Level;
 
 /**
  * A way to communicate between a runner and its caller.
  */
 public interface JobRunnerCallback
 {
+    /**
+     * Log level for exceptions thrown by jobs.
+     *
+     * @return configured level, INFO by default
+     */
+    public default Level getJobExceptionLogLevel()
+    {
+        return Level.INFO;
+    }
+
     /**
      * Should the runner use JMX?
      *

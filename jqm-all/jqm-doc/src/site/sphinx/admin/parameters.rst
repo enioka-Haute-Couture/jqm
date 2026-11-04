@@ -84,6 +84,9 @@ have to be altered directly inside the database with your tool of choice or thro
 |                         | if 'both', one log file will be created per launch PLUS                                             |               |         |              |
 |                         | one common file concatenating all these files                                                       |               |         |              |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
+| jobExceptionLogLevel    | Log level for exceptions thrown by jobs and caught by the engine. Read before each job runs.        | INFO          | No      | Yes          |
+|                         | Can be TRACE, DEBUG, INFO, WARN or ERROR (case-insensitive)                                         |               |         |              |
++-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | internalPollingPeriodMs | Period in ms for checking stop orders. Also period at which the "I'm a alive" signal is sent.       | 60000         | Yes     | No           |
 |                         | Also used for checking and applying  parameter modifications (new queues, global prm changes...)    |               |         |              |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+

@@ -10,6 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * All tests directly concerning payload logging.
@@ -309,4 +316,56 @@ public class LogTest extends JqmBaseTest
         }
     }
 
+    @Test
+    public void testJobExceptionLogLevel()
+    {
+        CreationTools.createJobDef(null, true, "pyl.SecThrow", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "CrashingJob", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        cnx.commit();
+        addAndStartEngine();
+
+        Logger logger = (Logger) LoggerFactory.getLogger("com.enioka.jqm");
+        Level originalLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.list = new CopyOnWriteArrayList<>();
+        appender.start();
+        logger.addAppender(appender);
+        logger.setLevel(Level.TRACE);
+        try
+        {
+            String[] configuredLevels = { null, "TRACE", "DEBUG", "INFO", "WARN", "ERROR", " warn ", "invalid", "   " };
+            Level[] expectedLevels = { Level.INFO, Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.WARN, Level.INFO,
+                    Level.INFO };
+            for (int i = 0; i < configuredLevels.length; i++)
+            {
+                if (i > 0)
+                {
+                    GlobalParameter.setParameter(cnx, "jobExceptionLogLevel", configuredLevels[i]);
+                    cnx.commit();
+                }
+                appender.list.clear();
+                long id = jqmClient.newJobRequest("CrashingJob", "TestUser").enqueue();
+                TestHelpers.waitFor(i + 1, 20000, cnx);
+                Assert.assertEquals(i + 1, TestHelpers.getNonOkCount(cnx));
+                Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+
+                String message = "Job instance " + id + " has crashed. Exception was:";
+                ILoggingEvent event = appender.list.stream().filter(e -> message.equals(e.getFormattedMessage())).findFirst()
+                        .orElseThrow(() -> new AssertionError("Missing job exception log: " + message));
+                Assert.assertEquals(expectedLevels[i], event.getLevel());
+                Assert.assertNotNull(event.getThrowableProxy());
+                if (i >= 7)
+                {
+                    Assert.assertTrue(appender.list.stream().anyMatch(
+                            e -> e.getLevel() == Level.WARN && e.getFormattedMessage().startsWith("Invalid jobExceptionLogLevel")));
+                }
+            }
+        }
+        finally
+        {
+            logger.setLevel(originalLevel);
+            logger.detachAppender(appender);
+            appender.stop();
+        }
+    }
 }

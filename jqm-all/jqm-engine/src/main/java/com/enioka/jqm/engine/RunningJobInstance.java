@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.client.api.JqmDbClientFactory;
@@ -50,6 +51,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     private Boolean isDone = false;
     private Calendar endDate = null;
     private JobRunner jr = null;
+    private Level jobExceptionLogLevel = Level.INFO;
 
     /**
      * Constructor for JI coming from queue pollers.
@@ -145,6 +147,16 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         // Block needing the database
         try (DbConn cnx = Helpers.getNewDbSession())
         {
+            String configuredLevel = GlobalParameter.getParameter(cnx, "jobExceptionLogLevel", "INFO");
+            try
+            {
+                jobExceptionLogLevel = Level.valueOf(configuredLevel.trim().toUpperCase(Locale.ROOT));
+            }
+            catch (IllegalArgumentException e)
+            {
+                jqmlogger.warn("Invalid jobExceptionLogLevel '{}'. Using INFO.", configuredLevel);
+            }
+
             // Cache heating & co, loader-specific.
             tracker.initialize(cnx);
 
@@ -182,7 +194,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         }
         catch (Exception e)
         {
-            jqmlogger.info("Job instance " + this.ji.getId() + " has crashed. Exception was:", e);
+            jqmlogger.atLevel(jobExceptionLogLevel).setCause(e).log("Job instance " + this.ji.getId() + " has crashed. Exception was:");
             resultStatus = State.CRASHED;
         }
 
@@ -202,6 +214,12 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     ///////////////////////////////////////////////////////////////////////////
     // Deal with end of run - persist
     ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public Level getJobExceptionLogLevel()
+    {
+        return jobExceptionLogLevel;
+    }
 
     /**
      * For external payloads. This is used to force the end of run.
