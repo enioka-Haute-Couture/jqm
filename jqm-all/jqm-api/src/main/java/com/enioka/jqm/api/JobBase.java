@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 /**
  * @deprecated Use {@link JobManager} instead.
  */
+@Deprecated
 public class JobBase
 {
     // Public because JPMS jobs need injection here.

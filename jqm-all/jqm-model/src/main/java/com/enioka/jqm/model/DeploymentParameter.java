@@ -69,6 +69,7 @@ public class DeploymentParameter
      * @deprecated was never used
      * @return the class ID (deprecated)
      */
+    @Deprecated
     public long getClassId()
     {
         return classId;
@@ -79,6 +80,7 @@ public class DeploymentParameter
      * @param classId
      *            the class ID to set (deprecated)
      */
+    @Deprecated
     public void setClassId(final long classId)
     {
         this.classId = classId;

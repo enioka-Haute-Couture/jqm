@@ -221,6 +221,7 @@ public interface JqmClient
      * @param jobId
      *            the id of the job instance to resume
      */
+    @Deprecated
     void resumeJob(long jobId);
 
     /**
