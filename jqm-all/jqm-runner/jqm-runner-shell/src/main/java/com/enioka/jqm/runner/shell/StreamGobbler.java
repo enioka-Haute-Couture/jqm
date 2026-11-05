@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.concurrent.Semaphore;
 
@@ -26,6 +27,7 @@ class StreamGobbler extends Thread
     Semaphore end = new Semaphore(0);
     String threadName;
     boolean useCommonLogFile = false;
+    PrintStream console = null;
 
     private StreamGobbler(InputStream is, OutputStream os)
     {
@@ -44,13 +46,18 @@ class StreamGobbler extends Thread
         return res;
     }
 
-    static Waiter plumbProcess(Process p, OutputStream out, OutputStream err, boolean alsoWriteToCommonLog)
+    static Waiter plumbProcess(Process p, OutputStream out, OutputStream err, boolean alsoWriteToCommonLog, boolean alsoWriteToConsole)
     {
         Waiter res = new Waiter();
         res.stdout = new StreamGobbler(p.getInputStream(), out);
         res.stdout.useCommonLogFile = alsoWriteToCommonLog;
         res.stderr = new StreamGobbler(p.getErrorStream(), err);
         res.stderr.useCommonLogFile = alsoWriteToCommonLog;
+        if (alsoWriteToConsole)
+        {
+            res.stdout.console = System.out;
+            res.stderr.console = System.err;
+        }
         res.stdout.start();
         res.stderr.start();
         return res;
@@ -73,6 +80,10 @@ class StreamGobbler extends Thread
                 {
                     alljobslogger.info(line);
                 }
+                if (console != null)
+                {
+                    console.println(line);
+                }
             }
 
             // Remember to flush before exiting!
@@ -85,6 +96,10 @@ class StreamGobbler extends Thread
         }
         finally
         {
+            if (console != null)
+            {
+                console.flush();
+            }
             end.release();
         }
     }

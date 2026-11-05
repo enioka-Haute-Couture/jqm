@@ -150,14 +150,15 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         try
         {
             Waiter w;
-            if (logFilePerLaunch.equals("true") || logFilePerLaunch.equals("both"))
+            if (logFilePerLaunch.equals("true") || logFilePerLaunch.equals("both") || logFilePerLaunch.equals("console"))
             {
                 String fileName = StringUtils.leftPad("" + this.ji.getId(), 10, "0");
                 File stdoutFileLog = new File(logFileDirectory, fileName + ".stdout.log");
                 FileOutputStream stdoutFileOutputStream = new FileOutputStream(stdoutFileLog);
                 File stderrFileLog = new File(logFileDirectory, fileName + ".stderr.log");
                 FileOutputStream stderrFileOutputStream = new FileOutputStream(stderrFileLog);
-                w = StreamGobbler.plumbProcess(process, stdoutFileOutputStream, stderrFileOutputStream, logFilePerLaunch.equals("both"));
+                w = StreamGobbler.plumbProcess(process, stdoutFileOutputStream, stderrFileOutputStream, logFilePerLaunch.equals("both"),
+                        logFilePerLaunch.equals("console"));
             }
             else
             {

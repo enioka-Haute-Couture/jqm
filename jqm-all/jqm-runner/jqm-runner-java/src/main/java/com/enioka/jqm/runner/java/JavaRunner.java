@@ -75,7 +75,7 @@ public class JavaRunner implements JobRunner
 
             String gp1 = GlobalParameter.getParameter(cnx, "logFilePerLaunch", "true");
 
-            if ("true".equals(gp1) || "both".equals(gp1))
+            if ("true".equals(gp1) || "both".equals(gp1) || "console".equals(gp1))
             {
                 oneLogPerLaunch = true;
 
@@ -83,11 +83,11 @@ public class JavaRunner implements JobRunner
                 String logDirectory = FilenameUtils.concat(rootPath, "logs");
 
                 // Override stdout so that we are able to capture it inside log files.
-                MultiplexPrintStream s = new MultiplexPrintStream(System.out, logDirectory, "both".equals(gp1));
+                MultiplexPrintStream s = new MultiplexPrintStream(System.out, logDirectory, "both".equals(gp1), "console".equals(gp1));
                 System.setOut(s);
 
                 // Same with stderr
-                s = new MultiplexPrintStream(System.err, logDirectory, "both".equals(gp1));
+                s = new MultiplexPrintStream(System.err, logDirectory, "both".equals(gp1), "console".equals(gp1));
                 System.setErr(s);
 
                 // Redirect JQM's own logging to the multiplexing stdout.

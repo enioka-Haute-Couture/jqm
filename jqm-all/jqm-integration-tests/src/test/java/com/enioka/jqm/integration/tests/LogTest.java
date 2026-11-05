@@ -317,6 +317,89 @@ public class LogTest extends JqmBaseTest
     }
 
     @Test
+    public void testConsoleLogJavaRunner() throws Exception
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(stdout, true, StandardCharsets.UTF_8);
+        System.setOut(newOut);
+
+        try
+        {
+            GlobalParameter.setParameter(cnx, "logFilePerLaunch", "console");
+            CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                    "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+            cnx.commit();
+            long id = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
+            addAndStartEngine();
+            TestHelpers.waitFor(1, 20000, cnx);
+
+            Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+            Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+            String fileName = StringUtils.leftPad("" + id, 10, "0") + ".stdout.log";
+            String content = Files.readString(Path.of("./target/server/logs", fileName), StandardCharsets.UTF_8);
+            String payloadLine = content.lines().filter(line -> line.startsWith("Date GENERATED: ")).findFirst()
+                    .orElseThrow(() -> new AssertionError("Missing payload output in job log"));
+            Assert.assertEquals(1, stdout.toString(StandardCharsets.UTF_8).lines().filter(payloadLine::equals).count());
+        }
+        finally
+        {
+            System.setErr(errIni);
+            System.setOut(outIni);
+            newOut.close();
+        }
+    }
+
+    @Test
+    public void testConsoleLogForShellJob() throws Exception
+    {
+        PrintStream outIni = System.out;
+        PrintStream errIni = System.err;
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+        PrintStream newOut = new PrintStream(stdout, true, StandardCharsets.UTF_8);
+        PrintStream newErr = new PrintStream(stderr, true, StandardCharsets.UTF_8);
+        System.setOut(newOut);
+        System.setErr(newErr);
+
+        try
+        {
+            final String logTextStdout = "log into stdout";
+            final String logTextStderr = "log into stderr";
+            GlobalParameter.setParameter(cnx, "logFilePerLaunch", "console");
+            String command = "echo " + logTextStdout + ";echo " + logTextStderr + " >&2";
+            CreationTools.createJobDef("test job", true, "none", new HashMap<>(), command, TestHelpers.qNormal, 0, "TestApp1", null,
+                    "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, JobDef.PathType.DEFAULTSHELLCOMMAND);
+            cnx.commit();
+            long id = jqmClient.newJobRequest("TestApp1", "TestUser").enqueue();
+            addAndStartEngine();
+            TestHelpers.waitFor(1, 20000, cnx);
+
+            Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+            Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+            String logName = StringUtils.leftPad("" + id, 10, "0");
+            Path stdoutFile = Path.of("./target/server/logs", logName + ".stdout.log");
+            Path stderrFile = Path.of("./target/server/logs", logName + ".stderr.log");
+            Assert.assertEquals(logTextStdout, Files.readString(stdoutFile, StandardCharsets.UTF_8).trim());
+            Assert.assertEquals(logTextStderr, Files.readString(stderrFile, StandardCharsets.UTF_8).trim());
+            String outContent = stdout.toString(StandardCharsets.UTF_8);
+            String errContent = stderr.toString(StandardCharsets.UTF_8);
+            Assert.assertEquals(1, outContent.lines().filter(logTextStdout::equals).count());
+            Assert.assertEquals(1, errContent.lines().filter(logTextStderr::equals).count());
+            Assert.assertFalse(outContent.lines().anyMatch(logTextStderr::equals));
+            Assert.assertFalse(errContent.lines().anyMatch(logTextStdout::equals));
+        }
+        finally
+        {
+            System.setErr(errIni);
+            System.setOut(outIni);
+            newOut.close();
+            newErr.close();
+        }
+    }
+
+    @Test
     public void testJobExceptionLogLevel()
     {
         CreationTools.createJobDef(null, true, "pyl.SecThrow", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,

@@ -50,14 +50,16 @@ class MultiplexPrintStream extends PrintStream
 
     private BufferedWriter original = null;
     private boolean useCommonLogFile = false;
+    private boolean useConsole = false;
 
     private Map<String, BufferedWriter> writers = new HashMap<>();
     public String rootLogDir;
 
-    MultiplexPrintStream(OutputStream out, String rootLogDir, boolean alsoWriteToCommonLog)
+    MultiplexPrintStream(OutputStream out, String rootLogDir, boolean alsoWriteToCommonLog, boolean alsoWriteToConsole)
     {
         super(out);
         this.useCommonLogFile = alsoWriteToCommonLog;
+        this.useConsole = alsoWriteToConsole;
         this.original = new BufferedWriter(new OutputStreamWriter(out));
         this.rootLogDir = rootLogDir;
 
@@ -143,6 +145,15 @@ class MultiplexPrintStream extends PrintStream
             }
             textOut.flush();
 
+            if (useConsole && textOut != original)
+            {
+                this.original.write(s);
+                if (newLine)
+                {
+                    this.original.newLine();
+                }
+                this.original.flush();
+            }
             if (useCommonLogFile && textOut != original)
             {
                 alljobslogger.info(s + (newLine ? ls : ""));
