@@ -80,9 +80,10 @@ have to be altered directly inside the database with your tool of choice or thro
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | defaultConnection       | the JNDI alias returned by the engine API getDefaultConnection method.                              | jdbc/jqm      | No      | No           |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| logFilePerLaunch        | if 'true', one log file will be created per launch. If 'false', job stdout/stderr is lost.          | true          | Yes     | No           |
+| logFilePerLaunch        | if 'true', stdout/stderr log files will be created per launch. If 'false', output goes to the node. | true          | Yes     | No           |
 |                         | if 'both', one log file will be created per launch PLUS                                             |               |         |              |
 |                         | one common file concatenating all these files                                                       |               |         |              |
+|                         | if 'console', per-launch files PLUS stdout/stderr in the node output, without the common file.      |               |         |              |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | jobExceptionLogLevel    | Log level for exceptions thrown by jobs and caught by the engine. Read before each job runs.        | INFO          | No      | Yes          |
 |                         | Can be TRACE, DEBUG, INFO, WARN or ERROR (case-insensitive)                                         |               |         |              |
