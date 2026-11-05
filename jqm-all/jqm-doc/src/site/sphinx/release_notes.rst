@@ -1,6 +1,24 @@
 Release notes
 ######################
 
+3.5.3
+*************
+
+Small maintenance release with new minor features after the v3.5.2 release.
+
+Upgrade notes
+++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
++++++++++++++++++++++++++++
+
+* Engine: added new mode ``console`` to logFilePerLaunch to log job output to the console and per file simultaneously
+* Engine: added jobExceptionLogLevel parameter to change the log level of exception thrown in jobs (default is INFO)
+
 3.5.2
 *************
 
