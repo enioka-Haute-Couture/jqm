@@ -1,5 +1,8 @@
 package com.enioka.jqm.integration.tests;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import com.enioka.jqm.runner.java.PayloadClassLoader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,9 +10,9 @@ import org.junit.Test;
 public class PayloadClassLoaderExclusionTest
 {
     /**
-     * A parent CL that DOES resolve classes (by delegating to the system CL), but is a DISTINCT object from the system CL.
-     * This lets us tell apart "loaded through normal parent delegation" from "loaded through the excludedClassPrefixes shortcut",
-     * because in the latter case PayloadClassLoader explicitly calls getSystemClassLoader().
+     * A parent CL that DOES resolve classes (by delegating to the system CL), but is a DISTINCT object from the system CL. This lets us
+     * tell apart "loaded through normal parent delegation" from "loaded through the excludedClassPrefixes shortcut", because in the latter
+     * case PayloadClassLoader explicitly calls getSystemClassLoader().
      */
     private static class DelegatingParent extends ClassLoader
     {
@@ -40,8 +43,8 @@ public class PayloadClassLoaderExclusionTest
     }
 
     /**
-     * Control case: without any exclusion, the SAME class is resolved through normal parent delegation.
-     * It must therefore be loaded by the parent (the system CL here), reaching the code path the exclusion would bypass.
+     * Control case: without any exclusion, the SAME class is resolved through normal parent delegation. It must therefore be loaded by the
+     * parent (the system CL here), reaching the code path the exclusion would bypass.
      */
     @Test
     public void testWithoutExclusionGoesThroughParent() throws Exception
@@ -58,8 +61,8 @@ public class PayloadClassLoaderExclusionTest
     }
 
     /**
-     * A class NOT matching any prefix must NOT be sent to the system CL by the shortcut: it must follow normal delegation.
-     * We prove this with a denying parent: the non-excluded class then ends up unresolvable.
+     * A class NOT matching any prefix must NOT be sent to the system CL by the shortcut: it must follow normal delegation. We prove this
+     * with a denying parent: the non-excluded class then ends up unresolvable.
      */
     @Test(expected = ClassNotFoundException.class)
     public void testNonMatchingPrefixDoesNotUseShortcut() throws Exception
@@ -131,6 +134,19 @@ public class PayloadClassLoaderExclusionTest
 
             // No active prefix -> denying parent -> ClassNotFoundException.
             cl.loadClass(TEST_CLASS);
+        }
+    }
+
+    @Test
+    public void testExclusionThroughChildLoader() throws Exception
+    {
+        Class<?> fixture = ClassLoader.getSystemClassLoader().loadClass(TEST_CLASS);
+        try (PayloadClassLoader payload = new PayloadClassLoader(null); URLClassLoader child = new URLClassLoader(new URL[0], payload))
+        {
+            payload.setExcludedClassPrefixes("com.enioka.jqm.integration.tests.");
+
+            Assert.assertSame(fixture, payload.loadClass(TEST_CLASS));
+            Assert.assertSame(fixture, child.loadClass(TEST_CLASS));
         }
     }
 }

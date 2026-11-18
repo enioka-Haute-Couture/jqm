@@ -282,6 +282,20 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
     }
 
     @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    {
+        synchronized (getClassLoadingLock(name))
+        {
+            var loadedClass = loadClass(name);
+            if (resolve)
+            {
+                resolveClass(loadedClass);
+            }
+            return loadedClass;
+        }
+    }
+
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
         synchronized (getClassLoadingLock(name))
@@ -366,9 +380,7 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
             return;
         }
 
-        Arrays.stream(excludedClassPrefixes.split(","))
-                .map(String::trim)
-                .filter(prefix -> !prefix.isEmpty())
+        Arrays.stream(excludedClassPrefixes.split(",")).map(String::trim).filter(prefix -> !prefix.isEmpty())
                 .forEach(this.excludedClassPrefixes::add);
     }
 
