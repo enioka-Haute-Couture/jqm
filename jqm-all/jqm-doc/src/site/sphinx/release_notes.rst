@@ -1,6 +1,23 @@
 Release notes
 ######################
 
+3.5.4
+*************
+
+Maintenance release with one minor fix after the v3.5.3 release.
+
+Upgrade notes
+++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
++++++++++++++++++++++++++++
+
+* Engine: added missing loadClass(name, resolve) override that was causing issues when loading certain classes matching excluded class prefixes
+
 3.5.3
 *************
 
