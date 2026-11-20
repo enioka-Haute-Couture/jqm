@@ -10,11 +10,51 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <url>http://jqm.readthedocs.org</url>
 
-    <properties>
-        <skipPublishing>true</skipPublishing>
-    </properties>
-
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${plugin.shade.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.google.guava:guava</include>
+                                    <include>commons-io:commons-io</include>
+                                    <include>commons-lang:commons-lang</include>
+                                    <include>it.sauronsoftware.cron4j:cron4j</include>
+                                    <include>javax.inject:javax.inject</include>
+                                    <include>javax.xml:*</include>
+                                    <include>org.apache.commons:commons-lang3</include>
+                                    <include>org.apache.maven*:*</include>
+                                    <include>org.codehaus.plexus:*</include>
+                                    <include>org.jboss.shrinkwrap.resolver:*</include>
+                                    <include>org.jsoup:jsoup</include>
+                                    <include>org.sonatype.plexus:*</include>
+                                    <include>${project.groupId}:jqm-engine</include>
+                                    <include>${project.groupId}:jqm-engine-api</include>
+                                    <include>${project.groupId}:jqm-jndi-context</include>
+                                    <include>${project.groupId}:jqm-model-repository</include>
+                                    <include>${project.groupId}:jqm-providers</include>
+                                    <include>${project.groupId}:jqm-runner-api</include>
+                                    <include>${project.groupId}:jqm-runner-java</include>
+                                    <include>${project.groupId}:jqm-runner-java-api</include>
+                                </includes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
@@ -44,6 +84,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

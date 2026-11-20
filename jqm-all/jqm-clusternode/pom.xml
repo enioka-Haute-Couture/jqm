@@ -11,6 +11,10 @@
     <url>http://jqm.readthedocs.org</url>
     <description>A library containing a distribution of the JQM engine able to work in a standard JQM cluster (with WS, flow redirection...)</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <dependencies>
         <!-- Main goal: encapsulate the engine. -->
         <dependency>

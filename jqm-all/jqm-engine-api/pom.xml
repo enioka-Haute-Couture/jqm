@@ -11,6 +11,10 @@
     <url>http://jqm.readthedocs.org</url>
     <description>A library containing the internal API to access the JQM engine lifecycle. Not a public API.</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.enioka.jqm</groupId>

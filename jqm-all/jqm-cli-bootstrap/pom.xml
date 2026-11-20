@@ -9,5 +9,9 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <url>http://jqm.readthedocs.org</url>
+
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
     <description>An internal API to allow communication between the host and CLI service</description>
 </project>
