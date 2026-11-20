@@ -1,6 +1,25 @@
 Release notes
 ######################
 
+3.5.5
+*************
+
+Maintenance release with packaging changes after the v3.5.4 release.
+
+Upgrade notes
+++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+.. note:: Do not worry if fewer JQM artifacts are visible on Maven Central, internal artifacts are now bundled into ``jqm-tst`` and the public API artifacts.
+
+Minor changes
++++++++++++++++++++++++++++
+
+* Packaging: reduce the Maven Central release footprint by bundling internal artifacts in uber JARs.
+
 3.5.4
 *************
 
