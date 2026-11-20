@@ -9,6 +9,10 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <url>http://jqm.readthedocs.org</url>
+
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
     <description>A library containing most JQM CLI commands as well as the CLI parser</description>
 
     <dependencies>

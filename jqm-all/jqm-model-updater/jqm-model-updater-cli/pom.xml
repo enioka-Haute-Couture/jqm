@@ -12,6 +12,10 @@
     <url>http://jqm.readthedocs.org</url>
     <description>Manages the JQM database schema</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

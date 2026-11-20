@@ -13,6 +13,7 @@
     <description>A minimal PKI to provide basic X509 services</description>
 
     <properties>
+        <skipPublishing>true</skipPublishing>
     </properties>
 
     <dependencies>

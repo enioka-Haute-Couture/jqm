@@ -11,6 +11,10 @@
     <url>http://jqm.readthedocs.org</url>
     <description>A library containing a basic JNDI context. Not intended for use outside JQM.</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.enioka.jqm</groupId>

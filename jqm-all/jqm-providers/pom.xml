@@ -12,6 +12,7 @@
     <url>http://jqm.readthedocs.org</url>
 
     <properties>
+        <skipPublishing>true</skipPublishing>
     </properties>
 
     <dependencies>

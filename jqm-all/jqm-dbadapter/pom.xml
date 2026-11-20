@@ -12,6 +12,10 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <url>http://jqm.readthedocs.org</url>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <modules>
         <module>jqm-dbadapter-db2</module>
         <module>jqm-dbadapter-hsql</module>

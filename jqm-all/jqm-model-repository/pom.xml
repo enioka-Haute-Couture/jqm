@@ -12,6 +12,10 @@
     <url>http://jqm.readthedocs.org</url>
     <description>The JQM data access layer</description>
 
+    <properties>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
     <dependencies>
        <dependency>
             <groupId>com.enioka.jqm</groupId>
